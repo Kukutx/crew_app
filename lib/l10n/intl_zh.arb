@@ -1,0 +1,10 @@
+{
+  "@@locale": "zh",
+  "settings": "设置",
+  "dark_mode": "深色模式",
+  "language": "语言",
+  "about": "关于",
+  "chinese": "中文",
+  "english": "English",
+  "about_content": "这是一个通用设置页示例"
+}

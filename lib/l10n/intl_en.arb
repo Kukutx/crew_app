@@ -1,0 +1,10 @@
+{
+  "@@locale": "en",
+  "settings": "Settings",
+  "dark_mode": "Dark Mode",
+  "language": "Language",
+  "about": "About",
+  "chinese": "Chinese",
+  "english": "English",
+  "about_content": "This is a universal settings page example."
+}

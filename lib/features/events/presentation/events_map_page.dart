@@ -1,5 +1,6 @@
 import 'package:crew_app/core/state/events_providers.dart';
 import 'package:crew_app/core/state/location_provider.dart';
+import 'package:crew_app/features/events/data/event_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +43,153 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
+  final List<String> _allCategories = [
+    '派对',
+    '运动',
+    '音乐',
+    '户外',
+    '学习',
+    '展览',
+    '美食'
+  ];
+
+  EventFilter _filter = const EventFilter();
+
+  Future<EventFilter?> showEventFilterSheet(
+    BuildContext context,
+    EventFilter initial,
+    List<String> allCategories,
+  ) {
+    return showModalBottomSheet<EventFilter>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (ctx) {
+        var temp = initial;
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 8,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 距离
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('距离'),
+                      Text('${temp.distanceKm.toStringAsFixed(0)} km'),
+                    ],
+                  ),
+                  Slider(
+                    value: temp.distanceKm,
+                    min: 1,
+                    max: 50,
+                    divisions: 49,
+                    label: '${temp.distanceKm.toStringAsFixed(0)} km',
+                    onChanged: (v) => setState(() {
+                      temp = temp.copyWith(distanceKm: v);
+                    }),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // 日期
+                  Align(alignment: Alignment.centerLeft, child: Text('日期')),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final e in [
+                        ('today', '今天'),
+                        ('week', '本周'),
+                        ('month', '本月'),
+                        ('any', '不限'),
+                      ])
+                        ChoiceChip(
+                          label: Text(e.$2),
+                          selected: temp.date == e.$1,
+                          onSelected: (_) => setState(() {
+                            temp = temp.copyWith(date: e.$1);
+                          }),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // 仅免费
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('仅显示免费活动'),
+                    value: temp.onlyFree,
+                    onChanged: (v) => setState(() {
+                      temp = temp.copyWith(onlyFree: v);
+                    }),
+                  ),
+
+                  // 分类
+                  Align(alignment: Alignment.centerLeft, child: Text('分类')),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final c in allCategories)
+                        FilterChip(
+                          label: Text(c),
+                          selected: temp.categories.contains(c),
+                          onSelected: (v) => setState(() {
+                            final next = {...temp.categories};
+                            v ? next.add(c) : next.remove(c);
+                            temp = temp.copyWith(categories: next);
+                          }),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 操作
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () => setState(() {
+                          temp = const EventFilter();
+                        }),
+                        child: const Text('重置'),
+                      ),
+                      const Spacer(),
+                      OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, null),
+                        child: const Text('取消'),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(ctx, temp),
+                        child: const Text('应用'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  final _tags = ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
+  final _selected = <String>{};
+  // 放在 StatefulWidget 里，替换你的 AppBar 段
+  final String avatarUrl = 'https://i.pravatar.cc/100?img=3';
+
   @override
   Widget build(BuildContext context) {
     final events = ref.watch(eventsProvider);
@@ -51,31 +199,102 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return Scaffold(
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
       appBar: AppBar(
-        backgroundColor: Colors.black.withValues(alpha: 0), // 半透明背景
-        elevation: 0,
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: '搜索活动',
-              filled: true,
-              fillColor: Colors.white.withValues(alpha: 0.9),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
-                borderSide: BorderSide.none,
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  toolbarHeight: 0,
+  bottom: PreferredSize(
+    preferredSize: const Size.fromHeight(110),
+    child: SafeArea(
+      bottom: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 搜索框（左“定位”只是图标，右头像可点）
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+            child: Material(
+              elevation: 3, // 若仍显压，可改为 3
+              borderRadius: BorderRadius.circular(24),
+              clipBehavior: Clip.antiAlias,
+              surfaceTintColor: Colors.transparent,
+              child: TextField(
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: '搜索活动',
+                  filled: true,
+                  fillColor: Colors.white,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: const Icon(Icons.my_location_outlined), // 纯图标
+                  suffixIconConstraints:
+                      const BoxConstraints(minWidth: 44, minHeight: 44),
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: InkResponse(
+                      radius: 22,
+                      onTap: () {
+                        // TODO: 个人页 / 侧边栏
+                      },
+                      child: CircleAvatar(
+                        radius: 16,
+                        foregroundImage: NetworkImage(avatarUrl),
+                        child: const Icon(Icons.person, size: 18),
+                      ),
+                    ),
+                  ),
+                ),
+                onSubmitted: (kw) => debugPrint('搜索: $kw'),
               ),
-              prefixIcon: const Icon(Icons.search),
             ),
-            onSubmitted: (keyword) {
-              // TODO: 调用搜索逻辑
-              debugPrint('搜索: $keyword');
-            },
           ),
-        ),
+
+          const SizedBox(height: 8), // 关键：给阴影留“呼吸”空间
+
+          // 标签 + 筛选
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: [
+                ..._tags.map((t) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        visualDensity: VisualDensity.compact, //视觉更轻：给 ChoiceChip 用 visualDensity: VisualDensity.compact（可选）。
+                        label: Text(t),
+                        selected: _selected.contains(t),
+                        onSelected: (v) => setState(() {
+                          v ? _selected.add(t) : _selected.remove(t);
+                          // TODO: 触发筛选逻辑
+                        }),
+                      ),
+                    )),
+                const SizedBox(width: 4),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.tune),
+                  label: const Text('筛选'),
+                  onPressed: () async {
+                    final res = await showEventFilterSheet(
+                        context, _filter, _allCategories);
+                    if (res != null) {
+                      setState(() => _filter = res);
+                      // TODO: 刷新地图/列表
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
+    ),
+  ),
+),
       body: FlutterMap(
         mapController: _map,
         options: MapOptions(
@@ -121,6 +340,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final loc = ref.read(userLocationProvider).valueOrNull;

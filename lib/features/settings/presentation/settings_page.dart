@@ -1,4 +1,4 @@
-import 'package:crew_app/l10n/app_localizations.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {

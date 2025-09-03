@@ -1,7 +1,7 @@
-import 'package:crew_app/Pages/events_map_page.dart';
+import 'package:crew_app/features/events/presentation/events_map_page.dart';
 import 'package:flutter/material.dart';
-import '../Models/event.dart';
-import '../Services/api_service.dart';
+import '../data/event.dart';
+import '../../../core/network/api_service.dart';
 
 class SearchEventsPage extends StatefulWidget {
   const SearchEventsPage({super.key});

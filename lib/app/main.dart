@@ -1,28 +1,38 @@
 import 'dart:ui';
 
-import 'package:crew_app/Pages/events_list_page.dart';
-import 'package:crew_app/Pages/login_page.dart';
-import 'package:crew_app/Pages/settings_page.dart';
-import 'package:crew_app/Test%20Pages/test_evente_detail_page.dart';
-import 'package:crew_app/Test%20Pages/test_home_page.dart';
-import 'package:crew_app/Test%20Pages/test_profile_page.dart';
-import 'package:crew_app/firebase_options.dart';
-import 'package:crew_app/l10n/app_localizations.dart';
+import 'package:crew_app/app/app.dart';
+import 'package:crew_app/shared/widgets/test_home_page.dart';
+import 'package:crew_app/core/network/auth/firebase_auth_service.dart';
+import 'package:crew_app/features/events/presentation/events_list_page.dart';
+import 'package:crew_app/features/events/presentation/events_map_page.dart';
+import 'package:crew_app/features/auth/presentation/login_page.dart';
+import 'package:crew_app/features/settings/presentation/settings_page.dart';
+import 'package:crew_app/playground/test_evente_detail_page.dart';
+import 'package:crew_app/playground/test_home_page.dart';
+import 'package:crew_app/playground/test_profile_page.dart';
+import 'package:crew_app/playground/test_staggered_grid.dart';
+import 'package:crew_app/core/config/firebase_options.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import './Services/api_service.dart';
+import '../core/network/api_service.dart';
 
+late final FirebaseAuthService auth;   // 全局或用 DI 框架注入
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
      options: DefaultFirebaseOptions.currentPlatform,
   ); 
 
-  final prefs = await SharedPreferences.getInstance();
+  auth = FirebaseAuthService();
 
-    // 获取持久化语言设置
+  // 本地化存储
+  final prefs = await SharedPreferences.getInstance(); 
+
+  // 获取持久化语言设置
   String? langCode = prefs.getString('language');
   Locale locale;
   if (langCode != null) {
@@ -32,13 +42,16 @@ void main() async {
     locale = PlatformDispatcher.instance.locale;
   }
 
+  // runApp(MyApp(locale: locale, darkMode: darkMode));  // 无flutter_riverpod访问地图
+  // runApp(TuotuoApp());
+  // runApp(TuotuoApp2());
+  // runApp(TuotuoApp3());
+  // runApp(TestStaggeredGrid());
+
   // 获取持久化主题设置
   bool darkMode = prefs.getBool('darkMode') ?? false;
 
-  // runApp(MyApp(locale: locale, darkMode: darkMode));
-  // runApp(TuotuoApp());
-  // runApp(TuotuoApp2());
-  runApp(TuotuoApp3());
+  runApp(ProviderScope(child: MyApp(locale: locale, darkMode: darkMode)));
 }
 
 class MyApp extends StatefulWidget {
@@ -89,15 +102,18 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: _darkMode ? ThemeMode.dark : ThemeMode.light,
+      initialRoute: FirebaseAuthService().currentUser == null ? '/' : kHomeRoute,    // 测试登录
       routes: {
-        '/': (context) => EventsListPage(api: api),
+        kHomeRoute: (_) => const TestHomePage(), // TODO: 替换为你的首页
+        // '/': (context) => const LoginPage(),
+        '/': (context) => App(),
         '/login': (context) => LoginPage (), 
         '/settings': (context) => SettingsPage(
         locale: _locale,
         darkMode: _darkMode,
         onLocaleChanged: updateLocale,
         onDarkModeChanged: updateDarkMode,
-      ), 
+        ), 
       },
     );
   }

@@ -1,8 +1,21 @@
+import 'package:crew_app/core/config/environment.dart';
 import 'package:dio/dio.dart';
-import '../Models/event.dart';
+import '../../features/events/data/event.dart';
 
 class ApiService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: "https://crew-api-u8vu.onrender.com/api", ));
+  late final Dio _dio;
+
+  ApiService() {
+  _dio = Dio(BaseOptions(baseUrl: Env.current));
+    
+  // 简单的日志拦截器
+  _dio.interceptors.add(LogInterceptor(
+      request: true,
+      responseBody: true,
+      error: true,
+    ));
+  }
+
 
   Future<List<Event>> getEvents() async {
     final response = await _dio.get("/events");

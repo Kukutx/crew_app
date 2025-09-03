@@ -1,5 +1,5 @@
-import 'package:crew_app/Models/event.dart';
-import 'package:crew_app/Pages/events_map_page.dart';
+import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/events_map_page.dart';
 import 'package:flutter/material.dart';
 
 class EventDetailPage extends StatelessWidget {

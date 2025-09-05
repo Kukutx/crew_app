@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fa;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -8,133 +9,219 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _schoolController = TextEditingController();
-  final TextEditingController _industryController = TextEditingController();
-  final TextEditingController _searchController = TextEditingController();
+  fa.User? _user;
 
-  // 标签列表
-  final List<String> _tags = [
-    'Museums',
-    'Art Galleries',
-    'Coffee',
-    'Hiking',
-    'Nightlife',
-    'Board Games',
-    'Live Music',
-    'Adventure Sports',
-    'Technology',
-    'Photography',
-    'Travel',
-    'Food',
-    'Fitness',
-    'Movies',
-    'Books',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _user = fa.FirebaseAuth.instance.currentUser;
+    // 监听用户状态变化
+    fa.FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (mounted) {
+        setState(() {
+          _user = user;
+        });
+      }
+    });
+  }
 
-  // 选中的标签
-  final Set<String> _selectedTags = {};
-
-  // 是否学生认证
-  bool _isStudentVerified = false;
-
-  // 搜索过滤
-  String _searchText = '';
+  Future<void> _signOut() async {
+    await fa.FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('已退出登录')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // 过滤后的标签
-    final filteredTags = _tags
-        .where((tag) =>
-            tag.toLowerCase().contains(_searchText.toLowerCase()))
-        .toList();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('个人资料')),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: ListView(
+        children: [
+          _ProfileHeader(user: _user),
+          const SizedBox(height: 16),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.favorite_border),
+                  title: const Text('我的收藏'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/favorites'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: const Text('浏览记录'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/history'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.verified_user),
+                  title: const Text('认证和偏好'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/preferences'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.settings_outlined),
+                  title: const Text('设置'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/settings'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: isDark ? theme.colorScheme.surface : Colors.white,
+        padding: const EdgeInsets.all(16),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 只有登录状态下显示退出按钮
+              if (_user != null)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: theme.colorScheme.error,
+                      foregroundColor: theme.colorScheme.onError,
+                    ),
+                    onPressed: _signOut,
+                    child: const Text('退出登录'),
+                  ),
+                ),
+              if (_user != null) const SizedBox(height: 16),
+              Text(
+                '版本 1.0.0',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// class _ProfileHeader extends StatelessWidget {
+//   const _ProfileHeader();
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       child: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Row(
+//           children: [
+//             const CircleAvatar(
+//               radius: 32,
+//               child: Icon(Icons.person, size: 32),
+//             ),
+//             const SizedBox(width: 16),
+//             Expanded(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text('未登录', style: Theme.of(context).textTheme.titleMedium),
+//                   const SizedBox(height: 4),
+//                   Text(
+//                     '点击上方按钮登录体验更多功能',
+//                     style: Theme.of(context).textTheme.bodySmall,
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             FilledButton(
+//               onPressed: () {
+//                 Navigator.pushNamed(context, '/login');
+//               },
+//               child: const Text('登录'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+class _ProfileHeader extends StatelessWidget {
+  final fa.User? user;
+  const _ProfileHeader({this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (user == null) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const CircleAvatar(radius: 32, child: Icon(Icons.person, size: 32)),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('未登录', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text('点击上方按钮登录体验更多功能',
+                        style: theme.textTheme.bodySmall),
+                  ],
+                ),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/login');
+                },
+                child: const Text('登录'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
           children: [
-            // 学校/行业输入
-            TextField(
-              controller: _schoolController,
-              decoration: InputDecoration(
-                labelText: '学校 (选填)',
-                suffixIcon: _isStudentVerified
-                    ? const Icon(Icons.verified, color: Colors.blue)
-                    : null,
+            CircleAvatar(
+              radius: 32,
+              backgroundImage: user!.photoURL != null
+                  ? NetworkImage(user!.photoURL!)
+                  : null,
+              child: user!.photoURL == null
+                  ? const Icon(Icons.person, size: 32)
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(user!.displayName ?? '用户',
+                      style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(user!.email ?? '未绑定邮箱',
+                      style: theme.textTheme.bodySmall),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _industryController,
-              decoration: const InputDecoration(
-                labelText: '行业 (选填)',
-              ),
-            ),
-            const SizedBox(height: 24),
-            
-            // 兴趣标签
-            const Text(
-              '兴趣标签',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-
-                     // 搜索框
-            TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: '搜索标签...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchText = value;
-                });
-              },
-            ),
-            const SizedBox(height: 12),
-
-             Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: filteredTags.map((tag) {
-                final isSelected = _selectedTags.contains(tag);
-                return ChoiceChip(
-                  label: Text(tag),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                  setState(() {
-                      if (selected) {
-                        if (_selectedTags.length < 5) {
-                          _selectedTags.add(tag);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('最多只能选择 5 个兴趣标签喵~'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      } else {
-                        _selectedTags.remove(tag);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 24),
-
-            // 模拟学生认证按钮
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _isStudentVerified = true;
-                });
-              },
-              child: const Text('学生认证'),
             ),
           ],
         ),

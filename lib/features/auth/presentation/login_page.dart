@@ -7,7 +7,7 @@ import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
 
 /// 登录完成后跳转的路由名
-const String kHomeRoute = '/home';
+const String kHomeRoute = '/';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

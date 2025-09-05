@@ -55,40 +55,7 @@ class GridHomePage extends StatelessWidget {
       ),
     );
   }
-
-/* 点击未加载的card弹出弹窗会卡死 */
-//   void _showImage(BuildContext context, String url, int index) {
-//     showDialog(
-//       context: context,
-//       builder: (_) => Dialog(
-//         insetPadding: const EdgeInsets.all(16),
-//         child: Stack(
-//           children: [
-//             InteractiveViewer(
-//               maxScale: 5,
-//               child: Hero(
-//                 tag: 'img_$index',
-//                 child: CachedNetworkImage(
-//                   imageUrl: '$url?w=1600',
-//                   fit: BoxFit.contain,
-//                 ),
-//               ),
-//             ),
-//             Positioned(
-//               top: 8,
-//               right: 8,
-//               child: IconButton(
-//                 onPressed: () => Navigator.of(context).pop(),
-//                 icon: const Icon(Icons.close),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
+  
   void _showImage(BuildContext context, String url, int index) {
     showDialog(
       context: context,

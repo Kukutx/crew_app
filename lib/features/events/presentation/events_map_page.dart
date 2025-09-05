@@ -1,6 +1,7 @@
 import 'package:crew_app/core/state/events_providers.dart';
 import 'package:crew_app/core/state/location_provider.dart';
 import 'package:crew_app/features/events/data/event_filter.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,22 @@ class EventsMapPage extends ConsumerStatefulWidget {
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool movedToSelected = false;
+
+  final List<String> _allCategories = [
+    '派对',
+    '运动',
+    '音乐',
+    '户外',
+    '学习',
+    '展览',
+    '美食'
+  ];
+
+  final _tags = ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
+  final _selected = <String>{};
+  // 放在 StatefulWidget 里，替换你的 AppBar 段
+  final String avatarUrl = 'https://i.pravatar.cc/100?img=3';
+  EventFilter _filter = const EventFilter();
 
   @override
   void didChangeDependencies() {
@@ -43,17 +60,292 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
-  final List<String> _allCategories = [
-    '派对',
-    '运动',
-    '音乐',
-    '户外',
-    '学习',
-    '展览',
-    '美食'
-  ];
+  fa.User? _user;
 
-  EventFilter _filter = const EventFilter();
+  @override
+  void initState() {
+    super.initState();
+    _user = fa.FirebaseAuth.instance.currentUser;
+    // 监听用户状态变化
+    fa.FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (mounted) {
+        setState(() {
+          _user = user;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final events = ref.watch(eventsProvider);
+    final userLoc = ref.watch(userLocationProvider).valueOrNull;
+    final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
+
+    return Scaffold(
+      extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        toolbarHeight: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(110),
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 搜索框（左“定位”只是图标，右头像可点）
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                  child: Material(
+                    elevation: 3, // 若仍显压，可改为 3
+                    borderRadius: BorderRadius.circular(24),
+                    clipBehavior: Clip.antiAlias,
+                    surfaceTintColor: Colors.transparent,
+                    child: TextField(
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        hintText: '搜索活动',
+                        filled: true,
+                        fillColor: Colors.white,
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon:
+                            const Icon(Icons.my_location_outlined), // 纯图标
+                        suffixIconConstraints:
+                            const BoxConstraints(minWidth: 44, minHeight: 44),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: InkResponse(
+                            radius: 22,
+                            onTap: _onAvatarTap,
+                            child: _buildAvatar(),
+                          ),
+                        ),
+                      ),
+                      onSubmitted: (kw) => debugPrint('搜索: $kw'),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8), // 关键：给阴影留“呼吸”空间
+
+                // 标签 + 筛选
+                SizedBox(
+                  height: 44,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      ..._tags.map((t) => Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              visualDensity: VisualDensity
+                                  .compact, //视觉更轻：给 ChoiceChip 用 visualDensity: VisualDensity.compact（可选）。
+                              label: Text(t),
+                              selected: _selected.contains(t),
+                              onSelected: (v) => setState(() {
+                                v ? _selected.add(t) : _selected.remove(t);
+                                // TODO: 触发筛选逻辑
+                              }),
+                            ),
+                          )),
+                      const SizedBox(width: 4),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.tune),
+                        label: const Text('筛选'),
+                        onPressed: () async {
+                          final res = await showEventFilterSheet(
+                              context, _filter, _allCategories);
+                          if (res != null) {
+                            setState(() => _filter = res);
+                            // TODO: 刷新地图/列表
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: FlutterMap(
+        mapController: _map,
+        options: MapOptions(
+          initialCenter: startCenter,
+          initialZoom: 5,
+          onLongPress: _onMapLongPress,
+          onMapReady: () {
+            if (!movedToSelected && userLoc != null) {
+              _map.move(userLoc, 14);
+            }
+          },
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            userAgentPackageName: 'com.example.crewapp',
+          ),
+          events.when(
+            loading: () => const MarkerLayer(markers: []),
+            error: (_, __) => const MarkerLayer(markers: []),
+            data: (list) => MarkerLayer(
+              markers: [
+                ...list.map((ev) => Marker(
+                      width: 80,
+                      height: 80,
+                      point: LatLng(ev.latitude, ev.longitude),
+                      child: GestureDetector(
+                        onTap: () => _showEventDetails(ev),
+                        child: const Icon(Icons.location_pin,
+                            color: Colors.red, size: 40),
+                      ),
+                    )),
+                if (userLoc != null)
+                  Marker(
+                    point: userLoc,
+                    width: 80,
+                    height: 80,
+                    child: const Icon(Icons.location_pin,
+                        color: Colors.blue, size: 40),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          final loc = ref.read(userLocationProvider).valueOrNull;
+          if (loc != null) {
+            _map.move(loc, 14);
+            _map.rotate(0);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('无法获取定位')),
+            );
+          }
+        },
+        child: const Icon(Icons.my_location),
+      ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    final photo = _user?.photoURL;
+    if (photo != null && photo.isNotEmpty) {
+      return CircleAvatar(
+        radius: 16,
+        backgroundColor: Colors.grey.shade200,
+        foregroundImage: NetworkImage(photo),
+        onForegroundImageError: (_, __) {}, // 加载失败 → 会显示 child
+        child: const Icon(Icons.person, size: 18),
+      );
+    }
+    return const CircleAvatar(
+      radius: 16,
+      child: Icon(Icons.person, size: 18),
+    );
+  }
+
+  void _onAvatarTap() {
+    if (_user != null) {
+      Navigator.pushNamed(context, '/profile');
+    } else {
+      Navigator.pushNamed(context, '/login');
+    }
+  }
+
+  Future<void> _onMapLongPress(TapPosition _, LatLng latlng) async {
+    final data = await _showCreateEventDialog(latlng);
+    if (data == null || data.title.trim().isEmpty) return;
+
+    // 反地理编码（容错）
+    String locationName = 'Unknown';
+    try {
+      final list =
+          await placemarkFromCoordinates(latlng.latitude, latlng.longitude)
+              .timeout(const Duration(seconds: 5));
+      if (list.isNotEmpty) {
+        locationName = list.first.locality ??
+            list.first.subAdministrativeArea ??
+            'Unknown';
+      }
+    } catch (_) {}
+
+    await ref.read(eventsProvider.notifier).createEvent(
+          title: data.title.trim(),
+          description: data.description.trim(),
+          pos: latlng,
+          locationName: locationName,
+        );
+  }
+
+  Future<EventData?> _showCreateEventDialog(LatLng pos) {
+    final title = TextEditingController();
+    final desc = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showDialog<EventData>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Create Event'),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    '位置: ${pos.latitude.toStringAsFixed(6)}, '
+                    '${pos.longitude.toStringAsFixed(6)}',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: title,
+                  decoration: const InputDecoration(
+                      labelText: '活动标题', border: OutlineInputBorder()),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? '请输入活动标题' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: desc,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                      labelText: '活动描述', border: OutlineInputBorder()),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (formKey.currentState?.validate() != true) return;
+              Navigator.pop(context,
+                  EventData(title: title.text, description: desc.text));
+            },
+            child: const Text('创建'),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<EventFilter?> showEventFilterSheet(
     BuildContext context,
@@ -182,260 +474,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           },
         );
       },
-    );
-  }
-
-  final _tags = ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
-  final _selected = <String>{};
-  // 放在 StatefulWidget 里，替换你的 AppBar 段
-  final String avatarUrl = 'https://i.pravatar.cc/100?img=3';
-
-  @override
-  Widget build(BuildContext context) {
-    final events = ref.watch(eventsProvider);
-    final userLoc = ref.watch(userLocationProvider).valueOrNull;
-    final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
-
-    return Scaffold(
-      extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
-      appBar: AppBar(
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  toolbarHeight: 0,
-  bottom: PreferredSize(
-    preferredSize: const Size.fromHeight(110),
-    child: SafeArea(
-      bottom: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 搜索框（左“定位”只是图标，右头像可点）
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-            child: Material(
-              elevation: 3, // 若仍显压，可改为 3
-              borderRadius: BorderRadius.circular(24),
-              clipBehavior: Clip.antiAlias,
-              surfaceTintColor: Colors.transparent,
-              child: TextField(
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                  hintText: '搜索活动',
-                  filled: true,
-                  fillColor: Colors.white,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon: const Icon(Icons.my_location_outlined), // 纯图标
-                  suffixIconConstraints:
-                      const BoxConstraints(minWidth: 44, minHeight: 44),
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: InkResponse(
-                      radius: 22,
-                      onTap: () {
-                        // TODO: 个人页 / 侧边栏
-                      },
-                      child: CircleAvatar(
-                        radius: 16,
-                        foregroundImage: NetworkImage(avatarUrl),
-                        child: const Icon(Icons.person, size: 18),
-                      ),
-                    ),
-                  ),
-                ),
-                onSubmitted: (kw) => debugPrint('搜索: $kw'),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8), // 关键：给阴影留“呼吸”空间
-
-          // 标签 + 筛选
-          SizedBox(
-            height: 44,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              children: [
-                ..._tags.map((t) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        visualDensity: VisualDensity.compact, //视觉更轻：给 ChoiceChip 用 visualDensity: VisualDensity.compact（可选）。
-                        label: Text(t),
-                        selected: _selected.contains(t),
-                        onSelected: (v) => setState(() {
-                          v ? _selected.add(t) : _selected.remove(t);
-                          // TODO: 触发筛选逻辑
-                        }),
-                      ),
-                    )),
-                const SizedBox(width: 4),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.tune),
-                  label: const Text('筛选'),
-                  onPressed: () async {
-                    final res = await showEventFilterSheet(
-                        context, _filter, _allCategories);
-                    if (res != null) {
-                      setState(() => _filter = res);
-                      // TODO: 刷新地图/列表
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-  ),
-),
-      body: FlutterMap(
-        mapController: _map,
-        options: MapOptions(
-          initialCenter: startCenter,
-          initialZoom: 5,
-          onLongPress: _onMapLongPress,
-          onMapReady: () {
-            if (!movedToSelected && userLoc != null) {
-              _map.move(userLoc, 14);
-            }
-          },
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-            userAgentPackageName: 'com.example.crewapp',
-          ),
-          events.when(
-            loading: () => const MarkerLayer(markers: []),
-            error: (_, __) => const MarkerLayer(markers: []),
-            data: (list) => MarkerLayer(
-              markers: [
-                ...list.map((ev) => Marker(
-                      width: 80,
-                      height: 80,
-                      point: LatLng(ev.latitude, ev.longitude),
-                      child: GestureDetector(
-                        onTap: () => _showEventDetails(ev),
-                        child: const Icon(Icons.location_pin,
-                            color: Colors.red, size: 40),
-                      ),
-                    )),
-                if (userLoc != null)
-                  Marker(
-                    point: userLoc,
-                    width: 80,
-                    height: 80,
-                    child: const Icon(Icons.location_pin,
-                        color: Colors.blue, size: 40),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final loc = ref.read(userLocationProvider).valueOrNull;
-          if (loc != null) {
-            _map.move(loc, 14);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('无法获取定位')),
-            );
-          }
-        },
-        child: const Icon(Icons.my_location),
-      ),
-    );
-  }
-
-  Future<void> _onMapLongPress(TapPosition _, LatLng latlng) async {
-    final data = await _showCreateEventDialog(latlng);
-    if (data == null || data.title.trim().isEmpty) return;
-
-    // 反地理编码（容错）
-    String locationName = 'Unknown';
-    try {
-      final list =
-          await placemarkFromCoordinates(latlng.latitude, latlng.longitude)
-              .timeout(const Duration(seconds: 5));
-      if (list.isNotEmpty) {
-        locationName = list.first.locality ??
-            list.first.subAdministrativeArea ??
-            'Unknown';
-      }
-    } catch (_) {}
-
-    await ref.read(eventsProvider.notifier).createEvent(
-          title: data.title.trim(),
-          description: data.description.trim(),
-          pos: latlng,
-          locationName: locationName,
-        );
-  }
-
-  Future<EventData?> _showCreateEventDialog(LatLng pos) {
-    final title = TextEditingController();
-    final desc = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    return showDialog<EventData>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Create Event'),
-        content: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    '位置: ${pos.latitude.toStringAsFixed(6)}, '
-                    '${pos.longitude.toStringAsFixed(6)}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: title,
-                  decoration: const InputDecoration(
-                      labelText: '活动标题', border: OutlineInputBorder()),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? '请输入活动标题' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: desc,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                      labelText: '活动描述', border: OutlineInputBorder()),
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() != true) return;
-              Navigator.pop(context,
-                  EventData(title: title.text, description: desc.text));
-            },
-            child: const Text('创建'),
-          ),
-        ],
-      ),
     );
   }
 

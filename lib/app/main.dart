@@ -1,7 +1,8 @@
 import 'dart:ui';
 
 import 'package:crew_app/app/app.dart';
-import 'package:crew_app/shared/widgets/test_home_page.dart';
+import 'package:crew_app/features/profile/presentation/preferences_page.dart';
+import 'package:crew_app/playground/deprecated/test_home_page.dart';
 import 'package:crew_app/core/network/auth/firebase_auth_service.dart';
 import 'package:crew_app/features/events/presentation/events_list_page.dart';
 import 'package:crew_app/features/events/presentation/events_map_page.dart';
@@ -102,9 +103,9 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: _darkMode ? ThemeMode.dark : ThemeMode.light,
-      initialRoute: FirebaseAuthService().currentUser == null ? '/' : kHomeRoute,    // 测试登录
+      // initialRoute: FirebaseAuthService().currentUser == null ? '/' : kHomeRoute,    // 测试登录
       routes: {
-        kHomeRoute: (_) => const TestHomePage(), // TODO: 替换为你的首页
+        // kHomeRoute: (_) => const TestHomePage(), // TODO: 替换为你的首页
         // '/': (context) => const LoginPage(),
         '/': (context) => App(),
         '/login': (context) => LoginPage (), 
@@ -114,6 +115,7 @@ class _MyAppState extends State<MyApp> {
         onLocaleChanged: updateLocale,
         onDarkModeChanged: updateDarkMode,
         ), 
+        '/preferences': (context) => PreferencesPage (), 
       },
     );
   }

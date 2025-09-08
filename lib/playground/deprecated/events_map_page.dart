@@ -332,3 +332,67 @@
 // urlTemplate: 'https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png',
 
 // */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 古早的地图详情页 */
+
+
+  // void _showEventDetails(Event ev) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     useSafeArea: true,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     builder: (_) => Padding(
+  //       padding: const EdgeInsets.all(16),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(ev.title,
+  //               style:
+  //                   const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+  //           const SizedBox(height: 8),
+  //           Text(ev.description),
+  //           const SizedBox(height: 12),
+  //           Row(children: [
+  //             const Icon(Icons.location_on, color: Colors.grey),
+  //             const SizedBox(width: 6),
+  //             Text('Lat: ${ev.latitude}, Lng: ${ev.longitude}'),
+  //           ]),
+  //           const SizedBox(height: 16),
+  //           ElevatedButton.icon(
+  //             onPressed: () {
+  //               Navigator.pop(context);
+  //               ScaffoldMessenger.of(context).showSnackBar(
+  //                 const SnackBar(content: Text('报名功能还没做 😅')),
+  //               );
+  //             },
+  //             icon: const Icon(Icons.check_circle),
+  //             label: const Text('报名参加'),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }

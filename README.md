@@ -7,11 +7,8 @@
 lib/
 ├── app/                  # 应用入口与全局配置
 │   ├── main.dart         # 应用入口
-│   ├── bootstrap.dart    # 初始化（runZonedGuarded、依赖注入、Firebase）
-│   ├── router/           # go_router 路由与守卫
-│   ├── theme/            # ThemeData、colors、text styles
-│   ├── localization/     # AppLocalizations（gen-l10n）
-│   └── di/               # 全局 Provider / Riverpod 配置
+│   ├── app.dart          # 初始化（runZonedGuarded、依赖注入、Firebase）
+│   └── router/           # go_router 路由与守卫
 │
 ├── core/                 # 跨 feature 的底层能力（无业务逻辑）
 │   ├── config/           # 环境变量、常量、app info
@@ -24,7 +21,6 @@ lib/
 ├── shared/               # 可复用 UI 和基础包裹
 │   ├── widgets/          # Button、AppScaffold 等组件
 │   ├── extensions/       # Dart 扩展方法
-│   └── mixins/           # 可复用 mixin
 │
 ├── features/             # 业务功能模块（按功能域划分）
 │   ├── home/

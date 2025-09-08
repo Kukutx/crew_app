@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:crew_app/app/app.dart';
+import 'package:crew_app/features/events/presentation/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/preferences_page.dart';
 import 'package:crew_app/playground/deprecated/test_home_page.dart';
 import 'package:crew_app/core/network/auth/firebase_auth_service.dart';
@@ -43,14 +44,15 @@ Future<void> main() async {
     locale = PlatformDispatcher.instance.locale;
   }
 
+  // 获取持久化主题设置
+  bool darkMode = prefs.getBool('darkMode') ?? false;
+
   // runApp(MyApp(locale: locale, darkMode: darkMode));  // 无flutter_riverpod访问地图
   // runApp(TuotuoApp());
   // runApp(TuotuoApp2());
   // runApp(TuotuoApp3());
   // runApp(TestStaggeredGrid());
 
-  // 获取持久化主题设置
-  bool darkMode = prefs.getBool('darkMode') ?? false;
 
   runApp(ProviderScope(child: MyApp(locale: locale, darkMode: darkMode)));
 }
@@ -116,6 +118,7 @@ class _MyAppState extends State<MyApp> {
         onDarkModeChanged: updateDarkMode,
         ), 
         '/preferences': (context) => PreferencesPage (), 
+        '/user_event': (context) => UserEventsPage (), 
       },
     );
   }

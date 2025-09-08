@@ -44,8 +44,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
   Widget build(BuildContext context) {
     // 过滤后的标签
     final filteredTags = _tags
-        .where((tag) =>
-            tag.toLowerCase().contains(_searchText.toLowerCase()))
+        .where((tag) => tag.toLowerCase().contains(_searchText.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -72,7 +71,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // 兴趣标签
             const Text(
               '兴趣标签',
@@ -80,7 +79,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
             ),
             const SizedBox(height: 8),
 
-                     // 搜索框
+            // 搜索框
             TextField(
               controller: _searchController,
               decoration: const InputDecoration(
@@ -96,7 +95,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
             ),
             const SizedBox(height: 12),
 
-             Wrap(
+            Wrap(
               spacing: 8,
               runSpacing: 8,
               children: filteredTags.map((tag) {
@@ -105,7 +104,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   label: Text(tag),
                   selected: isSelected,
                   onSelected: (selected) {
-                  setState(() {
+                    setState(() {
                       if (selected) {
                         if (_selectedTags.length < 5) {
                           _selectedTags.add(tag);

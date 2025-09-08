@@ -1,6 +1,7 @@
-import 'package:crew_app/core/state/events_providers.dart';
-import 'package:crew_app/core/state/location_provider.dart';
+import 'package:crew_app/core/state/event_map_state/events_providers.dart';
+import 'package:crew_app/core/state/event_map_state/location_provider.dart';
 import 'package:crew_app/features/events/data/event_filter.dart';
+import 'package:crew_app/features/events/presentation/events_detail_page.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -38,27 +39,27 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final String avatarUrl = 'https://i.pravatar.cc/100?img=3';
   EventFilter _filter = const EventFilter();
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
 
-    // 监听定位或选中事件变化后移动镜头（只移一次选中事件）
-    ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (_, next) {
-      final loc = next.valueOrNull;
-      if (!movedToSelected && widget.selectedEvent == null && loc != null) {
-        _map.move(loc, 14);
-      }
-    });
+  //   // 监听定位或选中事件变化后移动镜头（只移一次选中事件）
+  //   ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (_, next) {
+  //     final loc = next.valueOrNull;
+  //     if (!movedToSelected && widget.selectedEvent == null && loc != null) {
+  //       _map.move(loc, 14);
+  //     }
+  //   });
 
-    if (widget.selectedEvent != null && !movedToSelected) {
-      final ev = widget.selectedEvent!;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _map.move(LatLng(ev.latitude, ev.longitude), 15);
-        _showEventDetails(ev);
-        movedToSelected = true;
-      });
-    }
-  }
+  //   if (widget.selectedEvent != null && !movedToSelected) {
+  //     final ev = widget.selectedEvent!;
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       _map.move(LatLng(ev.latitude, ev.longitude), 15);
+  //       _showEventCard(ev);
+  //       movedToSelected = true;
+  //     });
+  //   }
+  // }
 
   fa.User? _user;
 
@@ -204,7 +205,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                       height: 80,
                       point: LatLng(ev.latitude, ev.longitude),
                       child: GestureDetector(
-                        onTap: () => _showEventDetails(ev),
+                        onTap: () => _showEventCard(ev),
                         child: const Icon(Icons.location_pin,
                             color: Colors.red, size: 40),
                       ),
@@ -240,31 +241,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  Widget _buildAvatar() {
-    final photo = _user?.photoURL;
-    if (photo != null && photo.isNotEmpty) {
-      return CircleAvatar(
-        radius: 16,
-        backgroundColor: Colors.grey.shade200,
-        foregroundImage: NetworkImage(photo),
-        onForegroundImageError: (_, __) {}, // 加载失败 → 会显示 child
-        child: const Icon(Icons.person, size: 18),
-      );
-    }
-    return const CircleAvatar(
-      radius: 16,
-      child: Icon(Icons.person, size: 18),
-    );
-  }
-
-  void _onAvatarTap() {
-    if (_user != null) {
-      Navigator.pushNamed(context, '/profile');
-    } else {
-      Navigator.pushNamed(context, '/login');
-    }
-  }
-
+  /// 地图创建事件
   Future<void> _onMapLongPress(TapPosition _, LatLng latlng) async {
     final data = await _showCreateEventDialog(latlng);
     if (data == null || data.title.trim().isEmpty) return;
@@ -347,6 +324,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
+  /// 地图搜索事件
   Future<EventFilter?> showEventFilterSheet(
     BuildContext context,
     EventFilter initial,
@@ -477,45 +455,201 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  void _showEventDetails(Event ev) {
+  Widget _buildAvatar() {
+    final photo = _user?.photoURL;
+    if (photo != null && photo.isNotEmpty) {
+      return CircleAvatar(
+        radius: 16,
+        backgroundColor: Colors.grey.shade200,
+        foregroundImage: NetworkImage(photo),
+        onForegroundImageError: (_, __) {}, // 加载失败 → 会显示 child
+        child: const Icon(Icons.person, size: 18),
+      );
+    }
+    return const CircleAvatar(
+      radius: 16,
+      child: Icon(Icons.person, size: 18),
+    );
+  }
+
+  void _onAvatarTap() {
+    if (_user != null) {
+      Navigator.pushNamed(context, '/profile');
+    } else {
+      Navigator.pushNamed(context, '/login');
+    }
+  }
+
+
+  /// 地图报名页事件
+  void _showEventCard(Event ev) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(ev.title,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(ev.description),
-            const SizedBox(height: 12),
-            Row(children: [
-              const Icon(Icons.location_on, color: Colors.grey),
-              const SizedBox(width: 6),
-              Text('Lat: ${ev.latitude}, Lng: ${ev.longitude}'),
-            ]),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('报名功能还没做 😅')),
-                );
-              },
-              icon: const Icon(Icons.check_circle),
-              label: const Text('报名参加'),
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.28,
+        minChildSize: 0.2,
+        maxChildSize: 0.7,
+        expand: false,
+        builder: (_, controller) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              boxShadow: [BoxShadow(blurRadius: 12, color: Colors.black26)],
             ),
-          ],
-        ),
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+            child: ListView(
+              controller: controller,
+              children: [
+                // 卡片
+                Material(
+                  color: Colors.white,
+                  elevation: 0,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 缩略图
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: 96,
+                          height: 96,
+                          child: /*ev.coverAsset != null
+                            ? Image.asset(ev.coverAsset!, fit: BoxFit.cover)
+                            : */
+                              Image.asset('assets/mock/event_1.jpg',
+                                  fit: BoxFit.cover),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // 文本区
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 标题 + 收藏
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context); // 先收起
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              EventDetailPage(event: ev),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      ev.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  icon: const Icon(Icons.favorite_border),
+                                  onPressed: () {}, // TODO: 收藏
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.place,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    ev.location,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style:
+                                        const TextStyle(color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                _smallChip('正在报名中'),
+                                const SizedBox(width: 6),
+                                const Icon(Icons.groups,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 2),
+                                Text(/*ev.peopleText ?? */ '3-5人',
+                                    style:
+                                        const TextStyle(color: Colors.black54)),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.event,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(/*ev.timeText ??*/ '12月28日 8:00',
+                                    style:
+                                        const TextStyle(color: Colors.black87)),
+                                const Spacer(),
+                                SizedBox(
+                                  height: 36,
+                                  child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      // TODO: 报名逻辑
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('报名功能未实现')),
+                                      );
+                                    },
+                                    child: const Text('立即报名'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
+
+  Widget _smallChip(String text) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFE7C2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(text,
+            style: const TextStyle(fontSize: 11, color: Colors.black87)),
+      );
 }

@@ -61,22 +61,21 @@ class SearchEventsPageState extends State<SearchEventsPage> {
                     : ListView.builder(
                         itemCount: results.length,
                         itemBuilder: (context, index) {
-                          final ev = results[index];
+                          final event = results[index];
                           return ListTile(
-                            title: Text(ev.title),
-                            subtitle: Text(ev.description),
+                            title: Text(event.title),
+                            subtitle: Text(event.description),
                             trailing: Icon(Icons.location_on),
-
-                             onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EventsMapPage(
-              selectedEvent: ev, // 把选中的活动传过去
-            ),
-          ),
-        );
-      },
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EventsMapPage(
+                                    selectedEvent: event, // 把选中的活动传过去
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),

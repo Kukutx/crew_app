@@ -55,6 +55,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/favorites'),
                 ),
+                ListTile(
+                  leading: const Icon(Icons.event_busy),
+                  title: const Text('我的活动'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/user_event'),
+                ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.history),
@@ -117,46 +123,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-// class _ProfileHeader extends StatelessWidget {
-//   const _ProfileHeader();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       child: Padding(
-//         padding: const EdgeInsets.all(16),
-//         child: Row(
-//           children: [
-//             const CircleAvatar(
-//               radius: 32,
-//               child: Icon(Icons.person, size: 32),
-//             ),
-//             const SizedBox(width: 16),
-//             Expanded(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text('未登录', style: Theme.of(context).textTheme.titleMedium),
-//                   const SizedBox(height: 4),
-//                   Text(
-//                     '点击上方按钮登录体验更多功能',
-//                     style: Theme.of(context).textTheme.bodySmall,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             FilledButton(
-//               onPressed: () {
-//                 Navigator.pushNamed(context, '/login');
-//               },
-//               child: const Text('登录'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 class _ProfileHeader extends StatelessWidget {
   final fa.User? user;
   const _ProfileHeader({this.user});

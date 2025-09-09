@@ -1,8 +1,7 @@
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/events_map_page.dart';
+import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -39,11 +38,19 @@ class _EventDetailPageState extends State<EventDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined, color: Colors.black),
-            onPressed: () {}, // TODO: 分享
+            onPressed: () {
+              // TODO: 分享逻辑
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('收藏逻辑 待开发')));
+            },
           ),
           IconButton(
             icon: const Icon(Icons.favorite_border, color: Colors.black),
-            onPressed: () {}, // TODO: 收藏
+            onPressed: () {
+              // TODO: 收藏逻辑
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('收藏逻辑 待开发')));
+            },
           ),
           const SizedBox(width: 8),
         ],
@@ -56,7 +63,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
             children: [
               IconButton(
                 icon: const Icon(Icons.favorite_border),
-                onPressed: () {},
+                onPressed: () {
+                  // TODO: 收藏逻辑
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(const SnackBar(content: Text('收藏逻辑 待开发')));
+                },
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -65,6 +76,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       // TODO: 报名逻辑
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('报名逻辑 待开发')));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
@@ -88,33 +101,33 @@ class _EventDetailPageState extends State<EventDetailPage> {
             // 顶部图片轮播 + 状态胶囊
             Stack(
               children: [
-AspectRatio(
-  aspectRatio: 16 / 9,
-  child: PageView.builder(
-    controller: _pageCtrl,
-    itemCount: _assets.length,
-    onPageChanged: (i) => setState(() => _page = i),
-    itemBuilder: (_, i) => CachedNetworkImage(
-      imageUrl: _assets[i], // 改成网络图片 URL
-      width: double.infinity,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      errorWidget: (context, url, error) => const Center(
-        child: Icon(Icons.error),
-      ),
-    ),
-  ),
-),
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: PageView.builder(
+                    controller: _pageCtrl,
+                    itemCount: _assets.length,
+                    onPageChanged: (i) => setState(() => _page = i),
+                    itemBuilder: (_, i) => CachedNetworkImage(
+                      imageUrl: _assets[i], // 改成网络图片 URL
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => const Center(
+                        child: Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                ),
                 Positioned(
                   top: 12,
                   left: 0,
                   right: 0,
                   child: Center(
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.orange,
                         borderRadius: BorderRadius.circular(12),
@@ -192,7 +205,8 @@ AspectRatio(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('活动详情',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   _detailRow(Icons.calendar_today, '活动时间', '待公布'),
                   _detailRow(Icons.people, '参与人数', '待公布'),
@@ -206,7 +220,8 @@ AspectRatio(
                         ),
                       );
                     },
-                    child: _detailRow(Icons.place, '集合地点', widget.event.location),
+                    child:
+                        _detailRow(Icons.place, '集合地点', widget.event.location),
                   ),
                 ],
               ),

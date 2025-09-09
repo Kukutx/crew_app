@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/presentation/events_map_page.dart';
+import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:flutter/material.dart';
 import '../data/event.dart';
 import '../../../core/network/api_service.dart';

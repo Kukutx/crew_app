@@ -2,11 +2,14 @@ import 'dart:ui';
 
 import 'package:crew_app/app/app.dart';
 import 'package:crew_app/features/events/presentation/user_events_page.dart';
+import 'package:crew_app/features/profile/presentation/favorites_page.dart';
+import 'package:crew_app/features/profile/presentation/history_page.dart';
 import 'package:crew_app/features/profile/presentation/preferences_page.dart';
+import 'package:crew_app/features/profile/presentation/profile_page.dart';
 import 'package:crew_app/playground/deprecated/test_home_page.dart';
 import 'package:crew_app/core/network/auth/firebase_auth_service.dart';
 import 'package:crew_app/features/events/presentation/events_list_page.dart';
-import 'package:crew_app/features/events/presentation/events_map_page.dart';
+import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/settings/presentation/settings_page.dart';
 import 'package:crew_app/playground/test_evente_detail_page.dart';
@@ -21,18 +24,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/network/api_service.dart';
 
-late final FirebaseAuthService auth;   // 全局或用 DI 框架注入
+late final FirebaseAuthService auth; // 全局或用 DI 框架注入
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-     options: DefaultFirebaseOptions.currentPlatform,
-  ); 
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   auth = FirebaseAuthService();
 
   // 本地化存储
-  final prefs = await SharedPreferences.getInstance(); 
+  final prefs = await SharedPreferences.getInstance();
 
   // 获取持久化语言设置
   String? langCode = prefs.getString('language');
@@ -52,7 +55,6 @@ Future<void> main() async {
   // runApp(TuotuoApp2());
   // runApp(TuotuoApp3());
   // runApp(TestStaggeredGrid());
-
 
   runApp(ProviderScope(child: MyApp(locale: locale, darkMode: darkMode)));
 }
@@ -110,17 +112,19 @@ class _MyAppState extends State<MyApp> {
         // kHomeRoute: (_) => const TestHomePage(), // TODO: 替换为你的首页
         // '/': (context) => const LoginPage(),
         '/': (context) => App(),
-        '/login': (context) => LoginPage (), 
+        '/login': (context) => LoginPage(),
         '/settings': (context) => SettingsPage(
-        locale: _locale,
-        darkMode: _darkMode,
-        onLocaleChanged: updateLocale,
-        onDarkModeChanged: updateDarkMode,
-        ), 
-        '/preferences': (context) => PreferencesPage (), 
-        '/user_event': (context) => UserEventsPage (), 
+              locale: _locale,
+              darkMode: _darkMode,
+              onLocaleChanged: updateLocale,
+              onDarkModeChanged: updateDarkMode,
+            ),
+        '/preferences': (context) => PreferencesPage(),
+        '/user_event': (context) => UserEventsPage(),
+        '/profile': (context) => ProfilePage(),
+        '/history': (context) => HistoryPage(),
+        '/favorites': (context) => FavoritesPage(),
       },
     );
   }
 }
-

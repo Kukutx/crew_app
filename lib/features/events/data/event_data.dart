@@ -2,6 +2,7 @@
 class EventData {
   final String title;
   final String description;
+  final String locationName;
   
-  EventData({required this.title, required this.description});
+  EventData( {required this.title, required this.description,required this.locationName});
 }

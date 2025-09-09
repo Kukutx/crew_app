@@ -13,13 +13,13 @@ class TuotuoApp2 extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFA000)),
         fontFamily: 'sans-serif',
       ),
-      home: const ProfilePage(),
+      home: const TestProfilePage(),
     );
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class TestProfilePage extends StatelessWidget {
+  const TestProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {

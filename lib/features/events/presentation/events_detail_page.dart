@@ -1,6 +1,8 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/events_map_page.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -16,9 +18,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   // 本地占位图（先用你的素材图，后续可换成 event.imageUrls）
   final List<String> _assets = const [
-    'assets/mock/event_1.jpg',
-    'assets/mock/event_2.jpg',
-    'assets/mock/event_3.jpg',
+    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
+    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
+    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
   ];
 
   @override
@@ -86,19 +88,25 @@ class _EventDetailPageState extends State<EventDetailPage> {
             // 顶部图片轮播 + 状态胶囊
             Stack(
               children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: PageView.builder(
-                    controller: _pageCtrl,
-                    itemCount: _assets.length,
-                    onPageChanged: (i) => setState(() => _page = i),
-                    itemBuilder: (_, i) => Image.asset(
-                      _assets[i],
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+AspectRatio(
+  aspectRatio: 16 / 9,
+  child: PageView.builder(
+    controller: _pageCtrl,
+    itemCount: _assets.length,
+    onPageChanged: (i) => setState(() => _page = i),
+    itemBuilder: (_, i) => CachedNetworkImage(
+      imageUrl: _assets[i], // 改成网络图片 URL
+      width: double.infinity,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      errorWidget: (context, url, error) => const Center(
+        child: Icon(Icons.error),
+      ),
+    ),
+  ),
+),
                 Positioned(
                   top: 12,
                   left: 0,

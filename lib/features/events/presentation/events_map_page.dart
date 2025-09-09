@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import '../data/event.dart';
 import '../data/event_data.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -38,29 +39,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   // 放在 StatefulWidget 里，替换你的 AppBar 段
   final String avatarUrl = 'https://i.pravatar.cc/100?img=3';
   EventFilter _filter = const EventFilter();
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-
-  //   // 监听定位或选中事件变化后移动镜头（只移一次选中事件）
-  //   ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (_, next) {
-  //     final loc = next.valueOrNull;
-  //     if (!movedToSelected && widget.selectedEvent == null && loc != null) {
-  //       _map.move(loc, 14);
-  //     }
-  //   });
-
-  //   if (widget.selectedEvent != null && !movedToSelected) {
-  //     final ev = widget.selectedEvent!;
-  //     WidgetsBinding.instance.addPostFrameCallback((_) {
-  //       _map.move(LatLng(ev.latitude, ev.longitude), 15);
-  //       _showEventCard(ev);
-  //       movedToSelected = true;
-  //     });
-  //   }
-  // }
-
   fa.User? _user;
 
   @override
@@ -79,9 +57,27 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   @override
   Widget build(BuildContext context) {
+    // 用 ref.listen 来监听 userLocationProvider
+    ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
+      final loc = next.valueOrNull;
+      if (!movedToSelected && widget.selectedEvent == null && loc != null) {
+        _map.move(loc, 14);
+      }
+    });
+
     final events = ref.watch(eventsProvider);
     final userLoc = ref.watch(userLocationProvider).valueOrNull;
     final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
+
+    // 如果有选中事件，页面初始化时直接跳过去
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.selectedEvent != null && !movedToSelected) {
+        final ev = widget.selectedEvent!;
+        _map.move(LatLng(ev.latitude, ev.longitude), 15);
+        _showEventCard(ev);
+        movedToSelected = true;
+      }
+    });
 
     return Scaffold(
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
@@ -194,6 +190,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           TileLayer(
             urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             userAgentPackageName: 'com.example.crewapp',
+            tileProvider: NetworkTileProvider(), // 禁用磁盘缓存（如果不需要可删）
           ),
           events.when(
             loading: () => const MarkerLayer(markers: []),
@@ -512,19 +509,25 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 缩略图
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: SizedBox(
-                          width: 96,
-                          height: 96,
-                          child: /*ev.coverAsset != null
-                            ? Image.asset(ev.coverAsset!, fit: BoxFit.cover)
-                            : */
-                              Image.asset('assets/mock/event_1.jpg',
-                                  fit: BoxFit.cover),
-                        ),
-                      ),
+ // 缩略图
+ClipRRect(
+  borderRadius: BorderRadius.circular(8),
+  child: SizedBox(
+    width: 96,
+    height: 96,
+    child: CachedNetworkImage(
+      imageUrl: /* ev.coverAsset ?? */
+          'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66', // 默认图地址
+      fit: BoxFit.cover,
+      placeholder: (context, url) => const Center(
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      errorWidget: (context, url, error) => const Center(
+        child: Icon(Icons.error),
+      ),
+    ),
+  ),
+),
                       const SizedBox(width: 12),
                       // 文本区
                       Expanded(

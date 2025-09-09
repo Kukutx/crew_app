@@ -27,46 +27,6 @@ class LoginPage extends StatelessWidget {
       if (Theme.of(context).platform == TargetPlatform.iOS) AppleProvider(),
     ];
 
-    // return Scaffold(
-    //   body: Center(
-    //     child: ConstrainedBox(
-    //       constraints: const BoxConstraints(maxWidth: 560),
-    //       child: Card(
-    //         margin: const EdgeInsets.all(24),
-    //         elevation: 2,
-    //         clipBehavior: Clip.antiAlias,
-    //         child: fui.SignInScreen(
-    //           providers: providers,
-    //           headerBuilder: (context, _, __) => const Padding(
-    //             padding: EdgeInsets.fromLTRB(24, 32, 24, 8),
-    //             child: Text('欢迎来到 Crew', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
-    //           ),
-    //           subtitleBuilder: (context, action) => const Padding(
-    //             padding: EdgeInsets.symmetric(horizontal: 24),
-    //             child: Text('基于地理位置组织活动 · 一键加入你的 Crew'),
-    //           ),
-    //           footerBuilder: (context, action) => const Padding(
-    //             padding: EdgeInsets.all(16),
-    //             child: Text('继续即表示同意《服务条款》和《隐私政策》'),
-    //           ),
-    //           actions: [
-    //             fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
-    //               await fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
-    //               if (context.mounted) Navigator.of(context).pushReplacementNamed(kHomeRoute);
-    //             }),
-    //             fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-    //               Navigator.of(context).pushReplacementNamed(kHomeRoute);
-    //             }),
-    //             fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-    //               Navigator.of(context).pushReplacementNamed(kHomeRoute);
-    //             }),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
-
     return fui.SignInScreen(
       providers: providers,
       headerBuilder: (context, constraints, _) => const Padding(

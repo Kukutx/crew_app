@@ -1,38 +1,47 @@
+import 'package:crew_app/core/state/app_provider/app_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class SettingsPage extends StatefulWidget {
-  final Locale locale;
-  final bool darkMode;
-  final ValueChanged<Locale> onLocaleChanged;
-  final ValueChanged<bool> onDarkModeChanged;
-
-  const SettingsPage({
-    required this.locale,
-    required this.darkMode,
-    required this.onLocaleChanged,
-    required this.onDarkModeChanged,
-    super.key,
-  });
+class SettingsPage extends ConsumerStatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   late bool _darkMode;
   late String _language;
 
   @override
   void initState() {
     super.initState();
-    _darkMode = widget.darkMode;
-    _language = widget.locale.languageCode == 'zh' ? 'zh' : 'en';
+    // 初值：先用占位，真正值在 didChangeDependencies 里同步
+    _darkMode = false;
+    _language = 'en';
   }
 
-   @override
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final s = ref.read(settingsProvider).value;
+    if (s != null) {
+      _darkMode = s.themeMode == ThemeMode.dark;
+      _language = (s.locale.languageCode == 'zh') ? 'zh' : 'en';
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final settingsAsync = ref.watch(settingsProvider);
+
+    if (settingsAsync.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    // final s = settingsAsync.requireValue;
 
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),
@@ -42,9 +51,9 @@ class _SettingsPageState extends State<SettingsPage> {
           SwitchListTile(
             title: Text(loc.dark_mode),
             value: _darkMode,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() => _darkMode = value);
-              widget.onDarkModeChanged(value);
+              await ref.read(settingsProvider.notifier).setDarkMode(value);
             },
           ),
           // 语言选择
@@ -56,10 +65,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 DropdownMenuItem(value: 'zh', child: Text(loc.chinese)),
                 DropdownMenuItem(value: 'en', child: Text(loc.english)),
               ],
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value == null) return;
                 setState(() => _language = value);
-                widget.onLocaleChanged(Locale(value));
+                await ref
+                    .read(settingsProvider.notifier)
+                    .setLocale(Locale(value));
               },
             ),
           ),
@@ -68,12 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             title: Text(loc.about),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AboutPage()),
-              );
-            },
+            onTap: () => context.push('/about'),
           ),
         ],
       ),
@@ -81,15 +87,4 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(title: Text(loc.about)),
-      body: Center(child: Text(loc.about_content)),
-    );
-  }
-}

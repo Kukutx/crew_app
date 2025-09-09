@@ -3,12 +3,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/events_detail_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// 地图报名页 事件
 void showEventBottomSheet(
     {required BuildContext context, required Event event}) {
   showModalBottomSheet(
     context: context,
+    useRootNavigator: false,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
@@ -67,13 +69,14 @@ void showEventBottomSheet(
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () {
-                                          Navigator.pop(context); // 先收起
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => EventDetailPage(
-                                                    event: event),
-                                              ));
+                                          Navigator.of(context,
+                                                  rootNavigator: false)
+                                              .pop();
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            context.pushNamed('eventDetail',
+                                                extra: event);
+                                          });
                                         },
                                         child: Text(event.title,
                                             maxLines: 2,

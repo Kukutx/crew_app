@@ -2,6 +2,7 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/network/api_service.dart';
 import 'events_detail_page.dart';
 
@@ -78,10 +79,7 @@ class _GridItem {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => EventDetailPage(event: event)),
-          );
+          context.pushNamed('eventDetail', extra: event);
         },
         child: Stack(
           children: [
@@ -93,7 +91,8 @@ class _GridItem {
                 memCacheWidth: memCacheW,
                 placeholder: (c, _) => const AspectRatio(
                   aspectRatio: 1,
-                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child:
+                      Center(child: CircularProgressIndicator(strokeWidth: 2)),
                 ),
                 errorWidget: (c, _, __) => const AspectRatio(
                   aspectRatio: 1,

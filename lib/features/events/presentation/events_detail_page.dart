@@ -2,6 +2,7 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -212,13 +213,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   _detailRow(Icons.people, '参与人数', '待公布'),
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              EventsMapPage(selectedEvent: event), // 你的原逻辑
-                        ),
-                      );
+                      context.pushNamed('map', extra: event);
                     },
                     child:
                         _detailRow(Icons.place, '集合地点', widget.event.location),

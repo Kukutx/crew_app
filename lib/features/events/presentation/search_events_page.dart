@@ -1,5 +1,6 @@
 import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../data/event.dart';
 import '../../../core/network/api_service.dart';
 
@@ -67,14 +68,7 @@ class SearchEventsPageState extends State<SearchEventsPage> {
                             subtitle: Text(event.description),
                             trailing: Icon(Icons.location_on),
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EventsMapPage(
-                                    selectedEvent: event, // 把选中的活动传过去
-                                  ),
-                                ),
-                              );
+                              context.pushNamed('map', extra: event);
                             },
                           );
                         },

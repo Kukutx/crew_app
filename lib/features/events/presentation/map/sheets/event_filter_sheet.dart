@@ -10,6 +10,7 @@ Future<EventFilter?> showEventFilterSheet({
 }) {
   return showModalBottomSheet<EventFilter>(
     context: context,
+    useRootNavigator: false,
     isScrollControlled: true,
     useSafeArea: true,
     showDragHandle: true,

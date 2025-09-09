@@ -36,6 +36,7 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
 
   return showDialog<EventData>(
     context: context,
+    useRootNavigator: false,
     builder: (_) => AlertDialog(
       title: const Text('Create Event'),
       content: Form(
@@ -81,12 +82,18 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context), child: const Text('取消')),
+            onPressed: () => Navigator.of(context, rootNavigator: false).pop(), child: const Text('取消')),
         ElevatedButton(
           onPressed: () {
             if (formKey.currentState?.validate() != true) return;
             Navigator.pop(
-                context, EventData(title: title.text, description: desc.text,                locationName: city.text.trim().isEmpty ? '未知' : city.text.trim(),));
+                context,
+                EventData(
+                  title: title.text,
+                  description: desc.text,
+                  locationName:
+                      city.text.trim().isEmpty ? '未知' : city.text.trim(),
+                ));
           },
           child: const Text('创建'),
         ),

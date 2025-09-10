@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as fui;
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
+import 'package:go_router/go_router.dart';
 
 /// 登录完成后跳转的路由名
 const String kHomeRoute = '/';
@@ -52,13 +53,13 @@ class LoginPage extends StatelessWidget {
     //           actions: [
     //             fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
     //               await fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
-    //               if (context.mounted) Navigator.of(context).pushReplacementNamed(kHomeRoute);
+    //               if (context.mounted) context.go(kHomeRoute);
     //             }),
     //             fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-    //               Navigator.of(context).pushReplacementNamed(kHomeRoute);
+    //               context.go(kHomeRoute);
     //             }),
     //             fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-    //               Navigator.of(context).pushReplacementNamed(kHomeRoute);
+    //               context.go(kHomeRoute);
     //             }),
     //           ],
     //         ),
@@ -90,13 +91,13 @@ class LoginPage extends StatelessWidget {
         fui.AuthStateChangeAction<fui.SignedIn>((context, state) {
           // 刷新 ID Token（拿到最新的 Custom Claims，例如订阅标记）
           fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
-          Navigator.of(context).pushReplacementNamed(kHomeRoute);
+          context.go(kHomeRoute);
         }),
         fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-          Navigator.of(context).pushReplacementNamed(kHomeRoute);
+          context.go(kHomeRoute);
         }),
         fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-          Navigator.of(context).pushReplacementNamed(kHomeRoute);
+          context.go(kHomeRoute);
         }),
       ],
       // // 主题美化（可选）

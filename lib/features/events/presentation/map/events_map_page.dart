@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
@@ -133,9 +134,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   void _onAvatarTap(bool authed) {
     if (authed) {
-      Navigator.pushNamed(context, '/profile');
+      context.push('/profile');
     } else {
-      Navigator.pushNamed(context, '/login');
+      context.go('/login');
     }
   }
 }

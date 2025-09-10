@@ -2,8 +2,8 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../core/network/api_service.dart';
-import 'events_detail_page.dart';
+import '../../../../core/network/api_service.dart';
+import '../detail/events_detail_page.dart';
 
 class EventsListPage extends StatelessWidget {
   const EventsListPage({super.key});

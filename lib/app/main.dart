@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:crew_app/app/app.dart';
-import 'package:crew_app/features/events/presentation/user_events_page.dart';
+import 'package:crew_app/features/profile/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/favorites_page.dart';
 import 'package:crew_app/features/profile/presentation/history_page.dart';
 import 'package:crew_app/features/profile/presentation/preferences_page.dart';

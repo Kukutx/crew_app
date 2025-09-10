@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
 import '../features/events/presentation/search_events_page.dart';
-import '../features/profile/presentation/profile_page.dart';
+import '../features/profile/presentation/profile/profile_page.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -33,7 +33,7 @@ class _AppState extends State<App> {
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-      // extendBody: true, 
+      // extendBody: true,  // 是否延伸到 bottomNavigationBar 背后 适合做半透明效果，比如底部做玻璃罩
     );
   }
 }

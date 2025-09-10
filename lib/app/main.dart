@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:crew_app/app/app.dart';
+import 'package:crew_app/features/profile/presentation/profile/profile_page.dart';
 import 'package:crew_app/features/profile/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/favorites_page.dart';
 import 'package:crew_app/features/profile/presentation/history_page.dart';
 import 'package:crew_app/features/profile/presentation/preferences_page.dart';
-import 'package:crew_app/features/profile/presentation/profile_page.dart';
 import 'package:crew_app/core/network/auth/firebase_auth_service.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/settings/presentation/settings/settings_page.dart';

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 class SettingsPage extends StatefulWidget {
   final Locale locale;
   final bool darkMode;
-  final ValueChanged<Locale> onLocaleChanged;
-  final ValueChanged<bool> onDarkModeChanged;
+  final Future<void> Function(Locale) onLocaleChanged;
+  final Future<void> Function(bool) onDarkModeChanged;
 
   const SettingsPage({
     required this.locale,
@@ -43,9 +43,9 @@ class _SettingsPageState extends State<SettingsPage> {
           SwitchListTile(
             title: Text(loc.dark_mode),
             value: _darkMode,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() => _darkMode = value);
-              widget.onDarkModeChanged(value);
+              await widget.onDarkModeChanged(value);
             },
           ),
           // 语言选择
@@ -57,10 +57,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 DropdownMenuItem(value: 'zh', child: Text(loc.chinese)),
                 DropdownMenuItem(value: 'en', child: Text(loc.english)),
               ],
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value == null) return;
                 setState(() => _language = value);
-                widget.onLocaleChanged(Locale(value));
+                await widget.onLocaleChanged(Locale(value));
               },
             ),
           ),

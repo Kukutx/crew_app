@@ -9,5 +9,5 @@ class Env {
   static bool get isProduction => current == prod;
 }
 
+  // 目前仍使用测试 API，尚无主服务器
 
-// 目前还在使用测试的api，没有主服务器

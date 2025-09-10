@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
     _darkMode = widget.darkMode;
   }
 
-  void updateLocale(Locale locale) async {
+  Future<void> updateLocale(Locale locale) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('language', locale.languageCode);
     setState(() {
@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void updateDarkMode(bool value) async {
+  Future<void> updateDarkMode(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('darkMode', value);
     setState(() {

@@ -33,12 +33,7 @@ Future<void> main() async {
   // 获取持久化语言设置
   String? langCode = prefs.getString('language');
   Locale locale;
-  if (langCode != null) {
-    locale = Locale(langCode);
-  } else {
-    // 自动跟随系统语言
-    locale = PlatformDispatcher.instance.locale;
-  }
+  locale = Locale(langCode ?? 'en');
   // 获取持久化主题设置
   bool darkMode = prefs.getBool('darkMode') ?? false;
   runApp(ProviderScope(child: MyApp(locale: locale, darkMode: darkMode)));

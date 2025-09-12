@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
+import 'package:go_router/go_router.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -53,34 +54,34 @@ class _ProfilePageState extends State<ProfilePage> {
                   leading: const Icon(Icons.favorite_border),
                   title: const Text('我的收藏'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/favorites'),
+                  onTap: () => context.push('/favorites'),
                 ),
                 ListTile(
                   leading: const Icon(Icons.event_busy),
                   title: const Text('我的活动'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/user_event'),
+                  onTap: () => context.push('/user_event'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.history),
                   title: const Text('浏览记录'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/history'),
+                  onTap: () => context.push('/history'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.verified_user),
                   title: const Text('认证和偏好'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/preferences'),
+                  onTap: () => context.push('/preferences'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.settings_outlined),
                   title: const Text('设置'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/settings'),
+                  onTap: () => context.push('/settings'),
                 ),
               ],
             ),
@@ -152,7 +153,7 @@ class _ProfileHeader extends StatelessWidget {
               ),
               FilledButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  context.go('/login');
                 },
                 child: const Text('登录'),
               ),

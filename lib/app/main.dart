@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:crew_app/app/app.dart';
 import 'package:crew_app/features/profile/presentation/profile/profile_page.dart';

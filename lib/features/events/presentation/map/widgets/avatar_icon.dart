@@ -1,16 +1,21 @@
 // widgets/avatar_icon.dart
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AvatarIcon extends StatefulWidget {
+import '../../../../../core/state/avatar_provider.dart';
+
+class AvatarIcon extends ConsumerStatefulWidget {
   final void Function(bool authed) onTap;
   const AvatarIcon({super.key, required this.onTap});
 
   @override
-  State<AvatarIcon> createState() => _AvatarIconState();
+  ConsumerState<AvatarIcon> createState() => _AvatarIconState();
 }
 
-class _AvatarIconState extends State<AvatarIcon> {
+class _AvatarIconState extends ConsumerState<AvatarIcon> {
   fa.User? _user;
   @override
   void initState() {
@@ -42,14 +47,20 @@ class _AvatarIconState extends State<AvatarIcon> {
 
   @override
   Widget build(BuildContext context) {
+    final customPath = ref.watch(avatarProvider);
+    ImageProvider? img;
+    if (customPath != null && _user != null) {
+      img = FileImage(File(customPath));
+    } else if ((_user?.photoURL?.isNotEmpty ?? false)) {
+      img = NetworkImage(_user!.photoURL!);
+    }
+
     return InkResponse(
       radius: 22,
       onTap: () => widget.onTap(_user != null),
       child: CircleAvatar(
         radius: 16,
-        foregroundImage: (_user?.photoURL?.isNotEmpty ?? false)
-            ? NetworkImage(_user!.photoURL!)
-            : null,
+        foregroundImage: img,
         child: const Icon(Icons.person, size: 18, color: Colors.grey),
       ),
     );

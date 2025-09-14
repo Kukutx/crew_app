@@ -22,7 +22,7 @@ class LoginPage extends StatelessWidget {
       // 3) Google（clientId 请替换成你自己的）
       GoogleProvider(
           clientId:
-              '417490407531-fq20k42jlls80ognl9sotjecdg3tbmhr.apps.googleusercontent.com'),
+              '417490407531-111poe29m187rdr8d43mp93v9fq92of1.apps.googleusercontent.com'),
       // 4) Apple（iOS 必须提供 Sign in with Apple，如果你启用了其他第三方登录）
       if (Theme.of(context).platform == TargetPlatform.iOS) AppleProvider(),
     ];

@@ -92,7 +92,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ],
       ),
       bottomNavigationBar: Container(
-        color: isDark ? theme.colorScheme.surface : Colors.white,
+        color: isDark ? theme.colorScheme.surface : Colors.transparent,
         padding: const EdgeInsets.all(16),
         child: SafeArea(
           child: Column(

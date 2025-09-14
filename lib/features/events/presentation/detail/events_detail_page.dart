@@ -16,6 +16,17 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
 
+
+ // 示例用户（可换成 event.organizer / backend 返回的用户）
+  final _host = (
+    name: 'Luca B.',
+    bio: 'Milan · 徒步/咖啡/摄影',
+    avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe',
+    userId: 'user_123'
+  );
+
+  bool _following = false;
+
   // 本地占位图（先用你的素材图，后续可换成 event.imageUrls）
   final List<String> _assets = const [
     'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
@@ -168,6 +179,30 @@ class _EventDetailPageState extends State<EventDetailPage> {
               ],
             ),
             const SizedBox(height: 16),
+
+            // === 新增：主办方/用户信息卡 ===
+            const SizedBox(height: 10),
+
+            _userCard(
+              name: _host.name,
+              bio: _host.bio,
+              avatarUrl: _host.avatar,
+              onTapProfile: () {
+                // TODO: 跳转到个人页（按你项目的路由来）
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage(userId: _host.userId)));
+              },
+              onFollow: () async {
+                // TODO: 在这里对接后端/Firestore 关注逻辑
+                setState(() => _following = !_following);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(_following ? '已关注' : '已取消关注')),
+                );
+              },
+              isFollowing: _following,
+            ),
+
+            const SizedBox(height: 10),
+
             // 标题 / 标签 / 描述
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -252,6 +287,83 @@ class _EventDetailPageState extends State<EventDetailPage> {
             ),
             const SizedBox(height: 80), // 给底部按钮留空间
           ],
+        ),
+      ),
+    );
+  }
+
+  // 用户信息卡片
+  Widget _userCard({
+    required String name,
+    required String bio,
+    required String avatarUrl,
+    required VoidCallback onTapProfile,
+    required VoidCallback onFollow,
+    required bool isFollowing,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 2,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTapProfile,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundImage: CachedNetworkImageProvider(avatarUrl),
+                backgroundColor: Colors.orange.shade50,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(
+                      bio,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                height: 36,
+                child: isFollowing
+                    ? OutlinedButton.icon(
+                        onPressed: onFollow,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.orange,
+                          side: BorderSide(color: Colors.orange.shade300),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.check, size: 18),
+                        label: const Text('Following'),
+                      )
+                    : ElevatedButton.icon(
+                        onPressed: onFollow,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.person_add_alt_1, size: 18),
+                        label: const Text('Follow'),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

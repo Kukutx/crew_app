@@ -16,8 +16,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
 
-
- // 示例用户（可换成 event.organizer / backend 返回的用户）
+  // 示例用户（可换成 event.organizer / backend 返回的用户）
   final _host = (
     name: 'Luca B.',
     bio: 'Milan · 徒步/咖啡/摄影',
@@ -26,13 +25,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
   );
 
   bool _following = false;
-
-  // 本地占位图（先用你的素材图，后续可换成 event.imageUrls）
-  final List<String> _assets = const [
-    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
-    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
-    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -69,23 +61,22 @@ class _EventDetailPageState extends State<EventDetailPage> {
           const SizedBox(width: 8),
         ],
         flexibleSpace: SafeArea(
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          margin: const EdgeInsets.only(top: 15),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.orange,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Text(
-            '正在报名中',
-            style: TextStyle(color: Colors.white, fontSize: 14),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              margin: const EdgeInsets.only(top: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                '正在报名中',
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
@@ -134,26 +125,34 @@ class _EventDetailPageState extends State<EventDetailPage> {
             Stack(
               children: [
                 AspectRatio(
-                  aspectRatio: 16/10,
+                  aspectRatio: 16 / 10,
                   child: PageView.builder(
                     controller: _pageCtrl,
-                    itemCount: _assets.length,
+                    itemCount: widget.event.imageUrls.isNotEmpty
+                        ? widget.event.imageUrls.length
+                        : 1,
                     onPageChanged: (i) => setState(() => _page = i),
-                    itemBuilder: (_, i) => CachedNetworkImage(
-                      imageUrl: _assets[i], // 改成网络图片 URL
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                      errorWidget: (context, url, error) => const Center(
-                        child: Icon(Icons.error),
-                      ),
-                    ),
+                    itemBuilder: (_, i) {
+                      final imageUrl = widget.event.imageUrls.isNotEmpty
+                          ? widget.event.imageUrls[i]
+                          : widget.event.coverImageUrl; // 如果没有 imageUrls，用封面图
+                      return CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                
+
                 // 简单指示点
+                    if (widget.event.imageUrls.length > 1)
                 Positioned(
                   bottom: 8,
                   left: 0,
@@ -161,7 +160,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _assets.length,
+                      widget.event.imageUrls.length,
                       (i) => Container(
                         width: 8,
                         height: 8,
@@ -330,7 +329,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       bio,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ],
                 ),

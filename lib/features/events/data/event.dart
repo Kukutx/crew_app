@@ -5,6 +5,8 @@ class Event {
   final String description;
   final double latitude;
   final double longitude;
+  final List<String> imageUrls;
+  final String coverImageUrl;
 
   Event({
     required this.id,
@@ -13,6 +15,8 @@ class Event {
     required this.description,
     required this.latitude,
     required this.longitude,
+    required this.imageUrls,
+    required this.coverImageUrl,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,10 @@ class Event {
       description: json['description'] as String,
       latitude: (json['latitude'] ?? 0).toDouble(),
       longitude: (json['longitude'] ?? 0).toDouble(),
+      imageUrls: (json['imageUrls'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+      coverImageUrl: json['coverImageUrl'] as String? ?? '',
     );
   }
 }

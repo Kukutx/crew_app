@@ -8,17 +8,6 @@ import '../detail/events_detail_page.dart';
 class EventsListPage extends StatelessWidget {
   const EventsListPage({super.key});
 
-  static const _demoImgs = <String>[
-    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
-    'https://images.unsplash.com/photo-1520975928316-56c6f6f163a4',
-    'https://images.unsplash.com/photo-1519681393784-d120267933ba',
-    'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66',
-    'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429',
-    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e',
-    'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
-    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?ixlib=rb-1.2.1',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final api = ApiService();
@@ -39,20 +28,13 @@ class EventsListPage extends StatelessWidget {
             return const Center(child: Text('暂无活动'));
           }
 
-          // 用固定的示例图片轮流给 event 配图
-          final items = List.generate(events.length, (i) {
-            final ev = events[i];
-            final img = _demoImgs[i % _demoImgs.length];
-            return _GridItem(event: ev, imageUrl: img, index: i);
-          });
-
           return MasonryGridView.count(
             padding: const EdgeInsets.all(8),
             crossAxisCount: 2,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            itemCount: items.length,
-            itemBuilder: (context, i) => items[i].build(context),
+            itemCount: events.length,
+            itemBuilder: (context, i) => _GridItem(event: events[i], index: i).build(context),
           );
         },
       ),
@@ -62,15 +44,19 @@ class EventsListPage extends StatelessWidget {
 
 class _GridItem {
   final Event event;
-  final String imageUrl;
   final int index;
 
-  _GridItem({required this.event, required this.imageUrl, required this.index});
+  _GridItem({required this.event, required this.index});
 
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final memCacheW = ((mq.size.width / 2) * mq.devicePixelRatio).round();
     final heroTag = 'event_$index';
+   // Tips： 判断imageUrls是否有值，否则用coverImageUrl 
+   // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
+    final imageUrl = (event.imageUrls.isNotEmpty)
+        ? event.imageUrls.first
+        : event.coverImageUrl;
 
     return Material(
       elevation: 4,
@@ -88,7 +74,7 @@ class _GridItem {
             Hero(
               tag: heroTag,
               child: CachedNetworkImage(
-                imageUrl: '$imageUrl?w=800',
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 memCacheWidth: memCacheW,
                 placeholder: (c, _) => const AspectRatio(

@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 /// 地图报名页 事件
 void showEventBottomSheet(
     {required BuildContext context, required Event event}) {
+  // Tips： 判断imageUrls是否有值，否则用coverImageUrl
+  // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
+  final imageUrl = (event.imageUrls.isNotEmpty)
+      ? event.imageUrls.first
+      : event.coverImageUrl;
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -43,8 +49,7 @@ void showEventBottomSheet(
                           width: 96,
                           height: 96,
                           child: CachedNetworkImage(
-                            imageUrl: /* ev.coverAsset ?? */
-                                'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66', // 默认图地址
+                            imageUrl: imageUrl,
                             fit: BoxFit.cover,
                             placeholder: (_, __) => const Center(
                                 child:

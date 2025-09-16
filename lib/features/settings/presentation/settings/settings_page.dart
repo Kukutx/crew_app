@@ -1,78 +1,56 @@
+import 'package:crew_app/core/state/settings_providers.dart';
 import 'package:crew_app/features/settings/presentation/about/about_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SettingsPage extends StatefulWidget {
-  final Locale locale;
-  final bool darkMode;
-  final Future<void> Function(Locale) onLocaleChanged;
-  final Future<void> Function(bool) onDarkModeChanged;
-
-  const SettingsPage({
-    required this.locale,
-    required this.darkMode,
-    required this.onLocaleChanged,
-    required this.onDarkModeChanged,
-    super.key,
-  });
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  late bool _darkMode;
-  late String _language;
-
-  @override
-  void initState() {
-    super.initState();
-    _darkMode = widget.darkMode;
-    _language = widget.locale.languageCode == 'zh' ? 'zh' : 'en';
-  }
-
-   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
     final loc = AppLocalizations.of(context)!;
+    final selectedLanguage =
+        settings.locale.languageCode == 'zh' ? 'zh' : 'en';
 
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),
       body: ListView(
         children: [
-          // 深色模式
           SwitchListTile(
             title: Text(loc.dark_mode),
-            value: _darkMode,
-            onChanged: (value) async {
-              setState(() => _darkMode = value);
-              await widget.onDarkModeChanged(value);
+            value: settings.themeMode == ThemeMode.dark,
+            onChanged: (value) {
+              ref.read(settingsProvider.notifier).setDarkMode(value);
             },
           ),
-          // 语言选择
           ListTile(
             title: Text(loc.language),
             trailing: DropdownButton<String>(
-              value: _language,
+              value: selectedLanguage,
               items: [
                 DropdownMenuItem(value: 'zh', child: Text(loc.chinese)),
                 DropdownMenuItem(value: 'en', child: Text(loc.english)),
               ],
-              onChanged: (value) async {
+              onChanged: (value) {
                 if (value == null) return;
-                setState(() => _language = value);
-                await widget.onLocaleChanged(Locale(value));
+                ref
+                    .read(settingsProvider.notifier)
+                    .setLocale(Locale(value));
               },
             ),
           ),
           const Divider(),
-          // 关于
           ListTile(
             title: Text(loc.about),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AboutPage()),
+                MaterialPageRoute(
+                  builder: (context) => const AboutPage(),
+                ),
               );
             },
           ),
@@ -81,98 +59,3 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
-
-
-
-
-// import 'package:crew_app/core/state/settings_providers.dart';
-// import 'package:crew_app/features/settings/presentation/about/about_page.dart';
-// import 'package:crew_app/l10n/generated/app_localizations.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// class SettingsPage extends ConsumerStatefulWidget {
-//   const SettingsPage({super.key});
-
-//   @override
-//   ConsumerState<SettingsPage> createState() => _SettingsPageState();
-// }
-
-// class _SettingsPageState extends ConsumerState<SettingsPage> {
-//   late bool _darkMode;
-//   late String _language;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // 初值：先用占位，真正值在 didChangeDependencies 里同步
-//     _darkMode = false;
-//     _language = 'en';
-//   }
-
-//   @override
-//   void didChangeDependencies() {
-//     super.didChangeDependencies();
-//     final s = ref.read(settingsProvider).value;
-//     if (s != null) {
-//       _darkMode = s.themeMode == ThemeMode.dark;
-//       _language = (s.locale.languageCode == 'zh') ? 'zh' : 'en';
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final loc = AppLocalizations.of(context)!;
-//     final settingsAsync = ref.watch(settingsProvider);
-
-//     if (settingsAsync.isLoading) {
-//       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-//     }
-//     // final s = settingsAsync.requireValue;
-
-//     return Scaffold(
-//       appBar: AppBar(title: Text(loc.settings)),
-//       body: ListView(
-//         children: [
-//           // 深色模式
-//           SwitchListTile(
-//             title: Text(loc.dark_mode),
-//             value: _darkMode,
-//             onChanged: (value) async {
-//               setState(() => _darkMode = value);
-//               await ref.read(settingsProvider.notifier).setDarkMode(value);
-//             },
-//           ),
-//           // 语言选择
-//           ListTile(
-//             title: Text(loc.language),
-//             trailing: DropdownButton<String>(
-//               value: _language,
-//               items: [
-//                 DropdownMenuItem(value: 'zh', child: Text(loc.chinese)),
-//                 DropdownMenuItem(value: 'en', child: Text(loc.english)),
-//               ],
-//               onChanged: (value) async {
-//                 if (value == null) return;
-//                 setState(() => _language = value);
-//                 await ref
-//                     .read(settingsProvider.notifier)
-//                     .setLocale(Locale(value));
-//               },
-//             ),
-//           ),
-//           const Divider(),
-//           // 关于
-//           ListTile(
-//             title: Text(loc.about),
-//             trailing: const Icon(Icons.chevron_right),
-//             onTap: () => Navigator.push(
-//               context,
-//               MaterialPageRoute(builder: (context) => const AboutPage()),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

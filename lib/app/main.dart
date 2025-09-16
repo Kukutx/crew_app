@@ -10,6 +10,7 @@ import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/settings/presentation/settings/settings_page.dart';
 import 'package:crew_app/core/config/firebase_options.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/playground/test_page_qq.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,7 +50,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: ThemeData.dark(),
       themeMode: settings.themeMode,
       routes: {
-        '/': (context) => const App(),
+        '/': (context) => const HomeP11age(),
         '/login': (context) => const LoginPage(),
         '/settings': (context) => const SettingsPage(),
         '/preferences': (context) => PreferencesPage(),

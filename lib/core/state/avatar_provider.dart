@@ -2,8 +2,6 @@ import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'settings_providers.dart';
-
 class AvatarNotifier extends StateNotifier<String?> {
   AvatarNotifier(this._uid) : super(null) {
     if (_uid != null) {

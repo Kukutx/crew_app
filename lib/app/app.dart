@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
-import '../features/events/presentation/search_events_page.dart';
+import '../features/events/presentation/search/search_events_page.dart';
 import '../features/profile/presentation/profile/profile_page.dart';
 
 class App extends StatefulWidget {

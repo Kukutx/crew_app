@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:flutter/material.dart';
 import '../data/event.dart';
+import '../../../core/error/api_exception.dart';
 import '../../../core/network/api_service.dart';
 
 class SearchEventsPage extends StatefulWidget {
@@ -21,6 +22,9 @@ class SearchEventsPageState extends State<SearchEventsPage> {
     try {
       final data = await api.searchEvents(_controller.text);
       setState(() => results = data);
+    } on ApiException catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       setState(() => isLoading = false);
     }

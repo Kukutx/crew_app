@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/network/api_service.dart';
 import '../detail/events_detail_page.dart';
+import '../../../../core/error/api_exception.dart';
 
 class EventsListPage extends StatelessWidget {
   const EventsListPage({super.key});
@@ -20,7 +21,15 @@ class EventsListPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snap.hasError) {
-            return Center(child: Text('Error: ${snap.error}'));
+            final err = snap.error;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final msg = err is ApiException
+                  ? err.toString()
+                  : err?.toString() ?? 'Unknown error';
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(msg)));
+            });
+            return const Center(child: Text('加载失败'));
           }
 
           final events = snap.data ?? const <Event>[];

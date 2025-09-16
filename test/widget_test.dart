@@ -6,7 +6,7 @@ import 'package:crew_app/app/main.dart';
 
 void main() {
   testWidgets('Home navigation bar renders correctly', (WidgetTester tester) async {
-    await tester.pumpWidget(MyApp(locale: const Locale('en'), darkMode: false));
+    await tester.pumpWidget(MyApp());
 
     expect(find.byIcon(Icons.event), findsOneWidget);
     expect(find.byIcon(Icons.map), findsOneWidget);

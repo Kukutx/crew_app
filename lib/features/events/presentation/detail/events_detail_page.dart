@@ -1,5 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
+import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
@@ -152,29 +153,29 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 ),
 
                 // 简单指示点
-                    if (widget.event.imageUrls.length > 1)
-                Positioned(
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      widget.event.imageUrls.length,
-                      (i) => Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: i == _page
-                              ? Colors.white
-                              : Colors.white.withValues(alpha: 0.5),
+                if (widget.event.imageUrls.length > 1)
+                  Positioned(
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        widget.event.imageUrls.length,
+                        (i) => Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: i == _page
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.5),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -187,8 +188,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
               bio: _host.bio,
               avatarUrl: _host.avatar,
               onTapProfile: () {
-                // TODO: 跳转到个人页（按你项目的路由来）
-                // Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage(userId: _host.userId)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            UserProfilePage(/*userId: _host.userId*/)));
               },
               onFollow: () async {
                 // TODO: 在这里对接后端/Firestore 关注逻辑

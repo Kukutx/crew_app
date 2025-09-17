@@ -18,7 +18,7 @@ class LoginPage extends StatelessWidget {
       // 1) 邮箱密码
       fui.EmailAuthProvider(),
       // 2) Phone（如需）
-      fui.PhoneAuthProvider(), // ← 使用 firebase_ui_auth 的 PhoneAuthProvider
+      // fui.PhoneAuthProvider(), // ← 使用 firebase_ui_auth 的 PhoneAuthProvider
       // 3) Google（clientId 请替换成你自己的）
       GoogleProvider(
           clientId:
@@ -27,89 +27,62 @@ class LoginPage extends StatelessWidget {
       if (Theme.of(context).platform == TargetPlatform.iOS) AppleProvider(),
     ];
 
-    // return Scaffold(
-    //   body: Center(
-    //     child: ConstrainedBox(
-    //       constraints: const BoxConstraints(maxWidth: 560),
-    //       child: Card(
-    //         margin: const EdgeInsets.all(24),
-    //         elevation: 2,
-    //         clipBehavior: Clip.antiAlias,
-    //         child: fui.SignInScreen(
-    //           providers: providers,
-    //           headerBuilder: (context, _, __) => const Padding(
-    //             padding: EdgeInsets.fromLTRB(24, 32, 24, 8),
-    //             child: Text('欢迎来到 Crew', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
-    //           ),
-    //           subtitleBuilder: (context, action) => const Padding(
-    //             padding: EdgeInsets.symmetric(horizontal: 24),
-    //             child: Text('基于地理位置组织活动 · 一键加入你的 Crew'),
-    //           ),
-    //           footerBuilder: (context, action) => const Padding(
-    //             padding: EdgeInsets.all(16),
-    //             child: Text('继续即表示同意《服务条款》和《隐私政策》'),
-    //           ),
-    //           actions: [
-    //             fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
-    //               await fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
-    //               if (context.mounted) Navigator.of(context).pushReplacementNamed(kHomeRoute);
-    //             }),
-    //             fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-    //               Navigator.of(context).pushReplacementNamed(kHomeRoute);
-    //             }),
-    //             fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-    //               Navigator.of(context).pushReplacementNamed(kHomeRoute);
-    //             }),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
-
-    return fui.SignInScreen(
-      providers: providers,
-      headerBuilder: (context, constraints, _) => const Padding(
-        padding: EdgeInsets.only(top: 40, bottom: 16),
-        child: Text(
-          '欢迎来到 Crew',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+return Scaffold(
+  appBar: AppBar(
+    title: const Text(
+      '欢迎来到 Crew',
+      style: TextStyle(fontWeight: FontWeight.bold),
+    ),
+    centerTitle: true, // 标题居中
+    leading: IconButton(
+      icon: const Icon(Icons.close),
+      onPressed: () {
+        Navigator.of(context).pop(); // 关闭页面
+      },
+    ),
+    elevation: 0,
+  ),
+  body: fui.SignInScreen(
+    providers: providers,
+    headerBuilder: (context, constraints, _) => Column(
+      children: const [
+        SizedBox(height: 32),
+        Icon(
+          Icons.nightlight_round, // 这里可以换成你自己的 logo 图片
+          size: 80,
+          color: Colors.blueAccent,
         ),
-      ),
-      subtitleBuilder: (context, action) => const Padding(
-        padding: EdgeInsets.only(bottom: 12),
-        child: Text('基于地理位置组织活动，一键加入你的 Crew'),
-      ),
-      footerBuilder: (context, action) => const Padding(
-        padding: EdgeInsets.only(top: 12),
-        child: Text('继续即表示同意我们的服务条款与隐私政策'),
-      ),
-      // 登录/注册状态回调：成功后跳转
-      actions: [
-        fui.AuthStateChangeAction<fui.SignedIn>((context, state) {
-          // 刷新 ID Token（拿到最新的 Custom Claims，例如订阅标记）
-          fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
-          Navigator.of(context).pushReplacementNamed(kHomeRoute);
-        }),
-        fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-          Navigator.of(context).pushReplacementNamed(kHomeRoute);
-        }),
-        fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-          Navigator.of(context).pushReplacementNamed(kHomeRoute);
-        }),
+        SizedBox(height: 16),
       ],
-      // // 主题美化（可选）
-      // styles: const {
-      //   fui.EmailAuthProvider: AuthProviderButtonStyle(height: 48),
-      // },
-      sideBuilder: (context, constraints) => const Padding(
-        padding: EdgeInsets.all(24),
-        child: Text(
-          '发现周边活动 · 快速组局 · 订阅解锁高级玩法',
-          style: TextStyle(fontSize: 16),
-        ),
+    ),
+    subtitleBuilder: (context, action) => const Padding(
+      padding: EdgeInsets.only(bottom: 12),
+      child: Text('基于地理位置组织活动，一键加入你的 Crew'),
+    ),
+    footerBuilder: (context, action) => const Padding(
+      padding: EdgeInsets.only(top: 12),
+      child: Text('继续即表示同意我们的服务条款与隐私政策'),
+    ),
+    actions: [
+      fui.AuthStateChangeAction<fui.SignedIn>((context, state) {
+        fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
+        Navigator.of(context).pushReplacementNamed(kHomeRoute);
+      }),
+      fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
+        Navigator.of(context).pushReplacementNamed(kHomeRoute);
+      }),
+      fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
+        Navigator.of(context).pushReplacementNamed(kHomeRoute);
+      }),
+    ],
+    sideBuilder: (context, constraints) => const Padding(
+      padding: EdgeInsets.all(24),
+      child: Text(
+        '发现周边活动 · 快速组局 · 订阅解锁高级玩法',
+        style: TextStyle(fontSize: 16),
       ),
-    );
+    ),
+  ),
+);
   }
 }

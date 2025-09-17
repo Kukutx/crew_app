@@ -7,14 +7,16 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchEventAppBar({
     super.key,
     required this.controller,
+    required this.focusNode,
     required this.onSearch,
+    required this.onChanged,
+    required this.onClear,
     required this.onAvatarTap,
     required this.tags,
     required this.selected,
     required this.onTagToggle,
     required this.onOpenFilter,
     required this.onResultTap,
-    required this.onClearResults,
     required this.showResults,
     required this.isLoading,
     required this.results,
@@ -22,14 +24,16 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
   final void Function(String keyword) onSearch;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
   final void Function(bool authed) onAvatarTap;
   final List<String> tags;
   final Set<String> selected;
   final void Function(String tag, bool value) onTagToggle;
   final VoidCallback onOpenFilter;
   final void Function(Event event) onResultTap;
-  final VoidCallback onClearResults;
   final bool showResults;
   final bool isLoading;
   final List<Event> results;
@@ -40,15 +44,15 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (isLoading) return 72;
     if (errorText != null || results.isEmpty) return 64;
 
-    final itemHeight = 60.0;
+    const itemHeight = 60.0;
     const maxVisible = 4;
     final visibleCount = results.length > maxVisible ? maxVisible : results.length;
     return visibleCount * itemHeight;
   }
 
-  // 搜索框 ~56 + 间距8 + 标签条44 + 顶部安全区 + 结果列表高度
+  // 搜索框 ~56 + 间距8 + 标签条44 + 结果列表高度
   @override
-  Size get preferredSize => Size.fromHeight(110 + _resultsHeight);
+  Size get preferredSize => Size.fromHeight(112 + _resultsHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -58,86 +62,103 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: 0,
       bottom: PreferredSize(
         preferredSize: preferredSize,
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              // 搜索框
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 搜索框
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(24),
+                clipBehavior: Clip.antiAlias,
+                surfaceTintColor: Colors.transparent,
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: controller,
+                  builder: (context, value, _) {
+                    final hasQuery = value.text.isNotEmpty;
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        hintText: '搜索活动',
+                        filled: true,
+                        fillColor: Colors.white,
+                        isDense: true,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: const Icon(Icons.my_location_outlined),
+                        suffixIconConstraints:
+                            const BoxConstraints(minWidth: 96, minHeight: 44),
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (hasQuery)
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: onClear,
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: AvatarIcon(onTap: onAvatarTap),
+                            ),
+                          ],
+                        ),
+                      ),
+                      onSubmitted: onSearch,
+                      onChanged: onChanged,
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // 标签 + 筛选按钮（一行，水平滚动）
+            SizedBox(
+              height: 44,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                children: [
+                  ...tags.map(
+                    (t) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        visualDensity: VisualDensity.compact,
+                        label: Text(t),
+                        selected: selected.contains(t),
+                        onSelected: (v) => onTagToggle(t, v),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.tune),
+                    label: const Text('筛选'),
+                    onPressed: onOpenFilter,
+                  ),
+                ],
+              ),
+            ),
+            if (showResults)
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
                 child: Material(
-                  elevation: 3,       // 若仍显压，可改为 3
-                  borderRadius: BorderRadius.circular(24),
+                  elevation: 4,
+                  borderRadius: BorderRadius.circular(16),
                   clipBehavior: Clip.antiAlias,
-                  surfaceTintColor: Colors.transparent,
-                  child: TextField(
-                    controller: controller,
-                    textInputAction: TextInputAction.search,
-                    decoration: InputDecoration(
-                      hintText: '搜索活动',
-                      filled: true,
-                      fillColor: Colors.white,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      prefixIcon: const Icon(Icons.my_location_outlined),
-                      suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: AvatarIcon(onTap: onAvatarTap),
-                      ),
-                    ),
-                    onSubmitted: onSearch,
-                    onChanged: (value) {
-                      if (value.isEmpty) onClearResults();
-                    },
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 240),
+                    child: _buildResults(),
                   ),
                 ),
               ),
-              const SizedBox(height: 8), // 关键：给阴影留“呼吸”空间
-              // 标签 + 筛选按钮（一行，水平滚动）
-              SizedBox(
-                height: 44,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  children: [
-                    ...tags.map((t) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            visualDensity: VisualDensity.compact,
-                            label: Text(t),
-                            selected: selected.contains(t),
-                            onSelected: (v) => onTagToggle(t, v),
-                          ),
-                        )),
-                    const SizedBox(width: 4),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.tune),
-                      label: const Text('筛选'),
-                      onPressed: onOpenFilter,
-                    ),
-                  ],
-                ),
-              ),
-              if (showResults)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-                  child: Material(
-                    elevation: 3,
-                    borderRadius: BorderRadius.circular(16),
-                    clipBehavior: Clip.antiAlias,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 240),
-                      child: _buildResults(),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          ],
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -28,6 +30,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool _movedToSelected = false;
   final _searchController = TextEditingController();
+  late final FocusNode _searchFocusNode;
   final _api = ApiService();
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
   final _quickTags = const ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
@@ -38,9 +41,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _showSearchResults = false;
   String? _searchError;
   String _currentSearchQuery = '';
+  Timer? _searchDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFocusNode = FocusNode();
+    _searchFocusNode.addListener(_onSearchFocusChanged);
+  }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchFocusNode.removeListener(_onSearchFocusChanged);
+    _searchFocusNode.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -73,7 +87,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
       appBar: SearchEventAppBar(
         controller: _searchController,
-        onSearch: _performSearch,
+        focusNode: _searchFocusNode,
+        onSearch: _onSearchSubmitted,
+        onChanged: _onQueryChanged,
+        onClear: _onSearchClear,
         onAvatarTap: _onAvatarTap,
         tags: _quickTags,
         selected: _selectedTags,
@@ -95,32 +112,41 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               .showSnackBar(const SnackBar(content: Text('filter 待开发')));
         },
         onResultTap: _onSearchResultTap,
-        onClearResults: _clearSearchResults,
         showResults: _showSearchResults,
         isLoading: _isSearching,
         results: _searchResults,
         errorText: _searchError,
       ),
-      body: MapCanvas(
-        mapController: _map,
-        initialCenter: startCenter,
-        onMapReady: () {
-          final loc = ref.read(userLocationProvider).valueOrNull;
-          if (!_movedToSelected && loc != null) _map.move(loc, 14);
+      body: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) {
+          if (_searchFocusNode.hasFocus) {
+            _searchFocusNode.unfocus();
+          } else if (_showSearchResults) {
+            setState(() => _showSearchResults = false);
+          }
         },
-        onLongPress: _onMapLongPress,
-        children: [
-          // OSM图层已内置在 MapCanvas 里，这里只放标记层
-          events.when(
-            loading: () => const MarkersLayer(markers: []),
-            error: (_, __) => const MarkersLayer(markers: []),
-            data: (list) => MarkersLayer.fromEvents(
-              events: list,
-              userLoc: userLoc,
-              onEventTap: _showEventCard,
+        child: MapCanvas(
+          mapController: _map,
+          initialCenter: startCenter,
+          onMapReady: () {
+            final loc = ref.read(userLocationProvider).valueOrNull;
+            if (!_movedToSelected && loc != null) _map.move(loc, 14);
+          },
+          onLongPress: _onMapLongPress,
+          children: [
+            // OSM图层已内置在 MapCanvas 里，这里只放标记层
+            events.when(
+              loading: () => const MarkersLayer(markers: []),
+              error: (_, __) => const MarkersLayer(markers: []),
+              data: (list) => MarkersLayer.fromEvents(
+                events: list,
+                userLoc: userLoc,
+                onEventTap: _showEventCard,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -162,19 +188,69 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
-  Future<void> _performSearch(String keyword) async {
-    final query = keyword.trim();
+  void _onSearchFocusChanged() {
+    if (!_searchFocusNode.hasFocus) {
+      _searchDebounce?.cancel();
+      if (_showSearchResults) {
+        setState(() => _showSearchResults = false);
+      }
+      return;
+    }
+
+    final text = _searchController.text.trim();
+    if (text.isEmpty) {
+      if (_showSearchResults) {
+        setState(() => _showSearchResults = false);
+      }
+      return;
+    }
+
+    if (_searchResults.isNotEmpty || _isSearching || _searchError != null) {
+      setState(() => _showSearchResults = true);
+    } else {
+      _triggerSearch(text);
+    }
+  }
+
+  void _onQueryChanged(String raw) {
+    _triggerSearch(raw);
+  }
+
+  void _triggerSearch(String raw, {bool immediate = false}) {
+    final query = raw.trim();
+    _searchDebounce?.cancel();
+
     if (query.isEmpty) {
       _clearSearchResults();
       return;
     }
 
     setState(() {
-      _isSearching = true;
-      _showSearchResults = true;
-      _searchError = null;
       _currentSearchQuery = query;
+      _showSearchResults = true;
+      _isSearching = true;
+      _searchError = null;
     });
+
+    if (immediate) {
+      _performSearch(query);
+    } else {
+      _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+        _performSearch(query);
+      });
+    }
+  }
+
+  void _onSearchSubmitted(String keyword) {
+    _triggerSearch(keyword, immediate: true);
+  }
+
+  Future<void> _performSearch(String keyword) async {
+    final query = keyword.trim();
+    if (query.isEmpty) {
+      _clearSearchResults();
+      return;
+    }
 
     try {
       final data = await _api.searchEvents(query);
@@ -194,6 +270,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         _isSearching = false;
       });
     }
+  }
+
+  void _onSearchClear() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    _clearSearchResults();
   }
 
   void _onSearchResultTap(Event event) {

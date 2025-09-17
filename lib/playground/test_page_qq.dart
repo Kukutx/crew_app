@@ -1,9 +1,6 @@
 
-import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
-import 'package:crew_app/features/events/presentation/search_events_page.dart';
-import 'package:crew_app/features/profile/presentation/profile/profile_page.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 
 

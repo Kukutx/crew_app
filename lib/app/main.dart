@@ -50,7 +50,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: ThemeData.dark(),
       themeMode: settings.themeMode,
       routes: {
-        '/': (context) => const HomeP11age(),
+        '/': (context) => const App(),
         '/login': (context) => const LoginPage(),
         '/settings': (context) => const SettingsPage(),
         '/preferences': (context) => PreferencesPage(),

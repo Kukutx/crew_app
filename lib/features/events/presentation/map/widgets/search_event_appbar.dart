@@ -46,7 +46,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     const itemHeight = 60.0;
     const maxVisible = 4;
-    final visibleCount = results.length > maxVisible ? maxVisible : results.length;
+    final visibleCount =
+        results.length > maxVisible ? maxVisible : results.length;
     return visibleCount * itemHeight;
   }
 
@@ -69,7 +70,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
               child: Material(
-                elevation: 4,
+                elevation: 4, // 若仍显压，可改为 3
                 borderRadius: BorderRadius.circular(24),
                 clipBehavior: Clip.antiAlias,
                 surfaceTintColor: Colors.transparent,
@@ -86,8 +87,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                         filled: true,
                         fillColor: Colors.white,
                         isDense: true,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
@@ -102,7 +103,10 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               IconButton(
                                 icon: const Icon(Icons.close),
                                 onPressed: onClear,
-                              ),
+                              )
+                            else
+                              const SizedBox(
+                                  width: 48), // 占位，宽度和 IconButton 差不多,
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AvatarIcon(onTap: onAvatarTap),

@@ -29,12 +29,14 @@ class EventsMapPage extends ConsumerStatefulWidget {
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool _movedToSelected = false;
-  final _searchController = TextEditingController();
-  late final FocusNode _searchFocusNode;
-  final _api = ApiService();
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
   final _quickTags = const ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
   final _selectedTags = <String>{};
+
+  // 搜索框
+  final _searchController = TextEditingController();
+  late final FocusNode _searchFocusNode;
+  final _api = ApiService();
   EventFilter _filter = const EventFilter();
   List<Event> _searchResults = const <Event>[];
   bool _isSearching = false;
@@ -188,6 +190,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
+  /// 搜索框事件
   void _onSearchFocusChanged() {
     if (!_searchFocusNode.hasFocus) {
       _searchDebounce?.cancel();

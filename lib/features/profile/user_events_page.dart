@@ -39,7 +39,7 @@ class _UserEventsPageState extends State<UserEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    // final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(centerTitle: true, title: const Text('我的活动')),

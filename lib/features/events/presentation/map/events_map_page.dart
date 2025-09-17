@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
+import '../../../../core/error/api_exception.dart';
+import '../../../../core/network/api_service.dart';
 import '../../../../core/state/event_map_state/events_providers.dart';
 import '../../../../core/state/event_map_state/location_provider.dart';
 import 'widgets/search_event_appbar.dart';
@@ -24,10 +27,23 @@ class EventsMapPage extends ConsumerStatefulWidget {
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool _movedToSelected = false;
+  final _searchController = TextEditingController();
+  final _api = ApiService();
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
   final _quickTags = const ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
   final _selectedTags = <String>{};
   EventFilter _filter = const EventFilter();
+  List<Event> _searchResults = const <Event>[];
+  bool _isSearching = false;
+  bool _showSearchResults = false;
+  String? _searchError;
+  String _currentSearchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,15 +72,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return Scaffold(
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
       appBar: SearchEventAppBar(
-        onSearch: (kw) => debugPrint('搜索: $kw'),
+        controller: _searchController,
+        onSearch: _performSearch,
         onAvatarTap: _onAvatarTap,
         tags: _quickTags,
         selected: _selectedTags,
         onTagToggle: (t, v) => setState(() {
           v ? _selectedTags.add(t) : _selectedTags.remove(t);
           // TODO: 将标签映射到 _filter 并刷新 Provider
-                                ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('category 待开发')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('category 待开发')));
         }),
         onOpenFilter: () async {
           final res = await showEventFilterSheet(
@@ -74,9 +91,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           );
           if (res != null) setState(() => _filter = res);
           // TODO: 根据 _filter 刷新数据
-                      ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('filter 待开发')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('filter 待开发')));
         },
+        onResultTap: _onSearchResultTap,
+        onClearResults: _clearSearchResults,
+        showResults: _showSearchResults,
+        isLoading: _isSearching,
+        results: _searchResults,
+        errorText: _searchError,
       ),
       body: MapCanvas(
         mapController: _map,
@@ -137,5 +160,62 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     } else {
       Navigator.pushNamed(context, '/login');
     }
+  }
+
+  Future<void> _performSearch(String keyword) async {
+    final query = keyword.trim();
+    if (query.isEmpty) {
+      _clearSearchResults();
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+      _showSearchResults = true;
+      _searchError = null;
+      _currentSearchQuery = query;
+    });
+
+    try {
+      final data = await _api.searchEvents(query);
+      if (!mounted || _currentSearchQuery != query) return;
+      setState(() {
+        _searchResults = data;
+      });
+    } on ApiException catch (e) {
+      if (!mounted || _currentSearchQuery != query) return;
+      setState(() {
+        _searchResults = const <Event>[];
+        _searchError = e.message;
+      });
+    } finally {
+      if (!mounted || _currentSearchQuery != query) return;
+      setState(() {
+        _isSearching = false;
+      });
+    }
+  }
+
+  void _onSearchResultTap(Event event) {
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _showSearchResults = false;
+      _searchResults = const <Event>[];
+      _searchError = null;
+      _currentSearchQuery = '';
+      _searchController.text = event.title;
+    });
+    _map.move(LatLng(event.latitude, event.longitude), 15);
+    _showEventCard(event);
+  }
+
+  void _clearSearchResults() {
+    setState(() {
+      _searchResults = const <Event>[];
+      _searchError = null;
+      _showSearchResults = false;
+      _isSearching = false;
+      _currentSearchQuery = '';
+    });
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
-import '../features/events/presentation/search_events_page.dart';
 import '../features/profile/presentation/profile/profile_page.dart';
 
 class App extends StatefulWidget {
@@ -15,7 +14,6 @@ class _AppState extends State<App> {
   final List<Widget> _pages = const [
     EventsListPage(),
     EventsMapPage(),
-    SearchEventsPage(),
     ProfilePage(),
   ];
 
@@ -27,9 +25,8 @@ class _AppState extends State<App> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.event),  label: 'Events'),
-          NavigationDestination(icon: Icon(Icons.map),    label: 'Map'),
-          NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Events'),
+          NavigationDestination(icon: Icon(Icons.map), label: 'Map'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

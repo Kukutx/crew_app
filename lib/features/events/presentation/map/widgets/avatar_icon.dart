@@ -1,6 +1,6 @@
 // widgets/avatar_icon.dart
 import 'dart:io';
-
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,14 +17,22 @@ class AvatarIcon extends ConsumerStatefulWidget  {
 
 class _AvatarIconState extends ConsumerState<AvatarIcon> {
   fa.User? _user;
+  StreamSubscription<fa.User?>? _authSub;
+
   @override
   void initState() {
     super.initState();
     // 监听用户状态变化
     _user = fa.FirebaseAuth.instance.currentUser;
-    fa.FirebaseAuth.instance.authStateChanges().listen((u) {
+    _authSub = fa.FirebaseAuth.instance.authStateChanges().listen((u) {
       if (mounted) setState(() => _user = u);
     });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
   }
 
   @override

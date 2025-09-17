@@ -31,6 +31,14 @@ class _PreferencesPageState extends State<PreferencesPage> {
     'Books',
   ];
 
+  @override
+  void dispose() {
+    _schoolController.dispose();
+    _industryController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+  
   // 选中的标签
   final Set<String> _selectedTags = {};
 

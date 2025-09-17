@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
@@ -14,19 +15,26 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   fa.User? _user;
+  StreamSubscription<fa.User?>? _authSub;
 
   @override
   void initState() {
     super.initState();
     _user = fa.FirebaseAuth.instance.currentUser;
     // 监听用户状态变化
-    fa.FirebaseAuth.instance.authStateChanges().listen((user) {
+    _authSub = fa.FirebaseAuth.instance.authStateChanges().listen((user) {
       if (mounted) {
         setState(() {
           _user = user;
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _signOut() async {
@@ -45,6 +53,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('个人中心'),
+        centerTitle: true,
+        // leading: IconButton(
+        //   icon: const Icon(Icons.close),
+        //   onPressed: () {
+        //     Navigator.of(context).pop(); // 关闭页面
+        //   },
+        // ),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

@@ -1,13 +1,12 @@
 import 'dart:ui';
-
-import 'package:crew_app/features/user/data/ActivityItem.dart';
-import 'package:crew_app/features/user/data/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-/// ====== 主页面 ======
+import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/data/ActivityItem.dart';
+
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key});
   @override
@@ -16,70 +15,75 @@ class UserProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<UserProfilePage>
     with TickerProviderStateMixin {
-  final _tabs = const [
-    Tab(text: '作品'),
-    Tab(text: '活动'),
-    Tab(text: '收藏'),
-  ];
+  late final TabController _tabCtrl;
+  final _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
 
-  Future<void> _onRefresh() async {
-    await Future<void>.delayed(const Duration(milliseconds: 800));
+  @override
+  void initState() {
+    super.initState();
+    _tabCtrl = TabController(length: _tabs.length, vsync: this);
   }
 
   @override
+  void dispose() {
+    _tabCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async =>
+      Future<void>.delayed(const Duration(milliseconds: 800));
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final profile = ref.watch(_profileProvider);
-    final tabCtrl = TabController(length: _tabs.length, vsync: this);
+    final theme = Theme.of(context);
+    final topPad = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: NestedScrollView(
-          headerSliverBuilder: (context, innerScrolled) => [
-            // ===== 背景封面图 =====
+          headerSliverBuilder: (_, __) => [
             SliverAppBar(
-              expandedHeight: 240,
               pinned: true,
               stretch: true,
-              title: Text(profile.name),
-              flexibleSpace: FlexibleSpaceBar(
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.center,
-                          colors: [Colors.black54, Colors.transparent],
+              expandedHeight: 300, // 给卡片留空间
+              flexibleSpace: LayoutBuilder(
+                builder: (context, c) {
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // 封面
+                      CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover),
+                      // 渐变压暗
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.center,
+                            colors: [Colors.black54, Colors.transparent],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      // 头像卡片：固定在底部，避开刘海（topPad）
+                      Positioned(
+                        left: 16,
+                        right: 16,
+                        bottom: 72, // 留出 TabBar 的高度
+                        child: _HeaderCard(userProfile: profile),
+                      ),
+                      // 顶部安全区占位，避免被刘海/状态栏压住
+                      Positioned(top: 0, left: 0, right: 0, child: SizedBox(height: topPad)),
+                    ],
+                  );
+                },
               ),
-            ),
-            // ===== 用户卡片，悬浮在封面下缘 =====
-            SliverToBoxAdapter(
-              child: Transform.translate(
-                offset: const Offset(0, -28),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _HeaderCard(userProfile: profile),
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 8)),
-            // ===== Tab Header 吸顶 =====
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _TabHeaderDelegate(
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(48),
                 child: Material(
                   color: theme.scaffoldBackgroundColor,
                   child: TabBar(
-                    controller: tabCtrl,
+                    controller: _tabCtrl,
                     tabs: _tabs,
                     indicatorSize: TabBarIndicatorSize.tab,
                   ),
@@ -88,18 +92,15 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
             ),
           ],
           body: TabBarView(
-            controller: tabCtrl,
-            children: const [
-              _PostsGrid(),
-              _ActivitiesList(),
-              _FavoritesGrid(),
-            ],
+            controller: _tabCtrl,
+            children: const [_ActivitiesList(), _FavoritesGrid()],
           ),
         ),
       ),
     );
   }
 }
+
 /// ====== 头部卡片（头像、签名、统计、按钮） ======
 class _HeaderCard extends ConsumerWidget {
   const _HeaderCard({required this.userProfile});
@@ -107,66 +108,50 @@ class _HeaderCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textTheme = Theme.of(context).textTheme;
-
+    final t = Theme.of(context).textTheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(48),
-                child: CachedNetworkImage(
-                  imageUrl: userProfile.avatar,
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.cover,
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Material( // 用 Material 带阴影/表面色
+          elevation: 6,
+          color: Colors.white.withOpacity(0.12),
+          surfaceTintColor: Colors.white,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(48),
+                  child: CachedNetworkImage(
+                    imageUrl: userProfile.avatar, width: 64, height: 64, fit: BoxFit.cover),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DefaultTextStyle(
-                  style: textTheme.bodyMedium!.copyWith(color: Colors.white),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userProfile.name,
-                        style: textTheme.titleMedium!.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        userProfile.bio,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          _Stat('粉丝', userProfile.followers),
-                          _Dot(),
-                          _Stat('关注', userProfile.following),
-                          _Dot(),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DefaultTextStyle(
+                    style: t.bodyMedium!.copyWith(color: Colors.white),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(userProfile.name,
+                            style: t.titleMedium!.copyWith(
+                              color: Colors.white, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 4),
+                        Text(userProfile.bio, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 8),
+                        Row(children: [
+                          _Stat('粉丝', userProfile.followers), _Dot(),
+                          _Stat('关注', userProfile.following), _Dot(),
                           _Stat('获赞', userProfile.likes),
-                        ],
-                      ),
-                    ],
+                        ]),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              _FollowButton(),
-            ],
+                const SizedBox(width: 8),
+                _FollowButton(),
+              ],
+            ),
           ),
         ),
       ),
@@ -227,35 +212,8 @@ class _FollowButton extends ConsumerWidget {
           followers:
               current.followed ? current.followers - 1 : current.followers + 1,
         );
-        // TODO: Firebase：写入/删除 collection('follows').doc(current.uid)...
       },
       child: Text(followed ? '已关注' : '关注'),
-    );
-  }
-}
-
-/// ====== Tab 内容：作品（瀑布流） ======
-class _PostsGrid extends ConsumerWidget {
-  const _PostsGrid();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final images = ref.watch(_postsProvider);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        itemCount: images.length,
-        itemBuilder: (_, i) => ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: AspectRatio(
-            aspectRatio: i.isEven ? 3 / 4 : 1,
-            child: CachedNetworkImage(imageUrl: images[i], fit: BoxFit.cover),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -381,8 +339,7 @@ class _TabHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant _TabHeaderDelegate oldDelegate) => false;
 }
 
-
-/// ====== 假数据 Provider（替换为 Firestore Stream/FutureProvider 即可） ======
+/// ====== 假数据 Provider ======
 final _profileProvider = StateProvider<User>((ref) {
   return User(
     uid: 'u_001',
@@ -397,26 +354,19 @@ final _profileProvider = StateProvider<User>((ref) {
   );
 });
 
-final _postsProvider = Provider<List<String>>((ref) => List.generate(
-      24,
-      (i) =>
-          'https://images.unsplash.com/photo-15${30 + i}2192596544-9eb780fc7f66',
-    ));
-
 final _activitiesProvider = Provider<List<ActivityItem>>((ref) => List.generate(
-      12,
+      8,
       (i) => ActivityItem(
         id: 'act_$i',
         title: '城市慢跑 #$i',
         imageUrl:
-            'https://images.unsplash.com/photo-1520975916090-3105956dac38',
-        time: DateTime.now().subtract(Duration(days: i * 3)),
+            'https://picsum.photos/seed/act$i/300/200',
+        time: DateTime.now().subtract(Duration(days: i * 2)),
         location: 'Milan, IT',
       ),
     ));
 
 final _favoritesProvider = Provider<List<String>>((ref) => List.generate(
-      16,
-      (i) =>
-          'https://images.unsplash.com/photo-151${40 + i}9255554-9eb780fc7f66',
+      12,
+      (i) => 'https://picsum.photos/seed/fav$i/400/600',
     ));

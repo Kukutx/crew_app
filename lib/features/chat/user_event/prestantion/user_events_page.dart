@@ -255,18 +255,18 @@ class _EventTile extends StatelessWidget {
 
 
 
+// import 'package:crew_app/core/network/api_service.dart';
 // import 'package:crew_app/features/events/data/event.dart';
+// import 'package:crew_app/features/events/presentation/detail/events_detail_page.dart';
 // import 'package:flutter/material.dart';
-// import '../../../core/network/api_service.dart';
-// import 'events_detail_page.dart';
 
-// class EventsListPage extends StatefulWidget {
-//   const EventsListPage({super.key});
+// class UserEventsPage extends StatefulWidget {
+//   const UserEventsPage({super.key});
 //   @override
-//   State<EventsListPage> createState() => _EventsListPageState();
+//   State<UserEventsPage> createState() => _EventsListPageState();
 // }
 
-// class _EventsListPageState extends State<EventsListPage> {
+// class _EventsListPageState extends State<UserEventsPage> {
 //   final api = ApiService();
 //   int _tab = 1; // 0=我喜欢的 1=我报名的（仅UI切换，数据过滤按你业务加）
 

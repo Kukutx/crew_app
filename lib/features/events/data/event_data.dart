@@ -4,5 +4,14 @@ class EventData {
   final String description;
   final String locationName;
   
-  EventData( {required this.title, required this.description,required this.locationName});
+  final List<String> imagePaths;
+  final int? coverIndex;
+
+  const EventData({
+    required this.title,
+    required this.description,
+    required this.locationName,
+    this.imagePaths = const [],
+    this.coverIndex,
+  });
 }

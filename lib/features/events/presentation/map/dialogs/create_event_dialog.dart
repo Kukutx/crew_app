@@ -1,14 +1,26 @@
 // dialogs/create_event_dialog.dart
 import 'package:crew_app/features/events/data/event_data.dart';
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
+
+class _DialogImage {
+  _DialogImage({required this.file, required this.bytes});
+
+  final XFile file;
+  final Uint8List bytes;
+}
 
 Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
   final title = TextEditingController();
   final desc = TextEditingController();
   final city = TextEditingController(text: '正在获取…');
   final formKey = GlobalKey<FormState>();
+  final picker = ImagePicker();
+  final images = <_DialogImage>[];
+  int? coverIndex;
 
   // 开始反地理编码
   () async {
@@ -36,61 +48,233 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
 
   return showDialog<EventData>(
     context: context,
-    builder: (_) => AlertDialog(
-      title: const Text('Create Event'),
-      content: Form(
-        key: formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  '位置: ${pos.latitude.toStringAsFixed(6)}, ${pos.longitude.toStringAsFixed(6)}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-              const SizedBox(height: 12),
-              // 城市（可编辑）
-              TextFormField(
-                controller: city,
-                decoration: const InputDecoration(
-                  labelText: '城市/地点(可编辑)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.location_city),
+    builder: (dialogContext) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          Future<void> handleAddImages() async {
+            final remain = 5 - images.length;
+            if (remain <= 0) return;
+
+            final picked = await picker.pickMultiImage();
+            if (picked.isEmpty) return;
+
+            for (final img in picked.take(remain)) {
+              final bytes = await img.readAsBytes();
+              images.add(_DialogImage(file: img, bytes: bytes));
+            }
+
+            if (images.isNotEmpty && coverIndex == null) {
+              coverIndex = 0;
+            }
+
+            setState(() {});
+          }
+
+          void handleRemoveImage(int index) {
+            setState(() {
+              images.removeAt(index);
+              if (images.isEmpty) {
+                coverIndex = null;
+              } else if (coverIndex != null) {
+                if (coverIndex! == index) {
+                  coverIndex = 0;
+                } else if (coverIndex! > index) {
+                  coverIndex = coverIndex! - 1;
+                }
+              }
+            });
+          }
+
+          void handleSelectCover(int index) {
+            setState(() {
+              coverIndex = index;
+            });
+          }
+
+          return AlertDialog(
+            title: const Text('Create Event'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '位置: ${pos.latitude.toStringAsFixed(6)}, ${pos.longitude.toStringAsFixed(6)}',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: city,
+                      decoration: const InputDecoration(
+                        labelText: '城市/地点(可编辑)',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.location_city),
+                      ),
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? '请输入城市' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: title,
+                      decoration: const InputDecoration(
+                        labelText: '活动标题',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? '请输入活动标题' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: desc,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: '活动描述',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '活动图片 (最多5张)',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                        Text(
+                          '${images.length}/5',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (images.isNotEmpty)
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (var i = 0; i < images.length; i++)
+                            Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => handleSelectCover(i),
+                                  child: Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: coverIndex == i
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                            : Colors.grey.shade300,
+                                        width: coverIndex == i ? 2 : 1,
+                                      ),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Image.memory(
+                                      images[i].bytes,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () => handleRemoveImage(i),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.all(2),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (coverIndex == i)
+                                  Positioned(
+                                    bottom: 4,
+                                    left: 4,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Text(
+                                        '封面',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    if (images.length < 5)
+                      OutlinedButton.icon(
+                        onPressed: handleAddImages,
+                        icon: const Icon(Icons.add_a_photo),
+                        label: const Text('添加图片'),
+                      ),
+                    if (images.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          coverIndex == null
+                              ? '未选择封面，默认使用第一张图片。'
+                              : '已选择第${coverIndex! + 1}张作为封面。',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ),
+                  ],
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? '请输入城市' : null,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: title,
-                decoration: const InputDecoration(
-                    labelText: '活动标题', border: OutlineInputBorder()),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? '请输入活动标题' : null,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('取消'),
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: desc,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                    labelText: '活动描述', border: OutlineInputBorder()),
+              ElevatedButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() != true) return;
+                  Navigator.pop(
+                      context,
+                      EventData(
+                        title: title.text,
+                        description: desc.text,
+                        locationName:
+                            city.text.trim().isEmpty ? '未知' : city.text.trim(),
+                      ));
+                },
+                child: const Text('创建'),
               ),
             ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context), child: const Text('取消')),
-        ElevatedButton(
-          onPressed: () {
-            if (formKey.currentState?.validate() != true) return;
-            Navigator.pop(
-                context, EventData(title: title.text, description: desc.text,                locationName: city.text.trim().isEmpty ? '未知' : city.text.trim(),));
-          },
-          child: const Text('创建'),
-        ),
-      ],
-    ),
+          );
+        },
+      );
+    },
   );
 }

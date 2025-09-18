@@ -54,7 +54,8 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                     fit: StackFit.expand,
                     children: [
                       // 封面
-                      CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover),
+                      CachedNetworkImage(
+                          imageUrl: profile.cover, fit: BoxFit.cover),
                       // 渐变压暗
                       const DecoratedBox(
                         decoration: BoxDecoration(
@@ -73,7 +74,11 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                         child: _HeaderCard(userProfile: profile),
                       ),
                       // 顶部安全区占位，避免被刘海/状态栏压住
-                      Positioned(top: 0, left: 0, right: 0, child: SizedBox(height: topPad)),
+                      Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: SizedBox(height: topPad)),
                     ],
                   );
                 },
@@ -90,6 +95,21 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                 ),
               ),
             ),
+            // // 用自己的 Delegate 来做吸顶 TabBar
+            // SliverPersistentHeader(
+            //   pinned: true,
+            //   delegate: _TabHeaderDelegate(
+            //     child: Material(
+            //       elevation: 2, // 吸顶时带一点阴影更有层次
+            //       color: Theme.of(context).scaffoldBackgroundColor,
+            //       child: TabBar(
+            //         controller: _tabCtrl,
+            //         tabs: _tabs,
+            //         indicatorSize: TabBarIndicatorSize.tab,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
           body: TabBarView(
             controller: _tabCtrl,
@@ -113,9 +133,10 @@ class _HeaderCard extends ConsumerWidget {
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Material( // 用 Material 带阴影/表面色
+        child: Material(
+          // 用 Material 带阴影/表面色
           elevation: 6,
-          color: Colors.white.withOpacity(0.12),
+          color: Colors.white.withValues(alpha: 0.12),
           surfaceTintColor: Colors.white,
           child: Container(
             padding: const EdgeInsets.all(12),
@@ -124,7 +145,10 @@ class _HeaderCard extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(48),
                   child: CachedNetworkImage(
-                    imageUrl: userProfile.avatar, width: 64, height: 64, fit: BoxFit.cover),
+                      imageUrl: userProfile.avatar,
+                      width: 64,
+                      height: 64,
+                      fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -135,13 +159,17 @@ class _HeaderCard extends ConsumerWidget {
                       children: [
                         Text(userProfile.name,
                             style: t.titleMedium!.copyWith(
-                              color: Colors.white, fontWeight: FontWeight.w600)),
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600)),
                         const SizedBox(height: 4),
-                        Text(userProfile.bio, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        Text(userProfile.bio,
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 8),
                         Row(children: [
-                          _Stat('粉丝', userProfile.followers), _Dot(),
-                          _Stat('关注', userProfile.following), _Dot(),
+                          _Stat('粉丝', userProfile.followers),
+                          _Dot(),
+                          _Stat('关注', userProfile.following),
+                          _Dot(),
                           _Stat('获赞', userProfile.likes),
                         ]),
                       ],
@@ -344,12 +372,12 @@ final _profileProvider = StateProvider<User>((ref) {
   return User(
     uid: 'u_001',
     name: 'Luna',
-    bio: '爱户外、爱分享 | Crew 资深爱动员',
+    bio: '爱户外、爱分享 | Crew 资深爱好者',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
     cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
     followers: 1280,
     following: 96,
-    likes: 34500,
+    likes: 345,
     followed: false,
   );
 });
@@ -359,8 +387,7 @@ final _activitiesProvider = Provider<List<ActivityItem>>((ref) => List.generate(
       (i) => ActivityItem(
         id: 'act_$i',
         title: '城市慢跑 #$i',
-        imageUrl:
-            'https://picsum.photos/seed/act$i/300/200',
+        imageUrl: 'https://picsum.photos/seed/act$i/300/200',
         time: DateTime.now().subtract(Duration(days: i * 2)),
         location: 'Milan, IT',
       ),

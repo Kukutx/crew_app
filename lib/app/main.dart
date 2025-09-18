@@ -1,8 +1,9 @@
 
 import 'package:crew_app/app/app.dart';
+import 'package:crew_app/playground/chat/presentation/user_chat_screen.dart';
 import 'package:crew_app/core/state/settings_providers.dart';
 import 'package:crew_app/features/profile/presentation/profile/profile_page.dart';
-import 'package:crew_app/features/profile/user_events_page.dart';
+import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/favorites/favorites_page.dart';
 import 'package:crew_app/features/profile/presentation/history/history_page.dart';
 import 'package:crew_app/features/profile/presentation/preferences/preferences_page.dart';
@@ -57,6 +58,7 @@ class MyApp extends ConsumerWidget {
         '/profile': (context) => ProfilePage(),
         '/history': (context) => HistoryPage(),
         '/favorites': (context) => FavoritesPage(),
+        '/chat': (context) => const UserChatScreen(),
       },
     );
   }

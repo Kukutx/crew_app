@@ -98,47 +98,97 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
-  /// No description provided for @settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Settings'**
   String get settings;
-
-  /// No description provided for @dark_mode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
   String get dark_mode;
-
-  /// No description provided for @language.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
   String get language;
-
-  /// No description provided for @about.
-  ///
-  /// In en, this message translates to:
-  /// **'About'**
   String get about;
-
-  /// No description provided for @chinese.
-  ///
-  /// In en, this message translates to:
-  /// **'Chinese'**
   String get chinese;
-
-  /// No description provided for @english.
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
   String get english;
-
-  /// No description provided for @about_content.
-  ///
-  /// In en, this message translates to:
-  /// **'This is a universal settings page example.'**
   String get about_content;
+  String get action_apply;
+  String get action_cancel;
+  String get action_create;
+  String get action_follow;
+  String get action_following;
+  String get action_login;
+  String get action_logout;
+  String get action_register;
+  String get action_register_now;
+  String get action_replace;
+  String get action_reset;
+  String get action_restore_defaults;
+  String get browsing_history;
+  String get city_field_label;
+  String get city_loading;
+  String get email_unbound;
+  String get event_description_field_label;
+  String get event_details_title;
+  String get event_meeting_point_title;
+  String get event_participants_title;
+  String get event_time_title;
+  String get event_title_field_label;
+  String get events_tab_favorites;
+  String get events_tab_registered;
+  String get events_title;
+  String get feature_not_ready;
+  String get filter;
+  String get filter_category;
+  String get filter_date;
+  String get filter_date_any;
+  String get filter_date_this_month;
+  String get filter_date_this_week;
+  String get filter_date_today;
+  String get filter_distance;
+  String get filter_only_free;
+  String get followed;
+  String get favorites_empty;
+  String get favorites_title;
+  String get history_empty;
+  String get history_title;
+  String get industry_label_optional;
+  String get interest_tags_title;
+  String get load_failed;
+  String location_coordinates(Object lat, Object lng);
+  String get location_unavailable;
+  String get login_footer;
+  String get login_prompt;
+  String get login_side_info;
+  String get login_subtitle;
+  String get login_title;
+  String get logout_success;
+  String get max_interest_selection;
+  String get my_events;
+  String get my_favorites;
+  String get no_events;
+  String get no_events_found;
+  String get not_logged_in;
+  String get preferences_title;
+  String get please_enter_city;
+  String get please_enter_event_title;
+  String get profile_title;
+  String get registration_not_implemented;
+  String get registration_open;
+  String get school_label_optional;
+  String get search_hint;
+  String get search_tags_hint;
+  String get student_verification;
+  String get tag_city_explore;
+  String get tag_easy_social;
+  String get tag_free;
+  String get tag_friends;
+  String get tag_music;
+  String get tag_nearby;
+  String get tag_party;
+  String get tag_sports;
+  String get tag_today;
+  String get tag_trending;
+  String get tag_walk_friendly;
+  String get to_be_announced;
+  String get unknown;
+  String get unfollowed;
+  String get user_display_name_fallback;
+  String get verification_preferences;
+  String version_label(Object version);
 }
 
 class _AppLocalizationsDelegate

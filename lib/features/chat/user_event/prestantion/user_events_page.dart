@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class UserEventsPage extends StatefulWidget {
@@ -39,10 +40,11 @@ class _UserEventsPageState extends State<UserEventsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     // final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: const Text('我的活动')),
+      appBar: AppBar(centerTitle: true, title: Text(loc.my_events)),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -63,14 +65,14 @@ class _UserEventsPageState extends State<UserEventsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _TabChip(
-                    label: '我喜欢的',
+                    label: loc.events_tab_favorites,
                     selected: _tab == 0,
                     onTap: () => setState(() => _tab = 0),
                     icon: Icons.favorite,
                   ),
                   const SizedBox(width: 12),
                   _TabChip(
-                    label: '我报名的',
+                    label: loc.events_tab_registered,
                     selected: _tab == 1,
                     onTap: () => setState(() => _tab = 1),
                     icon: Icons.autorenew,

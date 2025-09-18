@@ -2,11 +2,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/events_detail_page.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// 地图报名页 事件
 void showEventBottomSheet(
     {required BuildContext context, required Event event}) {
+  final loc = AppLocalizations.of(context)!;
   // Tips： 判断imageUrls是否有值，否则用coverImageUrl
   // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
   final imageUrl = (event.imageUrls.isNotEmpty)
@@ -93,9 +95,11 @@ void showEventBottomSheet(
                                       icon: const Icon(Icons.favorite_border),
                                       onPressed: () {
                                         // TODO: 收藏
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                content: Text('收藏 待开发')));
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(loc.feature_not_ready),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ]),
@@ -113,7 +117,7 @@ void showEventBottomSheet(
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
-                                _smallChip('正在报名中'),
+                                _smallChip(loc.registration_open),
                                 const SizedBox(width: 6),
                                 const Icon(Icons.groups,
                                     size: 16, color: Colors.grey),
@@ -142,11 +146,14 @@ void showEventBottomSheet(
                                     onPressed: () {
                                       // TODO: 报名逻辑
                                       Navigator.pop(context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text('报名功能未实现')));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              Text(loc.registration_not_implemented),
+                                        ),
+                                      );
                                     },
-                                    child: const Text('立即报名'),
+                                    child: Text(loc.action_register_now),
                                   ),
                                 ),
                               ]),

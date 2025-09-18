@@ -1,4 +1,5 @@
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'avatar_icon.dart';
@@ -57,6 +58,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -83,7 +85,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                       focusNode: focusNode,
                       textInputAction: TextInputAction.search,
                       decoration: InputDecoration(
-                        hintText: '搜索活动',
+                        hintText: loc.search_hint,
                         filled: true,
                         fillColor: Colors.white,
                         isDense: true,
@@ -129,12 +131,12 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 children: [
-                  ...tags.map(
+                 ...tags.map(
                     (t) => Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
                         visualDensity: VisualDensity.compact,
-                        label: Text(t),
+                        label: Text(_tagLabel(loc, t)),
                         selected: selected.contains(t),
                         onSelected: (v) => onTagToggle(t, v),
                       ),
@@ -143,7 +145,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                   const SizedBox(width: 4),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.tune),
-                    label: const Text('筛选'),
+                    label: Text(loc.filter),
                     onPressed: onOpenFilter,
                   ),
                 ],
@@ -158,7 +160,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                   clipBehavior: Clip.antiAlias,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 240),
-                    child: _buildResults(),
+                    child: _buildResults(context),
                   ),
                 ),
               ),
@@ -168,7 +170,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _buildResults() {
+  Widget _buildResults(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     if (isLoading) {
       return const SizedBox(
         height: 72,
@@ -193,9 +196,9 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     if (results.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 64,
-        child: Center(child: Text('没有找到活动')),
+        child: Center(child: Text(loc.no_events_found)),
       );
     }
 
@@ -218,5 +221,28 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
         );
       },
     );
+  }
+
+  String _tagLabel(AppLocalizations loc, String key) {
+    switch (key) {
+      case 'today':
+        return loc.tag_today;
+      case 'nearby':
+        return loc.tag_nearby;
+      case 'party':
+        return loc.tag_party;
+      case 'sports':
+        return loc.tag_sports;
+      case 'music':
+        return loc.tag_music;
+      case 'free':
+        return loc.tag_free;
+      case 'trending':
+        return loc.tag_trending;
+      case 'friends':
+        return loc.tag_friends;
+      default:
+        return key;
+    }
   }
 }

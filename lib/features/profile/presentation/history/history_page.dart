@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,13 +15,14 @@ class HistoryPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(historyProvider);
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History'),
+        title: Text(loc.history_title),
       ),
       body: history.isEmpty
-          ? const Center(child: Text('No history yet~'))
+          ? Center(child: Text(loc.history_empty))
           : ListView.separated(
               itemCount: history.length,
               separatorBuilder: (_, __) => const Divider(),

@@ -1,7 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/network/api_service.dart';
 import '../detail/events_detail_page.dart';
 import '../../../../core/error/api_exception.dart';
@@ -12,8 +13,9 @@ class EventsListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final api = ApiService();
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Events')),
+      appBar: AppBar(title: Text(loc.events_title)),
       body: FutureBuilder<List<Event>>(
         future: api.getEvents(),
         builder: (context, snap) {
@@ -29,12 +31,12 @@ class EventsListPage extends StatelessWidget {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(msg)));
             });
-            return const Center(child: Text('加载失败'));
+            return Center(child: Text(loc.load_failed));
           }
 
           final events = snap.data ?? const <Event>[];
           if (events.isEmpty) {
-            return const Center(child: Text('暂无活动'));
+            return Center(child: Text(loc.no_events));
           }
 
           return MasonryGridView.count(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -30,7 +31,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool _movedToSelected = false;
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
-  final _quickTags = const ['今天', '附近', '派对', '运动', '音乐', '免费', '热门', '朋友在'];
+  static const _quickTags = [
+    'today',
+    'nearby',
+    'party',
+    'sports',
+    'music',
+    'free',
+    'trending',
+    'friends',
+  ];
   final _selectedTags = <String>{};
 
   // 搜索框
@@ -63,6 +73,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.valueOrNull;
@@ -100,7 +111,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           v ? _selectedTags.add(t) : _selectedTags.remove(t);
           // TODO: 将标签映射到 _filter 并刷新 Provider
           ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('category 待开发')));
+              .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
         }),
         onOpenFilter: () async {
           final res = await showEventFilterSheet(
@@ -111,7 +122,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           if (res != null) setState(() => _filter = res);
           // TODO: 根据 _filter 刷新数据
           ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('filter 待开发')));
+              .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
         },
         onResultTap: _onSearchResultTap,
         showResults: _showSearchResults,
@@ -158,7 +169,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             _map.rotate(0);
           } else {
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('无法获取定位')));
+                .showSnackBar(SnackBar(content: Text(loc.location_unavailable)));
           }
         },
         child: const Icon(Icons.my_location),

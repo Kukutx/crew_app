@@ -96,6 +96,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_title_field_label => '活动标题';
 
   @override
+  String get events_open_chat => '进入群聊';
+
+  @override
   String get events_tab_favorites => '我喜欢的';
 
   @override
@@ -201,6 +204,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get my_favorites => '我的收藏';
+
+  @override
+  String chat_members_count(Object count) {
+    return '$count 位成员';
+  }
+
+  @override
+  String get chat_you_label => '我';
+
+  @override
+  String get chat_message_input_hint => '发送一条消息…';
+
+  @override
+  String chat_reply_count(Object count) {
+    return '$count 条回复';
+  }
 
   @override
   String get no_events => '暂无活动';

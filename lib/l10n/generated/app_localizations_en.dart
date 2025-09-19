@@ -96,6 +96,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_title_field_label => 'Event Title';
 
   @override
+  String get events_open_chat => 'Open group chat';
+
+  @override
   String get events_tab_favorites => 'Liked';
 
   @override
@@ -205,6 +208,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get my_favorites => 'My favorites';
+
+  @override
+  String chat_members_count(Object count) {
+    return '$count members';
+  }
+
+  @override
+  String get chat_you_label => 'You';
+
+  @override
+  String get chat_message_input_hint => 'Type a message';
+
+  @override
+  String chat_reply_count(Object count) {
+    return '$count replies';
+  }
 
   @override
   String get no_events => 'No events yet';

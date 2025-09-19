@@ -98,29 +98,95 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
-  /// No description provided for @settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
-
-  /// No description provided for @dark_mode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get dark_mode;
-
-  /// No description provided for @language.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
-
   /// No description provided for @about.
   ///
   /// In en, this message translates to:
   /// **'About'**
   String get about;
+
+  /// No description provided for @about_content.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a universal settings page example.'**
+  String get about_content;
+
+  /// No description provided for @action_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get action_apply;
+
+  /// No description provided for @action_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get action_cancel;
+
+  /// No description provided for @action_create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get action_create;
+
+  /// No description provided for @action_follow.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get action_follow;
+
+  /// No description provided for @action_following.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get action_following;
+
+  /// No description provided for @action_login.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get action_login;
+
+  /// No description provided for @action_logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get action_logout;
+
+  /// No description provided for @action_register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get action_register;
+
+  /// No description provided for @action_register_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Now'**
+  String get action_register_now;
+
+  /// No description provided for @action_replace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get action_replace;
+
+  /// No description provided for @action_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get action_reset;
+
+  /// No description provided for @action_restore_defaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore default'**
+  String get action_restore_defaults;
+
+  /// No description provided for @browsing_history.
+  ///
+  /// In en, this message translates to:
+  /// **'Browsing history'**
+  String get browsing_history;
 
   /// No description provided for @chinese.
   ///
@@ -128,17 +194,473 @@ abstract class AppLocalizations {
   /// **'Chinese'**
   String get chinese;
 
+  /// No description provided for @city_field_label.
+  ///
+  /// In en, this message translates to:
+  /// **'City / Place (editable)'**
+  String get city_field_label;
+
+  /// No description provided for @city_loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get city_loading;
+
+  /// No description provided for @dark_mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get dark_mode;
+
+  /// No description provided for @email_unbound.
+  ///
+  /// In en, this message translates to:
+  /// **'Email not linked'**
+  String get email_unbound;
+
+  /// No description provided for @user_display_name_fallback.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get user_display_name_fallback;
+
   /// No description provided for @english.
   ///
   /// In en, this message translates to:
   /// **'English'**
   String get english;
 
-  /// No description provided for @about_content.
+  /// No description provided for @events.
   ///
   /// In en, this message translates to:
-  /// **'This is a universal settings page example.'**
-  String get about_content;
+  /// **'Events'**
+  String get events;
+
+  /// No description provided for @event_description_field_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Description'**
+  String get event_description_field_label;
+
+  /// No description provided for @event_details_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Event details'**
+  String get event_details_title;
+
+  /// No description provided for @event_meeting_point_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting point'**
+  String get event_meeting_point_title;
+
+  /// No description provided for @event_participants_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Participants'**
+  String get event_participants_title;
+
+  /// No description provided for @event_time_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Event time'**
+  String get event_time_title;
+
+  /// No description provided for @event_title_field_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Title'**
+  String get event_title_field_label;
+
+  /// No description provided for @events_tab_favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked'**
+  String get events_tab_favorites;
+
+  /// No description provided for @events_tab_registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get events_tab_registered;
+
+  /// No description provided for @events_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get events_title;
+
+  /// No description provided for @create_event_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Event'**
+  String get create_event_title;
+
+  /// No description provided for @feature_not_ready.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is under development.'**
+  String get feature_not_ready;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @filter_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get filter_category;
+
+  /// No description provided for @filter_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get filter_date;
+
+  /// No description provided for @filter_date_any.
+  ///
+  /// In en, this message translates to:
+  /// **'Any time'**
+  String get filter_date_any;
+
+  /// No description provided for @filter_date_this_month.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get filter_date_this_month;
+
+  /// No description provided for @filter_date_this_week.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get filter_date_this_week;
+
+  /// No description provided for @filter_date_today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get filter_date_today;
+
+  /// No description provided for @filter_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get filter_distance;
+
+  /// No description provided for @filter_only_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Only show free events'**
+  String get filter_only_free;
+
+  /// No description provided for @followed.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get followed;
+
+  /// No description provided for @favorites_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet~'**
+  String get favorites_empty;
+
+  /// No description provided for @favorites_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites_title;
+
+  /// No description provided for @history_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet~'**
+  String get history_empty;
+
+  /// No description provided for @history_title.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history_title;
+
+  /// No description provided for @industry_label_optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Industry (optional)'**
+  String get industry_label_optional;
+
+  /// No description provided for @interest_tags_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest tags'**
+  String get interest_tags_title;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @load_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get load_failed;
+
+  /// No description provided for @location_coordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Location: {lat}, {lng}'**
+  String location_coordinates(Object lat, Object lng);
+
+  /// No description provided for @location_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to get location'**
+  String get location_unavailable;
+
+  /// No description provided for @login_footer.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our Terms of Service and Privacy Policy.'**
+  String get login_footer;
+
+  /// No description provided for @login_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button above to sign in and explore more features.'**
+  String get login_prompt;
+
+  /// No description provided for @login_side_info.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover nearby events · Host quickly · Subscribe for advanced features'**
+  String get login_side_info;
+
+  /// No description provided for @login_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize events by location and join your crew with one tap.'**
+  String get login_subtitle;
+
+  /// No description provided for @login_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Crew'**
+  String get login_title;
+
+  /// No description provided for @logout_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed out successfully.'**
+  String get logout_success;
+
+  /// No description provided for @map.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get map;
+
+  /// No description provided for @max_interest_selection.
+  ///
+  /// In en, this message translates to:
+  /// **'You can select up to 5 interest tags.'**
+  String get max_interest_selection;
+
+  /// No description provided for @my_events.
+  ///
+  /// In en, this message translates to:
+  /// **'My events'**
+  String get my_events;
+
+  /// No description provided for @my_favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'My favorites'**
+  String get my_favorites;
+
+  /// No description provided for @no_events.
+  ///
+  /// In en, this message translates to:
+  /// **'No events yet'**
+  String get no_events;
+
+  /// No description provided for @no_events_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No events found'**
+  String get no_events_found;
+
+  /// No description provided for @not_logged_in.
+  ///
+  /// In en, this message translates to:
+  /// **'Not logged in'**
+  String get not_logged_in;
+
+  /// No description provided for @preferences_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile info'**
+  String get preferences_title;
+
+  /// No description provided for @please_enter_city.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a city.'**
+  String get please_enter_city;
+
+  /// No description provided for @please_enter_event_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an event title.'**
+  String get please_enter_event_title;
+
+  /// No description provided for @profile_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile_title;
+
+  /// No description provided for @registration_not_implemented.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration feature is not available yet.'**
+  String get registration_not_implemented;
+
+  /// No description provided for @registration_open.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration open'**
+  String get registration_open;
+
+  /// No description provided for @school_label_optional.
+  ///
+  /// In en, this message translates to:
+  /// **'School (optional)'**
+  String get school_label_optional;
+
+  /// No description provided for @search_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search events'**
+  String get search_hint;
+
+  /// No description provided for @search_tags_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags...'**
+  String get search_tags_hint;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @student_verification.
+  ///
+  /// In en, this message translates to:
+  /// **'Student verification'**
+  String get student_verification;
+
+  /// No description provided for @tag_city_explore.
+  ///
+  /// In en, this message translates to:
+  /// **'City exploration'**
+  String get tag_city_explore;
+
+  /// No description provided for @tag_easy_social.
+  ///
+  /// In en, this message translates to:
+  /// **'Casual social'**
+  String get tag_easy_social;
+
+  /// No description provided for @tag_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get tag_free;
+
+  /// No description provided for @tag_friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends joined'**
+  String get tag_friends;
+
+  /// No description provided for @tag_music.
+  ///
+  /// In en, this message translates to:
+  /// **'Music'**
+  String get tag_music;
+
+  /// No description provided for @tag_nearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby'**
+  String get tag_nearby;
+
+  /// No description provided for @tag_party.
+  ///
+  /// In en, this message translates to:
+  /// **'Party'**
+  String get tag_party;
+
+  /// No description provided for @tag_sports.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports'**
+  String get tag_sports;
+
+  /// No description provided for @tag_today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get tag_today;
+
+  /// No description provided for @tag_trending.
+  ///
+  /// In en, this message translates to:
+  /// **'Trending'**
+  String get tag_trending;
+
+  /// No description provided for @tag_walk_friendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk friendly'**
+  String get tag_walk_friendly;
+
+  /// No description provided for @to_be_announced.
+  ///
+  /// In en, this message translates to:
+  /// **'TBD'**
+  String get to_be_announced;
+
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// No description provided for @unfollowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollowed'**
+  String get unfollowed;
+
+  /// No description provided for @verification_preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification & preferences'**
+  String get verification_preferences;
+
+  /// No description provided for @version_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String version_label(Object version);
 }
 
 class _AppLocalizationsDelegate

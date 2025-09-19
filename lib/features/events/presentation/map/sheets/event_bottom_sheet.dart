@@ -2,6 +2,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/events_detail_page.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// 地图报名页 事件
@@ -12,6 +13,7 @@ void showEventBottomSheet(
   final imageUrl = (event.imageUrls.isNotEmpty)
       ? event.imageUrls.first
       : event.coverImageUrl;
+  final loc = AppLocalizations.of(context)!;
 
   showModalBottomSheet(
     context: context,
@@ -94,8 +96,12 @@ void showEventBottomSheet(
                                       onPressed: () {
                                         // TODO: 收藏
                                         ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                content: Text('收藏 待开发')));
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                Text(loc.feature_not_ready),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ]),
@@ -113,7 +119,7 @@ void showEventBottomSheet(
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
-                                _smallChip('正在报名中'),
+                                _smallChip(loc.registration_open),
                                 const SizedBox(width: 6),
                                 const Icon(Icons.groups,
                                     size: 16, color: Colors.grey),
@@ -143,10 +149,14 @@ void showEventBottomSheet(
                                       // TODO: 报名逻辑
                                       Navigator.pop(context);
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text('报名功能未实现')));
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              loc.registration_not_implemented),
+                                        ),
+                                      );
                                     },
-                                    child: const Text('立即报名'),
+                                    child: Text(loc.action_register_now),
                                   ),
                                 ),
                               ]),

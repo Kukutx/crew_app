@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,13 +15,14 @@ class FavoritesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritesProvider);
+final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: Text(loc.favorites_title),
       ),
       body: favorites.isEmpty
-          ? const Center(child: Text('No favorites yet~'))
+           ? Center(child: Text(loc.favorites_empty))
           : GridView.builder(
               padding: const EdgeInsets.all(12),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -41,7 +43,8 @@ class FavoritesPage extends ConsumerWidget {
                     onTap: () {
                       // TODO: 点击查看详情
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('点击查看详情 待开发')));
+                                      SnackBar(content: Text(loc.feature_not_ready)),
+                      );
                     },
                     child: Center(
                       child: Text(item),

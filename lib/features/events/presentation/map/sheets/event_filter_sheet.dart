@@ -1,8 +1,9 @@
 // sheets/event_filter_sheet.dart
 import 'package:crew_app/features/events/data/event_filter.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-  /// 地图活动筛选事件
+/// 地图活动筛选事件
 Future<EventFilter?> showEventFilterSheet({
   required BuildContext context,
   required EventFilter initial,
@@ -14,45 +15,65 @@ Future<EventFilter?> showEventFilterSheet({
     useSafeArea: true,
     showDragHandle: true,
     builder: (ctx) {
+      final loc = AppLocalizations.of(ctx)!;
       var temp = initial;
       return StatefulBuilder(builder: (ctx, setState) {
+        final dateOptions = <(String, String)>[
+          ('today', loc.filter_date_today),
+          ('week', loc.filter_date_this_week),
+          ('month', loc.filter_date_this_month),
+          ('any', loc.filter_date_any),
+        ];
         return Padding(
           padding: EdgeInsets.only(
-            left: 16, right: 16, top: 8,
+            left: 16,
+            right: 16,
+            top: 8,
             bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('距离'), Text('${temp.distanceKm.toStringAsFixed(0)} km'),
+                Text(loc.filter_distance),
+                Text('${temp.distanceKm.toStringAsFixed(0)} km'),
               ]),
               Slider(
-                value: temp.distanceKm, min: 1, max: 50, divisions: 49,
+                value: temp.distanceKm,
+                min: 1,
+                max: 50,
+                divisions: 49,
                 label: '${temp.distanceKm.toStringAsFixed(0)} km',
-                onChanged: (v) => setState(() => temp = temp.copyWith(distanceKm: v)),
+                onChanged: (v) =>
+                    setState(() => temp = temp.copyWith(distanceKm: v)),
               ),
               const SizedBox(height: 8),
-              const Align(alignment: Alignment.centerLeft, child: Text('日期')),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(loc.filter_date),
+              ),
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final e in [
-                  ('today','今天'),('week','本周'),('month','本月'),('any','不限'),
-                ])
+                for (final e in dateOptions)
                   ChoiceChip(
                     label: Text(e.$2),
                     selected: temp.date == e.$1,
-                    onSelected: (_) => setState(() => temp = temp.copyWith(date: e.$1)),
+                    onSelected: (_) =>
+                        setState(() => temp = temp.copyWith(date: e.$1)),
                   ),
               ]),
               const SizedBox(height: 8),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('仅显示免费活动'),
+                title: Text(loc.filter_only_free),
                 value: temp.onlyFree,
-                onChanged: (v) => setState(() => temp = temp.copyWith(onlyFree: v)),
+                onChanged: (v) =>
+                    setState(() => temp = temp.copyWith(onlyFree: v)),
               ),
-              const Align(alignment: Alignment.centerLeft, child: Text('分类')),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(loc.filter_category),
+              ),
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final c in allCategories)
@@ -70,17 +91,17 @@ Future<EventFilter?> showEventFilterSheet({
               Row(children: [
                 TextButton(
                   onPressed: () => setState(() => temp = const EventFilter()),
-                  child: const Text('重置'),
+                  child: Text(loc.action_reset),
                 ),
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () => Navigator.pop(ctx, null),
-                  child: const Text('取消'),
+                  child: Text(loc.action_cancel),
                 ),
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: () => Navigator.pop(ctx, temp),
-                  child: const Text('应用'),
+                  child: Text(loc.action_apply),
                 ),
               ]),
               const SizedBox(height: 8),

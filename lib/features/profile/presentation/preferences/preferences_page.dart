@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class PreferencesPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
     _searchController.dispose();
     super.dispose();
   }
-  
+
   // 选中的标签
   final Set<String> _selectedTags = {};
 
@@ -50,13 +51,14 @@ class _PreferencesPageState extends State<PreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     // 过滤后的标签
     final filteredTags = _tags
         .where((tag) => tag.toLowerCase().contains(_searchText.toLowerCase()))
         .toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('个人资料')),
+      appBar: AppBar(title: Text(loc.preferences_title)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
@@ -65,7 +67,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
             TextField(
               controller: _schoolController,
               decoration: InputDecoration(
-                labelText: '学校 (选填)',
+                labelText: loc.school_label_optional,
                 suffixIcon: _isStudentVerified
                     ? const Icon(Icons.verified, color: Colors.blue)
                     : null,
@@ -74,26 +76,26 @@ class _PreferencesPageState extends State<PreferencesPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _industryController,
-              decoration: const InputDecoration(
-                labelText: '行业 (选填)',
+              decoration: InputDecoration(
+                labelText: loc.industry_label_optional,
               ),
             ),
             const SizedBox(height: 24),
 
             // 兴趣标签
-            const Text(
-              '兴趣标签',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              loc.interest_tags_title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
             // 搜索框
             TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: '搜索标签...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: loc.search_tags_hint,
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
               ),
               onChanged: (value) {
                 setState(() {
@@ -118,9 +120,9 @@ class _PreferencesPageState extends State<PreferencesPage> {
                           _selectedTags.add(tag);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('最多只能选择 5 个兴趣标签喵~'),
-                              duration: Duration(seconds: 2),
+                            SnackBar(
+                              content: Text(loc.max_interest_selection),
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         }
@@ -141,7 +143,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   _isStudentVerified = true;
                 });
               },
-              child: const Text('学生认证'),
+              child: Text(loc.student_verification),
             ),
           ],
         ),

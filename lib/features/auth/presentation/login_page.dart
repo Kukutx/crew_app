@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 // 用前缀避免与 UI 包里的 Provider 名称冲突
 import 'package:firebase_auth/firebase_auth.dart' as fa;
@@ -14,6 +15,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final providers = <fui.AuthProvider>[
       // 1) 邮箱密码
       fui.EmailAuthProvider(),
@@ -27,62 +29,62 @@ class LoginPage extends StatelessWidget {
       if (Theme.of(context).platform == TargetPlatform.iOS) AppleProvider(),
     ];
 
-return Scaffold(
-  appBar: AppBar(
-    title: const Text(
-      '欢迎来到 Crew',
-      style: TextStyle(fontWeight: FontWeight.bold),
-    ),
-    centerTitle: true, // 标题居中
-    leading: IconButton(
-      icon: const Icon(Icons.close),
-      onPressed: () {
-        Navigator.of(context).pop(); // 关闭页面
-      },
-    ),
-    elevation: 0,
-  ),
-  body: fui.SignInScreen(
-    providers: providers,
-    headerBuilder: (context, constraints, _) => Column(
-      children: const [
-        SizedBox(height: 32),
-        Icon(
-          Icons.nightlight_round, // 这里可以换成你自己的 logo 图片
-          size: 80,
-          color: Colors.blueAccent,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          loc.login_title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 16),
-      ],
-    ),
-    subtitleBuilder: (context, action) => const Padding(
-      padding: EdgeInsets.only(bottom: 12),
-      child: Text('基于地理位置组织活动，一键加入你的 Crew'),
-    ),
-    footerBuilder: (context, action) => const Padding(
-      padding: EdgeInsets.only(top: 12),
-      child: Text('继续即表示同意我们的服务条款与隐私政策'),
-    ),
-    actions: [
-      fui.AuthStateChangeAction<fui.SignedIn>((context, state) {
-        fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
-        Navigator.of(context).pushReplacementNamed(kHomeRoute);
-      }),
-      fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-        Navigator.of(context).pushReplacementNamed(kHomeRoute);
-      }),
-      fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-        Navigator.of(context).pushReplacementNamed(kHomeRoute);
-      }),
-    ],
-    sideBuilder: (context, constraints) => const Padding(
-      padding: EdgeInsets.all(24),
-      child: Text(
-        '发现周边活动 · 快速组局 · 订阅解锁高级玩法',
-        style: TextStyle(fontSize: 16),
+        centerTitle: true, // 标题居中
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            Navigator.of(context).pop(); // 关闭页面
+          },
+        ),
+        elevation: 0,
       ),
-    ),
-  ),
-);
+      body: fui.SignInScreen(
+        providers: providers,
+        headerBuilder: (context, constraints, _) => Column(
+          children: const [
+            SizedBox(height: 32),
+            Icon(
+              Icons.nightlight_round, // 这里可以换成你自己的 logo 图片
+              size: 80,
+              color: Colors.blueAccent,
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
+        subtitleBuilder: (context, action) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(loc.login_subtitle),
+        ),
+        footerBuilder: (context, action) => Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Text(loc.login_footer),
+        ),
+        actions: [
+          fui.AuthStateChangeAction<fui.SignedIn>((context, state) {
+            fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
+            Navigator.of(context).pushReplacementNamed(kHomeRoute);
+          }),
+          fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
+            Navigator.of(context).pushReplacementNamed(kHomeRoute);
+          }),
+          fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
+            Navigator.of(context).pushReplacementNamed(kHomeRoute);
+          }),
+        ],
+        sideBuilder: (context, constraints) => Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            loc.login_side_info,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ),
+    );
   }
 }

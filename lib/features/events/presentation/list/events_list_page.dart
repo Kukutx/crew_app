@@ -1,4 +1,5 @@
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,8 +13,9 @@ class EventsListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final api = ApiService();
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Events')),
+      appBar: AppBar(title: Text(loc.events_title)),
       body: FutureBuilder<List<Event>>(
         future: api.getEvents(),
         builder: (context, snap) {
@@ -29,12 +31,12 @@ class EventsListPage extends StatelessWidget {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(msg)));
             });
-            return const Center(child: Text('加载失败'));
+            return Center(child: Text(loc.load_failed));
           }
 
           final events = snap.data ?? const <Event>[];
           if (events.isEmpty) {
-            return const Center(child: Text('暂无活动'));
+            return Center(child: Text(loc.no_events));
           }
 
           return MasonryGridView.count(
@@ -43,7 +45,8 @@ class EventsListPage extends StatelessWidget {
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             itemCount: events.length,
-            itemBuilder: (context, i) => _GridItem(event: events[i], index: i).build(context),
+            itemBuilder: (context, i) =>
+                _GridItem(event: events[i], index: i).build(context),
           );
         },
       ),
@@ -61,8 +64,8 @@ class _GridItem {
     final mq = MediaQuery.of(context);
     final memCacheW = ((mq.size.width / 2) * mq.devicePixelRatio).round();
     final heroTag = 'event_$index';
-   // Tips： 判断imageUrls是否有值，否则用coverImageUrl 
-   // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
+    // Tips： 判断imageUrls是否有值，否则用coverImageUrl
+    // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
     final imageUrl = (event.imageUrls.isNotEmpty)
         ? event.imageUrls.first
         : event.coverImageUrl;
@@ -88,7 +91,8 @@ class _GridItem {
                 memCacheWidth: memCacheW,
                 placeholder: (c, _) => const AspectRatio(
                   aspectRatio: 1,
-                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child:
+                      Center(child: CircularProgressIndicator(strokeWidth: 2)),
                 ),
                 errorWidget: (c, _, __) => const AspectRatio(
                   aspectRatio: 1,

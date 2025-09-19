@@ -9,23 +9,288 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get settings => '设置';
-
-  @override
-  String get dark_mode => '深色模式';
-
-  @override
-  String get language => '语言';
-
-  @override
   String get about => '关于';
+
+  @override
+  String get about_content => '这是一个通用设置页示例';
+
+  @override
+  String get action_apply => '应用';
+
+  @override
+  String get action_cancel => '取消';
+
+  @override
+  String get action_create => '创建';
+
+  @override
+  String get action_follow => '关注';
+
+  @override
+  String get action_following => '已关注';
+
+  @override
+  String get action_login => '登录';
+
+  @override
+  String get action_logout => '退出登录';
+
+  @override
+  String get action_register => '报名';
+
+  @override
+  String get action_register_now => '立即报名';
+
+  @override
+  String get action_replace => '替换';
+
+  @override
+  String get action_reset => '重置';
+
+  @override
+  String get action_restore_defaults => '恢复默认';
+
+  @override
+  String get browsing_history => '浏览记录';
 
   @override
   String get chinese => '中文';
 
   @override
-  String get english => 'English';
+  String get city_field_label => '城市/地点（可编辑）';
 
   @override
-  String get about_content => '这是一个通用设置页示例';
+  String get city_loading => '正在获取…';
+
+  @override
+  String get dark_mode => '深色模式';
+
+  @override
+  String get email_unbound => '未绑定邮箱';
+
+  @override
+  String get user_display_name_fallback => '用户';
+
+  @override
+  String get english => '英文';
+
+  @override
+  String get events => '活动';
+
+  @override
+  String get event_description_field_label => '活动描述';
+
+  @override
+  String get event_details_title => '活动详情';
+
+  @override
+  String get event_meeting_point_title => '集合地点';
+
+  @override
+  String get event_participants_title => '参与人数';
+
+  @override
+  String get event_time_title => '活动时间';
+
+  @override
+  String get event_title_field_label => '活动标题';
+
+  @override
+  String get events_tab_favorites => '我喜欢的';
+
+  @override
+  String get events_tab_registered => '我报名的';
+
+  @override
+  String get events_title => '活动';
+
+  @override
+  String get create_event_title => '创建活动';
+
+  @override
+  String get feature_not_ready => '该功能正在开发中';
+
+  @override
+  String get filter => '筛选';
+
+  @override
+  String get filter_category => '分类';
+
+  @override
+  String get filter_date => '日期';
+
+  @override
+  String get filter_date_any => '不限';
+
+  @override
+  String get filter_date_this_month => '本月';
+
+  @override
+  String get filter_date_this_week => '本周';
+
+  @override
+  String get filter_date_today => '今天';
+
+  @override
+  String get filter_distance => '距离';
+
+  @override
+  String get filter_only_free => '仅显示免费活动';
+
+  @override
+  String get followed => '已关注';
+
+  @override
+  String get favorites_empty => '暂无收藏~';
+
+  @override
+  String get favorites_title => '收藏';
+
+  @override
+  String get history_empty => '暂无历史记录~';
+
+  @override
+  String get history_title => '历史记录';
+
+  @override
+  String get industry_label_optional => '行业（选填）';
+
+  @override
+  String get interest_tags_title => '兴趣标签';
+
+  @override
+  String get language => '语言';
+
+  @override
+  String get load_failed => '加载失败';
+
+  @override
+  String location_coordinates(Object lat, Object lng) {
+    return '位置：$lat, $lng';
+  }
+
+  @override
+  String get location_unavailable => '无法获取定位';
+
+  @override
+  String get login_footer => '继续即表示同意我们的服务条款与隐私政策';
+
+  @override
+  String get login_prompt => '点击上方按钮登录体验更多功能';
+
+  @override
+  String get login_side_info => '发现周边活动 · 快速组局 · 订阅解锁高级玩法';
+
+  @override
+  String get login_subtitle => '基于地理位置组织活动，一键加入你的 Crew';
+
+  @override
+  String get login_title => '欢迎来到 Crew';
+
+  @override
+  String get logout_success => '已退出登录';
+
+  @override
+  String get map => '地图';
+
+  @override
+  String get max_interest_selection => '最多只能选择 5 个兴趣标签喵~';
+
+  @override
+  String get my_events => '我的活动';
+
+  @override
+  String get my_favorites => '我的收藏';
+
+  @override
+  String get no_events => '暂无活动';
+
+  @override
+  String get no_events_found => '没有找到活动';
+
+  @override
+  String get not_logged_in => '未登录';
+
+  @override
+  String get preferences_title => '个人资料';
+
+  @override
+  String get please_enter_city => '请输入城市';
+
+  @override
+  String get please_enter_event_title => '请输入活动标题';
+
+  @override
+  String get profile_title => '个人中心';
+
+  @override
+  String get registration_not_implemented => '报名功能尚未实现';
+
+  @override
+  String get registration_open => '正在报名中';
+
+  @override
+  String get school_label_optional => '学校（选填）';
+
+  @override
+  String get search_hint => '搜索活动';
+
+  @override
+  String get search_tags_hint => '搜索标签...';
+
+  @override
+  String get settings => '设置';
+
+  @override
+  String get student_verification => '学生认证';
+
+  @override
+  String get tag_city_explore => '城市探索';
+
+  @override
+  String get tag_easy_social => '轻松社交';
+
+  @override
+  String get tag_free => '免费';
+
+  @override
+  String get tag_friends => '朋友在';
+
+  @override
+  String get tag_music => '音乐';
+
+  @override
+  String get tag_nearby => '附近';
+
+  @override
+  String get tag_party => '派对';
+
+  @override
+  String get tag_sports => '运动';
+
+  @override
+  String get tag_today => '今天';
+
+  @override
+  String get tag_trending => '热门';
+
+  @override
+  String get tag_walk_friendly => '步行友好';
+
+  @override
+  String get to_be_announced => '待公布';
+
+  @override
+  String get unknown => '未知';
+
+  @override
+  String get unfollowed => '已取消关注';
+
+  @override
+  String get verification_preferences => '认证和偏好';
+
+  @override
+  String version_label(Object version) {
+    return '版本 $version';
+  }
 }

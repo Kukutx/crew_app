@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:crew_app/features/user/presentation/user_profile_page.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +31,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     final event = widget.event;
-
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7E9),
       extendBodyBehindAppBar: true,
@@ -48,7 +49,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             onPressed: () {
               // TODO: 分享逻辑
               ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text('收藏逻辑 待开发')));
+                  .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
             },
           ),
           IconButton(
@@ -56,7 +57,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             onPressed: () {
               // TODO: 收藏逻辑
               ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text('收藏逻辑 待开发')));
+                  .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
             },
           ),
           const SizedBox(width: 8),
@@ -71,9 +72,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 color: Colors.orange,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
-                '正在报名中',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+              child: Text(
+                loc.registration_open,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
           ),
@@ -89,8 +90,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 icon: const Icon(Icons.favorite_border),
                 onPressed: () {
                   // TODO: 收藏逻辑
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(const SnackBar(content: Text('收藏逻辑 待开发')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(loc.feature_not_ready)));
                 },
               ),
               const SizedBox(width: 12),
@@ -101,7 +102,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     onPressed: () {
                       // TODO: 报名逻辑
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('报名逻辑 待开发')));
+                        SnackBar(
+                            content: Text(loc.registration_not_implemented)),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
@@ -110,7 +113,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('报名'),
+                    child: Text(loc.action_register),
                   ),
                 ),
               ),
@@ -184,6 +187,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             const SizedBox(height: 10),
 
             _userCard(
+              loc: loc,
               name: _host.name,
               bio: _host.bio,
               avatarUrl: _host.avatar,
@@ -198,7 +202,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 // TODO: 在这里对接后端/Firestore 关注逻辑
                 setState(() => _following = !_following);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(_following ? '已关注' : '已取消关注')),
+                  SnackBar(
+                    content: Text(_following ? loc.followed : loc.unfollowed),
+                  ),
                 );
               },
               isFollowing: _following,
@@ -231,9 +237,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       spacing: 8,
                       alignment: WrapAlignment.spaceBetween,
                       children: [
-                        _tagChip('城市探索'),
-                        _tagChip('轻松社交'),
-                        _tagChip('步行友好'),
+                        _tagChip(loc.tag_city_explore),
+                        _tagChip(loc.tag_easy_social),
+                        _tagChip(loc.tag_walk_friendly),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -264,13 +270,15 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('活动详情',
-                        style: TextStyle(
+                    Text(loc.event_details_title,
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const Divider(height: 20),
                     const SizedBox(height: 12),
-                    _detailRow(Icons.calendar_today, '活动时间', '待公布'),
-                    _detailRow(Icons.people, '参与人数', '待公布'),
+                    _detailRow(Icons.calendar_today, loc.event_time_title,
+                        loc.to_be_announced),
+                    _detailRow(Icons.people, loc.event_participants_title,
+                        loc.to_be_announced),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -281,8 +289,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           ),
                         );
                       },
-                      child: _detailRow(
-                          Icons.place, '集合地点', widget.event.location),
+                      child: _detailRow(Icons.place,
+                          loc.event_meeting_point_title, widget.event.location),
                     ),
                   ],
                 ),
@@ -297,6 +305,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   // 用户信息卡片
   Widget _userCard({
+    required AppLocalizations loc,
     required String name,
     required String bio,
     required String avatarUrl,
@@ -352,7 +361,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                               borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: const Icon(Icons.check, size: 18),
-                        label: const Text('Following'),
+                        label: Text(loc.action_following),
                       )
                     : ElevatedButton.icon(
                         onPressed: onFollow,
@@ -363,7 +372,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                               borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: const Icon(Icons.person_add_alt_1, size: 18),
-                        label: const Text('Follow'),
+                        label: Text(loc.action_follow),
                       ),
               ),
             ],

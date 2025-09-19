@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
@@ -41,8 +42,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     await fa.FirebaseAuth.instance.signOut();
     if (!mounted) return;
     if (context.mounted) {
+      final loc = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('已退出登录')),
+        SnackBar(content: Text(loc.logout_success)),
       );
     }
   }
@@ -51,10 +53,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('个人中心'),
+        title: Text(loc.profile_title),
         centerTitle: true,
         // leading: IconButton(
         //   icon: const Icon(Icons.close),
@@ -73,34 +76,34 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.favorite_border),
-                  title: const Text('我的收藏'),
+                  title: Text(loc.my_favorites),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/favorites'),
                 ),
                 ListTile(
                   leading: const Icon(Icons.event_busy),
-                  title: const Text('我的活动'),
+                  title: Text(loc.my_events),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/user_event'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.history),
-                  title: const Text('浏览记录'),
+                  title: Text(loc.browsing_history),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/history'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.verified_user),
-                  title: const Text('认证和偏好'),
+                  title: Text(loc.verification_preferences),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/preferences'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.settings_outlined),
-                  title: const Text('设置'),
+                  title: Text(loc.settings),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/settings'),
                 ),
@@ -126,12 +129,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       foregroundColor: theme.colorScheme.onError,
                     ),
                     onPressed: _signOut,
-                    child: const Text('退出登录'),
+                    child: Text(loc.action_logout),
                   ),
                 ),
               if (_user != null) const SizedBox(height: 16),
               Text(
-                '版本 1.0.0',
+                loc.version_label('1.0.0'),
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -152,6 +155,7 @@ class _ProfileHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     if (user == null) {
       return Card(
@@ -166,9 +170,9 @@ class _ProfileHeader extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('未登录', style: theme.textTheme.titleMedium),
+                    Text(loc.not_logged_in, style: theme.textTheme.titleMedium),
                     const SizedBox(height: 4),
-                    Text('点击上方按钮登录体验更多功能', style: theme.textTheme.bodySmall),
+                    Text(loc.login_prompt, style: theme.textTheme.bodySmall),
                   ],
                 ),
               ),
@@ -176,7 +180,7 @@ class _ProfileHeader extends ConsumerWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/login');
                 },
-                child: const Text('登录'),
+                child: Text(loc.action_login),
               ),
             ],
           ),
@@ -210,10 +214,10 @@ class _ProfileHeader extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user!.displayName ?? '用户',
+                  Text(user!.displayName ?? loc.user_display_name_fallback,
                       style: theme.textTheme.titleMedium),
                   const SizedBox(height: 4),
-                  Text(user!.email ?? '未绑定邮箱',
+                  Text(user!.email ?? loc.email_unbound,
                       style: theme.textTheme.bodySmall),
                 ],
               ),
@@ -226,6 +230,7 @@ class _ProfileHeader extends ConsumerWidget {
 
   Future<void> _onAvatarTap(BuildContext context, WidgetRef ref) async {
     if (user == null) return;
+    final loc = AppLocalizations.of(context)!;
     final action = await showModalBottomSheet<String>(
       context: context,
       builder: (c) => SafeArea(
@@ -233,12 +238,12 @@ class _ProfileHeader extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('替换'),
+              title: Text(loc.action_replace),
               onTap: () => Navigator.pop(c, 'replace'),
             ),
             if (ref.read(avatarProvider) != null)
               ListTile(
-                title: const Text('恢复默认'),
+                title: Text(loc.action_restore_defaults),
                 onTap: () => Navigator.pop(c, 'remove'),
               ),
           ],

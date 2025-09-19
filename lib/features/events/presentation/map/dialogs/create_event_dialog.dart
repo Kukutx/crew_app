@@ -1,5 +1,6 @@
 // dialogs/create_event_dialog.dart
 import 'package:crew_app/features/events/data/event_data.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
@@ -14,9 +15,10 @@ class _DialogImage {
 }
 
 Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
+  final loc = AppLocalizations.of(context)!;
   final title = TextEditingController();
   final desc = TextEditingController();
-  final city = TextEditingController(text: '正在获取…');
+  final city = TextEditingController(text: loc.city_loading);
   final formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
   final images = <_DialogImage>[];
@@ -36,13 +38,13 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
             ? p.locality!
             : (p.subAdministrativeArea?.trim().isNotEmpty == true)
                 ? p.subAdministrativeArea!
-                : (p.administrativeArea ?? '未知');
+                : (p.administrativeArea ?? loc.unknown);
         city.text = name;
       } else {
-        city.text = '未知';
+        city.text = loc.unknown;
       }
     } catch (_) {
-      city.text = '未知';
+      city.text = loc.unknown;
     }
   }();
 
@@ -92,7 +94,7 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
           }
 
           return AlertDialog(
-            title: const Text('Create Event'),
+            title: Text(loc.create_event_title),
             content: Form(
               key: formKey,
               child: SingleChildScrollView(
@@ -101,37 +103,42 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '位置: ${pos.latitude.toStringAsFixed(6)}, ${pos.longitude.toStringAsFixed(6)}',
+                      loc.location_coordinates(
+                        pos.latitude.toStringAsFixed(6),
+                        pos.longitude.toStringAsFixed(6),
+                      ),
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: city,
-                      decoration: const InputDecoration(
-                        labelText: '城市/地点(可编辑)',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.location_city),
+                      decoration: InputDecoration(
+                        labelText: loc.city_field_label,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.location_city),
                       ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? '请输入城市' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? loc.please_enter_city
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: title,
-                      decoration: const InputDecoration(
-                        labelText: '活动标题',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: loc.event_title_field_label,
+                        border: const OutlineInputBorder(),
                       ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? '请输入活动标题' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? loc.please_enter_event_title
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: desc,
                       maxLines: 3,
-                      decoration: const InputDecoration(
-                        labelText: '活动描述',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: loc.event_description_field_label,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -254,22 +261,24 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('取消'),
+                onPressed: () => Navigator.pop(context),
+                child: Text(loc.action_cancel),
               ),
               ElevatedButton(
                 onPressed: () {
                   if (formKey.currentState?.validate() != true) return;
                   Navigator.pop(
-                      context,
-                      EventData(
-                        title: title.text,
-                        description: desc.text,
-                        locationName:
-                            city.text.trim().isEmpty ? '未知' : city.text.trim(),
-                      ));
+                    context,
+                    EventData(
+                      title: title.text,
+                      description: desc.text,
+                      locationName: city.text.trim().isEmpty
+                          ? loc.unknown
+                          : city.text.trim(),
+                    ),
+                  );
                 },
-                child: const Text('创建'),
+                child: Text(loc.action_create),
               ),
             ],
           );

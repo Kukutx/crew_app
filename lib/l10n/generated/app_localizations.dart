@@ -272,6 +272,12 @@ abstract class AppLocalizations {
   /// **'Event Title'**
   String get event_title_field_label;
 
+  /// No description provided for @events_open_chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Open group chat'**
+  String get events_open_chat;
+
   /// No description provided for @events_tab_favorites.
   ///
   /// In en, this message translates to:
@@ -481,6 +487,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My favorites'**
   String get my_favorites;
+
+  /// No description provided for @chat_members_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} members'**
+  String chat_members_count(Object count);
+
+  /// No description provided for @chat_you_label.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get chat_you_label;
+
+  /// No description provided for @chat_message_input_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get chat_message_input_hint;
+
+  /// No description provided for @chat_reply_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} replies'**
+  String chat_reply_count(Object count);
 
   /// No description provided for @no_events.
   ///

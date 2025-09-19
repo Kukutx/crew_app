@@ -29,6 +29,7 @@
   "event_participants_title": "Participants",
   "event_time_title": "Event time",
   "event_title_field_label": "Event Title",
+  "events_open_chat": "Open group chat",
   "events_tab_favorites": "Liked",
   "events_tab_registered": "Joined",
   "events_title": "Events",
@@ -70,6 +71,20 @@
   "max_interest_selection": "You can select up to 5 interest tags.",
   "my_events": "My events",
   "my_favorites": "My favorites",
+  "chat_members_count": "{count} members",
+  "@chat_members_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "chat_you_label": "You",
+  "chat_message_input_hint": "Type a message",
+  "chat_reply_count": "{count} replies",
+  "@chat_reply_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "no_events": "No events yet",
   "no_events_found": "No events found",
   "not_logged_in": "Not logged in",

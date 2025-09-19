@@ -58,7 +58,27 @@ class MyApp extends ConsumerWidget {
         '/profile': (context) => ProfilePage(),
         '/history': (context) => HistoryPage(),
         '/favorites': (context) => FavoritesPage(),
-        '/chat': (context) => const UserChatScreen(),
+        '/chat': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments;
+          String? title;
+          String? status;
+          List<String>? tags;
+
+          if (args is Map) {
+            title = args['title'] as String?;
+            status = args['status'] as String?;
+            final rawTags = args['tags'];
+            if (rawTags is List) {
+              tags = rawTags.whereType<String>().toList();
+            }
+          }
+
+          return UserChatScreen(
+            chatTitle: title,
+            chatStatus: status,
+            tags: tags,
+          );
+        },
       },
     );
   }

@@ -10,14 +10,15 @@ class UserEventsPage extends StatefulWidget {
 class _UserEventsPageState extends State<UserEventsPage> {
   int _tab = 1; // 0=我喜欢的 1=我报名的
 
-  final fakeEvents = [
+  final List<Map<String, Object?>> fakeEvents = [
     {
       "title": "春天一起去爬山吧！",
       "status": "报名中",
       "time": "15:25",
       "subtitle": "不要忘带保温壶",
       "tags": ["户外", "运动"],
-      "unread": 3
+      "unread": 3,
+      "category": "joined",
     },
     {
       "title": "线上听歌小组",
@@ -25,7 +26,8 @@ class _UserEventsPageState extends State<UserEventsPage> {
       "time": "11:20",
       "subtitle": "王聪聪：开门！开门！开门！",
       "tags": ["音乐"],
-      "unread": 2
+      "unread": 2,
+      "category": "joined",
     },
     {
       "title": "米兰市区City Walk 2号",
@@ -33,9 +35,37 @@ class _UserEventsPageState extends State<UserEventsPage> {
       "time": "16:26",
       "subtitle": "米兰小巷：我们征集下一条路线~",
       "tags": ["社交", "旅行"],
-      "unread": 0
+      "unread": 0,
+      "category": "liked",
+    },
+    {
+      "title": "周末手工烘焙坊",
+      "status": "即将开始",
+      "time": "明天 09:00",
+      "subtitle": "阿星：记得带上围裙和好心情～",
+      "tags": ["美食", "社交"],
+      "unread": 5,
+      "category": "liked",
     },
   ];
+
+  List<Map<String, Object?>> get _filteredEvents {
+    final target = _tab == 0 ? 'liked' : 'joined';
+    return fakeEvents
+        .where((event) => event['category'] == target)
+        .toList(growable: false);
+  }
+
+  void _openChat(Map<String, Object?> event) {
+    Navigator.of(context).pushNamed(
+      '/chat',
+      arguments: {
+        'title': event['title'],
+        'status': event['status'],
+        'tags': event['tags'],
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,19 +109,33 @@ class _UserEventsPageState extends State<UserEventsPage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: fakeEvents.length,
-                itemBuilder: (context, i) {
-                  final ev = fakeEvents[i];
-                  return _EventTile(
-                    title: ev["title"] as String,
-                    subTitle: ev["subtitle"] as String,
-                    status: ev["status"] as String,
-                    timeText: ev["time"] as String,
-                    tags: (ev["tags"] as List).cast<String>(),
-                    unreadCount: ev["unread"] as int,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: Builder(builder: (context) {
+                  final events = _filteredEvents;
+                  if (events.isEmpty) {
+                    return _EmptyState(
+                      key: ValueKey(_tab),
+                      isLikedTab: _tab == 0,
+                    );
+                  }
+                  return ListView.builder(
+                    key: ValueKey('${_tab}_${events.length}'),
+                    itemCount: events.length,
+                    itemBuilder: (context, i) {
+                      final ev = events[i];
+                      return _EventTile(
+                        title: ev['title'] as String,
+                        subTitle: ev['subtitle'] as String,
+                        status: ev['status'] as String,
+                        timeText: ev['time'] as String,
+                        tags: (ev['tags'] as List).cast<String>(),
+                        unreadCount: ev['unread'] as int,
+                        onTap: () => _openChat(ev),
+                      );
+                    },
                   );
-                },
+                }),
               ),
             ),
           ],
@@ -123,7 +167,7 @@ class _TabChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? color.primary : color.surfaceContainerHighest ,
+          color: selected ? color.primary : color.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
@@ -153,6 +197,7 @@ class _EventTile extends StatelessWidget {
     this.status,
     this.timeText,
     this.unreadCount,
+    this.onTap,
   });
 
   final String title;
@@ -161,83 +206,138 @@ class _EventTile extends StatelessWidget {
   final String? status;
   final String? timeText;
   final int? unreadCount;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: cs.outlineVariant.withValues(alpha: .3))),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: cs.surfaceContainerHighest ,
-            child: const Icon(Icons.event, size: 20),
+    final hasUnread = (unreadCount ?? 0) > 0;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: cs.outlineVariant.withValues(alpha: .3))),
+            color: hasUnread ? cs.primary.withValues(alpha: 0.04) : null,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: cs.surfaceContainerHighest,
+                child: const Icon(Icons.event, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
-                    if (status != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        margin: const EdgeInsets.only(left: 6),
-                        decoration: BoxDecoration(
-                          color: cs.secondaryContainer,
-                          borderRadius: BorderRadius.circular(12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
-                        child: Text(status!, style: TextStyle(fontSize: 11, color: cs.onSecondaryContainer)),
+                        if (status != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            margin: const EdgeInsets.only(left: 6),
+                            decoration: BoxDecoration(
+                              color: cs.secondaryContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(status!, style: TextStyle(fontSize: 11, color: cs.onSecondaryContainer)),
+                          ),
+                        const SizedBox(width: 8),
+                        Text(timeText ?? '', style: TextStyle(fontSize: 12, color: cs.outline)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(subTitle, style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant)),
+                    if (tags != null && tags!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Wrap(
+                          spacing: 6,
+                          children: tags!
+                              .map((e) => Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: cs.surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(e, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
+                                  ))
+                              .toList(),
+                        ),
                       ),
-                    const SizedBox(width: 8),
-                    Text(timeText ?? '', style: TextStyle(fontSize: 12, color: cs.outline)),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(subTitle, style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant)),
-                if (tags != null && tags!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Wrap(
-                      spacing: 6,
-                      children: tags!
-                          .map((e) => Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: cs.surfaceContainerHighest ,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(e, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
-                              ))
-                          .toList(),
-                    ),
+              ),
+              if (hasUnread)
+                Container(
+                  margin: const EdgeInsets.only(left: 8, top: 4),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(color: cs.error, shape: BoxShape.circle),
+                  child: Text(
+                    unreadCount.toString(),
+                    style: TextStyle(color: cs.onError, fontSize: 11),
                   ),
-              ],
-            ),
+                ),
+              if (!hasUnread)
+                const Padding(
+                  padding: EdgeInsets.only(left: 8, top: 6),
+                  child: Icon(Icons.chevron_right, size: 20),
+                ),
+            ],
           ),
-          if ((unreadCount ?? 0) > 0)
-            Container(
-              margin: const EdgeInsets.only(left: 8, top: 4),
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(color: cs.error, shape: BoxShape.circle),
-              child: Text(
-                unreadCount.toString(),
-                style: TextStyle(color: cs.onError, fontSize: 11),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({super.key, required this.isLikedTab});
+
+  final bool isLikedTab;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final title = isLikedTab ? '还没有收藏的活动' : '暂时没有报名的活动';
+    final subtitle = isLikedTab
+        ? '去发现页看看，遇到喜欢的就收藏吧～'
+        : '可以在活动详情页报名加入群聊';
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.event_busy, size: 64, color: cs.outlineVariant),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: cs.onSurface,
               ),
             ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+            ),
+          ],
+        ),
       ),
     );
   }

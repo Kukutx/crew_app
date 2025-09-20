@@ -132,7 +132,7 @@ void showEventBottomSheet(
                                 const Icon(Icons.event,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 4),
-                                const Text(/*ev.timeText ??*/ '12月28日 8:00',
+                                const Text(/*ev.timeText ??*/ '12.28 8:00',
                                     style: TextStyle(color: Colors.black87)),
                                 const Spacer(),
                                 SizedBox(

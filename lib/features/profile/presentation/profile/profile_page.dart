@@ -80,6 +80,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/favorites'),
                 ),
+                const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.event_busy),
                   title: Text(loc.my_events),

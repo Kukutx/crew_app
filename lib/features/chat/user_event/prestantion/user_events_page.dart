@@ -240,7 +240,7 @@ class _UserEventsPageState extends State<UserEventsPage> {
                     tags: (ev['tags'] as List).cast<String>(),
                     unreadCount: ev['unread'] as int,
                     highlightColor: cs.primary,
-                    openChatLabel: loc.eventsOpenChat,
+                    openChatLabel: loc.events_open_chat,
                     onTap: () => _openChat(ev, index),
                   );
                 },
@@ -313,7 +313,7 @@ class _EventTile extends StatelessWidget {
   final String title;
   final String subTitle;
   final List<String> tags;
-  final Color highlightColor;
+  final Color highlightColor; 
   final String openChatLabel;
   final String? status;
   final String? timeText;
@@ -345,7 +345,7 @@ class _EventTile extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 26,
-                          backgroundColor: highlightColor.withOpacity(.12),
+                          backgroundColor: highlightColor.withValues(alpha: .12),
                           child: Icon(Icons.forum_outlined, color: highlightColor),
                         ),
                         if ((unreadCount ?? 0) > 0)

@@ -97,7 +97,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
             ),
             const SizedBox(height: 4),
             Text(
-              loc.chatMembersCount(participants.length),
+              loc.chat_members_count(participants.length),
               style: TextStyle(
                 fontSize: 13,
                 color: cs.onSurfaceVariant,
@@ -157,8 +157,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   return _GroupMessageTile(
                     message: msg,
                     showAvatar: showAvatar,
-                    youLabel: loc.chatYouLabel,
-                    repliesLabelBuilder: loc.chatReplyCount,
+                    youLabel: loc.chat_you_label,
+                    repliesLabelBuilder: (count) => loc.chat_reply_count(count),
                   );
                 },
               ),
@@ -166,7 +166,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
           ),
           _MessageComposer(
             controller: _composerController,
-            hintText: loc.chatMessageInputHint,
+            hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
           ),
         ],
@@ -230,7 +230,7 @@ class _ParticipantAvatar extends StatelessWidget {
           ),
           child: CircleAvatar(
             radius: 20,
-            backgroundColor: participant.avatarColor.withOpacity(.18),
+            backgroundColor: participant.avatarColor.withValues(alpha: .12),
             child: Text(
               participant.initials,
               style: TextStyle(
@@ -244,7 +244,7 @@ class _ParticipantAvatar extends StatelessWidget {
         SizedBox(
           width: 64,
           child: Text(
-            participant.isSelf ? AppLocalizations.of(context)!.chatYouLabel : participant.name,
+            participant.isSelf ? AppLocalizations.of(context)!.chat_you_label : participant.name,
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -278,7 +278,7 @@ class _GroupMessageTile extends StatelessWidget {
     final isMine = message.isMine;
     final bubbleColor = isMine ? cs.primary : cs.surface;
     final textColor = isMine ? cs.onPrimary : cs.onSurface;
-    final captionColor = isMine ? cs.onPrimary.withOpacity(.8) : cs.onSurfaceVariant;
+    final captionColor = isMine ? cs.onPrimary.withValues(alpha: .8) : cs.onSurfaceVariant;
 
     return Padding(
       padding: EdgeInsetsDirectional.only(
@@ -299,7 +299,7 @@ class _GroupMessageTile extends StatelessWidget {
               child: showAvatar
                   ? CircleAvatar(
                       radius: 18,
-                      backgroundColor: message.sender.avatarColor.withOpacity(.15),
+                      backgroundColor: message.sender.avatarColor.withValues(alpha: .15),
                       child: Text(
                         message.sender.initials,
                         style: TextStyle(
@@ -339,7 +339,7 @@ class _GroupMessageTile extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: cs.shadow.withOpacity(.04),
+                        color: cs.shadow.withValues(alpha:.04),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -371,7 +371,7 @@ class _GroupMessageTile extends StatelessWidget {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isMine
-                                        ? cs.onPrimary.withOpacity(.12)
+                                        ? cs.onPrimary.withValues(alpha:.12)
                                         : cs.surfaceContainerHighest,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -381,7 +381,7 @@ class _GroupMessageTile extends StatelessWidget {
                                       Icon(
                                         Icons.insert_drive_file_outlined,
                                         size: 14,
-                                        color: textColor.withOpacity(.85),
+                                        color: textColor.withValues(alpha:.85),
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
@@ -407,7 +407,7 @@ class _GroupMessageTile extends StatelessWidget {
                     margin: const EdgeInsets.only(top: 6),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: cs.surfaceVariant.withOpacity(.3),
+                      color: cs.surfaceContainerHighest.withValues(alpha:.3),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -469,7 +469,7 @@ class _MessageComposer extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: cs.shadow.withOpacity(.06),
+                color: cs.shadow.withValues(alpha:.06),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),

@@ -266,6 +266,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get report_issue => 'Report a problem';
+
+  @override
+  String get report_issue_description =>
+      'Send feedback and logs to help us fix issues faster.';
+
+  @override
+  String get feedback_thanks => 'Thanks for your feedback!';
+
+  @override
   String get student_verification => 'Student verification';
 
   @override

@@ -261,6 +261,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings => '设置';
 
   @override
+  String get report_issue => '问题反馈';
+
+  @override
+  String get report_issue_description => '提交截图和日志，帮助我们快速定位问题。';
+
+  @override
+  String get feedback_thanks => '感谢你的反馈！';
+
+  @override
   String get student_verification => '学生认证';
 
   @override

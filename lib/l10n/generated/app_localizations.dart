@@ -590,6 +590,24 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @report_issue.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get report_issue;
+
+  /// No description provided for @report_issue_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback and logs to help us fix issues faster.'**
+  String get report_issue_description;
+
+  /// No description provided for @feedback_thanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for your feedback!'**
+  String get feedback_thanks;
+
   /// No description provided for @student_verification.
   ///
   /// In en, this message translates to:

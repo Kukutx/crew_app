@@ -2,6 +2,7 @@ import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
 import '../features/profile/presentation/profile/profile_page.dart';
@@ -42,18 +43,6 @@ class _AppState extends State<App> {
 
 
 
-
-// import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
-// import 'package:crew_app/l10n/generated/app_localizations.dart';
-// import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// import '../features/events/presentation/list/events_list_page.dart';
-// import '../features/events/presentation/map/events_map_page.dart';
-// import '../features/profile/presentation/profile/profile_page.dart';
-
-
 // class App extends ConsumerStatefulWidget {
 //   const App({super.key});
 //   @override
@@ -61,43 +50,35 @@ class _AppState extends State<App> {
 // }
 
 // class _AppState extends ConsumerState<App> {
-//   int _index = 1; // 默认“地图”
-//   final List<Widget> _pages = const [EventsListPage(), EventsMapPage(), ProfilePage()];
-
-//   late final ProviderSubscription _sub;
-
-//   @override
-//  void initState() {
-//     super.initState();
-
-//     ref.listen<AsyncValue<DisclaimerState>>(
-//       disclaimerStateProvider,
-//       (prev, next) async {
-//         final s = next.asData?.value;
-//         if (s == null || !s.needsReconsent || !mounted) return;
-
-//         final accept = ref.read(acceptDisclaimerProvider);
-//         await showDisclaimerDialog(
-//           context: context,
-//           d: s.toShow,
-//           onAccept: () => accept(s.toShow.version),
-//         );
-//       },
-//     );
-//   }
-
-
-//   @override
-//   void dispose() {
-//     _sub.close();
-//     super.dispose();
-//   }
+//   int _index = 1;
+//   final _pages = const [EventsListPage(), EventsMapPage(), ProfilePage()];
+//   int? _promptedVersion; // 防止同一版本重复弹
 
 //   @override
 //   Widget build(BuildContext context) {
 //     final loc = AppLocalizations.of(context)!;
 
-//     // 也可根据加载态给个启动菊花（可选）
+//     // 监听放在 build 内，交给 Riverpod 管
+//     ref.listen<AsyncValue<DisclaimerState>>(disclaimerStateProvider,
+//         (prev, next) {
+//       final s = next.asData?.value;
+//       if (s == null || !s.needsReconsent) return;
+
+//       final ver = s.toShow.version;
+//       if (_promptedVersion == ver) return; // 已经弹过了
+//       _promptedVersion = ver;
+
+//       WidgetsBinding.instance.addPostFrameCallback((_) async {
+//         if (!mounted) return;
+//         final accept = ref.read(acceptDisclaimerProvider);
+//         await showDisclaimerDialog(
+//           context: context,
+//           d: s.toShow,
+//           onAccept: () => accept(ver),
+//         );
+//       });
+//     });
+
 //     final legal = ref.watch(disclaimerStateProvider);
 //     if (legal.isLoading) {
 //       return const Scaffold(body: Center(child: CircularProgressIndicator()));

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:crew_app/app/app.dart';
 import 'package:crew_app/core/config/firebase_options.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
-import 'package:crew_app/core/state/settings_providers.dart';
+import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/favorites/favorites_page.dart';
@@ -30,7 +30,7 @@ Future<void> main() async {
 
   final crashlytics = await _configureCrashlytics();
   final talker = Talker();
-  final talkerRouteObserver = TalkerRouteObserver(talker: talker);
+  final talkerRouteObserver = TalkerRouteObserver(talker);
 
   if (crashlytics == null) {
     talker.info('Crashlytics disabled for this platform.');

@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:math';
-
 import 'package:feedback/feedback.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -13,53 +13,47 @@ class FeedbackService {
   final FirebaseCrashlytics? _crashlytics;
   final Talker _talker;
 
+  /// 弹出反馈面板并在提交后记录日志与上报
   Future<bool> collectFeedback(BuildContext context) async {
     final controller = BetterFeedback.of(context);
-    if (controller == null) {
-      _talker.warning('Feedback controller is not available in the widget tree.');
-      return false;
-    }
 
-    final feedback = await controller.show();
-    if (feedback == null) {
-      _talker.info('User dismissed the feedback reporter.');
-      return false;
-    }
+    // 3.x 为回调式；用 Completer 等待提交完成
+    final completer = Completer<bool>();
 
-    final message = feedback.text?.trim() ?? '';
-    final screenshotLength = feedback.screenshot?.length ?? 0;
+    controller.show((UserFeedback fb) async {
+      final message = (fb.text).trim();
+      final screenshotLength = fb.screenshot.length;
 
-    if (message.isNotEmpty) {
-      _talker.info('User feedback captured (${message.length} chars).');
-    } else {
-      _talker.info('User submitted feedback without a description.');
-    }
+      if (message.isNotEmpty) {
+        _talker.info('User feedback captured (${message.length} chars).');
+      } else {
+        _talker.info('User submitted feedback without a description.');
+      }
+      if (screenshotLength > 0) {
+        _talker.info('Feedback screenshot captured ($screenshotLength bytes).');
+      }
 
-    if (screenshotLength > 0) {
-      _talker.info('Feedback screenshot captured ($screenshotLength bytes).');
-    }
+      await _logFeedbackToCrashlytics(message, screenshotLength);
+      if (!completer.isCompleted) completer.complete(true);
+    });
 
-    await _logFeedbackToCrashlytics(message, screenshotLength);
-    return true;
+    // 无“取消”回调，若用户直接关闭页面你拿不到结果；
+    // 这里返回 true 仅在提交发生时。
+    return completer.future;
   }
 
   Future<void> _logFeedbackToCrashlytics(String message, int screenshotLength) async {
-    if (_crashlytics == null) {
-      return;
-    }
+    final crash = _crashlytics;
+    if (crash == null) return;
 
-    final truncatedMessage = message.substring(
-      0,
-      min(message.length, _maxLoggedMessageLength),
-    );
+    final truncated = message.substring(0, min(message.length, _maxLoggedMessageLength));
 
-    await _crashlytics!.log(
-      'User feedback: ${truncatedMessage.isEmpty ? '<empty>' : truncatedMessage}',
-    );
-    await _crashlytics!.setCustomKey('feedback_message_length', message.length);
-    await _crashlytics!.setCustomKey('feedback_screenshot_bytes', screenshotLength);
-    await _crashlytics!.recordError(
-      _FeedbackException(truncatedMessage),
+    await crash.log('User feedback: ${truncated.isEmpty ? '<empty>' : truncated}');
+    await crash.setCustomKey('feedback_message_length', message.length);
+    await crash.setCustomKey('feedback_screenshot_bytes', screenshotLength);
+
+    await crash.recordError(
+      _FeedbackException(truncated),
       null,
       reason: 'User Feedback',
       information: [
@@ -73,9 +67,7 @@ class FeedbackService {
 
 class _FeedbackException implements Exception {
   _FeedbackException(this.message);
-
   final String message;
-
   @override
   String toString() => 'FeedbackException: $message';
 }

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/state/avatar_provider.dart';
+import '../../../../../core/state/avatar/avatar_provider.dart';
 
 class AvatarIcon extends ConsumerStatefulWidget  {
   final void Function(bool authed) onTap;

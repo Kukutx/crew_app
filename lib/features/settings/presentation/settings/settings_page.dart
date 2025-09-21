@@ -1,6 +1,6 @@
 import 'package:crew_app/features/settings/presentation/about/about_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/core/state/settings_providers.dart';
+import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,6 @@
 
 import 'package:crew_app/app/app.dart';
-import 'package:crew_app/core/state/settings_providers.dart';
+import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:crew_app/features/profile/presentation/profile/profile_page.dart';
 import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/favorites/favorites_page.dart';

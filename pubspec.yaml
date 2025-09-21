@@ -55,6 +55,8 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_riverpod: ^2.6.1
   image_picker: ^1.2.0
+  firebase_remote_config: ^5.0.5
+  package_info_plus: ^8.1.0
 
 
 dev_dependencies:

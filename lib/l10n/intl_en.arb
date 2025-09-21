@@ -49,6 +49,7 @@
   "favorites_title": "Favorites",
   "history_empty": "No history yet~",
   "history_title": "History",
+  "check_for_updates": "Check for updates",
   "industry_label_optional": "Industry (optional)",
   "interest_tags_title": "Interest tags",
   "language": "Language",
@@ -114,6 +115,32 @@
   "unknown": "Unknown",
   "unfollowed": "Unfollowed",
   "verification_preferences": "Verification & preferences",
+  "update_available_label": "New version {version} available",
+  "@update_available_label": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "update_check_failed": "Unable to check for updates right now.",
+  "update_checking": "Checking for updates…",
+  "update_latest": "You're already on the latest version.",
+  "update_dialog_title": "Update available",
+  "update_dialog_required_title": "Update required",
+  "update_dialog_message": "Version {version} is available.",
+  "@update_dialog_message": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "update_dialog_required_message": "Please update to version {version} to continue.",
+  "@update_dialog_required_message": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "update_now": "Update now",
+  "update_later": "Maybe later",
+  "update_launch_failed": "Unable to open the store page.",
   "version_label": "Version {version}",
   "@version_label": {
     "placeholders": {

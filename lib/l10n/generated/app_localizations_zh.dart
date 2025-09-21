@@ -309,6 +309,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get verification_preferences => '认证和偏好';
 
   @override
+  String get check_for_updates => '检查更新';
+
+  @override
+  String update_available_label(Object version) {
+    return '发现新版本 $version';
+  }
+
+  @override
+  String get update_check_failed => '暂时无法检查更新';
+
+  @override
+  String get update_checking => '正在检查更新…';
+
+  @override
+  String get update_latest => '已经是最新版本啦';
+
+  @override
+  String get update_dialog_title => '发现新版本';
+
+  @override
+  String get update_dialog_required_title => '必须更新';
+
+  @override
+  String update_dialog_message(Object version) {
+    return '发现新版本 $version。';
+  }
+
+  @override
+  String update_dialog_required_message(Object version) {
+    return '请更新至 $version 后继续使用。';
+  }
+
+  @override
+  String get update_now => '立即更新';
+
+  @override
+  String get update_later => '稍后再说';
+
+  @override
+  String get update_launch_failed => '未能打开应用商店页面。';
+
+  @override
   String version_label(Object version) {
     return '版本 $version';
   }

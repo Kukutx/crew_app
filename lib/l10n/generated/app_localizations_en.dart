@@ -314,6 +314,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verification_preferences => 'Verification & preferences';
 
   @override
+  String get check_for_updates => 'Check for updates';
+
+  @override
+  String update_available_label(Object version) {
+    return 'New version $version available';
+  }
+
+  @override
+  String get update_check_failed => 'Unable to check for updates right now.';
+
+  @override
+  String get update_checking => 'Checking for updates…';
+
+  @override
+  String get update_latest => "You're already on the latest version.";
+
+  @override
+  String get update_dialog_title => 'Update available';
+
+  @override
+  String get update_dialog_required_title => 'Update required';
+
+  @override
+  String update_dialog_message(Object version) {
+    return 'Version $version is available.';
+  }
+
+  @override
+  String update_dialog_required_message(Object version) {
+    return 'Please update to version $version to continue.';
+  }
+
+  @override
+  String get update_now => 'Update now';
+
+  @override
+  String get update_later => 'Maybe later';
+
+  @override
+  String get update_launch_failed => 'Unable to open the store page.';
+
+  @override
   String version_label(Object version) {
     return 'Version $version';
   }

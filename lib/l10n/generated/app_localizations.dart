@@ -686,6 +686,78 @@ abstract class AppLocalizations {
   /// **'Verification & preferences'**
   String get verification_preferences;
 
+  /// No description provided for @check_for_updates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates'**
+  String get check_for_updates;
+
+  /// No description provided for @update_available_label.
+  ///
+  /// In en, this message translates to:
+  /// **'New version {version} available'**
+  String update_available_label(Object version);
+
+  /// No description provided for @update_check_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to check for updates right now.'**
+  String get update_check_failed;
+
+  /// No description provided for @update_checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates…'**
+  String get update_checking;
+
+  /// No description provided for @update_latest.
+  ///
+  /// In en, this message translates to:
+  /// **"You're already on the latest version."**
+  String get update_latest;
+
+  /// No description provided for @update_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get update_dialog_title;
+
+  /// No description provided for @update_dialog_required_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get update_dialog_required_title;
+
+  /// No description provided for @update_dialog_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available.'**
+  String update_dialog_message(Object version);
+
+  /// No description provided for @update_dialog_required_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please update to version {version} to continue.'**
+  String update_dialog_required_message(Object version);
+
+  /// No description provided for @update_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get update_now;
+
+  /// No description provided for @update_later.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get update_later;
+
+  /// No description provided for @update_launch_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the store page.'**
+  String get update_launch_failed;
+
   /// No description provided for @version_label.
   ///
   /// In en, this message translates to:

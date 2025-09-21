@@ -1,24 +1,65 @@
-import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
+import 'dart:async';
+
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
+import 'package:crew_app/shared/update/app_update_dialog.dart';
+import 'package:crew_app/shared/update/app_update_providers.dart';
+import 'package:crew_app/shared/update/app_update_status.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
 import '../features/profile/presentation/profile/profile_page.dart';
 
-class App extends StatefulWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
   @override
-  State<App> createState() => _AppState();
+  ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends ConsumerState<App> {
   int _index = 1; // 默认打开“地图”
   final List<Widget> _pages = const [
     EventsListPage(),
     EventsMapPage(),
     ProfilePage(),
   ];
+
+  ProviderSubscription<AsyncValue<AppUpdateStatus>>? _updateSubscription;
+  String? _lastPromptedVersion;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateSubscription = ref.listen<AsyncValue<AppUpdateStatus>>(
+      appUpdateStatusProvider,
+      (previous, next) {
+        final status = next.asData?.value;
+        if (!mounted || status == null || !status.updateAvailable) {
+          return;
+        }
+
+        if (_lastPromptedVersion == status.latestVersion) {
+          return;
+        }
+
+        _lastPromptedVersion = status.latestVersion;
+        unawaited(
+          showAppUpdateDialog(
+            context: context,
+            status: status,
+          ),
+        );
+      },
+    );
+
+    Future.microtask(() => ref.read(appUpdateStatusProvider.future));
+  }
+
+  @override
+  void dispose() {
+    _updateSubscription?.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

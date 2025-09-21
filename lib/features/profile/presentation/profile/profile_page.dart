@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:image_picker/image_picker.dart';
+import 'package:crew_app/shared/update/app_update_providers.dart';
 import '../../../../core/state/avatar/avatar_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -54,6 +55,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
+    final updateStatus = ref.watch(appUpdateStatusProvider);
+    final versionLabel = updateStatus.when(
+      data: (status) => loc.version_label(status.currentVersion),
+      loading: () => loc.version_label('…'),
+      error: (_, __) => loc.version_label('—'),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -135,7 +142,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
               if (_user != null) const SizedBox(height: 16),
               Text(
-                loc.version_label('1.0.0'),
+                versionLabel,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),

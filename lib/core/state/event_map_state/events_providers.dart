@@ -6,7 +6,6 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-
 final eventsProvider =
     AutoDisposeAsyncNotifierProvider<EventsCtrl, List<Event>>(EventsCtrl.new);
 
@@ -30,12 +29,17 @@ class EventsCtrl extends AutoDisposeAsyncNotifier<List<Event>> {
   }) async {
     final api = ref.read(apiServiceProvider);
     final newEv = await api.createEvent(
-      title, locationName, description, pos.latitude, pos.longitude,
+      title,
+      locationName,
+      description,
+      pos.latitude,
+      pos.longitude,
     );
     await _refreshEvents();
     return newEv;
   }
 
+  // 每隔30 秒自动刷新
   void _startPolling() {
     _pollingTimer?.cancel();
     _pollingTimer = Timer.periodic(

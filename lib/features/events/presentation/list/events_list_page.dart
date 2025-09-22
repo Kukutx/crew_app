@@ -1,55 +1,101 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../../core/network/api_service.dart';
-import '../detail/events_detail_page.dart';
-import '../../../../core/error/api_exception.dart';
 
-class EventsListPage extends StatelessWidget {
+import '../../../../core/error/api_exception.dart';
+import '../../../../core/state/event_map_state/events_providers.dart';
+import '../detail/events_detail_page.dart';
+
+class EventsListPage extends ConsumerStatefulWidget {
   const EventsListPage({super.key});
 
   @override
+  ConsumerState<EventsListPage> createState() => _EventsListPageState();
+}
+
+class _EventsListPageState extends ConsumerState<EventsListPage> {
+  @override
+  void initState() {
+    super.initState();
+    ref.listen<AsyncValue<List<Event>>>(eventsProvider, (prev, next) {
+      next.whenOrNull(error: (error, _) {
+        if (!mounted) return;
+        final msg = _errorMessage(error);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(msg)));
+        });
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final api = ApiService();
     final loc = AppLocalizations.of(context)!;
+    final eventsAsync = ref.watch(eventsProvider);
     return Scaffold(
       appBar: AppBar(title: Text(loc.events_title)),
-      body: FutureBuilder<List<Event>>(
-        future: api.getEvents(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snap.hasError) {
-            final err = snap.error;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              final msg = err is ApiException
-                  ? err.toString()
-                  : err?.toString() ?? 'Unknown error';
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(msg)));
-            });
-            return Center(child: Text(loc.load_failed));
-          }
-
-          final events = snap.data ?? const <Event>[];
-          if (events.isEmpty) {
-            return Center(child: Text(loc.no_events));
-          }
-
-          return MasonryGridView.count(
-            padding: const EdgeInsets.all(8),
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            itemCount: events.length,
-            itemBuilder: (context, i) =>
-                _GridItem(event: events[i], index: i).build(context),
-          );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.refresh(eventsProvider.future);
         },
+        child: eventsAsync.when(
+          data: (events) {
+            if (events.isEmpty) {
+              return _CenteredScrollable(child: Text(loc.no_events));
+            }
+
+            return MasonryGridView.count(
+              padding: const EdgeInsets.all(8),
+              crossAxisCount: 2,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              itemCount: events.length,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemBuilder: (context, i) =>
+                  _GridItem(event: events[i], index: i).build(context),
+            );
+          },
+          loading: () =>
+              const _CenteredScrollable(child: CircularProgressIndicator()),
+          error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+        ),
       ),
+    );
+  }
+}
+
+String _errorMessage(Object error) {
+  if (error is ApiException) {
+    return error.toString();
+  }
+  final msg = error.toString();
+  return msg.isEmpty ? 'Unknown error' : msg;
+}
+
+class _CenteredScrollable extends StatelessWidget {
+  final Widget child;
+
+  const _CenteredScrollable({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: constraints.maxHeight,
+              child: Center(child: child),
+            ),
+          ],
+        );
+      },
     );
   }
 }

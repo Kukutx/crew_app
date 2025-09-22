@@ -31,7 +31,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool _movedToSelected = false;
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
- static const _quickTags = [
+  static const _quickTags = [
     'today',
     'nearby',
     'party',
@@ -83,6 +83,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     });
 
     final events = ref.watch(eventsProvider);
+    final eventsList = events.valueOrNull ?? const <Event>[];
     final userLoc = ref.watch(userLocationProvider).valueOrNull;
     final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
 
@@ -149,14 +150,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onLongPress: _onMapLongPress,
           children: [
             // OSM图层已内置在 MapCanvas 里，这里只放标记层
-            events.when(
-              loading: () => const MarkersLayer(markers: []),
-              error: (_, __) => const MarkersLayer(markers: []),
-              data: (list) => MarkersLayer.fromEvents(
-                events: list,
-                userLoc: userLoc,
-                onEventTap: _showEventCard,
-              ),
+            MarkersLayer.fromEvents(
+              events: eventsList,
+              userLoc: userLoc,
+              onEventTap: _showEventCard,
             ),
           ],
         ),

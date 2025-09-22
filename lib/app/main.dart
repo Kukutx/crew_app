@@ -18,6 +18,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -94,6 +95,18 @@ Future<void> main() async {
 
     // 错误捕获
     _setupErrorHandling(talker!, crashlytics);
+
+    // 离线瓦片缓存
+    try {
+      await FMTC.instance('osmTiles').manage.create();
+    } catch (error, stackTrace) {
+      talker?.handle(error, stackTrace, 'Failed to initialize tile cache');
+      crashlytics?.recordError(
+        error,
+        stackTrace,
+        reason: 'Tile cache init failed',
+      );
+    }
 
     // SharedPreferences
     final prefs = await SharedPreferences.getInstance();

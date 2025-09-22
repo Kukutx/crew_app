@@ -33,4 +33,17 @@ class Event {
       coverImageUrl: json['coverImageUrl'] as String? ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'location': location,
+      'description': description,
+      'latitude': latitude,
+      'longitude': longitude,
+      'imageUrls': imageUrls,
+      'coverImageUrl': coverImageUrl,
+    };
+  }
 }

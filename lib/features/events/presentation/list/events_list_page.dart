@@ -21,6 +21,7 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final eventsAsync = ref.watch(eventsProvider);
+    final cachedEvents = eventsAsync.valueOrNull;
 
     // 刷新列表
     ref.listen<AsyncValue<List<Event>>>(eventsProvider, (prev, next) {
@@ -41,24 +42,33 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
         onRefresh: () async => await ref.refresh(eventsProvider.future),
         child: eventsAsync.when(
           data: (events) {
-            if (events.isEmpty) {
-              return _CenteredScrollable(child: Text(loc.no_events));
-            }
-
-            return MasonryGridView.count(
-              padding: const EdgeInsets.all(8),
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              itemCount: events.length,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, i) =>
-                  EventGridItem(event: events[i], index: i),
+            return _EventsFeed(
+              events: events,
+              loc: loc,
             );
           },
-          loading: () =>
-              const _CenteredScrollable(child: CircularProgressIndicator()),
-          error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+          loading: () {
+            if (cachedEvents != null) {
+              return _EventsFeed(
+                events: cachedEvents,
+                loc: loc,
+                isRefreshing: true,
+              );
+            }
+            return const _CenteredScrollable(
+              child: CircularProgressIndicator(),
+            );
+          },
+          error: (error, __) {
+            if (cachedEvents != null) {
+              return _EventsFeed(
+                events: cachedEvents,
+                loc: loc,
+                errorMessage: _errorMessage(error),
+              );
+            }
+            return _CenteredScrollable(child: Text(loc.load_failed));
+          },
         ),
       ),
     );
@@ -160,6 +170,105 @@ class EventGridItem extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EventsFeed extends StatelessWidget {
+  final List<Event> events;
+  final AppLocalizations loc;
+  final bool isRefreshing;
+  final String? errorMessage;
+
+  const _EventsFeed({
+    required this.events,
+    required this.loc,
+    this.isRefreshing = false,
+    this.errorMessage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final base = events.isEmpty
+        ? _CenteredScrollable(child: Text(loc.no_events))
+        : MasonryGridView.count(
+            padding: const EdgeInsets.all(8),
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            itemCount: events.length,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemBuilder: (context, i) =>
+                EventGridItem(event: events[i], index: i),
+          );
+
+    final overlays = <Widget>[];
+    if (isRefreshing) {
+      overlays.add(const _LoadingOverlay());
+    }
+    if (errorMessage != null) {
+      overlays.add(_MessageBanner(message: errorMessage!));
+    }
+
+    if (overlays.isEmpty) return base;
+
+    return Stack(
+      children: [
+        Positioned.fill(child: base),
+        ...overlays,
+      ],
+    );
+  }
+}
+
+class _LoadingOverlay extends StatelessWidget {
+  const _LoadingOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Positioned(
+      top: 16,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: RefreshProgressIndicator(),
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageBanner extends StatelessWidget {
+  final String message;
+
+  const _MessageBanner({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Positioned(
+      top: 16,
+      left: 16,
+      right: 16,
+      child: SafeArea(
+        child: Material(
+          elevation: 6,
+          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.errorContainer,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            child: Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onErrorContainer,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
       ),
     );

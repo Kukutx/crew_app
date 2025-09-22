@@ -58,6 +58,7 @@ dependencies:
   firebase_crashlytics: ^5.0.1
   feedback: ^3.2.0
   talker_flutter: ^5.0.1
+  flutter_map_tile_caching: ^9.1.1
 
 
 dev_dependencies:

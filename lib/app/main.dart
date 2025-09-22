@@ -22,32 +22,89 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
+/// 早期版本
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
+
+//   final crashlytics = await _configureCrashlytics();
+//   final talker = Talker();
+//   final talkerRouteObserver = TalkerRouteObserver(talker);
+
+//   if (crashlytics == null) {
+//     talker.info('Crashlytics disabled for this platform.');
+//   }
+
+//   _setupErrorHandling(talker, crashlytics);
+
+//   // 本地化存储
+//   final prefs = await SharedPreferences.getInstance();
+
+//   runZonedGuarded(() {
+//     runApp(
+//       ProviderScope(
+//         overrides: [
+//           sharedPreferencesProvider.overrideWithValue(prefs),
+//           crashlyticsProvider.overrideWithValue(crashlytics),
+//           talkerProvider.overrideWithValue(talker),
+//           talkerRouteObserverProvider.overrideWithValue(talkerRouteObserver),
+//         ],
+//         child: BetterFeedback(
+//           child: const MyApp(),
+//         ),
+//       ),
+//     );
+//   }, (error, stackTrace) {
+//     _reportError(
+//       talker,
+//       crashlytics,
+//       error,
+//       stackTrace,
+//       fatal: true,
+//       reason: 'runZonedGuarded',
+//     );
+//   });
+// }
+
+
+
+
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  Talker? talker;
+  FirebaseCrashlytics? crashlytics;
 
-  final crashlytics = await _configureCrashlytics();
-  final talker = Talker();
-  final talkerRouteObserver = TalkerRouteObserver(talker);
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  if (crashlytics == null) {
-    talker.info('Crashlytics disabled for this platform.');
-  }
+    // Firebase 初始化
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  _setupErrorHandling(talker, crashlytics);
+    // Crashlytics & Talker 初始化
+    crashlytics = await _configureCrashlytics();
+    talker = Talker();
+    final talkerRouteObserver = TalkerRouteObserver(talker!);
 
-  // 本地化存储
-  final prefs = await SharedPreferences.getInstance();
+    if (crashlytics == null) {
+      talker?.info('Crashlytics disabled for this platform.');
+    }
 
-  runZonedGuarded(() {
+    // 错误捕获
+    _setupErrorHandling(talker!, crashlytics);
+
+    // SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+
+    // 启动应用
     runApp(
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           crashlyticsProvider.overrideWithValue(crashlytics),
-          talkerProvider.overrideWithValue(talker),
+          talkerProvider.overrideWithValue(talker!),
           talkerRouteObserverProvider.overrideWithValue(talkerRouteObserver),
         ],
         child: BetterFeedback(
@@ -56,9 +113,9 @@ Future<void> main() async {
       ),
     );
   }, (error, stackTrace) {
-    _reportError(
-      talker,
-      crashlytics,
+    // 全局未捕获异常
+    talker?.handle(error, stackTrace, 'unhandled zone error');
+    crashlytics?.recordError(
       error,
       stackTrace,
       fatal: true,
@@ -66,6 +123,7 @@ Future<void> main() async {
     );
   });
 }
+
 
 Future<FirebaseCrashlytics?> _configureCrashlytics() async {
   if (kIsWeb) {

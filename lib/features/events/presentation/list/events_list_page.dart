@@ -18,31 +18,27 @@ class EventsListPage extends ConsumerStatefulWidget {
 
 class _EventsListPageState extends ConsumerState<EventsListPage> {
   @override
-  void initState() {
-    super.initState();
-    ref.listen<AsyncValue<List<Event>>>(eventsProvider, (prev, next) {
-      next.whenOrNull(error: (error, _) {
-        if (!mounted) return;
-        final msg = _errorMessage(error);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(msg)));
-        });
-      });
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final eventsAsync = ref.watch(eventsProvider);
+
+    // 刷新列表
+    ref.listen<AsyncValue<List<Event>>>(eventsProvider, (prev, next) {
+      next.whenOrNull(error: (error, _) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          final msg = _errorMessage(error);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(msg)),
+          );
+        });
+      });
+    });
+
     return Scaffold(
       appBar: AppBar(title: Text(loc.events_title)),
       body: RefreshIndicator(
-        onRefresh: () async {
-          await ref.refresh(eventsProvider.future);
-        },
+        onRefresh: () async => await ref.refresh(eventsProvider.future),
         child: eventsAsync.when(
           data: (events) {
             if (events.isEmpty) {
@@ -57,7 +53,7 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
               itemCount: events.length,
               physics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, i) =>
-                  _GridItem(event: events[i], index: i).build(context),
+                  EventGridItem(event: events[i], index: i),
             );
           },
           loading: () =>
@@ -71,7 +67,7 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
 
 String _errorMessage(Object error) {
   if (error is ApiException) {
-    return error.toString();
+    return error.message.isNotEmpty ? error.message : error.toString();
   }
   final msg = error.toString();
   return msg.isEmpty ? 'Unknown error' : msg;
@@ -100,17 +96,19 @@ class _CenteredScrollable extends StatelessWidget {
   }
 }
 
-class _GridItem {
+// Flutter idiomatic 的 GridItem
+class EventGridItem extends StatelessWidget {
   final Event event;
   final int index;
 
-  _GridItem({required this.event, required this.index});
+  const EventGridItem({required this.event, required this.index, super.key});
 
+  @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final memCacheW = ((mq.size.width / 2) * mq.devicePixelRatio).round();
     final heroTag = 'event_$index';
-    // Tips： 判断imageUrls是否有值，否则用coverImageUrl
+     // Tips： 判断imageUrls是否有值，否则用coverImageUrl
     // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
     final imageUrl = (event.imageUrls.isNotEmpty)
         ? event.imageUrls.first
@@ -137,8 +135,8 @@ class _GridItem {
                 memCacheWidth: memCacheW,
                 placeholder: (c, _) => const AspectRatio(
                   aspectRatio: 1,
-                  child:
-                      Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: Center(
+                      child: CircularProgressIndicator(strokeWidth: 2)),
                 ),
                 errorWidget: (c, _, __) => const AspectRatio(
                   aspectRatio: 1,

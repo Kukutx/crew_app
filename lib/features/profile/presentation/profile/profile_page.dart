@@ -59,12 +59,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       appBar: AppBar(
         title: Text(loc.profile_title),
         centerTitle: true,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.close),
-        //   onPressed: () {
-        //     Navigator.of(context).pop(); // 关闭页面
-        //   },
-        // ),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            Navigator.of(context).pop(); // 关闭页面
+          },
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -79,13 +79,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   title: Text(loc.my_favorites),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.pushNamed(context, '/favorites'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.event_busy),
-                  title: Text(loc.my_events),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/user_event'),
                 ),
                 const Divider(height: 1),
                 ListTile(

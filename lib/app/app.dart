@@ -1,11 +1,11 @@
 import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
+import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
-import '../features/profile/presentation/profile/profile_page.dart';
 
 // class App extends StatefulWidget {
 //   const App({super.key});
@@ -51,7 +51,7 @@ class App extends ConsumerStatefulWidget {
 
 class _AppState extends ConsumerState<App> {
   int _index = 1;  // 默认打开“地图”
-  final _pages = const [EventsListPage(), EventsMapPage(), ProfilePage()];
+  final _pages = const [EventsListPage(), EventsMapPage(), UserEventsPage()];
   int? _promptedVersion; // 防止同一版本重复弹
 
   @override
@@ -92,7 +92,7 @@ class _AppState extends ConsumerState<App> {
         destinations: [
           NavigationDestination(icon: const Icon(Icons.event), label: loc.events),
           NavigationDestination(icon: const Icon(Icons.map), label: loc.map),
-          const NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+          const NavigationDestination(icon: Icon(Icons.chat), label: 'Group'),
         ],
       ),
       // extendBody: true,  // 是否延伸到 bottomNavigationBar 背后 适合做半透明效果，比如底部做玻璃罩

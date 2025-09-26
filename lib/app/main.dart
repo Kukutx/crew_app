@@ -147,7 +147,7 @@ void _setupErrorHandling(Talker talker, FirebaseCrashlytics? crashlytics) {
       crashlytics,
       details.exception,
       details.stack,
-      fatal: true,
+      fatal: false,   // 通常标记 fatal: false；真正未捕获的原生/平台异常在 platformDispatcher.onError 里用 fatal: true。
       reason: details.context?.toDescription(),
     );
   };

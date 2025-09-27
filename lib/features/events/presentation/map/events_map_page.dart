@@ -164,7 +164,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Padding(
         padding: EdgeInsets.only(
-          bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+          bottom: 132 + MediaQuery.of(context).viewPadding.bottom,
+          right: 6,
         ),
         child: FloatingActionButton(
           onPressed: () {

@@ -137,117 +137,118 @@ class _AppState extends ConsumerState<App> {
     }
 
     final theme = Theme.of(context);
-    final navigationBarColor = _isScrolling
-        ? theme.colorScheme.surface.withOpacity(0.6)
-        : theme.colorScheme.surface;
-    final glassBorderColor = theme.colorScheme.outline.withOpacity(0.12);
-    final borderColor =
-        _isScrolling ? glassBorderColor : Colors.transparent;
+    final colorScheme = theme.colorScheme;
+    final borderRadius = const BorderRadius.only(
+      topLeft: Radius.circular(32),
+      topRight: Radius.circular(32),
+      bottomLeft: Radius.circular(40),
+      bottomRight: Radius.circular(40),
+    );
+    final glassBorderColor = colorScheme.outline.withOpacity(0.14);
+    final glassDecoration = BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          colorScheme.surface.withOpacity(0.65),
+          colorScheme.surfaceVariant.withOpacity(0.45),
+        ],
+      ),
+      borderRadius: borderRadius,
+      border: Border.all(color: glassBorderColor),
+      boxShadow: [
+        BoxShadow(
+          color: colorScheme.shadow.withOpacity(0.08),
+          blurRadius: 32,
+          offset: const Offset(0, 18),
+        ),
+      ],
+    );
+    final solidDecoration = BoxDecoration(
+      color: colorScheme.surface,
+      borderRadius: borderRadius,
+      boxShadow: [
+        BoxShadow(
+          color: colorScheme.shadow.withOpacity(0.12),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
 
     return Scaffold(
       extendBody: true,
       body: IndexedStack(index: _index, children: _pages),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.only(bottom: 32),
+        minimum: const EdgeInsets.only(bottom: 28),
         child: Align(
           alignment: Alignment.bottomCenter,
           child: FractionallySizedBox(
             widthFactor: 0.88,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.shadow.withOpacity(0.08),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
+            child: ClipRRect(
+              borderRadius: borderRadius,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeInOut,
+                  decoration: _isScrolling ? glassDecoration : solidDecoration,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeInOut,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: navigationBarColor,
-                      border: Border.all(color: borderColor),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(32),
-                        topRight: Radius.circular(32),
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
-                      ),
-                    ),
-                    child: NavigationBarTheme(
-                      data: theme.navigationBarTheme.copyWith(
-                        backgroundColor: Colors.transparent,
-                        height: 64,
-                        indicatorColor: theme.colorScheme.primary,
-                        indicatorShape: const CircleBorder(),
-                        labelBehavior:
-                            NavigationDestinationLabelBehavior.alwaysShow,
-                        labelTextStyle: MaterialStateProperty.resolveWith(
-                          (states) => theme.textTheme.labelMedium?.copyWith(
-                            fontWeight: states.contains(MaterialState.selected)
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                            color: states.contains(MaterialState.selected)
-                                ? theme.colorScheme.onPrimary
-                                : theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        iconTheme: MaterialStateProperty.resolveWith(
-                          (states) => IconThemeData(
-                            size: states.contains(MaterialState.selected)
-                                ? 30
-                                : 24,
-                            color: states.contains(MaterialState.selected)
-                                ? theme.colorScheme.onPrimary
-                                : theme.colorScheme.onSurfaceVariant,
-                          ),
+                  child: NavigationBarTheme(
+                    data: theme.navigationBarTheme.copyWith(
+                      backgroundColor: Colors.transparent,
+                      height: 64,
+                      indicatorColor: colorScheme.primary.withOpacity(0.18),
+                      indicatorShape: const StadiumBorder(),
+                      labelBehavior:
+                          NavigationDestinationLabelBehavior.alwaysShow,
+                      labelTextStyle: MaterialStateProperty.resolveWith(
+                        (states) => theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: states.contains(MaterialState.selected)
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: states.contains(MaterialState.selected)
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      child: NavigationBar(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        selectedIndex: _index,
-                        onDestinationSelected: (i) =>
-                            setState(() => _index = i),
-                        destinations: [
-                          NavigationDestination(
-                            icon: const Icon(Icons.event_outlined),
-                            selectedIcon: const Icon(Icons.event),
-                            label: loc.events,
-                          ),
-                          NavigationDestination(
-                            icon: const Icon(Icons.map_outlined),
-                            selectedIcon: const Icon(Icons.map),
-                            label: loc.map,
-                          ),
-                          const NavigationDestination(
-                            icon: Icon(Icons.chat_bubble_outline),
-                            selectedIcon: Icon(Icons.chat_bubble),
-                            label: 'Group',
-                          ),
-                        ],
+                      iconTheme: MaterialStateProperty.resolveWith(
+                        (states) => IconThemeData(
+                          size: states.contains(MaterialState.selected)
+                              ? 30
+                              : 26,
+                          color: states.contains(MaterialState.selected)
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
+                        ),
                       ),
+                    ),
+                    child: NavigationBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      selectedIndex: _index,
+                      onDestinationSelected: (i) =>
+                          setState(() => _index = i),
+                      destinations: [
+                        NavigationDestination(
+                          icon: const Icon(Icons.event_outlined),
+                          selectedIcon: const Icon(Icons.event),
+                          label: loc.events,
+                        ),
+                        NavigationDestination(
+                          icon: const Icon(Icons.map_outlined),
+                          selectedIcon: const Icon(Icons.map),
+                          label: loc.map,
+                        ),
+                        const NavigationDestination(
+                          icon: Icon(Icons.chat_bubble_outline),
+                          selectedIcon: Icon(Icons.chat_bubble),
+                          label: 'Group',
+                        ),
+                      ],
                     ),
                   ),
                 ),

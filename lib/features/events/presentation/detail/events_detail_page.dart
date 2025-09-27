@@ -285,7 +285,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                EventsMapPage(selectedEvent: event), // 你的原逻辑
+                                EventsMapPage(selectedEvent: event),
                           ),
                         );
                       },

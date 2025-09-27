@@ -7,9 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 final eventsProvider =
-    AutoDisposeAsyncNotifierProvider<EventsCtrl, List<Event>>(EventsCtrl.new);
+    AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);
 
-class EventsCtrl extends AutoDisposeAsyncNotifier<List<Event>> {
+class EventsCtrl extends AsyncNotifier<List<Event>>{
   Timer? _pollingTimer;
 
   @override

@@ -76,14 +76,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final loc = AppLocalizations.of(context)!;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
-      final loc = next.valueOrNull;
+      final loc = next.value;
       if (!_movedToSelected && widget.selectedEvent == null && loc != null) {
         _map.move(loc, 14);
       }
     });
 
     final events = ref.watch(eventsProvider);
-    final userLoc = ref.watch(userLocationProvider).valueOrNull;
+    final userLoc = ref.watch(userLocationProvider).value;
     final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
 
     // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
@@ -143,7 +143,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           mapController: _map,
           initialCenter: startCenter,
           onMapReady: () {
-            final loc = ref.read(userLocationProvider).valueOrNull;
+            final loc = ref.read(userLocationProvider).value;
             if (!_movedToSelected && loc != null) _map.move(loc, 14);
           },
           onLongPress: _onMapLongPress,
@@ -163,7 +163,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final loc = ref.read(userLocationProvider).valueOrNull;
+          final loc = ref.read(userLocationProvider).value;
           if (loc != null) {
             _map.move(loc, 14);
             _map.rotate(0);

@@ -132,7 +132,8 @@ Future<FirebaseCrashlytics?> _configureCrashlytics() async {
   }
 
   final crashlytics = FirebaseCrashlytics.instance;
-  await crashlytics.setCrashlyticsCollectionEnabled(!kDebugMode);
+  // await crashlytics.setCrashlyticsCollectionEnabled(!kDebugMode);  // 非调试模式下启用,正式版本使用
+  await crashlytics.setCrashlyticsCollectionEnabled(true);    // 强制开启，测试用,如果release版请注释掉
   if (kDebugMode) {
     debugPrint('Crashlytics collection disabled in debug mode.');
   }

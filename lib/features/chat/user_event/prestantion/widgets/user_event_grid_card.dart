@@ -31,7 +31,7 @@ class UserEventGridCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: event.accentColor.withOpacity(0.12),
+                  color: event.accentColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(Icons.favorite_outline, color: event.accentColor, size: 20),

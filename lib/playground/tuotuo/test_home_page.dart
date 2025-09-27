@@ -85,7 +85,7 @@ class _LogoWordmark extends StatelessWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: .12),
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
@@ -118,7 +118,7 @@ class _TopIcon extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.08),
+          color: Colors.black.withValues(alpha:0.08),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: Colors.white, size: 20),
@@ -133,7 +133,7 @@ class _TabChip extends StatelessWidget {
   const _TabChip({required this.label, this.highlighted = false});
   @override
   Widget build(BuildContext context) {
-    final bg = highlighted ? Colors.white : Colors.black.withOpacity(0.12);
+    final bg = highlighted ? Colors.white : Colors.black.withValues(alpha:0.12);
     final fg = highlighted ? Colors.black : Colors.white;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

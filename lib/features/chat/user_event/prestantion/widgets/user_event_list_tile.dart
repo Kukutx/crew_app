@@ -38,7 +38,7 @@ class UserEventListTile extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 26,
-                          backgroundColor: event.accentColor.withOpacity(0.12),
+                          backgroundColor: event.accentColor.withValues(alpha:.12),
                           child: Icon(Icons.forum_outlined, color: event.accentColor),
                         ),
                         if (event.unreadCount > 0)
@@ -144,7 +144,7 @@ class UserEventListTile extends StatelessWidget {
                         Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 16,
-                          color: colorScheme.onSurfaceVariant.withOpacity(.7),
+                          color: colorScheme.onSurfaceVariant.withValues(alpha:.7),
                         ),
                       ],
                     ),

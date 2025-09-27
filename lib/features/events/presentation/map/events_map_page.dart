@@ -31,7 +31,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _map = MapController();
   bool _movedToSelected = false;
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
- static const _quickTags = [
+  static const _quickTags = [
     'today',
     'nearby',
     'party',
@@ -111,7 +111,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           v ? _selectedTags.add(t) : _selectedTags.remove(t);
           // TODO: 将标签映射到 _filter 并刷新 Provider
           ScaffoldMessenger.of(context)
-         .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
+              .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
         }),
         onOpenFilter: () async {
           final res = await showEventFilterSheet(
@@ -122,7 +122,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           if (res != null) setState(() => _filter = res);
           // TODO: 根据 _filter 刷新数据
           ScaffoldMessenger.of(context)
-               .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
+              .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
         },
         onResultTap: _onSearchResultTap,
         showResults: _showSearchResults,
@@ -168,8 +168,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             _map.move(loc, 14);
             _map.rotate(0);
           } else {
-            ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("Unable to get location")));
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Unable to get location")));
           }
         },
         child: const Icon(Icons.my_location),
@@ -279,10 +279,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         _searchError = e.message;
       });
     } finally {
-      if (!mounted || _currentSearchQuery != query) return;
-      setState(() {
-        _isSearching = false;
-      });
+      if (mounted && _currentSearchQuery == query) {
+        setState(() {
+          _isSearching = false;
+        });
+      }
     }
   }
 

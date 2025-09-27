@@ -43,9 +43,9 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ],
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(72),
+        preferredSize: const Size.fromHeight(84),
         child: SizedBox(
-          height: 72,
+          height: 84,
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             scrollDirection: Axis.horizontal,

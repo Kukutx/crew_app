@@ -119,36 +119,32 @@ class _AppState extends ConsumerState<App> {
     final colorScheme = theme.colorScheme;
     final borderRadius = BorderRadius.circular(30);
     final glassBorderColor = colorScheme.outline.withValues(alpha: 0.14);
-    final glassDecoration = BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          colorScheme.surface.withValues(alpha: 0.65),
-          colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+    BoxDecoration navDecoration(bool isScrolling) {
+      return BoxDecoration(
+        borderRadius: borderRadius,
+        border: Border.all(
+          color: isScrolling ? glassBorderColor : Colors.transparent,
+        ),
+        gradient: isScrolling
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.surface.withValues(alpha: 0.65),
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+                ],
+              )
+            : null,
+        color: isScrolling ? null : colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: isScrolling ? 0.08 : 0.12),
+            blurRadius: isScrolling ? 30 : 24,
+            offset: Offset(0, isScrolling ? 18 : 12),
+          ),
         ],
-      ),
-      borderRadius: borderRadius,
-      border: Border.all(color: glassBorderColor),
-      boxShadow: [
-        BoxShadow(
-          color: colorScheme.shadow.withValues(alpha: 0.08),
-          blurRadius: 30,
-          offset: const Offset(0, 18),
-        ),
-      ],
-    );
-    final solidDecoration = BoxDecoration(
-      color: colorScheme.surface,
-      borderRadius: borderRadius,
-      boxShadow: [
-        BoxShadow(
-          color: colorScheme.shadow.withValues(alpha: 0.12),
-          blurRadius: 24,
-          offset: const Offset(0, 12),
-        ),
-      ],
-    );
+      );
+    }
     final destinations = <NavigationDestination>[
       NavigationDestination(
         icon: const Icon(Icons.event_outlined),
@@ -183,7 +179,7 @@ class _AppState extends ConsumerState<App> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 240),
                   curve: Curves.easeInOut,
-                  decoration: _isScrolling ? glassDecoration : solidDecoration,
+                  decoration: navDecoration(_isScrolling),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 10,

@@ -16,6 +16,9 @@ class UserProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<UserProfilePage>
     with TickerProviderStateMixin {
+  static const double _expandedHeight = 320;
+  static const double _tabBarHeight = 48;
+
   late final TabController _tabCtrl;
   final _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
 
@@ -48,9 +51,19 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
             SliverAppBar(
               pinned: true,
               stretch: true,
-              expandedHeight: 300, // 给卡片留空间
+              expandedHeight: _expandedHeight, // 给卡片留空间
               flexibleSpace: LayoutBuilder(
                 builder: (context, c) {
+                  final currentHeight = c.biggest.height;
+                  final minExtent =
+                      topPad + kToolbarHeight + _tabBarHeight; // 吸顶后的高度
+                  final maxExtent = topPad + _expandedHeight;
+                  final availableExtent =
+                      maxExtent - minExtent <= 0 ? 1.0 : maxExtent - minExtent;
+                  final t = ((currentHeight - minExtent) / availableExtent)
+                      .clamp(0.0, 1.0);
+                  final collapseProgress = 1 - t;
+
                   return Stack(
                     fit: StackFit.expand,
                     children: [
@@ -67,13 +80,36 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                           ),
                         ),
                       ),
-                      // 头像卡片：固定在底部，避开刘海（topPad）
-                      Positioned(
-                        left: 16,
-                        right: 16,
-                        bottom: 72, // 留出 TabBar 的高度
-                        child: _HeaderCard(userProfile: profile),
-                      ),
+                      // 头像卡片：随滚动淡出，避免折叠时溢出
+                      if (t > 0.05)
+                        Positioned(
+                          left: 16,
+                          right: 16,
+                          bottom: lerpDouble(16, 72, t)!,
+                          child: Opacity(
+                            opacity: Curves.easeOut.transform(t),
+                            child: Transform.scale(
+                              scale: lerpDouble(0.92, 1, t)!,
+                              child: _HeaderCard(userProfile: profile),
+                            ),
+                          ),
+                        ),
+                      // 折叠后的头像
+                      if (collapseProgress > 0)
+                        Positioned(
+                          top: topPad + (kToolbarHeight - 48) / 2,
+                          left: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                            ignoring: collapseProgress < 0.6,
+                            child: Opacity(
+                              opacity: Curves.easeIn.transform(collapseProgress),
+                              child: Center(
+                                child: _CollapsedAvatar(user: profile),
+                              ),
+                            ),
+                          ),
+                        ),
                       // 顶部安全区占位，避免被刘海/状态栏压住
                       Positioned(
                           top: 0,
@@ -85,7 +121,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                 },
               ),
               bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(48),
+                preferredSize: Size.fromHeight(_tabBarHeight),
                 child: Material(
                   color: theme.scaffoldBackgroundColor,
                   child: TabBar(
@@ -228,6 +264,36 @@ class _FollowButton extends ConsumerWidget {
         );
       },
       child: Text(followed ? '已关注' : '关注'),
+    );
+  }
+}
+
+class _CollapsedAvatar extends StatelessWidget {
+  const _CollapsedAvatar({required this.user});
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.85),
+        shape: BoxShape.circle,
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: CircleAvatar(
+          radius: 20,
+          backgroundImage: CachedNetworkImageProvider(user.avatar),
+        ),
+      ),
     );
   }
 }

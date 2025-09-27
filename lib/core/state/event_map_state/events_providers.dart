@@ -4,10 +4,13 @@ import 'dart:async';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:latlong2/latlong.dart';
 
 final eventsProvider =
     AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);
+
+final mapFocusEventProvider = StateProvider<Event?>((ref) => null);
 
 class EventsCtrl extends AsyncNotifier<List<Event>>{
   Timer? _pollingTimer;

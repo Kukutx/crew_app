@@ -1,5 +1,4 @@
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/map/events_map_page.dart';
 import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -280,15 +279,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     _detailRow(Icons.people, loc.event_participants_title,
                         loc.to_be_announced),
                     InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                EventsMapPage(selectedEvent: event),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.pop(context, widget.event),
                       child: _detailRow(Icons.place,
                           loc.event_meeting_point_title, widget.event.location),
                     ),

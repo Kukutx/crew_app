@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../../../../core/state/app/app_overlay_provider.dart';
 import '../../../../core/error/api_exception.dart';
 import '../../../../core/state/event_map_state/events_providers.dart';
 import '../detail/events_detail_page.dart';
@@ -52,8 +53,14 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
               crossAxisSpacing: 8,
               itemCount: events.length,
               physics: const AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, i) =>
-                  EventGridItem(event: events[i], index: i),
+              itemBuilder: (context, i) => EventGridItem(
+                event: events[i],
+                index: i,
+                onShowOnMap: (event) {
+                  ref.read(appOverlayIndexProvider.notifier).state = 1;
+                  ref.read(mapFocusEventProvider.notifier).state = event;
+                },
+              ),
             );
           },
           loading: () =>
@@ -100,8 +107,14 @@ class _CenteredScrollable extends StatelessWidget {
 class EventGridItem extends StatelessWidget {
   final Event event;
   final int index;
+  final ValueChanged<Event>? onShowOnMap;
 
-  const EventGridItem({required this.event, required this.index, super.key});
+  const EventGridItem({
+    required this.event,
+    required this.index,
+    this.onShowOnMap,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,11 +132,16 @@ class EventGridItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push<Event>(
             context,
-            MaterialPageRoute(builder: (_) => EventDetailPage(event: event)),
+            MaterialPageRoute(
+              builder: (_) => EventDetailPage(event: event),
+            ),
           );
+          if (result != null) {
+            onShowOnMap?.call(result);
+          }
         },
         child: Stack(
           children: [

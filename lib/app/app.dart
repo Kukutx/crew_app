@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
+import '../core/state/app/app_overlay_provider.dart';
 
 /// 添加免责声明，缺测试
 class App extends ConsumerStatefulWidget {
@@ -27,6 +28,7 @@ class _AppState extends ConsumerState<App> {
   int? _promptedVersion; // 防止同一版本重复弹
   ProviderSubscription<AsyncValue<DisclaimerState>>?
       _disclaimerSubscription;
+  ProviderSubscription<int>? _overlayIndexSubscription;
 
   @override
   void initState() {
@@ -36,6 +38,25 @@ class _AppState extends ConsumerState<App> {
       _onDisclaimerStateChanged,
       fireImmediately: true,
     );
+    _overlayIndexSubscription = ref.listenManual(
+      appOverlayIndexProvider,
+      (previous, next) {
+        if (next == _index) {
+          return;
+        }
+        setState(() {
+          _index = next;
+          if (next == 1) {
+            _isScrolling = false;
+          }
+        });
+        _overlayController.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      },
+    );
   }
 
   @override
@@ -43,6 +64,7 @@ class _AppState extends ConsumerState<App> {
     _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _disclaimerSubscription?.close();
+    _overlayIndexSubscription?.close();
     super.dispose();
   }
 
@@ -172,6 +194,7 @@ class _AppState extends ConsumerState<App> {
                     _isScrolling = false;
                   }
                 });
+                ref.read(appOverlayIndexProvider.notifier).state = page;
               },
               children: [
                 ScrollActivityListener(
@@ -250,6 +273,7 @@ class _AppState extends ConsumerState<App> {
                             _isScrolling = false;
                           }
                         });
+                        ref.read(appOverlayIndexProvider.notifier).state = i;
                         _overlayController.animateToPage(
                           i,
                           duration: const Duration(milliseconds: 300),

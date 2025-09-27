@@ -23,21 +23,7 @@ class _AppState extends ConsumerState<App> {
   int _index = 1; // 默认打开“地图”
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
-  late final List<Widget> _pages = [
-    ScrollActivityListener(
-      onScrollActivityChanged: _handleScrollActivity,
-      child: const EventsListPage(),
-    ),
-    ScrollActivityListener(
-      onScrollActivityChanged: _handleScrollActivity,
-      listenToPointerActivity: true,
-      child: const EventsMapPage(),
-    ),
-    ScrollActivityListener(
-      onScrollActivityChanged: _handleScrollActivity,
-      child: const UserEventsPage(),
-    ),
-  ];
+  late final PageController _overlayController = PageController(initialPage: 1);
   int? _promptedVersion; // 防止同一版本重复弹
   ProviderSubscription<AsyncValue<DisclaimerState>>?
       _disclaimerSubscription;
@@ -54,6 +40,7 @@ class _AppState extends ConsumerState<App> {
 
   @override
   void dispose() {
+    _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _disclaimerSubscription?.close();
     super.dispose();
@@ -155,9 +142,52 @@ class _AppState extends ConsumerState<App> {
       ),
     ];
 
+    final isOverlayOpen = _index != 1;
+
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(index: _index, children: _pages),
+      body: Stack(
+        children: [
+          ScrollActivityListener(
+            onScrollActivityChanged: _handleScrollActivity,
+            listenToPointerActivity: true,
+            child: const EventsMapPage(),
+          ),
+          IgnorePointer(
+            ignoring: !isOverlayOpen,
+            child: PageView(
+              controller: _overlayController,
+              physics: isOverlayOpen
+                  ? const PageScrollPhysics()
+                  : const NeverScrollableScrollPhysics(),
+              onPageChanged: (page) {
+                final shouldUpdateIndex = _index != page;
+                final shouldResetScroll = page == 1 && _isScrolling;
+                if (!shouldUpdateIndex && !shouldResetScroll) {
+                  return;
+                }
+                setState(() {
+                  _index = page;
+                  if (page == 1) {
+                    _isScrolling = false;
+                  }
+                });
+              },
+              children: [
+                ScrollActivityListener(
+                  onScrollActivityChanged: _handleScrollActivity,
+                  child: const EventsListPage(),
+                ),
+                const SizedBox.expand(),
+                ScrollActivityListener(
+                  onScrollActivityChanged: _handleScrollActivity,
+                  child: const UserEventsPage(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.only(bottom: 28),
         child: Align(
@@ -210,7 +240,22 @@ class _AppState extends ConsumerState<App> {
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                       selectedIndex: _index,
-                      onDestinationSelected: (i) => setState(() => _index = i),
+                      onDestinationSelected: (i) {
+                        if (_index == i) {
+                          return;
+                        }
+                        setState(() {
+                          _index = i;
+                          if (i == 1) {
+                            _isScrolling = false;
+                          }
+                        });
+                        _overlayController.animateToPage(
+                          i,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
                       destinations: destinations,
                     ),
                   ),

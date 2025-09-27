@@ -161,18 +161,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final loc = ref.read(userLocationProvider).value;
-          if (loc != null) {
-            _map.move(loc, 14);
-            _map.rotate(0);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Unable to get location")));
-          }
-        },
-        child: const Icon(Icons.my_location),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(
+          bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            final loc = ref.read(userLocationProvider).value;
+            if (loc != null) {
+              _map.move(loc, 14);
+              _map.rotate(0);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Unable to get location")));
+            }
+          },
+          child: const Icon(Icons.my_location),
+        ),
       ),
     );
   }

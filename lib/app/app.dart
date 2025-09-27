@@ -124,7 +124,7 @@ class _AppState extends ConsumerState<App> {
       boxShadow: [
         BoxShadow(
           color: colorScheme.shadow.withValues(alpha:0.08),
-          blurRadius: 32,
+          blurRadius: 30,
           offset: const Offset(0, 18),
         ),
       ],

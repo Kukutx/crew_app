@@ -125,17 +125,9 @@ class _AppState extends ConsumerState<App> {
         border: Border.all(
           color: isScrolling ? glassBorderColor : Colors.transparent,
         ),
-        gradient: isScrolling
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.surface.withValues(alpha: 0.65),
-                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-                ],
-              )
-            : null,
-        color: isScrolling ? null : colorScheme.surface,
+        color: isScrolling
+            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.52)
+            : colorScheme.surface,
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: isScrolling ? 0.08 : 0.12),

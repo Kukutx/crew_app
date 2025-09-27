@@ -12,41 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
 
-// class App extends StatefulWidget {
-//   const App({super.key});
-//   @override
-//   State<App> createState() => _AppState();
-// }
-
-// class _AppState extends State<App> {
-//   int _index = 1; // 默认打开“地图”
-//   final List<Widget> _pages = const [
-//     EventsListPage(),
-//     EventsMapPage(),
-//     ProfilePage(),
-//   ];
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final loc = AppLocalizations.of(context)!;
-//     return Scaffold(
-//       body: IndexedStack(index: _index, children: _pages),
-//       bottomNavigationBar: NavigationBar(
-//         selectedIndex: _index,
-//         onDestinationSelected: (i) => setState(() => _index = i),
-//         destinations: [
-//           NavigationDestination(icon: Icon(Icons.event), label: loc.events),
-//           NavigationDestination(icon: Icon(Icons.map), label: loc.map),
-//           const NavigationDestination(
-//               icon: Icon(Icons.person), label: 'Profile'),
-//         ],
-//       ),
-//       extendBody: true,  // 是否延伸到 bottomNavigationBar 背后 适合做半透明效果，比如底部做玻璃罩
-//     );
-//   }
-// }
-
-
 /// 添加免责声明，缺测试
 class App extends ConsumerStatefulWidget {
   const App({super.key});

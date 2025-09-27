@@ -120,7 +120,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                   );
                 },
               ),
-              bottom: const PreferredSize(
+              bottom: PreferredSize(
                 preferredSize: Size.fromHeight(_tabBarHeight),
                 child: Material(
                   color: theme.scaffoldBackgroundColor,

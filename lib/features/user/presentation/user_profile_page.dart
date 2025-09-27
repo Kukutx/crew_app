@@ -96,21 +96,6 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                 ),
               ),
             ),
-            // // 用自己的 Delegate 来做吸顶 TabBar
-            // SliverPersistentHeader(
-            //   pinned: true,
-            //   delegate: _TabHeaderDelegate(
-            //     child: Material(
-            //       elevation: 2, // 吸顶时带一点阴影更有层次
-            //       color: Theme.of(context).scaffoldBackgroundColor,
-            //       child: TabBar(
-            //         controller: _tabCtrl,
-            //         tabs: _tabs,
-            //         indicatorSize: TabBarIndicatorSize.tab,
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
           body: TabBarView(
             controller: _tabCtrl,
@@ -350,22 +335,6 @@ class _FavoritesGrid extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// ====== 吸顶 Tab Header Delegate ======
-class _TabHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-  _TabHeaderDelegate({required this.child});
-  @override
-  Widget build(
-          BuildContext context, double shrinkOffset, bool overlapsContent) =>
-      child;
-  @override
-  double get maxExtent => 48;
-  @override
-  double get minExtent => 48;
-  @override
-  bool shouldRebuild(covariant _TabHeaderDelegate oldDelegate) => false;
 }
 
 /// ====== 假数据 Provider ======

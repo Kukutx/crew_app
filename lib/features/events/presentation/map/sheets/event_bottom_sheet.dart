@@ -6,8 +6,11 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// 地图报名页 事件
-void showEventBottomSheet(
-    {required BuildContext context, required Event event}) {
+void showEventBottomSheet({
+  required BuildContext context,
+  required Event event,
+  ValueChanged<Event>? onShowOnMap,
+}) {
   // Tips： 判断imageUrls是否有值，否则用coverImageUrl
   // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
   final imageUrl = (event.imageUrls.isNotEmpty)
@@ -73,14 +76,18 @@ void showEventBottomSheet(
                                   children: [
                                     Expanded(
                                       child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(context); // 先收起
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => EventDetailPage(
-                                                    event: event),
-                                              ));
+                                        onTap: () async {
+                                          final navigator = Navigator.of(context);
+                                          navigator.pop(); // 先收起
+                                          final result = await navigator.push<Event>(
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  EventDetailPage(event: event),
+                                            ),
+                                          );
+                                          if (result != null) {
+                                            onShowOnMap?.call(result);
+                                          }
                                         },
                                         child: Text(event.title,
                                             maxLines: 2,

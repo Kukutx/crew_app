@@ -54,12 +54,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   String? _searchError;
   String _currentSearchQuery = '';
   Timer? _searchDebounce;
+  ProviderSubscription<Event?>? _mapFocusSubscription;
 
   @override
   void initState() {
     super.initState();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
+    _mapFocusSubscription = ref.listenManual(
+      mapFocusEventProvider,
+      (previous, next) {
+        final event = next;
+        if (event == null) {
+          return;
+        }
+        _focusOnEvent(event);
+        ref.read(mapFocusEventProvider.notifier).state = null;
+      },
+    );
   }
 
   @override
@@ -68,6 +80,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode.removeListener(_onSearchFocusChanged);
     _searchFocusNode.dispose();
     _searchController.dispose();
+    _mapFocusSubscription?.close();
     super.dispose();
   }
 
@@ -89,10 +102,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.selectedEvent != null && !_movedToSelected) {
-        final ev = widget.selectedEvent!;
-        _map.move(LatLng(ev.latitude, ev.longitude), 15);
-        _showEventCard(ev);
-        _movedToSelected = true;
+        _focusOnEvent(widget.selectedEvent!);
       }
     });
 
@@ -197,7 +207,23 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _showEventCard(Event ev) {
-    showEventBottomSheet(context: context, event: ev);
+    if (!mounted) {
+      return;
+    }
+    showEventBottomSheet(
+      context: context,
+      event: ev,
+      onShowOnMap: _focusOnEvent,
+    );
+  }
+
+  void _focusOnEvent(Event event) {
+    if (!mounted) {
+      return;
+    }
+    _map.move(LatLng(event.latitude, event.longitude), 15);
+    _movedToSelected = true;
+    _showEventCard(event);
   }
 
   void _onAvatarTap(bool authed) {

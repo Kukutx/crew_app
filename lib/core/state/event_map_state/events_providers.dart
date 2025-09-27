@@ -9,6 +9,8 @@ import 'package:latlong2/latlong.dart';
 final eventsProvider =
     AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);
 
+final mapFocusEventProvider = StateProvider<Event?>((ref) => null);
+
 class EventsCtrl extends AsyncNotifier<List<Event>>{
   Timer? _pollingTimer;
 

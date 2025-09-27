@@ -1,8 +1,8 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import '../data/models/group_message.dart';
-import '../data/models/group_participant.dart';
+import '../data/group_message.dart';
+import '../data/group_participant.dart';
 import 'widgets/group_chat_app_bar.dart';
 import 'widgets/group_chat_message_composer.dart';
 import 'widgets/group_chat_message_list.dart';

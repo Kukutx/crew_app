@@ -1,7 +1,7 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/models/group_participant.dart';
+import '../../data/group_participant.dart';
 import 'group_participant_avatar.dart';
 
 class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {

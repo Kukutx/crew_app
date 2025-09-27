@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/models/group_message.dart';
+import '../../data/group_message.dart';
 import 'group_message_tile.dart';
 
 class GroupChatMessageList extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/models/group_message.dart';
+import '../../data/group_message.dart';
 
 class GroupMessageTile extends StatelessWidget {
   const GroupMessageTile({

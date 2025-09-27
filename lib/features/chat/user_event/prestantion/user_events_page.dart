@@ -1,5 +1,5 @@
-import 'package:crew_app/features/chat/group_chat/data/models/group_message.dart';
-import 'package:crew_app/features/chat/group_chat/data/models/group_participant.dart';
+import 'package:crew_app/features/chat/group_chat/data/group_message.dart';
+import 'package:crew_app/features/chat/group_chat/data/group_participant.dart';
 import 'package:crew_app/features/chat/group_chat/presentation/group_chat_page.dart';
 import 'package:crew_app/features/chat/user_event/data/user_event.dart';
 import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_favorites_grid.dart';

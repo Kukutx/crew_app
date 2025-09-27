@@ -1,6 +1,10 @@
 import 'package:crew_app/features/chat/group_chat/presentation/group_chat_page.dart';
 import 'package:crew_app/features/chat/user_event/data/user_event.dart';
-import 'package:crew_app/features/chat/widgets/widgets.dart';
+import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_favorites_grid.dart';
+import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_registered_list.dart';
+import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_tab_bar.dart';
+export 'package:crew_app/features/chat/user_event/prestantion/widgets/user_event_list_tile.dart';
+export 'package:crew_app/features/chat/user_event/prestantion/widgets/user_event_tab_chip.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -201,7 +205,7 @@ class _UserEventsPageState extends State<UserEventsPage> {
             image: const AssetImage('assets/images/bg_pattern.png'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.9),
+              Colors.white.withValues(alpha: .9),
               BlendMode.srcATop,
             ),
           ),

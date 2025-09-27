@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import '../user_event/data/user_event.dart';
+import '../../data/user_event.dart';
 import 'user_event_grid_card.dart';
 
 typedef UserEventTap = void Function(int index);

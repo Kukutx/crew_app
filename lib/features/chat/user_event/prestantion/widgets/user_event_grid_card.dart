@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../user_event/data/user_event.dart';
+import '../../data/user_event.dart';
 
 class UserEventGridCard extends StatelessWidget {
   const UserEventGridCard({

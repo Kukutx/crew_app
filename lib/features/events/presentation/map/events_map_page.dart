@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -162,20 +161,25 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ],
         ),
       ),
-      floatingActionButtonLocation: const _AdaptiveEndFloatFabLocation(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final loc = ref.read(userLocationProvider).value;
-          if (loc != null) {
-            _map.move(loc, 14);
-            _map.rotate(0);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Unable to get location")),
-            );
-          }
-        },
-        child: const Icon(Icons.my_location),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(
+          bottom: 132 + MediaQuery.of(context).viewPadding.bottom,
+          right: 6,
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            final loc = ref.read(userLocationProvider).value;
+            if (loc != null) {
+              _map.move(loc, 14);
+              _map.rotate(0);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Unable to get location")));
+            }
+          },
+          child: const Icon(Icons.my_location),
+        ),
       ),
     );
   }
@@ -318,48 +322,4 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _currentSearchQuery = '';
     });
   }
-}
-
-class _AdaptiveEndFloatFabLocation extends FloatingActionButtonLocation {
-  const _AdaptiveEndFloatFabLocation();
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry geometry) {
-    final fabSize = geometry.floatingActionButtonSize;
-    if (fabSize == null) {
-      return Offset.zero;
-    }
-
-    final double navTop = geometry.bottomNavigationBarTop ??
-        geometry.scaffoldSize.height;
-    final double availableHeight = math.min(
-      geometry.scaffoldSize.height - geometry.minInsets.bottom -
-          fabSize.height - kFloatingActionButtonMargin,
-      navTop - fabSize.height - kFloatingActionButtonMargin,
-    );
-
-    final double snackBarTop = geometry.snackBarSize == null
-        ? double.infinity
-        : geometry.scaffoldSize.height -
-            geometry.snackBarSize!.height -
-            fabSize.height -
-            kFloatingActionButtonMargin;
-
-    final double bottomSheetTop = geometry.bottomSheetSize == null
-        ? double.infinity
-        : geometry.scaffoldSize.height -
-            geometry.bottomSheetSize!.height -
-            fabSize.height -
-            kFloatingActionButtonMargin;
-
-    final double fabY = math.min(availableHeight, math.min(snackBarTop, bottomSheetTop));
-    final double fabX = geometry.scaffoldSize.width -
-        fabSize.width -
-        kFloatingActionButtonMargin;
-
-    return Offset(fabX, fabY);
-  }
-
-  @override
-  String toString() => 'AdaptiveEndFloatFabLocation';
 }

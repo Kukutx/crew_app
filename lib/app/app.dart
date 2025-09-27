@@ -139,26 +139,26 @@ class _AppState extends ConsumerState<App> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final borderRadius = const BorderRadius.only(
-      topLeft: Radius.circular(32),
-      topRight: Radius.circular(32),
-      bottomLeft: Radius.circular(40),
-      bottomRight: Radius.circular(40),
+      topLeft: Radius.circular(30),
+      topRight: Radius.circular(30),
+      bottomLeft: Radius.circular(30),
+      bottomRight: Radius.circular(30),
     );
-    final glassBorderColor = colorScheme.outline.withOpacity(0.14);
+    final glassBorderColor = colorScheme.outline.withValues(alpha:.14);
     final glassDecoration = BoxDecoration(
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.surface.withOpacity(0.65),
-          colorScheme.surfaceVariant.withOpacity(0.45),
+          colorScheme.surface.withValues(alpha:0.65),
+          colorScheme.surfaceContainerHighest.withValues(alpha:0.45),
         ],
       ),
       borderRadius: borderRadius,
       border: Border.all(color: glassBorderColor),
       boxShadow: [
         BoxShadow(
-          color: colorScheme.shadow.withOpacity(0.08),
+          color: colorScheme.shadow.withValues(alpha:0.08),
           blurRadius: 32,
           offset: const Offset(0, 18),
         ),
@@ -169,7 +169,7 @@ class _AppState extends ConsumerState<App> {
       borderRadius: borderRadius,
       boxShadow: [
         BoxShadow(
-          color: colorScheme.shadow.withOpacity(0.12),
+          color: colorScheme.shadow.withValues(alpha:0.12),
           blurRadius: 24,
           offset: const Offset(0, 12),
         ),
@@ -201,26 +201,26 @@ class _AppState extends ConsumerState<App> {
                     data: theme.navigationBarTheme.copyWith(
                       backgroundColor: Colors.transparent,
                       height: 64,
-                      indicatorColor: colorScheme.primary.withOpacity(0.18),
+                      indicatorColor: colorScheme.primary.withValues(alpha:0.18),
                       indicatorShape: const StadiumBorder(),
                       labelBehavior:
                           NavigationDestinationLabelBehavior.alwaysShow,
-                      labelTextStyle: MaterialStateProperty.resolveWith(
+                      labelTextStyle: WidgetStateProperty.resolveWith(
                         (states) => theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: states.contains(MaterialState.selected)
+                          fontWeight: states.contains(WidgetState.selected)
                               ? FontWeight.w600
                               : FontWeight.w500,
-                          color: states.contains(MaterialState.selected)
+                          color: states.contains(WidgetState.selected)
                               ? colorScheme.primary
                               : colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      iconTheme: MaterialStateProperty.resolveWith(
+                      iconTheme: WidgetStateProperty.resolveWith(
                         (states) => IconThemeData(
-                          size: states.contains(MaterialState.selected)
+                          size: states.contains(WidgetState.selected)
                               ? 30
                               : 26,
-                          color: states.contains(MaterialState.selected)
+                          color: states.contains(WidgetState.selected)
                               ? colorScheme.primary
                               : colorScheme.onSurfaceVariant,
                         ),

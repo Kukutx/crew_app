@@ -23,32 +23,39 @@ class _AppState extends ConsumerState<App> {
   int _index = 1; // 默认打开“地图”
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
-  late final List<Widget> _pages;
+  late final List<Widget> _pages = [
+    ScrollActivityListener(
+      onScrollActivityChanged: _handleScrollActivity,
+      child: const EventsListPage(),
+    ),
+    ScrollActivityListener(
+      onScrollActivityChanged: _handleScrollActivity,
+      listenToPointerActivity: true,
+      child: const EventsMapPage(),
+    ),
+    ScrollActivityListener(
+      onScrollActivityChanged: _handleScrollActivity,
+      child: const UserEventsPage(),
+    ),
+  ];
   int? _promptedVersion; // 防止同一版本重复弹
+  ProviderSubscription<AsyncValue<DisclaimerState>>?
+      _disclaimerSubscription;
 
   @override
   void initState() {
     super.initState();
-    _pages = [
-      ScrollActivityListener(
-        onScrollActivityChanged: _handleScrollActivity,
-        child: const EventsListPage(),
-      ),
-      ScrollActivityListener(
-        onScrollActivityChanged: _handleScrollActivity,
-        listenToPointerActivity: true,
-        child: const EventsMapPage(),
-      ),
-      ScrollActivityListener(
-        onScrollActivityChanged: _handleScrollActivity,
-        child: const UserEventsPage(),
-      ),
-    ];
+    _disclaimerSubscription = ref.listenManual(
+      disclaimerStateProvider,
+      _onDisclaimerStateChanged,
+      fireImmediately: true,
+    );
   }
 
   @override
   void dispose() {
     _scrollDebounceTimer?.cancel();
+    _disclaimerSubscription?.close();
     super.dispose();
   }
 
@@ -71,30 +78,37 @@ class _AppState extends ConsumerState<App> {
     });
   }
 
+  void _onDisclaimerStateChanged(
+    AsyncValue<DisclaimerState>? _,
+    AsyncValue<DisclaimerState> next,
+  ) {
+    final disclaimer = next.asData?.value;
+    if (disclaimer == null || !disclaimer.needsReconsent) {
+      return;
+    }
+
+    final version = disclaimer.toShow.version;
+    if (_promptedVersion == version) {
+      return; // 已经弹过了
+    }
+    _promptedVersion = version;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) {
+        return;
+      }
+      final accept = ref.read(acceptDisclaimerProvider);
+      await showDisclaimerDialog(
+        context: context,
+        d: disclaimer.toShow,
+        onAccept: () => accept(version),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-
-    // 监听放在 build 内，交给 Riverpod 管
-    ref.listen<AsyncValue<DisclaimerState>>(disclaimerStateProvider,
-        (prev, next) {
-      final s = next.asData?.value;
-      if (s == null || !s.needsReconsent) return;
-
-      final ver = s.toShow.version;
-      if (_promptedVersion == ver) return; // 已经弹过了
-      _promptedVersion = ver;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
-        final accept = ref.read(acceptDisclaimerProvider);
-        await showDisclaimerDialog(
-          context: context,
-          d: s.toShow,
-          onAccept: () => accept(ver),
-        );
-      });
-    });
 
     final legal = ref.watch(disclaimerStateProvider);
     if (legal.isLoading) {
@@ -103,27 +117,22 @@ class _AppState extends ConsumerState<App> {
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final borderRadius = const BorderRadius.only(
-      topLeft: Radius.circular(30),
-      topRight: Radius.circular(30),
-      bottomLeft: Radius.circular(30),
-      bottomRight: Radius.circular(30),
-    );
-    final glassBorderColor = colorScheme.outline.withValues(alpha:.14);
+    final borderRadius = BorderRadius.circular(30);
+    final glassBorderColor = colorScheme.outline.withValues(alpha: 0.14);
     final glassDecoration = BoxDecoration(
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.surface.withValues(alpha:0.65),
-          colorScheme.surfaceContainerHighest.withValues(alpha:0.45),
+          colorScheme.surface.withValues(alpha: 0.65),
+          colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
         ],
       ),
       borderRadius: borderRadius,
       border: Border.all(color: glassBorderColor),
       boxShadow: [
         BoxShadow(
-          color: colorScheme.shadow.withValues(alpha:0.08),
+          color: colorScheme.shadow.withValues(alpha: 0.08),
           blurRadius: 30,
           offset: const Offset(0, 18),
         ),
@@ -134,12 +143,29 @@ class _AppState extends ConsumerState<App> {
       borderRadius: borderRadius,
       boxShadow: [
         BoxShadow(
-          color: colorScheme.shadow.withValues(alpha:0.12),
+          color: colorScheme.shadow.withValues(alpha: 0.12),
           blurRadius: 24,
           offset: const Offset(0, 12),
         ),
       ],
     );
+    final destinations = <NavigationDestination>[
+      NavigationDestination(
+        icon: const Icon(Icons.event_outlined),
+        selectedIcon: const Icon(Icons.event),
+        label: loc.events,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.map_outlined),
+        selectedIcon: const Icon(Icons.map),
+        label: loc.map,
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.chat_bubble_outline),
+        selectedIcon: Icon(Icons.chat_bubble),
+        label: 'Group',
+      ),
+    ];
 
     return Scaffold(
       extendBody: true,
@@ -166,7 +192,8 @@ class _AppState extends ConsumerState<App> {
                     data: theme.navigationBarTheme.copyWith(
                       backgroundColor: Colors.transparent,
                       height: 64,
-                      indicatorColor: colorScheme.primary.withValues(alpha:0.18),
+                      indicatorColor:
+                          colorScheme.primary.withValues(alpha: 0.18),
                       indicatorShape: const StadiumBorder(),
                       labelBehavior:
                           NavigationDestinationLabelBehavior.alwaysShow,
@@ -195,25 +222,8 @@ class _AppState extends ConsumerState<App> {
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                       selectedIndex: _index,
-                      onDestinationSelected: (i) =>
-                          setState(() => _index = i),
-                      destinations: [
-                        NavigationDestination(
-                          icon: const Icon(Icons.event_outlined),
-                          selectedIcon: const Icon(Icons.event),
-                          label: loc.events,
-                        ),
-                        NavigationDestination(
-                          icon: const Icon(Icons.map_outlined),
-                          selectedIcon: const Icon(Icons.map),
-                          label: loc.map,
-                        ),
-                        const NavigationDestination(
-                          icon: Icon(Icons.chat_bubble_outline),
-                          selectedIcon: Icon(Icons.chat_bubble),
-                          label: 'Group',
-                        ),
-                      ],
+                      onDestinationSelected: (i) => setState(() => _index = i),
+                      destinations: destinations,
                     ),
                   ),
                 ),

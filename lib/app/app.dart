@@ -11,7 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
-import 'state/app_overlay_provider.dart';
+import '../core/state/app/app_overlay_provider.dart';
 
 /// 添加免责声明，缺测试
 class App extends ConsumerStatefulWidget {

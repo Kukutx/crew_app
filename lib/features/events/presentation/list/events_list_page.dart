@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../../app/state/app_overlay_provider.dart';
+import '../../../../core/state/app/app_overlay_provider.dart';
 import '../../../../core/error/api_exception.dart';
 import '../../../../core/state/event_map_state/events_providers.dart';
 import '../detail/events_detail_page.dart';

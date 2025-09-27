@@ -221,8 +221,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    _map.move(LatLng(event.latitude, event.longitude), 15);
+    _map.move(LatLng(event.latitude, event.longitude), 14);
     _movedToSelected = true;
+    _map.rotate(0);
     _showEventCard(event);
   }
 

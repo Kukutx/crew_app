@@ -15,6 +15,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get about_content => '这是一个通用设置页示例';
 
   @override
+  String get about_section_version_details => '版本信息';
+
+  @override
+  String get about_current_version => '当前版本';
+
+  @override
+  String get about_build_number => '构建号';
+
+  @override
+  String get about_latest_version => '最新版本';
+
+  @override
+  String get about_check_updates => '查看最新版本';
+
+  @override
+  String get about_update_status_up_to_date => '当前已是最新版本。';
+
+  @override
+  String about_update_status_optional(Object version) {
+    return '有可用的新版本 $version。';
+  }
+
+  @override
+  String about_update_status_required(Object version) {
+    return '需要升级到版本 $version 才能继续使用。';
+  }
+
+  @override
+  String get about_update_status_unknown => '暂时无法获取最新版本信息。';
+
+  @override
   String get action_apply => '应用';
 
   @override
@@ -321,4 +352,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String version_label(Object version) {
     return '版本 $version';
   }
+
+  @override
+  String get disclaimer_acknowledge => '我已阅读并同意上述条款';
+
+  @override
+  String get disclaimer_exit => '退出';
+
+  @override
+  String get disclaimer_accept => '同意';
 }

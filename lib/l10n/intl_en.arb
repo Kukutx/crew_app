@@ -2,6 +2,25 @@
   "@@locale": "en",
   "about": "About",
   "about_content": "This is a universal settings page example.",
+  "about_section_version_details": "Version information",
+  "about_current_version": "Current version",
+  "about_build_number": "Build number",
+  "about_latest_version": "Latest version",
+  "about_check_updates": "Check latest version",
+  "about_update_status_up_to_date": "You're on the latest version.",
+  "about_update_status_optional": "Version {version} is available.",
+  "@about_update_status_optional": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "about_update_status_required": "Version {version} is required to continue.",
+  "@about_update_status_required": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "about_update_status_unknown": "Unable to determine the latest version right now.",
   "action_apply": "Apply",
   "action_cancel": "Cancel",
   "action_create": "Create",
@@ -122,5 +141,8 @@
     "placeholders": {
       "version": {}
     }
-  }
+  },
+  "disclaimer_acknowledge": "I have read and agree to the terms above.",
+  "disclaimer_exit": "Exit",
+  "disclaimer_accept": "Agree"
 }

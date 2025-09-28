@@ -5,6 +5,25 @@
   "language": "语言",
   "about": "关于",
   "about_content": "这是一个通用设置页示例",
+  "about_section_version_details": "版本信息",
+  "about_current_version": "当前版本",
+  "about_build_number": "构建号",
+  "about_latest_version": "最新版本",
+  "about_check_updates": "查看最新版本",
+  "about_update_status_up_to_date": "当前已是最新版本。",
+  "about_update_status_optional": "有可用的新版本 {version}。",
+  "@about_update_status_optional": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "about_update_status_required": "需要升级到版本 {version} 才能继续使用。",
+  "@about_update_status_required": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "about_update_status_unknown": "暂时无法获取最新版本信息。",
   "action_apply": "应用",
   "action_cancel": "取消",
   "action_create": "创建",
@@ -125,5 +144,8 @@
     "placeholders": {
       "version": {}
     }
-  }
+  },
+  "disclaimer_acknowledge": "我已阅读并同意上述条款",
+  "disclaimer_exit": "退出",
+  "disclaimer_accept": "同意"
 }

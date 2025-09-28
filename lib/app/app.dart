@@ -107,11 +107,14 @@ class _AppState extends ConsumerState<App> {
         return;
       }
       final accept = ref.read(acceptDisclaimerProvider);
-      await showDisclaimerDialog(
+      final accepted = await showDisclaimerDialog(
         context: context,
         d: disclaimer.toShow,
         onAccept: () => accept(version),
       );
+      if (!accepted) {
+        _promptedVersion = null;
+      }
     });
   }
 

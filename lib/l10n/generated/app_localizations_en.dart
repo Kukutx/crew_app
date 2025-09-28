@@ -15,6 +15,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_content => 'This is a universal settings page example.';
 
   @override
+  String get about_section_version_details => 'Version information';
+
+  @override
+  String get about_current_version => 'Current version';
+
+  @override
+  String get about_build_number => 'Build number';
+
+  @override
+  String get about_latest_version => 'Latest version';
+
+  @override
+  String get about_check_updates => 'Check latest version';
+
+  @override
+  String get about_update_status_up_to_date =>
+      "You're on the latest version.";
+
+  @override
+  String about_update_status_optional(Object version) {
+    return 'Version $version is available.';
+  }
+
+  @override
+  String about_update_status_required(Object version) {
+    return 'Version $version is required to continue.';
+  }
+
+  @override
+  String get about_update_status_unknown =>
+      'Unable to determine the latest version right now.';
+
+  @override
   String get action_apply => 'Apply';
 
   @override
@@ -327,4 +360,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String version_label(Object version) {
     return 'Version $version';
   }
+
+  @override
+  String get disclaimer_acknowledge =>
+      'I have read and agree to the terms above.';
+
+  @override
+  String get disclaimer_exit => 'Exit';
+
+  @override
+  String get disclaimer_accept => 'Agree';
 }

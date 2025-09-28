@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:crew_app/app/app.dart';
 import 'package:crew_app/core/config/firebase_options.dart';
+import 'package:crew_app/core/config/remote_config_keys.dart';
+import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
@@ -16,6 +18,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,6 +89,7 @@ Future<void> main() async {
     // Crashlytics & Talker 初始化
     crashlytics = await _configureCrashlytics();
     talker = Talker();
+    final remoteConfig = await _configureRemoteConfig(talker!);
     final talkerRouteObserver = TalkerRouteObserver(talker!);
 
     if (crashlytics == null) {
@@ -106,6 +110,7 @@ Future<void> main() async {
           crashlyticsProvider.overrideWithValue(crashlytics),
           talkerProvider.overrideWithValue(talker!),
           talkerRouteObserverProvider.overrideWithValue(talkerRouteObserver),
+          remoteConfigProvider.overrideWithValue(remoteConfig),
         ],
         child: BetterFeedback(
           child: const MyApp(),
@@ -138,6 +143,26 @@ Future<FirebaseCrashlytics?> _configureCrashlytics() async {
     debugPrint('Crashlytics collection disabled in debug mode.');
   }
   return crashlytics;
+}
+
+Future<FirebaseRemoteConfig?> _configureRemoteConfig(Talker talker) async {
+  try {
+    final remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.setConfigSettings(const RemoteConfigSettings(
+      fetchTimeout: Duration(seconds: 10),
+      minimumFetchInterval: Duration(hours: 1),
+    ));
+    await remoteConfig.setDefaults(RemoteConfigDefaults.values);
+
+    final activated = await remoteConfig.fetchAndActivate();
+    talker.info('Remote Config fetchAndActivate: $activated');
+    return remoteConfig;
+  } on FirebaseException catch (error, stackTrace) {
+    talker.handle(error, stackTrace, 'remote_config.init.firebase_exception');
+  } on Object catch (error, stackTrace) {
+    talker.handle(error, stackTrace, 'remote_config.init.exception');
+  }
+  return null;
 }
 
 void _setupErrorHandling(Talker talker, FirebaseCrashlytics? crashlytics) {

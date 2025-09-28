@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -195,6 +197,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _onMapLongPress(TapPosition _, LatLng latlng) async {
+    if (!await _ensureDisclaimerAccepted()) {
+      return;
+    }
+
     final data = await showCreateEventDialog(context, latlng);
     if (data == null || data.title.trim().isEmpty) return;
 
@@ -233,6 +239,25 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     } else {
       Navigator.pushNamed(context, '/login');
     }
+  }
+
+  Future<bool> _ensureDisclaimerAccepted() async {
+    final state = await ref.read(disclaimerStateProvider.future);
+    if (!mounted) {
+      return false;
+    }
+    if (!state.needsReconsent) {
+      return true;
+    }
+
+    final accept = ref.read(acceptDisclaimerProvider);
+    final acknowledged = await showDisclaimerDialog(
+      context: context,
+      d: state.toShow,
+      onAccept: () => accept(state.toShow.version),
+    );
+
+    return acknowledged;
   }
 
   /// 搜索框事件

@@ -19,7 +19,7 @@ const _kAcceptedVersionKey = 'legal.disclaimer.accepted.version';
 
 class LocalAssetDisclaimerSource {
   Future<Disclaimer> loadBundled() async {
-    final raw = await rootBundle.loadString('assets/disclaimer_v1.json');
+    final raw = await rootBundle.loadString('assets/legal/disclaimer_v1.json');
     return Disclaimer.fromJson(json.decode(raw) as Map<String, dynamic>);
   }
 }

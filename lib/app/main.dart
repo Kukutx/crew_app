@@ -148,7 +148,7 @@ Future<FirebaseCrashlytics?> _configureCrashlytics() async {
 Future<FirebaseRemoteConfig?> _configureRemoteConfig(Talker talker) async {
   try {
     final remoteConfig = FirebaseRemoteConfig.instance;
-    await remoteConfig.setConfigSettings(const RemoteConfigSettings(
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: Duration(seconds: 10),
       minimumFetchInterval: Duration(hours: 1),
     ));

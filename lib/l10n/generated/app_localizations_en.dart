@@ -30,8 +30,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_check_updates => 'Check latest version';
 
   @override
-  String get about_update_status_up_to_date =>
-      "You're on the latest version.";
+  String get about_update_status_up_to_date => 'You\'re on the latest version.';
 
   @override
   String about_update_status_optional(Object version) {

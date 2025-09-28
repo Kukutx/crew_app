@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_update_status_up_to_date.
   ///
   /// In en, this message translates to:
-  /// **'You're on the latest version.'**
+  /// **'You\'re on the latest version.'**
   String get about_update_status_up_to_date;
 
   /// No description provided for @about_update_status_optional.

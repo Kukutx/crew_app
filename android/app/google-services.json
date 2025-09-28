@@ -22,14 +22,6 @@
           }
         },
         {
-          "client_id": "417490407531-i9k1qr5v8v5v20lbark9rdvnkmvt9qdp.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.crew_app",
-            "certificate_hash": "00bcbab3560d607a3f8955cb6cbf2bfa746bc501"
-          }
-        },
-        {
           "client_id": "417490407531-fq20k42jlls80ognl9sotjecdg3tbmhr.apps.googleusercontent.com",
           "client_type": 3
         }

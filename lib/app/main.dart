@@ -25,55 +25,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
-/// 早期版本
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(
-//     options: DefaultFirebaseOptions.currentPlatform,
-//   );
-
-//   final crashlytics = await _configureCrashlytics();
-//   final talker = Talker();
-//   final talkerRouteObserver = TalkerRouteObserver(talker);
-
-//   if (crashlytics == null) {
-//     talker.info('Crashlytics disabled for this platform.');
-//   }
-
-//   _setupErrorHandling(talker, crashlytics);
-
-//   // 本地化存储
-//   final prefs = await SharedPreferences.getInstance();
-
-//   runZonedGuarded(() {
-//     runApp(
-//       ProviderScope(
-//         overrides: [
-//           sharedPreferencesProvider.overrideWithValue(prefs),
-//           crashlyticsProvider.overrideWithValue(crashlytics),
-//           talkerProvider.overrideWithValue(talker),
-//           talkerRouteObserverProvider.overrideWithValue(talkerRouteObserver),
-//         ],
-//         child: BetterFeedback(
-//           child: const MyApp(),
-//         ),
-//       ),
-//     );
-//   }, (error, stackTrace) {
-//     _reportError(
-//       talker,
-//       crashlytics,
-//       error,
-//       stackTrace,
-//       fatal: true,
-//       reason: 'runZonedGuarded',
-//     );
-//   });
-// }
-
-
-
-
 Future<void> main() async {
   Talker? talker;
   FirebaseCrashlytics? crashlytics;
@@ -148,7 +99,7 @@ Future<FirebaseCrashlytics?> _configureCrashlytics() async {
 Future<FirebaseRemoteConfig?> _configureRemoteConfig(Talker talker) async {
   try {
     final remoteConfig = FirebaseRemoteConfig.instance;
-    await remoteConfig.setConfigSettings(const RemoteConfigSettings(
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: Duration(seconds: 10),
       minimumFetchInterval: Duration(hours: 1),
     ));

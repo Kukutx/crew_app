@@ -110,6 +110,60 @@ abstract class AppLocalizations {
   /// **'This is a universal settings page example.'**
   String get about_content;
 
+  /// No description provided for @about_section_version_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Version information'**
+  String get about_section_version_details;
+
+  /// No description provided for @about_current_version.
+  ///
+  /// In en, this message translates to:
+  /// **'Current version'**
+  String get about_current_version;
+
+  /// No description provided for @about_build_number.
+  ///
+  /// In en, this message translates to:
+  /// **'Build number'**
+  String get about_build_number;
+
+  /// No description provided for @about_latest_version.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version'**
+  String get about_latest_version;
+
+  /// No description provided for @about_check_updates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check latest version'**
+  String get about_check_updates;
+
+  /// No description provided for @about_update_status_up_to_date.
+  ///
+  /// In en, this message translates to:
+  /// **'You're on the latest version.'**
+  String get about_update_status_up_to_date;
+
+  /// No description provided for @about_update_status_optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available.'**
+  String about_update_status_optional(Object version);
+
+  /// No description provided for @about_update_status_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is required to continue.'**
+  String about_update_status_required(Object version);
+
+  /// No description provided for @about_update_status_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to determine the latest version right now.'**
+  String get about_update_status_unknown;
+
   /// No description provided for @action_apply.
   ///
   /// In en, this message translates to:
@@ -709,6 +763,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version}'**
   String version_label(Object version);
+
+  /// No description provided for @disclaimer_acknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I have read and agree to the terms above.'**
+  String get disclaimer_acknowledge;
+
+  /// No description provided for @disclaimer_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get disclaimer_exit;
+
+  /// No description provided for @disclaimer_accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Agree'**
+  String get disclaimer_accept;
 }
 
 class _AppLocalizationsDelegate

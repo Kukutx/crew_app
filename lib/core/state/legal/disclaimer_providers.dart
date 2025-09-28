@@ -1,13 +1,20 @@
+import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/shared/legal/data/disclaimer.dart';
 import 'package:crew_app/shared/legal/disclaimer_sources.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../monitoring/monitoring_providers.dart';
 
 final disclaimerRepoProvider = Provider<DisclaimerRepository>((ref) {
+  final remoteConfig = ref.watch(remoteConfigProvider);
+  final Talker talker = ref.watch(talkerProvider);
+
   return DisclaimerRepository(
     asset: LocalAssetDisclaimerSource(),
     cache: LocalCacheDisclaimerSource(),
-    // 选一个：RemoteConfigDisclaimerSource() 或 ApiDisclaimerSource()
-    remote: ApiDisclaimerSource(),
+    remote: remoteConfig != null
+        ? RemoteConfigDisclaimerSource(remoteConfig, talker: talker)
+        : const NoopRemoteDisclaimerSource(),
   );
 });
 

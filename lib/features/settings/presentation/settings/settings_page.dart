@@ -3,6 +3,7 @@ import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:crew_app/features/settings/presentation/about/about_page.dart';
 import 'package:crew_app/features/settings/presentation/test/test_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -257,24 +258,25 @@ class SettingsPage extends ConsumerWidget {
               ),
             ],
           ),
-          _SettingsSection(
-            title: loc.settings_section_developer,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.science_outlined),
-                title: const Text('测试 Crashlytics'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TestPage(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+          if (kDebugMode)
+            _SettingsSection(
+              title: loc.settings_section_developer,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.science_outlined),
+                  title: const Text('测试 Crashlytics'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TestPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
         ],
       ),
     );

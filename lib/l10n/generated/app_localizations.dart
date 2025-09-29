@@ -644,6 +644,210 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @settings_section_general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settings_section_general;
+
+  /// No description provided for @settings_section_support.
+  ///
+  /// In en, this message translates to:
+  /// **'About & support'**
+  String get settings_section_support;
+
+  /// No description provided for @settings_section_subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription & billing'**
+  String get settings_section_subscription;
+
+  /// No description provided for @settings_section_privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & safety'**
+  String get settings_section_privacy;
+
+  /// No description provided for @settings_section_account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get settings_section_account;
+
+  /// No description provided for @settings_section_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settings_section_notifications;
+
+  /// No description provided for @settings_section_developer.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer tools'**
+  String get settings_section_developer;
+
+  /// No description provided for @settings_help_feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & feedback'**
+  String get settings_help_feedback;
+
+  /// No description provided for @settings_help_feedback_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQ, contact support'**
+  String get settings_help_feedback_subtitle;
+
+  /// No description provided for @settings_app_version.
+  ///
+  /// In en, this message translates to:
+  /// **'App version'**
+  String get settings_app_version;
+
+  /// No description provided for @settings_app_version_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View release notes and build info'**
+  String get settings_app_version_subtitle;
+
+  /// No description provided for @settings_subscription_current_plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current plan'**
+  String get settings_subscription_current_plan;
+
+  /// No description provided for @settings_subscription_current_plan_value.
+  ///
+  /// In en, this message translates to:
+  /// **'{plan} plan'**
+  String settings_subscription_current_plan_value(Object plan);
+
+  /// No description provided for @settings_subscription_plan_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get settings_subscription_plan_free;
+
+  /// No description provided for @settings_subscription_plan_plus.
+  ///
+  /// In en, this message translates to:
+  /// **'Plus'**
+  String get settings_subscription_plan_plus;
+
+  /// No description provided for @settings_subscription_plan_pro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get settings_subscription_plan_pro;
+
+  /// No description provided for @settings_subscription_upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade subscription'**
+  String get settings_subscription_upgrade;
+
+  /// No description provided for @settings_subscription_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel subscription'**
+  String get settings_subscription_cancel;
+
+  /// No description provided for @settings_subscription_payment_methods.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage payment methods'**
+  String get settings_subscription_payment_methods;
+
+  /// No description provided for @settings_location_permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission'**
+  String get settings_location_permission;
+
+  /// No description provided for @settings_location_permission_allow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow location access'**
+  String get settings_location_permission_allow;
+
+  /// No description provided for @settings_location_permission_while_using.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow only while using the app'**
+  String get settings_location_permission_while_using;
+
+  /// No description provided for @settings_location_permission_deny.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny location access'**
+  String get settings_location_permission_deny;
+
+  /// No description provided for @settings_manage_blocklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked & muted users'**
+  String get settings_manage_blocklist;
+
+  /// No description provided for @settings_privacy_documents.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy & user agreement'**
+  String get settings_privacy_documents;
+
+  /// No description provided for @settings_account_info.
+  ///
+  /// In en, this message translates to:
+  /// **'Account details'**
+  String get settings_account_info;
+
+  /// No description provided for @settings_account_email_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get settings_account_email_label;
+
+  /// No description provided for @settings_account_uid_label.
+  ///
+  /// In en, this message translates to:
+  /// **'UID'**
+  String get settings_account_uid_label;
+
+  /// No description provided for @settings_account_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get settings_account_delete;
+
+  /// No description provided for @settings_notifications_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity reminders'**
+  String get settings_notifications_activity;
+
+  /// No description provided for @settings_notifications_following.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed users updates'**
+  String get settings_notifications_following;
+
+  /// No description provided for @settings_notifications_push.
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications'**
+  String get settings_notifications_push;
+
+  /// No description provided for @settings_notifications_push_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable push notifications on this device'**
+  String get settings_notifications_push_subtitle;
+
+  /// No description provided for @settings_saved_toast.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings updated'**
+  String get settings_saved_toast;
+
   /// No description provided for @report_issue.
   ///
   /// In en, this message translates to:

@@ -298,6 +298,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get settings_section_general => 'General';
+
+  @override
+  String get settings_section_support => 'About & support';
+
+  @override
+  String get settings_section_subscription => 'Subscription & billing';
+
+  @override
+  String get settings_section_privacy => 'Privacy & safety';
+
+  @override
+  String get settings_section_account => 'Account';
+
+  @override
+  String get settings_section_notifications => 'Notifications';
+
+  @override
+  String get settings_section_developer => 'Developer tools';
+
+  @override
+  String get settings_help_feedback => 'Help & feedback';
+
+  @override
+  String get settings_help_feedback_subtitle => 'FAQ, contact support';
+
+  @override
+  String get settings_app_version => 'App version';
+
+  @override
+  String get settings_app_version_subtitle =>
+      'View release notes and build info';
+
+  @override
+  String get settings_subscription_current_plan => 'Current plan';
+
+  @override
+  String settings_subscription_current_plan_value(Object plan) {
+    return '$plan plan';
+  }
+
+  @override
+  String get settings_subscription_plan_free => 'Free';
+
+  @override
+  String get settings_subscription_plan_plus => 'Plus';
+
+  @override
+  String get settings_subscription_plan_pro => 'Pro';
+
+  @override
+  String get settings_subscription_upgrade => 'Upgrade subscription';
+
+  @override
+  String get settings_subscription_cancel => 'Cancel subscription';
+
+  @override
+  String get settings_subscription_payment_methods =>
+      'Manage payment methods';
+
+  @override
+  String get settings_location_permission => 'Location permission';
+
+  @override
+  String get settings_location_permission_allow => 'Allow location access';
+
+  @override
+  String get settings_location_permission_while_using =>
+      'Allow only while using the app';
+
+  @override
+  String get settings_location_permission_deny => 'Deny location access';
+
+  @override
+  String get settings_manage_blocklist => 'Blocked & muted users';
+
+  @override
+  String get settings_privacy_documents =>
+      'Privacy policy & user agreement';
+
+  @override
+  String get settings_account_info => 'Account details';
+
+  @override
+  String get settings_account_email_label => 'Email';
+
+  @override
+  String get settings_account_uid_label => 'UID';
+
+  @override
+  String get settings_account_delete => 'Delete account';
+
+  @override
+  String get settings_notifications_activity => 'Activity reminders';
+
+  @override
+  String get settings_notifications_following => 'Followed users updates';
+
+  @override
+  String get settings_notifications_push => 'Push notifications';
+
+  @override
+  String get settings_notifications_push_subtitle =>
+      'Enable push notifications on this device';
+
+  @override
+  String get settings_saved_toast => 'Settings updated';
+
+  @override
   String get report_issue => 'Report a problem';
 
   @override

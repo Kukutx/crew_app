@@ -292,6 +292,110 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings => '设置';
 
   @override
+  String get settings_section_general => '通用';
+
+  @override
+  String get settings_section_support => '关于与支持';
+
+  @override
+  String get settings_section_subscription => '订阅与付费';
+
+  @override
+  String get settings_section_privacy => '隐私与安全';
+
+  @override
+  String get settings_section_account => '账号信息';
+
+  @override
+  String get settings_section_notifications => '通知设置';
+
+  @override
+  String get settings_section_developer => '开发者工具';
+
+  @override
+  String get settings_help_feedback => '帮助与反馈';
+
+  @override
+  String get settings_help_feedback_subtitle => 'FAQ，联系支持';
+
+  @override
+  String get settings_app_version => '应用版本信息';
+
+  @override
+  String get settings_app_version_subtitle => '查看版本和构建信息';
+
+  @override
+  String get settings_subscription_current_plan => '当前订阅计划';
+
+  @override
+  String settings_subscription_current_plan_value(Object plan) {
+    return '$plan 计划';
+  }
+
+  @override
+  String get settings_subscription_plan_free => 'Free';
+
+  @override
+  String get settings_subscription_plan_plus => 'Plus';
+
+  @override
+  String get settings_subscription_plan_pro => 'Pro';
+
+  @override
+  String get settings_subscription_upgrade => '升级订阅';
+
+  @override
+  String get settings_subscription_cancel => '取消订阅';
+
+  @override
+  String get settings_subscription_payment_methods => '支付方式管理';
+
+  @override
+  String get settings_location_permission => '位置权限';
+
+  @override
+  String get settings_location_permission_allow => '允许定位';
+
+  @override
+  String get settings_location_permission_while_using => '仅在使用时允许';
+
+  @override
+  String get settings_location_permission_deny => '拒绝定位';
+
+  @override
+  String get settings_manage_blocklist => '屏蔽 / 拉黑管理';
+
+  @override
+  String get settings_privacy_documents => '隐私政策 / 用户协议';
+
+  @override
+  String get settings_account_info => '账号信息';
+
+  @override
+  String get settings_account_email_label => '邮箱';
+
+  @override
+  String get settings_account_uid_label => 'UID';
+
+  @override
+  String get settings_account_delete => '删除账号';
+
+  @override
+  String get settings_notifications_activity => '活动提醒';
+
+  @override
+  String get settings_notifications_following => '关注用户动态';
+
+  @override
+  String get settings_notifications_push => '推送开关';
+
+  @override
+  String get settings_notifications_push_subtitle => '在此设备接收推送通知';
+
+  @override
+  String get settings_saved_toast => '设置已更新';
+
+  @override
   String get report_issue => '问题反馈';
 
   @override

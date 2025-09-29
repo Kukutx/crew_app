@@ -355,8 +355,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_subscription_cancel => 'Cancel subscription';
 
   @override
-  String get settings_subscription_payment_methods =>
-      'Manage payment methods';
+  String get settings_subscription_payment_methods => 'Manage payment methods';
 
   @override
   String get settings_location_permission => 'Location permission';
@@ -375,8 +374,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_manage_blocklist => 'Blocked & muted users';
 
   @override
-  String get settings_privacy_documents =>
-      'Privacy policy & user agreement';
+  String get settings_privacy_documents => 'Privacy policy & user agreement';
 
   @override
   String get settings_account_info => 'Account details';

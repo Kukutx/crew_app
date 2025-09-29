@@ -6,6 +6,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 enum LocationPermissionOption {
   allow,
@@ -41,8 +42,8 @@ extension SubscriptionPlanLabel on SubscriptionPlan {
   }
 }
 
-final locationPermissionProvider =
-    StateProvider<LocationPermissionOption>((ref) => LocationPermissionOption.allow);
+final locationPermissionProvider = StateProvider<LocationPermissionOption>(
+    (ref) => LocationPermissionOption.allow);
 final subscriptionPlanProvider =
     StateProvider<SubscriptionPlan>((ref) => SubscriptionPlan.free);
 final activityReminderProvider = StateProvider<bool>((ref) => true);
@@ -90,7 +91,9 @@ class SettingsPage extends ConsumerWidget {
                     if (value == null) {
                       return;
                     }
-                    ref.read(settingsProvider.notifier).setLocale(Locale(value));
+                    ref
+                        .read(settingsProvider.notifier)
+                        .setLocale(Locale(value));
                     _showSavedSnackBar(context, loc);
                   },
                   items: [
@@ -110,7 +113,8 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: Text(loc.settings_help_feedback_subtitle),
                 onTap: () async {
                   final feedbackService = ref.read(feedbackServiceProvider);
-                  final submitted = await feedbackService.collectFeedback(context);
+                  final submitted =
+                      await feedbackService.collectFeedback(context);
                   if (!context.mounted) {
                     return;
                   }
@@ -176,8 +180,8 @@ class SettingsPage extends ConsumerWidget {
                 title: Text(loc.settings_location_permission),
                 subtitle: Text(currentPermission.label(loc)),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () =>
-                    _showLocationPermissionSheet(context, ref, loc, currentPermission),
+                onTap: () => _showLocationPermissionSheet(
+                    context, ref, loc, currentPermission),
               ),
               ListTile(
                 leading: const Icon(Icons.block_outlined),
@@ -200,7 +204,8 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${loc.settings_account_email_label}: crew@example.com'),
+                    Text(
+                        '${loc.settings_account_email_label}: crew@example.com'),
                     const SizedBox(height: 4),
                     Text('${loc.settings_account_uid_label}: UID-000000'),
                   ],
@@ -296,15 +301,16 @@ class SettingsPage extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (final plan in SubscriptionPlan.values)
-                RadioListTile<SubscriptionPlan>(
+                ListTile(
                   title: Text(plan.label(loc)),
-                  value: plan,
-                  groupValue: currentPlan,
-                  onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
-                    ref.read(subscriptionPlanProvider.notifier).state = value;
+                  trailing: Icon(
+                    plan == currentPlan
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                  ),
+                  selected: plan == currentPlan,
+                  onTap: () {
+                    ref.read(subscriptionPlanProvider.notifier).state = plan;
                     Navigator.of(context).pop();
                     _showSavedSnackBar(context, loc);
                   },
@@ -330,15 +336,17 @@ class SettingsPage extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (final option in LocationPermissionOption.values)
-                RadioListTile<LocationPermissionOption>(
+                ListTile(
                   title: Text(option.label(loc)),
-                  value: option,
-                  groupValue: current,
-                  onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
-                    ref.read(locationPermissionProvider.notifier).state = value;
+                  trailing: Icon(
+                    option == current
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                  ),
+                  selected: option == current,
+                  onTap: () {
+                    ref.read(locationPermissionProvider.notifier).state =
+                        option;
                     Navigator.of(context).pop();
                     _showSavedSnackBar(context, loc);
                   },
@@ -384,7 +392,8 @@ class _SettingsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               title,
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 8),

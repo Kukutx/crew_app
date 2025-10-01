@@ -20,7 +20,7 @@ class ApiService {
 
   Future<List<Event>> getEvents() async {
     try {
-      final response = await _dio.get("/events");
+      final response = await _dio.get("events");
       if (response.statusCode == 200) {
         return (response.data as List)
             .map((e) => Event.fromJson(e))
@@ -38,7 +38,7 @@ class ApiService {
   Future<Event> createEvent(String title, String location, String description,
       double lat, double lng) async {
     try {
-      final response = await _dio.post("/events", data: {
+      final response = await _dio.post("events", data: {
         "title": title,
         "location": location,
         "description": description,
@@ -60,7 +60,7 @@ class ApiService {
   Future<List<Event>> searchEvents(String query) async {
     try {
       final response = await _dio.get(
-        "/events/search",
+        "events/search",
         queryParameters: {"query": query},
       );
 

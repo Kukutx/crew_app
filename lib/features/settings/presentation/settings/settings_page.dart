@@ -118,11 +118,12 @@ class SettingsPage extends ConsumerWidget {
                   if (!context.mounted) {
                     return;
                   }
-                  if (submitted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(loc.feedback_thanks)),
-                    );
+                  if (submitted != true) {
+                    return;
                   }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(loc.feedback_thanks)),
+                  );
                 },
               ),
               ListTile(

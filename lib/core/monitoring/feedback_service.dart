@@ -17,12 +17,34 @@ class FeedbackService {
   Future<bool> collectFeedback(BuildContext context) async {
     final controller = BetterFeedback.of(context);
 
-    // 3.x 为回调式；用 Completer 等待提交完成
     final completer = Completer<bool>();
+    var overlayShown = false;
+    var submissionInProgress = false;
 
-    controller.show((UserFeedback fb) async {
-      final message = (fb.text).trim();
-      final screenshotLength = fb.screenshot.length;
+    void finish(bool result) {
+      if (!completer.isCompleted) {
+        completer.complete(result);
+      }
+    }
+
+    late final StreamSubscription<bool> visibilitySubscription;
+    visibilitySubscription = controller.isVisibleStream.listen((visible) {
+      if (visible) {
+        overlayShown = true;
+        return;
+      }
+      if (!overlayShown || submissionInProgress) {
+        return;
+      }
+      _talker.info('User dismissed feedback overlay without submitting.');
+      finish(false);
+    });
+
+    controller.show((UserFeedback feedback) async {
+      submissionInProgress = true;
+
+      final message = feedback.text.trim();
+      final screenshotLength = feedback.screenshot.length;
 
       if (message.isNotEmpty) {
         _talker.info('User feedback captured (${message.length} chars).');
@@ -34,12 +56,10 @@ class FeedbackService {
       }
 
       await _logFeedbackToCrashlytics(message, screenshotLength);
-      if (!completer.isCompleted) completer.complete(true);
+      finish(true);
     });
 
-    // 无“取消”回调，若用户直接关闭页面你拿不到结果；
-    // 这里返回 true 仅在提交发生时。
-    return completer.future;
+    return completer.future.whenComplete(() => visibilitySubscription.cancel());
   }
 
   Future<void> _logFeedbackToCrashlytics(String message, int screenshotLength) async {

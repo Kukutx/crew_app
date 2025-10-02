@@ -664,6 +664,7 @@ class _SharePreviewCard extends StatelessWidget {
           ),
         ),
       ),
+      )
     );
   }
 }

@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'Share this event card with your friends.'**
   String get share_card_subtitle;
 
+  /// No description provided for @share_card_qr_caption.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to view the event details'**
+  String get share_card_qr_caption;
+
   /// No description provided for @share_action_copy_link.
   ///
   /// In en, this message translates to:

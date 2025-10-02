@@ -292,6 +292,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_card_subtitle => 'Share this event card with your friends.';
 
   @override
+  String get share_card_qr_caption => 'Scan to view the event details';
+
+  @override
   String get share_action_copy_link => 'Copy link';
 
   @override

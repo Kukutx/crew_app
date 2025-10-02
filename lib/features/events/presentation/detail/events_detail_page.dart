@@ -1,9 +1,11 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -45,11 +47,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined, color: Colors.white),
-            onPressed: () {
-              // TODO: 分享逻辑
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
-            },
+            onPressed: () => _showShareSheet(loc, event),
           ),
           IconButton(
             icon: const Icon(Icons.favorite_border, color: Colors.black),
@@ -403,4 +401,121 @@ class _EventDetailPageState extends State<EventDetailPage> {
           ],
         ),
       );
+}
+
+  void _showShareSheet(AppLocalizations loc, Event event) {
+    final shareUrl = 'https://crew.app/events/${event.id}';
+    final shareMessage =
+        loc.share_event_message(eventTitle: event.title, shareUrl: shareUrl);
+
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    loc.share_event_title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.ios_share),
+                  title: Text(loc.share_option_system),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await Share.share(shareMessage);
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.chat_bubble_outline),
+                  title: Text(loc.share_option_wechat),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _shareToWeChat(loc, shareMessage);
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.whatsapp),
+                  title: Text(loc.share_option_whatsapp),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _shareToWhatsApp(loc, shareMessage);
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.link),
+                  title: Text(loc.share_option_copy_link),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await Clipboard.setData(ClipboardData(text: shareUrl));
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(loc.share_copy_success)),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _shareToWeChat(
+      AppLocalizations loc, String shareMessage) async {
+    await Clipboard.setData(ClipboardData(text: shareMessage));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(loc.share_copy_success)),
+    );
+
+    final weChatUri = Uri.parse('weixin://');
+    if (await canLaunchUrl(weChatUri)) {
+      await launchUrl(weChatUri, mode: LaunchMode.externalApplication);
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            loc.share_app_not_installed(appName: loc.share_option_wechat),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _shareToWhatsApp(
+      AppLocalizations loc, String shareMessage) async {
+    final encoded = Uri.encodeComponent(shareMessage);
+    final whatsappUri = Uri.parse('whatsapp://send?text=$encoded');
+
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            loc.share_app_not_installed(appName: loc.share_option_whatsapp),
+          ),
+        ),
+      );
+    }
+  }
+
 }

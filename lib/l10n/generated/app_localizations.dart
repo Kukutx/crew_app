@@ -620,6 +620,54 @@ abstract class AppLocalizations {
   /// **'Registration open'**
   String get registration_open;
 
+  /// No description provided for @share_event_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Share event'**
+  String get share_event_title;
+
+  /// No description provided for @share_option_system.
+  ///
+  /// In en, this message translates to:
+  /// **'Share via system'**
+  String get share_option_system;
+
+  /// No description provided for @share_option_wechat.
+  ///
+  /// In en, this message translates to:
+  /// **'WeChat'**
+  String get share_option_wechat;
+
+  /// No description provided for @share_option_whatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get share_option_whatsapp;
+
+  /// No description provided for @share_option_copy_link.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get share_option_copy_link;
+
+  /// No description provided for @share_copy_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied to clipboard'**
+  String get share_copy_success;
+
+  /// No description provided for @share_app_not_installed.
+  ///
+  /// In en, this message translates to:
+  /// **'{appName} is not installed on this device.'**
+  String share_app_not_installed({required Object appName});
+
+  /// No description provided for @share_event_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Check out "{eventTitle}" on Crew: {shareUrl}'**
+  String share_event_message({required Object eventTitle, required Object shareUrl});
+
   /// No description provided for @school_label_optional.
   ///
   /// In en, this message translates to:

@@ -280,6 +280,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get registration_open => '正在报名中';
 
   @override
+  String get share_event_title => '分享活动';
+
+  @override
+  String get share_option_system => '系统分享';
+
+  @override
+  String get share_option_wechat => '微信';
+
+  @override
+  String get share_option_whatsapp => 'WhatsApp';
+
+  @override
+  String get share_option_copy_link => '复制链接';
+
+  @override
+  String get share_copy_success => '链接已复制到剪贴板';
+
+  @override
+  String share_app_not_installed({required Object appName}) {
+    return '未检测到 ${appName}，请先安装应用';
+  }
+
+  @override
+  String share_event_message({required Object eventTitle, required Object shareUrl}) {
+    return '快来看看「${eventTitle}」：${shareUrl}';
+  }
+
+  @override
   String get school_label_optional => '学校（选填）';
 
   @override

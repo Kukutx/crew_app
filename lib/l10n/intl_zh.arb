@@ -155,6 +155,25 @@
   "profile_title": "个人中心",
   "registration_not_implemented": "报名功能尚未实现",
   "registration_open": "正在报名中",
+  "share_event_title": "分享活动",
+  "share_option_system": "系统分享",
+  "share_option_wechat": "微信",
+  "share_option_whatsapp": "WhatsApp",
+  "share_option_copy_link": "复制链接",
+  "share_copy_success": "链接已复制到剪贴板",
+  "share_app_not_installed": "未检测到 {appName}，请先安装应用",
+  "@share_app_not_installed": {
+    "placeholders": {
+      "appName": {}
+    }
+  },
+  "share_event_message": "快来看看「{eventTitle}」：{shareUrl}",
+  "@share_event_message": {
+    "placeholders": {
+      "eventTitle": {},
+      "shareUrl": {}
+    }
+  },
   "school_label_optional": "学校（选填）",
   "search_hint": "搜索活动",
   "search_tags_hint": "搜索标签...",

@@ -286,6 +286,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registration_open => 'Registration open';
 
   @override
+  String get share_event_title => 'Share event';
+
+  @override
+  String get share_option_system => 'Share via system';
+
+  @override
+  String get share_option_wechat => 'WeChat';
+
+  @override
+  String get share_option_whatsapp => 'WhatsApp';
+
+  @override
+  String get share_option_copy_link => 'Copy link';
+
+  @override
+  String get share_copy_success => 'Link copied to clipboard';
+
+  @override
+  String share_app_not_installed({required Object appName}) {
+    return '$appName is not installed on this device.';
+  }
+
+  @override
+  String share_event_message({required Object eventTitle, required Object shareUrl}) {
+    return 'Check out "${eventTitle}" on Crew: ${shareUrl}';
+  }
+
+  @override
   String get school_label_optional => 'School (optional)';
 
   @override

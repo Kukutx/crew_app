@@ -113,6 +113,25 @@
   "profile_title": "Profile",
   "registration_not_implemented": "Registration feature is not available yet.",
   "registration_open": "Registration open",
+  "share_event_title": "Share event",
+  "share_option_system": "Share via system",
+  "share_option_wechat": "WeChat",
+  "share_option_whatsapp": "WhatsApp",
+  "share_option_copy_link": "Copy link",
+  "share_copy_success": "Link copied to clipboard",
+  "share_app_not_installed": "{appName} is not installed on this device.",
+  "@share_app_not_installed": {
+    "placeholders": {
+      "appName": {}
+    }
+  },
+  "share_event_message": "Check out \"{eventTitle}\" on Crew: {shareUrl}",
+  "@share_event_message": {
+    "placeholders": {
+      "eventTitle": {},
+      "shareUrl": {}
+    }
+  },
   "school_label_optional": "School (optional)",
   "search_hint": "Search events",
   "search_tags_hint": "Search tags...",

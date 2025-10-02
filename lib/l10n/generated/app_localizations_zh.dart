@@ -280,6 +280,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get registration_open => '正在报名中';
 
   @override
+  String get share_card_title => '邀请朋友';
+
+  @override
+  String get share_card_subtitle => '把这个活动卡片分享给好友吧';
+
+  @override
+  String get share_action_copy_link => '复制链接';
+
+  @override
+  String get share_action_share_system => '系统分享';
+
+  @override
+  String get share_copy_success => '活动链接已复制';
+
+  @override
   String get school_label_optional => '学校（选填）';
 
   @override

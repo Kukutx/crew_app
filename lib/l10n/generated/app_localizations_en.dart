@@ -286,6 +286,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registration_open => 'Registration open';
 
   @override
+  String get share_card_title => 'Invite friends';
+
+  @override
+  String get share_card_subtitle => 'Share this event card with your friends.';
+
+  @override
+  String get share_action_copy_link => 'Copy link';
+
+  @override
+  String get share_action_share_system => 'Share…';
+
+  @override
+  String get share_copy_success => 'Event link copied';
+
+  @override
   String get school_label_optional => 'School (optional)';
 
   @override

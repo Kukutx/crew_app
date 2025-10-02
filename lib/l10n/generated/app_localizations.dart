@@ -620,6 +620,36 @@ abstract class AppLocalizations {
   /// **'Registration open'**
   String get registration_open;
 
+  /// No description provided for @share_card_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite friends'**
+  String get share_card_title;
+
+  /// No description provided for @share_card_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this event card with your friends.'**
+  String get share_card_subtitle;
+
+  /// No description provided for @share_action_copy_link.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get share_action_copy_link;
+
+  /// No description provided for @share_action_share_system.
+  ///
+  /// In en, this message translates to:
+  /// **'Share…'**
+  String get share_action_share_system;
+
+  /// No description provided for @share_copy_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Event link copied'**
+  String get share_copy_success;
+
   /// No description provided for @school_label_optional.
   ///
   /// In en, this message translates to:

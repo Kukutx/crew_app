@@ -1,9 +1,13 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:share_plus/share_plus.dart';
 
 class EventDetailPage extends StatefulWidget {
@@ -17,6 +21,7 @@ class EventDetailPage extends StatefulWidget {
 class _EventDetailPageState extends State<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
+  final GlobalKey _sharePreviewKey = GlobalKey();
 
   // 示例用户（可换成 event.organizer / backend 返回的用户）
   final _host = (
@@ -53,7 +58,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _SharePreviewCard(event: widget.event, loc: loc),
+                  _SharePreviewCard(
+                    event: widget.event,
+                    loc: loc,
+                    previewKey: _sharePreviewKey,
+                  ),
                   const SizedBox(height: 20),
                   Text(
                     loc.share_card_subtitle,
@@ -90,7 +99,34 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   Future<void> _shareThroughSystem(BuildContext sheetContext) async {
     final shareText = _buildShareMessage();
-    await Share.share(shareText);
+    final boundary =
+        _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) {
+      await Share.share(shareText);
+      if (!mounted) return;
+      Navigator.of(sheetContext).pop();
+      return;
+    }
+
+    try {
+      final ui.Image image =
+          await boundary.toImage(pixelRatio: MediaQuery.of(context).devicePixelRatio);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        await Share.share(shareText);
+      } else {
+        final Uint8List pngBytes = byteData.buffer.asUint8List();
+        final xFile = XFile.fromData(
+          pngBytes,
+          mimeType: 'image/png',
+          name: 'crew_event_share.png',
+        );
+        await Share.shareXFiles([xFile], text: shareText);
+      }
+    } catch (_) {
+      await Share.share(shareText);
+    }
     if (!mounted) return;
     Navigator.of(sheetContext).pop();
   }
@@ -481,13 +517,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
 class _SharePreviewCard extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
+  final GlobalKey previewKey;
 
-  const _SharePreviewCard({required this.event, required this.loc});
+  const _SharePreviewCard({
+    required this.event,
+    required this.loc,
+    required this.previewKey,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    return RepaintBoundary(
+      key: previewKey,
+      child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [

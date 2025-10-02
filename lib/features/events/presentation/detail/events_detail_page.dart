@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 class EventDetailPage extends StatefulWidget {
@@ -62,6 +63,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     event: widget.event,
                     loc: loc,
                     previewKey: _sharePreviewKey,
+                    shareLink: _eventShareLink,
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -518,11 +520,13 @@ class _SharePreviewCard extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
   final GlobalKey previewKey;
+  final String shareLink;
 
   const _SharePreviewCard({
     required this.event,
     required this.loc,
     required this.previewKey,
+    required this.shareLink,
   });
 
   @override
@@ -653,6 +657,58 @@ class _SharePreviewCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.3,
                             ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                loc.share_card_qr_caption,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.black54,
+                                  height: 1.4,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                shareLink,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: Colors.orange.shade700,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: QrImageView(
+                            data: shareLink,
+                            version: QrVersions.auto,
+                            size: 88,
+                            backgroundColor: Colors.white,
                           ),
                         ),
                       ],

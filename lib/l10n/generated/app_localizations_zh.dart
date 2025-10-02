@@ -286,6 +286,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get share_card_subtitle => '把这个活动卡片分享给好友吧';
 
   @override
+  String get share_card_qr_caption => '扫描二维码查看活动详情';
+
+  @override
   String get share_action_copy_link => '复制链接';
 
   @override

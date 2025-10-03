@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class EventShareSheet extends StatelessWidget {
@@ -261,14 +262,29 @@ class SharePreviewCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Text(
-                                shareLink,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: Colors.orange.shade700,
-                                  fontWeight: FontWeight.w600,
+                              GestureDetector(
+                                onLongPress: () async {
+                                  await Clipboard.setData(
+                                    ClipboardData(text: shareLink),
+                                  );
+                                  HapticFeedback.lightImpact();
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content: Text(loc.share_copy_success),
+                                      ),
+                                    );
+                                },
+                                child: Text(
+                                  shareLink,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: Colors.orange.shade700,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),

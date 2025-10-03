@@ -81,7 +81,6 @@ class SharePreviewCard extends StatelessWidget {
   final AppLocalizations loc;
   final GlobalKey previewKey;
   final String shareLink;
-
   const SharePreviewCard({
     super.key,
     required this.event,
@@ -393,6 +392,127 @@ class ShareActionButton extends StatelessWidget {
                   color: Colors.orange.shade800,
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ShareSystemOptionsSheet extends StatelessWidget {
+  final AppLocalizations loc;
+  final Future<void> Function() onCopyLink;
+  final Future<void> Function() onShareSystem;
+
+  const ShareSystemOptionsSheet({
+    super.key,
+    required this.loc,
+    required this.onCopyLink,
+    required this.onShareSystem,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final theme = Theme.of(context);
+    return SafeArea(
+      top: false,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding + 16),
+          child: Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            elevation: 6,
+            shadowColor: Colors.black.withValues(alpha: 0.15),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    loc.share_action_share_system,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _ShareSystemOptionTile(
+                    icon: Icons.copy_rounded,
+                    label: loc.share_action_copy_link,
+                    onTap: onCopyLink,
+                  ),
+                  const SizedBox(height: 8),
+                  _ShareSystemOptionTile(
+                    icon: Icons.ios_share,
+                    label: loc.share_action_share_system,
+                    onTap: onShareSystem,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShareSystemOptionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Future<void> Function() onTap;
+
+  const _ShareSystemOptionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: const Color(0xFFFFF7E9),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => onTap(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: Colors.orange.shade700),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+              ),
+              Icon(Icons.keyboard_arrow_right, color: Colors.orange.shade300),
             ],
           ),
         ),

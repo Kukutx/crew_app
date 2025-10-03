@@ -53,7 +53,26 @@ class _EventDetailPageState extends State<EventDetailPage> {
         previewKey: _sharePreviewKey,
         shareLink: _eventShareLink,
         onCopyLink: () => _copyShareLink(sheetContext),
-        onShareSystem: () => _shareThroughSystem(sheetContext),
+        onShareSystem: () => _showSystemShareOptions(sheetContext),
+      ),
+    );
+  }
+
+  Future<void> _showSystemShareOptions(BuildContext sheetContext) async {
+    final loc = AppLocalizations.of(sheetContext)!;
+    await showModalBottomSheet<void>(
+      context: sheetContext,
+      backgroundColor: Colors.transparent,
+      builder: (optionsContext) => ShareSystemOptionsSheet(
+        loc: loc,
+        onCopyLink: () async {
+          Navigator.of(optionsContext).pop();
+          await _copyShareLink(sheetContext);
+        },
+        onShareSystem: () async {
+          Navigator.of(optionsContext).pop();
+          await _shareThroughSystem(sheetContext);
+        },
       ),
     );
   }

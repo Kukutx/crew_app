@@ -40,6 +40,7 @@ class EventShareSheet extends StatelessWidget {
                 loc: loc,
                 previewKey: previewKey,
                 shareLink: shareLink,
+                onCopyLink: onCopyLink,
               ),
               const SizedBox(height: 20),
               Text(
@@ -81,6 +82,7 @@ class SharePreviewCard extends StatelessWidget {
   final AppLocalizations loc;
   final GlobalKey previewKey;
   final String shareLink;
+  final Future<void> Function() onCopyLink;
 
   const SharePreviewCard({
     super.key,
@@ -88,6 +90,7 @@ class SharePreviewCard extends StatelessWidget {
     required this.loc,
     required this.previewKey,
     required this.shareLink,
+    required this.onCopyLink,
   });
 
   @override
@@ -271,6 +274,21 @@ class SharePreviewCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => onCopyLink(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.copy_rounded,
+                                color: Colors.orange.shade700,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),

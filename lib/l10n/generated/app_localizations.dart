@@ -647,7 +647,7 @@ abstract class AppLocalizations {
   /// No description provided for @share_action_save_image.
   ///
   /// In en, this message translates to:
-  /// **'Save image'**
+  /// **'Save Event'**
   String get share_action_save_image;
 
   /// No description provided for @share_action_share_system.

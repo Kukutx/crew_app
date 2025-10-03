@@ -10,8 +10,8 @@ import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -120,7 +120,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
       }
 
       final Uint8List pngBytes = byteData.buffer.asUint8List();
-      final result = await ImageGallerySaver.saveImage(
+      final result = await ImageGallerySaverPlus.saveImage(
         pngBytes,
         name: 'crew_event_${widget.event.id}',
         quality: 100,

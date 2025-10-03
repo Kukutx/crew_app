@@ -116,7 +116,8 @@ class SharePreviewCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(28)),
               child: Stack(
                 children: [
                   AspectRatio(
@@ -154,12 +155,20 @@ class SharePreviewCard extends StatelessWidget {
                         ),
                         _StatusChip(
                           label: loc.to_be_announced,
+                          textColor: Colors.grey.shade800,
+                          backgroundColor: Colors.orange.shade50,
+                          icon: Icons.calendar_today,
+                          iconColor: Colors.orange.shade300,
                         ),
                         _StatusChip(
                           label: loc.to_be_announced,
+                          textColor: Colors.grey.shade800,
+                          backgroundColor: Colors.orange.shade50,
+                          icon: Icons.people,
+                          iconColor: Colors.orange.shade300,
                         ),
                       ],
-              ),
+                    ),
                   ),
                   Positioned(
                     left: 20,
@@ -207,7 +216,8 @@ class SharePreviewCard extends StatelessWidget {
               width: double.infinity,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(28)),
               ),
               padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
               child: Column(
@@ -230,7 +240,8 @@ class SharePreviewCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFF3E0),
                       borderRadius: BorderRadius.circular(18),
@@ -299,32 +310,54 @@ class SharePreviewCard extends StatelessWidget {
 class _StatusChip extends StatelessWidget {
   final String label;
   final Color? backgroundColor;
+  final IconData? icon;
+  final Color? iconColor;
+  final Color textColor;
 
   const _StatusChip({
     required this.label,
     this.backgroundColor,
+    this.icon,
+    this.iconColor,
+    this.textColor = Colors.white,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(
-        label,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.3,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(
+              icon,
+              size: 16,
+              color: iconColor ?? textColor,
+            ),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
+
 class ShareActionButton extends StatelessWidget {
   final IconData icon;
   final String label;

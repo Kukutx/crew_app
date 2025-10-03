@@ -47,10 +47,15 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
       city.text = loc.unknown;
     }
   }();
-
-  return showDialog<EventData>(
+  return showModalBottomSheet<EventData>(
     context: context,
-    builder: (dialogContext) {
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (_) {
       return StatefulBuilder(
         builder: (context, setState) {
           Future<void> handleAddImages() async {
@@ -92,195 +97,238 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
               coverIndex = index;
             });
           }
-
-          return AlertDialog(
-            title: Text(loc.create_event_title),
-            content: Form(
-              key: formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      loc.location_coordinates(
-                        pos.latitude.toStringAsFixed(6),
-                        pos.longitude.toStringAsFixed(6),
-                      ),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+          return AnimatedPadding(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              top: 24,
+              left: 24,
+              right: 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: city,
-                      decoration: InputDecoration(
-                        labelText: loc.city_field_label,
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.location_city),
-                      ),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? loc.please_enter_city
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: title,
-                      decoration: InputDecoration(
-                        labelText: loc.event_title_field_label,
-                        border: const OutlineInputBorder(),
-                      ),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? loc.please_enter_event_title
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: desc,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        labelText: loc.event_description_field_label,
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  loc.create_event_title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 12),
+                Form(
+                  key: formKey,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            '活动图片 (最多5张)',
-                            style: Theme.of(context).textTheme.bodyMedium,
+                        Text(
+                          loc.location_coordinates(
+                            pos.latitude.toStringAsFixed(6),
+                            pos.longitude.toStringAsFixed(6),
+                          ),
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: city,
+                          decoration: InputDecoration(
+                            labelText: loc.city_field_label,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.location_city),
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? loc.please_enter_city
+                              : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: title,
+                          decoration: InputDecoration(
+                            labelText: loc.event_title_field_label,
+                            border: const OutlineInputBorder(),
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? loc.please_enter_event_title
+                              : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: desc,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText: loc.event_description_field_label,
+                            border: const OutlineInputBorder(),
                           ),
                         ),
-                        Text(
-                          '${images.length}/5',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(color: Colors.grey[600]),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '活动图片 (最多5张)',
+                                style:
+                                    Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
+                            Text(
+                              '${images.length}/5',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: Colors.grey[600]),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (images.isNotEmpty)
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          for (var i = 0; i < images.length; i++)
-                            Stack(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => handleSelectCover(i),
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: coverIndex == i
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Colors.grey.shade300,
-                                        width: coverIndex == i ? 2 : 1,
-                                      ),
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Image.memory(
-                                      images[i].bytes,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: GestureDetector(
-                                    onTap: () => handleRemoveImage(i),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black54,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      padding: const EdgeInsets.all(2),
-                                      child: const Icon(
-                                        Icons.close,
-                                        size: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (coverIndex == i)
-                                  Positioned(
-                                    bottom: 4,
-                                    left: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black54,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: const Text(
-                                        '封面',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
+                        const SizedBox(height: 8),
+                        if (images.isNotEmpty)
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (var i = 0; i < images.length; i++)
+                                Stack(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => handleSelectCover(i),
+                                      child: Container(
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: coverIndex == i
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Colors.grey.shade300,
+                                            width: coverIndex == i ? 2 : 1,
+                                          ),
+                                        ),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: Image.memory(
+                                          images[i].bytes,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                    Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: GestureDetector(
+                                        onTap: () => handleRemoveImage(i),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black54,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          padding: const EdgeInsets.all(2),
+                                          child: const Icon(
+                                            Icons.close,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (coverIndex == i)
+                                      Positioned(
+                                        bottom: 4,
+                                        left: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black54,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: const Text(
+                                            '封面',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        if (images.length < 5)
+                          OutlinedButton.icon(
+                            onPressed: handleAddImages,
+                            icon: const Icon(Icons.add_a_photo),
+                            label: const Text('添加图片'),
+                          ),
+                        if (images.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              coverIndex == null
+                                  ? '未选择封面，默认使用第一张图片。'
+                                  : '已选择第${coverIndex! + 1}张作为封面。',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: Colors.grey[600]),
                             ),
-                        ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(loc.action_cancel),
                       ),
-                    if (images.length < 5)
-                      OutlinedButton.icon(
-                        onPressed: handleAddImages,
-                        icon: const Icon(Icons.add_a_photo),
-                        label: const Text('添加图片'),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState?.validate() != true) {
+                            return;
+                          }
+                          Navigator.pop(
+                            context,
+                            EventData(
+                              title: title.text,
+                              description: desc.text,
+                              locationName: city.text.trim().isEmpty
+                                  ? loc.unknown
+                                  : city.text.trim(),
+                            ),
+                          );
+                        },
+                        child: Text(loc.action_create),
                       ),
-                    if (images.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          coverIndex == null
-                              ? '未选择封面，默认使用第一张图片。'
-                              : '已选择第${coverIndex! + 1}张作为封面。',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(color: Colors.grey[600]),
-                        ),
-                      ),
+                    ),
                   ],
                 ),
-              ),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(loc.action_cancel),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (formKey.currentState?.validate() != true) return;
-                  Navigator.pop(
-                    context,
-                    EventData(
-                      title: title.text,
-                      description: desc.text,
-                      locationName: city.text.trim().isEmpty
-                          ? loc.unknown
-                          : city.text.trim(),
-                    ),
-                  );
-                },
-                child: Text(loc.action_create),
-              ),
-            ],
           );
         },
       );

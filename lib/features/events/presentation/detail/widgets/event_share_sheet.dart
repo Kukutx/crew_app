@@ -116,8 +116,7 @@ class SharePreviewCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(28)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
               child: Stack(
                 children: [
                   AspectRatio(
@@ -160,7 +159,7 @@ class SharePreviewCard extends StatelessWidget {
                           label: loc.to_be_announced,
                         ),
                       ],
-                    ),
+              ),
                   ),
                   Positioned(
                     left: 20,
@@ -208,8 +207,7 @@ class SharePreviewCard extends StatelessWidget {
               width: double.infinity,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(28)),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
               ),
               padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
               child: Column(
@@ -232,8 +230,7 @@ class SharePreviewCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFF3E0),
                       borderRadius: BorderRadius.circular(18),
@@ -328,7 +325,6 @@ class _StatusChip extends StatelessWidget {
     );
   }
 }
-
 class ShareActionButton extends StatelessWidget {
   final IconData icon;
   final String label;

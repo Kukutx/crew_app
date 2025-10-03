@@ -298,7 +298,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_action_copy_link => 'Copy link';
 
   @override
-  String get share_action_save_image => 'Save image';
+  String get share_action_save_image => 'Save Event';
 
   @override
   String get share_action_share_system => 'Share…';

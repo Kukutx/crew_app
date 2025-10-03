@@ -59,7 +59,10 @@ class EventDetailBody extends StatelessWidget {
             isFollowing: isFollowing,
           ),
           const SizedBox(height: 10),
-          EventSummaryCard(event: event, loc: loc),
+          SizedBox(
+            width: double.infinity,
+            child: EventSummaryCard(event: event, loc: loc),
+          ),
           const SizedBox(height: 10),
           EventInfoCard(
             event: event,

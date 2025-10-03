@@ -33,8 +33,16 @@ class EventInfoCard extends StatelessWidget {
             ),
             const Divider(height: 20),
             const SizedBox(height: 12),
-            _detailRow(Icons.calendar_today, loc.event_time_title, loc.to_be_announced),
-            _detailRow(Icons.people, loc.event_participants_title, loc.to_be_announced),
+            _detailRow(
+              Icons.calendar_today,
+              loc.event_time_title,
+              event.formattedStartTime(loc.localeName) ?? loc.to_be_announced,
+            ),
+            _detailRow(
+              Icons.people,
+              loc.event_participants_title,
+              event.participantsDisplayText ?? loc.to_be_announced,
+            ),
             InkWell(
               onTap: onTapLocation,
               child: _detailRow(

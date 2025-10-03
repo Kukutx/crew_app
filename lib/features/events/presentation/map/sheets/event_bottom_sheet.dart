@@ -13,9 +13,7 @@ void showEventBottomSheet({
 }) {
   // Tips： 判断imageUrls是否有值，否则用coverImageUrl
   // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
-  final imageUrl = (event.imageUrls.isNotEmpty)
-      ? event.imageUrls.first
-      : event.coverImageUrl;
+  final imageUrl = event.primaryImageUrl;
   final loc = AppLocalizations.of(context)!;
 
   showModalBottomSheet(
@@ -131,16 +129,20 @@ void showEventBottomSheet({
                                 const Icon(Icons.groups,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 2),
-                                const Text(/*ev.peopleText ?? */ '3-5人',
-                                    style: TextStyle(color: Colors.black54)),
+                                Text(
+                                    event.participantsDisplayText ??
+                                        loc.to_be_announced,
+                                    style: const TextStyle(color: Colors.black54)),
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
                                 const Icon(Icons.event,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 4),
-                                const Text(/*ev.timeText ??*/ '12.28 8:00',
-                                    style: TextStyle(color: Colors.black87)),
+                                Text(
+                                    event.formattedStartTime(loc.localeName) ??
+                                        loc.to_be_announced,
+                                    style: const TextStyle(color: Colors.black87)),
                                 const Spacer(),
                                 SizedBox(
                                   height: 36,

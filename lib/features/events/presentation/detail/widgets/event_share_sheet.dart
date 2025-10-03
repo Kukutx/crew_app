@@ -93,6 +93,10 @@ class SharePreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final timeText = event.formattedStartTime(loc.localeName);
+    final participantsText = event.participantsDisplayText;
+    final showDetails =
+        (timeText?.isNotEmpty ?? false) || (participantsText?.isNotEmpty ?? false);
     return RepaintBoundary(
       key: previewKey,
       child: Container(
@@ -121,10 +125,7 @@ class SharePreviewCard extends StatelessWidget {
                 children: [
                   AspectRatio(
                     aspectRatio: 16 / 9,
-                    child: Image(
-                      image: CachedNetworkImageProvider(event.coverImageUrl),
-                      fit: BoxFit.cover,
-                    ),
+                    child: _SharePreviewImage(imageUrl: event.primaryImageUrl),
                   ),
                   Positioned.fill(
                     child: DecoratedBox(
@@ -226,7 +227,15 @@ class SharePreviewCard extends StatelessWidget {
                       height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  if (showDetails) ...[
+                    const SizedBox(height: 18),
+                    _ShareEventDetails(
+                      timeText: timeText,
+                      participantsText: participantsText,
+                      loc: loc,
+                    ),
+                    const SizedBox(height: 18),
+                  ],
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
@@ -333,6 +342,114 @@ class ShareActionButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SharePreviewImage extends StatelessWidget {
+  final String imageUrl;
+
+  const _SharePreviewImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl.isEmpty) {
+      return Container(
+        color: Colors.grey.shade300,
+        child: const Center(
+          child: Icon(Icons.image_not_supported_outlined, color: Colors.white70, size: 48),
+        ),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+      errorWidget: (_, __, ___) => Container(
+        color: Colors.grey.shade300,
+        child: const Center(
+          child: Icon(Icons.broken_image_outlined, color: Colors.white70, size: 48),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShareEventDetails extends StatelessWidget {
+  final String? timeText;
+  final String? participantsText;
+  final AppLocalizations loc;
+
+  const _ShareEventDetails({
+    required this.timeText,
+    required this.participantsText,
+    required this.loc,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final details = <Widget>[];
+    final timeValue = timeText;
+    final participantsValue = participantsText;
+
+    if (timeValue != null && timeValue.isNotEmpty) {
+      details.add(_detailRow(Icons.calendar_today_rounded, loc.event_time_title, timeValue));
+    }
+
+    if (participantsValue != null && participantsValue.isNotEmpty) {
+      if (details.isNotEmpty) {
+        details.add(const SizedBox(height: 12));
+      }
+      details.add(_detailRow(Icons.people_alt_rounded, loc.event_participants_title, participantsValue));
+    }
+
+    if (details.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF5E8),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: details,
+      ),
+    );
+  }
+
+  Widget _detailRow(IconData icon, String title, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.orange.shade700),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

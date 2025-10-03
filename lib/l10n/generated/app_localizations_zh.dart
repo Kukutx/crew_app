@@ -292,7 +292,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get share_action_copy_link => '复制链接';
 
   @override
-  String get share_action_save_image => '保存图片';
+  String get share_action_save_image => '保存活动';
 
   @override
   String get share_action_share_system => '系统分享';

@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
@@ -61,52 +60,34 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   Future<void> _shareThroughSystem(BuildContext sheetContext) async {
     final shareText = _buildShareMessage();
-    final shareOrigin = () {
-      final renderBox = sheetContext.findRenderObject() as RenderBox?;
-      return renderBox != null
-          ? renderBox.localToGlobal(Offset.zero) & renderBox.size
-          : null;
-    }();
-
     final boundary =
         _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) {
+      await Share.share(shareText);
+      if (!mounted) return;
+      Navigator.of(sheetContext).pop();
+      return;
+    }
 
-    var hasSharedPreview = false;
-
-    if (boundary != null) {
-      try {
-        final ui.Image image =
-            await boundary.toImage(pixelRatio: MediaQuery.of(context).devicePixelRatio);
-        final ByteData? byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
-        if (byteData != null) {
-          final Uint8List pngBytes = byteData.buffer.asUint8List();
-          final xFile = XFile.fromData(
-            pngBytes,
-            mimeType: 'image/png',
-            name: 'crew_event_share.png',
-          );
-          await Share.shareXFiles(
-            [xFile],
-            text: shareText,
-            subject: widget.event.title,
-            sharePositionOrigin: shareOrigin,
-          );
-          hasSharedPreview = true;
-        }
-      } catch (_) {
-        // Fall back to text-only sharing below when screenshot capture fails.
+    try {
+      final ui.Image image =
+          await boundary.toImage(pixelRatio: MediaQuery.of(context).devicePixelRatio);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        await Share.share(shareText);
+      } else {
+        final Uint8List pngBytes = byteData.buffer.asUint8List();
+        final xFile = XFile.fromData(
+          pngBytes,
+          mimeType: 'image/png',
+          name: 'crew_event_share.png',
+        );
+        await Share.shareXFiles([xFile], text: shareText);
       }
+    } catch (_) {
+      await Share.share(shareText);
     }
-
-    if (!hasSharedPreview) {
-      await Share.shareWithResult(
-        shareText,
-        subject: widget.event.title,
-        sharePositionOrigin: shareOrigin,
-      );
-    }
-
     if (!mounted) return;
     Navigator.of(sheetContext).pop();
   }

@@ -25,7 +25,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
-  final SharePlus _sharePlus = SharePlus();
 
   final _host = (
     name: 'Luca B.',
@@ -65,7 +64,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final boundary =
         _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) {
-      await _sharePlus.share(shareText);
+      await Share.share(shareText);
       if (!mounted) return;
       Navigator.of(sheetContext).pop();
       return;
@@ -77,7 +76,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        await _sharePlus.share(shareText);
+        await Share.share(shareText);
       } else {
         final Uint8List pngBytes = byteData.buffer.asUint8List();
         final xFile = XFile.fromData(
@@ -85,10 +84,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
           mimeType: 'image/png',
           name: 'crew_event_share.png',
         );
-        await _sharePlus.shareXFiles([xFile], text: shareText);
+        await Share.shareXFiles([xFile], text: shareText);
       }
     } catch (_) {
-      await _sharePlus.share(shareText);
+      await Share.share(shareText);
     }
     if (!mounted) return;
     Navigator.of(sheetContext).pop();

@@ -298,10 +298,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_action_copy_link => 'Copy link';
 
   @override
+  String get share_action_save_image => 'Save image';
+
+  @override
   String get share_action_share_system => 'Share…';
 
   @override
   String get share_copy_success => 'Event link copied';
+
+  @override
+  String get share_save_success => 'Share card saved to Photos';
+
+  @override
+  String get share_save_failure => "Couldn't save share card";
 
   @override
   String get school_label_optional => 'School (optional)';

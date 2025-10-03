@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
@@ -9,7 +10,7 @@ import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
 
 class EventDetailPage extends StatefulWidget {
@@ -52,7 +53,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         loc: loc,
         previewKey: _sharePreviewKey,
         shareLink: _eventShareLink,
-        onCopyLink: () => _copyShareLink(sheetContext),
+        onSaveImage: () => _saveShareImage(sheetContext),
         onShareSystem: () => _shareThroughSystem(sheetContext),
       ),
     );
@@ -92,13 +93,56 @@ class _EventDetailPageState extends State<EventDetailPage> {
     Navigator.of(sheetContext).pop();
   }
 
-  Future<void> _copyShareLink(BuildContext sheetContext) async {
-    await Clipboard.setData(ClipboardData(text: _buildShareMessage()));
-    if (!mounted) return;
-    Navigator.of(sheetContext).pop();
+  Future<void> _saveShareImage(BuildContext sheetContext) async {
+    final boundary =
+        _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     final loc = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(loc.share_copy_success)));
+
+    if (boundary == null) {
+      if (!mounted) return;
+      Navigator.of(sheetContext).pop();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
+      return;
+    }
+
+    try {
+      final ui.Image image = await boundary
+          .toImage(pixelRatio: MediaQuery.of(context).devicePixelRatio);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        if (!mounted) return;
+        Navigator.of(sheetContext).pop();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
+        return;
+      }
+
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+      final result = await ImageGallerySaver.saveImage(
+        pngBytes,
+        name: 'crew_event_${widget.event.id}',
+        quality: 100,
+      );
+
+      if (!mounted) return;
+      Navigator.of(sheetContext).pop();
+
+      final success = result is Map &&
+          (result['isSuccess'] == true || result['success'] == true);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success ? loc.share_save_success : loc.share_save_failure),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(sheetContext).pop();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
+    }
   }
 
   void _onFavoriteNotReady(AppLocalizations loc) {

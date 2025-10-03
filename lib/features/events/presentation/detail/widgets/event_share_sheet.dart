@@ -9,7 +9,7 @@ class EventShareSheet extends StatelessWidget {
   final AppLocalizations loc;
   final GlobalKey previewKey;
   final String shareLink;
-  final Future<void> Function() onCopyLink;
+  final Future<void> Function() onSaveImage;
   final Future<void> Function() onShareSystem;
 
   const EventShareSheet({
@@ -18,7 +18,7 @@ class EventShareSheet extends StatelessWidget {
     required this.loc,
     required this.previewKey,
     required this.shareLink,
-    required this.onCopyLink,
+    required this.onSaveImage,
     required this.onShareSystem,
   });
 
@@ -57,9 +57,9 @@ class EventShareSheet extends StatelessWidget {
                 runSpacing: 12,
                 children: [
                   ShareActionButton(
-                    icon: Icons.copy_rounded,
-                    label: loc.share_action_copy_link,
-                    onTap: onCopyLink,
+                    icon: Icons.image_outlined,
+                    label: loc.share_action_save_image,
+                    onTap: onSaveImage,
                   ),
                   ShareActionButton(
                     icon: Icons.ios_share,

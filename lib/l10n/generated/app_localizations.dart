@@ -644,6 +644,12 @@ abstract class AppLocalizations {
   /// **'Copy link'**
   String get share_action_copy_link;
 
+  /// No description provided for @share_action_save_image.
+  ///
+  /// In en, this message translates to:
+  /// **'Save image'**
+  String get share_action_save_image;
+
   /// No description provided for @share_action_share_system.
   ///
   /// In en, this message translates to:
@@ -655,6 +661,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Event link copied'**
   String get share_copy_success;
+
+  /// No description provided for @share_save_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Share card saved to Photos'**
+  String get share_save_success;
+
+  /// No description provided for @share_save_failure.
+  ///
+  /// In en, this message translates to:
+  /// **"Couldn't save share card"**
+  String get share_save_failure;
 
   /// No description provided for @school_label_optional.
   ///

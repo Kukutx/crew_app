@@ -671,7 +671,7 @@ abstract class AppLocalizations {
   /// No description provided for @share_save_failure.
   ///
   /// In en, this message translates to:
-  /// **"Couldn't save share card"**
+  /// **'Couldn\'t save share card'**
   String get share_save_failure;
 
   /// No description provided for @school_label_optional.

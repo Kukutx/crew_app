@@ -310,7 +310,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_save_success => 'Share card saved to Photos';
 
   @override
-  String get share_save_failure => "Couldn't save share card";
+  String get share_save_failure => 'Couldn\'t save share card';
 
   @override
   String get school_label_optional => 'School (optional)';

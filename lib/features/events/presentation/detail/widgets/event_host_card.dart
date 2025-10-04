@@ -6,7 +6,7 @@ class EventHostCard extends StatelessWidget {
   final AppLocalizations loc;
   final String name;
   final String bio;
-  final String avatarUrl;
+  final String? avatarUrl;
   final VoidCallback onTapProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
@@ -37,8 +37,8 @@ class EventHostCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundImage: CachedNetworkImageProvider(avatarUrl),
                 backgroundColor: Colors.orange.shade50,
+                backgroundImage: _buildAvatarImage(),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -96,5 +96,13 @@ class EventHostCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  ImageProvider<Object> _buildAvatarImage() {
+    final url = avatarUrl?.trim();
+    if (url != null && url.isNotEmpty) {
+      return CachedNetworkImageProvider(url);
+    }
+    return const AssetImage('assets/images/icons/crew.png');
   }
 }

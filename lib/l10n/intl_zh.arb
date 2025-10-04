@@ -86,6 +86,14 @@
   "events": "活动",
   "event_description_field_label": "活动描述",
   "event_details_title": "活动详情",
+  "events_host_default_name": "Crew 用户",
+  "@events_host_default_name": {
+    "description": "当后端未返回活动发起人名称时的默认文案"
+  },
+  "events_host_default_bio": "Crew 社区活动发起人",
+  "@events_host_default_bio": {
+    "description": "当后端缺少发起人简介时展示的默认说明"
+  },
   "event_meeting_point_title": "集合地点",
   "event_participants_title": "参与人数",
   "event_time_title": "活动时间",

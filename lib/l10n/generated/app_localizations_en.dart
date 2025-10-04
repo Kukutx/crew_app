@@ -116,6 +116,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_details_title => 'Event details';
 
   @override
+  String get events_host_default_name => 'Crew member';
+
+  @override
+  String get events_host_default_bio => 'Crew community event host';
+
+  @override
   String get event_meeting_point_title => 'Meeting point';
 
   @override

@@ -44,6 +44,14 @@
   "events": "Events",
   "event_description_field_label": "Event Description",
   "event_details_title": "Event details",
+  "events_host_default_name": "Crew member",
+  "@events_host_default_name": {
+    "description": "Fallback text for event host name when the backend does not provide one"
+  },
+  "events_host_default_bio": "Crew community event host",
+  "@events_host_default_bio": {
+    "description": "Fallback biography shown for event hosts when user information is missing"
+  },
   "event_meeting_point_title": "Meeting point",
   "event_participants_title": "Participants",
   "event_time_title": "Event time",

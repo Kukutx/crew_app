@@ -26,16 +26,21 @@ class _EventDetailPageState extends State<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
 
-  final _host = (
-    name: 'Luca B.',
-    bio: 'Milan · 徒步/咖啡/摄影',
-    avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe',
-    userId: 'user_123',
-  );
-
   bool _following = false;
 
   String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
+
+  String _resolveHostName(AppLocalizations loc) {
+    return widget.event.hostDisplayName ?? loc.events_host_default_name;
+  }
+
+  String _resolveHostBio(AppLocalizations loc) {
+    return widget.event.hostBio ?? loc.events_host_default_bio;
+  }
+
+  String? _resolveHostAvatar() {
+    return widget.event.hostAvatarUrl;
+  }
 
   String _buildShareMessage() {
     final event = widget.event;
@@ -184,13 +189,15 @@ class _EventDetailPageState extends State<EventDetailPage> {
         pageController: _pageCtrl,
         currentPage: _page,
         onPageChanged: (index) => setState(() => _page = index),
-        hostName: _host.name,
-        hostBio: _host.bio,
-        hostAvatarUrl: _host.avatar,
+        hostName: _resolveHostName(loc),
+        hostBio: _resolveHostBio(loc),
+        hostAvatarUrl: _resolveHostAvatar(),
         onTapHostProfile: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => UserProfilePage(/*userId: _host.userId*/)),
+            MaterialPageRoute(
+              builder: (_) => const UserProfilePage(/* userId: */),
+            ),
           );
         },
         onToggleFollow: () async {

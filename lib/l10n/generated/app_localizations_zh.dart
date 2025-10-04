@@ -115,6 +115,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_details_title => '活动详情';
 
   @override
+  String get events_host_default_name => 'Crew 用户';
+
+  @override
+  String get events_host_default_bio => 'Crew 社区活动发起人';
+
+  @override
   String get event_meeting_point_title => '集合地点';
 
   @override

@@ -302,6 +302,18 @@ abstract class AppLocalizations {
   /// **'Event details'**
   String get event_details_title;
 
+  /// Fallback text for the event host name when user information is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Crew member'**
+  String get events_host_default_name;
+
+  /// Fallback biography for the event host when no profile description is available.
+  ///
+  /// In en, this message translates to:
+  /// **'Crew community event host'**
+  String get events_host_default_bio;
+
   /// No description provided for @event_meeting_point_title.
   ///
   /// In en, this message translates to:

@@ -14,7 +14,7 @@ class EventDetailBody extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final String hostName;
   final String hostBio;
-  final String hostAvatarUrl;
+  final String? hostAvatarUrl;
   final VoidCallback onTapHostProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;

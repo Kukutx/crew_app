@@ -207,19 +207,35 @@ class _ProfileHeader extends ConsumerWidget {
         ? FileImage(File(customPath)) as ImageProvider
         : (user.photoURL != null ? NetworkImage(user.photoURL!) : null);
 
-    final action = await showDialog<String>(
+    final action = await showGeneralDialog<String>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => _AvatarPreviewDialog(
-        imageProvider: imageProvider,
-        replaceLabel: loc.action_replace,
-        onReplace: () => Navigator.of(context).pop('replace'),
-        restoreLabel:
-            customPath != null ? loc.action_restore_defaults : null,
-        onRestore: customPath != null
-            ? () => Navigator.of(context).pop('remove')
-            : null,
-      ),
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black.withOpacity(0.75),
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return _AvatarPreviewOverlay(
+          imageProvider: imageProvider,
+          replaceLabel: loc.action_replace,
+          onReplace: () => Navigator.of(dialogContext).pop('replace'),
+          restoreLabel:
+              customPath != null ? loc.action_restore_defaults : null,
+          onRestore: customPath != null
+              ? () => Navigator.of(dialogContext).pop('remove')
+              : null,
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation =
+            CurvedAnimation(parent: animation, curve: Curves.easeOut);
+        return FadeTransition(
+          opacity: curvedAnimation,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1).animate(curvedAnimation),
+            child: child,
+          ),
+        );
+      },
     );
     if (action == 'replace') {
       final picker = ImagePicker();
@@ -233,8 +249,8 @@ class _ProfileHeader extends ConsumerWidget {
   }
 }
 
-class _AvatarPreviewDialog extends StatelessWidget {
-  const _AvatarPreviewDialog({
+class _AvatarPreviewOverlay extends StatelessWidget {
+  const _AvatarPreviewOverlay({
     required this.imageProvider,
     required this.replaceLabel,
     required this.onReplace,
@@ -252,51 +268,58 @@ class _AvatarPreviewDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Dialog(
-      insetPadding: const EdgeInsets.all(16),
-      clipBehavior: Clip.antiAlias,
-      child: SafeArea(
+    final colorScheme = theme.colorScheme;
+
+    return SafeArea(
+      child: Material(
+        color: Colors.transparent,
         child: Stack(
           children: [
-            Positioned.fill(
+            Center(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: _ZoomableAvatar(imageProvider: imageProvider),
               ),
             ),
             Positioned(
-              top: 8,
-              right: 8,
+              top: 16,
+              right: 16,
               child: IconButton(
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.close, color: Colors.white),
                 onPressed: () => Navigator.of(context).maybePop(),
               ),
             ),
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: onReplace,
-                      child: Text(replaceLabel),
-                    ),
-                  ),
-                  if (onRestore != null && restoreLabel != null) ...[
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: onRestore,
-                      style: TextButton.styleFrom(
-                        foregroundColor: theme.colorScheme.error,
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: onReplace,
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                        ),
+                        child: Text(replaceLabel),
                       ),
-                      child: Text(restoreLabel!),
                     ),
+                    if (onRestore != null && restoreLabel != null) ...[
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: onRestore,
+                        style: TextButton.styleFrom(
+                          foregroundColor: colorScheme.error,
+                        ),
+                        child: Text(restoreLabel!),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ],
@@ -319,7 +342,8 @@ class _ZoomableAvatar extends StatelessWidget {
           tag: 'profile_avatar',
           child: Icon(
             Icons.person,
-            size: 96,
+            size: 120,
+            color: Colors.white,
           ),
         ),
       );

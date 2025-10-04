@@ -164,16 +164,19 @@ class _ProfileHeader extends ConsumerWidget {
           children: [
             GestureDetector(
               onTap: () => _onAvatarTap(context, ref, user),
-              child: CircleAvatar(
-                radius: 32,
-                foregroundImage: customPath != null
-                    ? FileImage(File(customPath))
-                    : (user.photoURL != null
-                        ? NetworkImage(user.photoURL!)
-                        : null),
-                child: (customPath == null && user.photoURL == null)
-                    ? const Icon(Icons.person, size: 32)
-                    : null,
+              child: Hero(
+                tag: 'profile_avatar',
+                child: CircleAvatar(
+                  radius: 32,
+                  foregroundImage: customPath != null
+                      ? FileImage(File(customPath))
+                      : (user.photoURL != null
+                          ? NetworkImage(user.photoURL!)
+                          : null),
+                  child: (customPath == null && user.photoURL == null)
+                      ? const Icon(Icons.person, size: 32)
+                      : null,
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -199,24 +202,40 @@ class _ProfileHeader extends ConsumerWidget {
       BuildContext context, WidgetRef ref, fa.User? user) async {
     if (user == null) return;
     final loc = AppLocalizations.of(context)!;
-    final action = await showModalBottomSheet<String>(
+    final customPath = ref.read(avatarProvider);
+    final imageProvider = customPath != null
+        ? FileImage(File(customPath)) as ImageProvider
+        : (user.photoURL != null ? NetworkImage(user.photoURL!) : null);
+
+    final action = await showGeneralDialog<String>(
       context: context,
-      builder: (c) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text(loc.action_replace),
-              onTap: () => Navigator.pop(c, 'replace'),
-            ),
-            if (ref.read(avatarProvider) != null)
-              ListTile(
-                title: Text(loc.action_restore_defaults),
-                onTap: () => Navigator.pop(c, 'remove'),
-              ),
-          ],
-        ),
-      ),
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black.withOpacity(0.75),
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return _AvatarPreviewOverlay(
+          imageProvider: imageProvider,
+          replaceLabel: loc.action_replace,
+          onReplace: () => Navigator.of(dialogContext).pop('replace'),
+          restoreLabel:
+              customPath != null ? loc.action_restore_defaults : null,
+          onRestore: customPath != null
+              ? () => Navigator.of(dialogContext).pop('remove')
+              : null,
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation =
+            CurvedAnimation(parent: animation, curve: Curves.easeOut);
+        return FadeTransition(
+          opacity: curvedAnimation,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1).animate(curvedAnimation),
+            child: child,
+          ),
+        );
+      },
     );
     if (action == 'replace') {
       final picker = ImagePicker();
@@ -227,5 +246,118 @@ class _ProfileHeader extends ConsumerWidget {
     } else if (action == 'remove') {
       await ref.read(avatarProvider.notifier).clearAvatar();
     }
+  }
+}
+
+class _AvatarPreviewOverlay extends StatelessWidget {
+  const _AvatarPreviewOverlay({
+    required this.imageProvider,
+    required this.replaceLabel,
+    required this.onReplace,
+    this.restoreLabel,
+    this.onRestore,
+  });
+
+  final ImageProvider? imageProvider;
+  final String replaceLabel;
+  final VoidCallback onReplace;
+  final String? restoreLabel;
+  final VoidCallback? onRestore;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final colorScheme = theme.colorScheme;
+
+    return SafeArea(
+      child: Material(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: _ZoomableAvatar(imageProvider: imageProvider),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: onReplace,
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                        ),
+                        child: Text(replaceLabel),
+                      ),
+                    ),
+                    if (onRestore != null && restoreLabel != null) ...[
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: onRestore,
+                        style: TextButton.styleFrom(
+                          foregroundColor: colorScheme.error,
+                        ),
+                        child: Text(restoreLabel!),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ZoomableAvatar extends StatelessWidget {
+  const _ZoomableAvatar({required this.imageProvider});
+
+  final ImageProvider? imageProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageProvider == null) {
+      return const Center(
+        child: Hero(
+          tag: 'profile_avatar',
+          child: Icon(
+            Icons.person,
+            size: 120,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
+    return Hero(
+      tag: 'profile_avatar',
+      child: InteractiveViewer(
+        maxScale: 5,
+        child: Image(
+          image: imageProvider!,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
   }
 }

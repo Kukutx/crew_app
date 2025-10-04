@@ -237,7 +237,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (authed) {
       Navigator.pushNamed(context, '/profile');
     } else {
-      Navigator.pushNamed(context, '/login');
+      Navigator.pushNamed(context, '/profile');
     }
   }
 

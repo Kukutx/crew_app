@@ -20,7 +20,9 @@ class UserEventListTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Material(
         color: colorScheme.surface,
-        elevation: 0,
+        elevation: 4,
+        shadowColor: colorScheme.shadow.withValues(alpha: 0.15),
+        surfaceTintColor: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -38,15 +40,18 @@ class UserEventListTile extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 26,
-                          backgroundColor: event.accentColor.withValues(alpha:.12),
-                          child: Icon(Icons.forum_outlined, color: event.accentColor),
+                          backgroundColor:
+                              event.accentColor.withValues(alpha: .12),
+                          child: Icon(Icons.forum_outlined,
+                              color: event.accentColor),
                         ),
                         if (event.unreadCount > 0)
                           Positioned(
                             right: -4,
                             top: -4,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: colorScheme.error,
                                 borderRadius: BorderRadius.circular(10),
@@ -84,7 +89,8 @@ class UserEventListTile extends StatelessWidget {
                               if (event.status != null)
                                 Container(
                                   margin: const EdgeInsets.only(left: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: colorScheme.secondaryContainer,
                                     borderRadius: BorderRadius.circular(12),
@@ -105,7 +111,9 @@ class UserEventListTile extends StatelessWidget {
                             event.subtitle,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: colorScheme.onSurfaceVariant),
                           ),
                           if (event.tags.isNotEmpty)
                             Padding(
@@ -116,14 +124,20 @@ class UserEventListTile extends StatelessWidget {
                                 children: event.tags
                                     .map(
                                       (tag) => Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: colorScheme.surfaceContainerHighest,
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: colorScheme
+                                              .surfaceContainerHighest,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Text(
                                           tag,
-                                          style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color:
+                                                  colorScheme.onSurfaceVariant),
                                         ),
                                       ),
                                     )
@@ -138,13 +152,16 @@ class UserEventListTile extends StatelessWidget {
                       children: [
                         Text(
                           event.timeText ?? '',
-                          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: colorScheme.onSurfaceVariant),
                         ),
                         const SizedBox(height: 18),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 16,
-                          color: colorScheme.onSurfaceVariant.withValues(alpha:.7),
+                          color: colorScheme.onSurfaceVariant
+                              .withValues(alpha: .7),
                         ),
                       ],
                     ),

@@ -19,7 +19,9 @@ class UserEventGridCard extends StatelessWidget {
     return Material(
       color: colorScheme.surface,
       borderRadius: BorderRadius.circular(20),
-      elevation: 0,
+      elevation: 4,
+      shadowColor: colorScheme.shadow.withValues(alpha:0.15),
+      surfaceTintColor: Colors.transparent,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

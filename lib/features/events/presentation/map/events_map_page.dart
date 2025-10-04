@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
+import 'package:crew_app/shared/legal/disclaimer_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -251,7 +251,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
 
     final accept = ref.read(acceptDisclaimerProvider);
-    final acknowledged = await showDisclaimerDialog(
+    final acknowledged = await showDisclaimerBottomSheet(
       context: context,
       d: state.toShow,
       onAccept: () => accept(state.toShow.version),

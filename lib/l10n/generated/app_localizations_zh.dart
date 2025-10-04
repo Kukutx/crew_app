@@ -228,6 +228,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map => '地图';
 
   @override
+  String get group => '群聊';
+
+  @override
   String get max_interest_selection => '最多只能选择 5 个兴趣标签喵~';
 
   @override

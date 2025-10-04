@@ -233,6 +233,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'Map';
 
   @override
+  String get group => 'Group';
+
+  @override
   String get max_interest_selection => 'You can select up to 5 interest tags.';
 
   @override

@@ -524,6 +524,12 @@ abstract class AppLocalizations {
   /// **'Map'**
   String get map;
 
+  /// No description provided for @group.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get group;
+
   /// No description provided for @max_interest_selection.
   ///
   /// In en, this message translates to:

@@ -112,10 +112,10 @@ class _AppState extends ConsumerState<App> {
         selectedIcon: const Icon(Icons.map),
         label: loc.map,
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.chat_bubble_outline),
-        selectedIcon: Icon(Icons.chat_bubble),
-        label: 'Group',
+      NavigationDestination(
+        icon: const Icon(Icons.chat_bubble_outline),
+        selectedIcon: const Icon(Icons.chat_bubble),
+        label: loc.group,
       ),
     ];
 

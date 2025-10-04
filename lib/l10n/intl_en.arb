@@ -87,6 +87,7 @@
   "login_title": "Welcome to Crew",
   "logout_success": "Signed out successfully.",
   "map": "Map",
+  "group": "Group",
   "max_interest_selection": "You can select up to 5 interest tags.",
   "my_events": "My events",
   "my_favorites": "My favorites",

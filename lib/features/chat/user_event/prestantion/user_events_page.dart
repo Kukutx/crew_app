@@ -171,7 +171,8 @@ class _UserEventsPageState extends State<UserEventsPage> {
   ];
 
   void _openChat(UserEventPreview event, int index) {
-    final participants = _sampleParticipants[index % _sampleParticipants.length];
+    final participants =
+        _sampleParticipants[index % _sampleParticipants.length];
     final messages = _sampleMessages[index % _sampleMessages.length];
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -201,48 +202,38 @@ class _UserEventsPageState extends State<UserEventsPage> {
           ),
         ],
       ),
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: const AssetImage('assets/images/bg_pattern.png'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withValues(alpha: .9),
-              BlendMode.srcATop,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: UserEventsTabBar(
+              selectedIndex: _tab,
+              favoritesLabel: loc.events_tab_favorites,
+              registeredLabel: loc.events_tab_registered,
+              onChanged: (value) => setState(() => _tab = value),
             ),
           ),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: UserEventsTabBar(
-                selectedIndex: _tab,
-                favoritesLabel: loc.events_tab_favorites,
-                registeredLabel: loc.events_tab_registered,
-                onChanged: (value) => setState(() => _tab = value),
-              ),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: _tab == 0
+                  ? UserEventsFavoritesGrid(
+                      key: const ValueKey('favorites'),
+                      events: _sampleEvents,
+                      onEventTap: (index) =>
+                          _openChat(_sampleEvents[index], index),
+                    )
+                  : UserEventsRegisteredList(
+                      key: const ValueKey('registered'),
+                      events: _sampleEvents,
+                      onEventTap: (index) =>
+                          _openChat(_sampleEvents[index], index),
+                    ),
             ),
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                child: _tab == 0
-                    ? UserEventsFavoritesGrid(
-                        key: const ValueKey('favorites'),
-                        events: _sampleEvents,
-                        onEventTap: (index) => _openChat(_sampleEvents[index], index),
-                      )
-                    : UserEventsRegisteredList(
-                        key: const ValueKey('registered'),
-                        events: _sampleEvents,
-                        onEventTap: (index) => _openChat(_sampleEvents[index], index),
-                      ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

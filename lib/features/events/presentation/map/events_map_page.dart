@@ -19,7 +19,7 @@ import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'sheets/event_filter_sheet.dart';
 import 'sheets/event_bottom_sheet.dart';
-import 'dialogs/create_event_dialog.dart';
+import 'sheets/create_event_sheet.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -201,7 +201,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
 
-    final data = await showCreateEventDialog(context, latlng);
+    final data = await showCreateEventBottomSheet(context, latlng);
     if (data == null || data.title.trim().isEmpty) return;
 
     await ref.read(eventsProvider.notifier).createEvent(

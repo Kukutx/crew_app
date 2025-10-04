@@ -1,4 +1,3 @@
-// dialogs/create_event_dialog.dart
 import 'package:crew_app/features/events/data/event_data.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -7,21 +6,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 
-class _DialogImage {
-  _DialogImage({required this.file, required this.bytes});
+class _CreateEventImage {
+  _CreateEventImage({required this.file, required this.bytes});
 
   final XFile file;
   final Uint8List bytes;
 }
 
-Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
+Future<EventData?> showCreateEventBottomSheet(BuildContext context, LatLng pos) {
   final loc = AppLocalizations.of(context)!;
   final title = TextEditingController();
   final desc = TextEditingController();
   final city = TextEditingController(text: loc.city_loading);
   final formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
-  final images = <_DialogImage>[];
+  final images = <_CreateEventImage>[];
   int? coverIndex;
 
   // 开始反地理编码
@@ -67,7 +66,7 @@ Future<EventData?> showCreateEventDialog(BuildContext context, LatLng pos) {
 
             for (final img in picked.take(remain)) {
               final bytes = await img.readAsBytes();
-              images.add(_DialogImage(file: img, bytes: bytes));
+              images.add(_CreateEventImage(file: img, bytes: bytes));
             }
 
             if (images.isNotEmpty && coverIndex == null) {

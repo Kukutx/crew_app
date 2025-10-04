@@ -13,16 +13,6 @@ class ApiService {
   })  : _dio = dio ?? Dio(BaseOptions(baseUrl: Env.current)),
         _auth = authService {
     _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final headers = await _auth.authHeader();
-          options.headers.addAll(headers);
-          handler.next(options);
-        },
-      ),
-    );
-
-    _dio.interceptors.add(
       LogInterceptor(
         request: true,
         responseBody: true,
@@ -34,9 +24,39 @@ class ApiService {
   final Dio _dio;
   final AuthService _auth;
 
+  Future<Map<String, String>> _buildAuthHeaders({bool required = false}) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      if (required) {
+        throw ApiException('User not authenticated');
+      }
+      return const {};
+    }
+
+    try {
+      final token = await _auth.getIdToken();
+      if (token == null || token.isEmpty) {
+        if (required) {
+          throw ApiException('Unable to obtain authentication token');
+        }
+        return const {};
+      }
+      return {'Authorization': 'Bearer $token'};
+    } catch (error) {
+      if (required) {
+        throw ApiException('Failed to acquire authentication token');
+      }
+      return const {};
+    }
+  }
+
   Future<AuthenticatedUserDto> getAuthenticatedUserDetail() async {
     try {
-      final response = await _dio.get('/User/GetAuthenticatedUserDetail');
+      final headers = await _buildAuthHeaders(required: true);
+      final response = await _dio.get(
+        '/User/GetAuthenticatedUserDetail',
+        options: Options(headers: headers),
+      );
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) {
@@ -48,6 +68,8 @@ class ApiService {
         'Failed to load user detail',
         statusCode: response.statusCode,
       );
+    } on ApiException {
+      rethrow;
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
       throw ApiException(
@@ -86,13 +108,18 @@ class ApiService {
     double lng,
   ) async {
     try {
-      final response = await _dio.post('/events', data: {
-        'title': title,
-        'location': location,
-        'description': description,
-        'latitude': lat,
-        'longitude': lng,
-      });
+      final headers = await _buildAuthHeaders();
+      final response = await _dio.post(
+        '/events',
+        data: {
+          'title': title,
+          'location': location,
+          'description': description,
+          'latitude': lat,
+          'longitude': lng,
+        },
+        options: headers.isEmpty ? null : Options(headers: headers),
+      );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Event.fromJson(response.data);
       }
@@ -100,6 +127,8 @@ class ApiService {
         'Failed to create event',
         statusCode: response.statusCode,
       );
+    } on ApiException {
+      rethrow;
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
       throw ApiException(

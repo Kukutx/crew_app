@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
 import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/legal/disclaimer_dialog.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +11,6 @@ import '../features/events/presentation/list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
 import '../core/state/app/app_overlay_provider.dart';
 
-/// 添加免责声明，缺测试
 class App extends ConsumerStatefulWidget {
   const App({super.key});
   @override
@@ -25,19 +22,11 @@ class _AppState extends ConsumerState<App> {
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
   late final PageController _overlayController = PageController(initialPage: 1);
-  int? _promptedVersion; // 防止同一版本重复弹
-  ProviderSubscription<AsyncValue<DisclaimerState>>?
-      _disclaimerSubscription;
   ProviderSubscription<int>? _overlayIndexSubscription;
 
   @override
   void initState() {
     super.initState();
-    _disclaimerSubscription = ref.listenManual(
-      disclaimerStateProvider,
-      _onDisclaimerStateChanged,
-      fireImmediately: true,
-    );
     _overlayIndexSubscription = ref.listenManual(
       appOverlayIndexProvider,
       (previous, next) {
@@ -63,7 +52,6 @@ class _AppState extends ConsumerState<App> {
   void dispose() {
     _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
-    _disclaimerSubscription?.close();
     _overlayIndexSubscription?.close();
     super.dispose();
   }
@@ -87,45 +75,9 @@ class _AppState extends ConsumerState<App> {
     });
   }
 
-  void _onDisclaimerStateChanged(
-    AsyncValue<DisclaimerState>? _,
-    AsyncValue<DisclaimerState> next,
-  ) {
-    final disclaimer = next.asData?.value;
-    if (disclaimer == null || !disclaimer.needsReconsent) {
-      return;
-    }
-
-    final version = disclaimer.toShow.version;
-    if (_promptedVersion == version) {
-      return; // 已经弹过了
-    }
-    _promptedVersion = version;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) {
-        return;
-      }
-      final accept = ref.read(acceptDisclaimerProvider);
-      final accepted = await showDisclaimerDialog(
-        context: context,
-        d: disclaimer.toShow,
-        onAccept: () => accept(version),
-      );
-      if (!accepted) {
-        _promptedVersion = null;
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-
-    final legal = ref.watch(disclaimerStateProvider);
-    if (legal.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

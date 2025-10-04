@@ -147,19 +147,18 @@ class EventGridItem extends StatelessWidget {
             Hero(
               tag: heroTag,
               child: imageUrl != null
-                  ? AspectRatio(
-                      aspectRatio: 1,
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        memCacheWidth: memCacheW,
-                        placeholder: (c, _) => const Center(
+                  ? CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      fit: BoxFit.cover,
+                      memCacheWidth: memCacheW,
+                      placeholder: (c, _) => const AspectRatio(
+                        aspectRatio: 1,
+                        child: Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                        errorWidget: (c, _, __) => const Center(
-                          child: Icon(Icons.broken_image),
-                        ),
                       ),
+                      errorWidget: (c, _, __) =>
+                          const EventImagePlaceholder(aspectRatio: 1),
                     )
                   : const EventImagePlaceholder(aspectRatio: 1),
             ),

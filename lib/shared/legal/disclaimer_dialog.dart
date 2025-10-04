@@ -9,58 +9,90 @@ Future<bool> showDisclaimerDialog({
 }) async {
   bool acknowledged = false;
 
-  final accepted = await showDialog<bool>(
+  final accepted = await showModalBottomSheet<bool>(
     context: context,
-    barrierDismissible: false, // 强制阅读同意
-    builder: (dialogContext) {
-      final loc = AppLocalizations.of(dialogContext)!;
+    isScrollControlled: true,
+    isDismissible: false,
+    enableDrag: false,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) {
+      final loc = AppLocalizations.of(sheetContext)!;
       return StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
-            title: Text('${d.title}（v${d.version}）'),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 320, minWidth: 280),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 220),
-                    child: SingleChildScrollView(
-                      child: Text(d.content),
-                    ),
+          return SafeArea(
+            top: false,
+            child: FractionallySizedBox(
+              heightFactor: 0.9,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${d.title}（v${d.version}）',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Text(
+                            d.content,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      CheckboxListTile(
+                        value: acknowledged,
+                        onChanged: (value) {
+                          setState(() {
+                            acknowledged = value ?? false;
+                          });
+                        },
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        title: Text(loc.disclaimer_acknowledge),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () => Navigator.of(sheetContext).pop(false),
+                              child: Text(loc.disclaimer_exit),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: acknowledged
+                                  ? () {
+                                      onAccept();
+                                      Navigator.of(sheetContext).pop(true);
+                                    }
+                                  : null,
+                              child: Text(loc.disclaimer_accept),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  CheckboxListTile(
-                    value: acknowledged,
-                    onChanged: (value) {
-                      setState(() {
-                        acknowledged = value ?? false;
-                      });
-                    },
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    title: Text(loc.disclaimer_acknowledge),
-                  ),
-                ],
+                ),
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: Text(loc.disclaimer_exit),
-              ),
-              ElevatedButton(
-                onPressed: acknowledged
-                    ? () {
-                        onAccept();
-                        Navigator.of(dialogContext).pop(true);
-                      }
-                    : null,
-                child: Text(loc.disclaimer_accept),
-              ),
-            ],
           );
         },
       );

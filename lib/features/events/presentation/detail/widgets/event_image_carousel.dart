@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:flutter/material.dart';
 
 class EventImageCarousel extends StatelessWidget {
@@ -18,19 +19,25 @@ class EventImageCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final images = event.imageUrls;
+    final images = event.imageUrls
+        .map((url) => url.trim())
+        .where((url) => url.isNotEmpty)
+        .toList();
+    final fallbackUrl = event.firstAvailableImageUrl;
+    final hasImages = images.isNotEmpty;
     return Stack(
       children: [
         AspectRatio(
           aspectRatio: 16 / 10,
           child: PageView.builder(
             controller: controller,
-            itemCount: images.isNotEmpty ? images.length : 1,
+            itemCount: hasImages ? images.length : 1,
             onPageChanged: onPageChanged,
             itemBuilder: (_, index) {
-              final imageUrl = images.isNotEmpty
-                  ? images[index]
-                  : event.coverImageUrl;
+              final imageUrl = hasImages ? images[index] : fallbackUrl;
+              if (imageUrl == null) {
+                return const EventImagePlaceholder(aspectRatio: 16 / 10);
+              }
               return CachedNetworkImage(
                 imageUrl: imageUrl,
                 width: double.infinity,

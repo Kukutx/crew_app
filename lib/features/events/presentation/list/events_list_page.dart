@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/state/app/app_overlay_provider.dart';
 import '../../../../core/error/api_exception.dart';
@@ -123,9 +124,7 @@ class EventGridItem extends StatelessWidget {
     final heroTag = 'event_$index';
      // Tips： 判断imageUrls是否有值，否则用coverImageUrl
     // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
-    final imageUrl = (event.imageUrls.isNotEmpty)
-        ? event.imageUrls.first
-        : event.coverImageUrl;
+    final imageUrl = event.firstAvailableImageUrl;
 
     return Material(
       elevation: 4,
@@ -147,20 +146,22 @@ class EventGridItem extends StatelessWidget {
           children: [
             Hero(
               tag: heroTag,
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                memCacheWidth: memCacheW,
-                placeholder: (c, _) => const AspectRatio(
-                  aspectRatio: 1,
-                  child: Center(
-                      child: CircularProgressIndicator(strokeWidth: 2)),
-                ),
-                errorWidget: (c, _, __) => const AspectRatio(
-                  aspectRatio: 1,
-                  child: Center(child: Icon(Icons.broken_image)),
-                ),
-              ),
+              child: imageUrl != null
+                  ? AspectRatio(
+                      aspectRatio: 1,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        memCacheWidth: memCacheW,
+                        placeholder: (c, _) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (c, _, __) => const Center(
+                          child: Icon(Icons.broken_image),
+                        ),
+                      ),
+                    )
+                  : const EventImagePlaceholder(aspectRatio: 1),
             ),
             Positioned(
               left: 0,

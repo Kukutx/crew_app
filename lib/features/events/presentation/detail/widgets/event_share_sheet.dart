@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -123,10 +124,7 @@ class SharePreviewCard extends StatelessWidget {
                 children: [
                   AspectRatio(
                     aspectRatio: 16 / 9,
-                    child: Image(
-                      image: CachedNetworkImageProvider(event.coverImageUrl),
-                      fit: BoxFit.cover,
-                    ),
+                    child: _SharePreviewImage(event: event),
                   ),
                   Positioned.fill(
                     child: DecoratedBox(
@@ -369,6 +367,29 @@ class _StatusChip extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SharePreviewImage extends StatelessWidget {
+  final Event event;
+
+  const _SharePreviewImage({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = event.firstAvailableImageUrl;
+    if (imageUrl == null) {
+      return const EventImagePlaceholder();
+    }
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      placeholder: (context, url) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      errorWidget: (context, url, error) => const EventImagePlaceholder(),
     );
   }
 }

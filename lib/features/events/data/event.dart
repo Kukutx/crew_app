@@ -33,4 +33,16 @@ class Event {
       coverImageUrl: json['coverImageUrl'] as String? ?? '',
     );
   }
+
+  /// Returns the first non-empty image URL among [imageUrls] and
+  /// [coverImageUrl]. If no URL is available, `null` is returned.
+  String? get firstAvailableImageUrl {
+    for (final url in [...imageUrls, coverImageUrl]) {
+      final trimmed = url.trim();
+      if (trimmed.isNotEmpty) {
+        return trimmed;
+      }
+    }
+    return null;
+  }
 }

@@ -17,6 +17,9 @@ final authStateProvider = StreamProvider<User?>((ref) {
 
 /// 当前用户快照（同步）：大多数展示场景更轻量
 final currentUserProvider = Provider<User?>((ref) {
+  // 监听 `authStateProvider` 确保在登录状态变化时重新读取当前用户，
+  // 避免使用缓存的旧用户信息导致 UI 不更新。
+  ref.watch(authStateProvider);
   return ref.watch(authRepositoryProvider).currentUser;
 });
 

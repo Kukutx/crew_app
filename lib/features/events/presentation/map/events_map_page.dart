@@ -12,6 +12,7 @@ import '../../data/event.dart';
 import '../../data/event_filter.dart';
 import '../../../../core/error/api_exception.dart';
 import '../../../../core/network/api_service.dart';
+import '../../../../core/state/di/providers.dart';
 import '../../../../core/state/event_map_state/events_providers.dart';
 import '../../../../core/state/event_map_state/location_provider.dart';
 import 'widgets/search_event_appbar.dart';
@@ -48,7 +49,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   // 搜索框
   final _searchController = TextEditingController();
   late final FocusNode _searchFocusNode;
-  final _api = ApiService();
+  late final ApiService _api;
   EventFilter _filter = const EventFilter();
   List<Event> _searchResults = const <Event>[];
   bool _isSearching = false;
@@ -61,6 +62,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   @override
   void initState() {
     super.initState();
+    _api = ref.read(apiServiceProvider);
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _mapFocusSubscription = ref.listenManual(

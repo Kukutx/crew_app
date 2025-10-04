@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-// 用前缀避免与 UI 包里的 Provider 名称冲突
-import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as fui;
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
@@ -10,11 +13,11 @@ import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
 /// 登录完成后跳转的路由名
 const String kHomeRoute = '/';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final providers = <fui.AuthProvider>[
       // 1) 邮箱密码
@@ -66,8 +69,31 @@ class LoginPage extends StatelessWidget {
           child: Text(loc.login_footer),
         ),
         actions: [
-          fui.AuthStateChangeAction<fui.SignedIn>((context, state) {
-            fa.FirebaseAuth.instance.currentUser?.getIdToken(true);
+          fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
+            final messenger = ScaffoldMessenger.of(context);
+            try {
+              await ref
+                  .read(authServiceProvider)
+                  .getIdToken(forceRefresh: true);
+
+              final profile = await ref
+                  .read(apiServiceProvider)
+                  .getAuthenticatedUserDetail();
+
+              debugPrint('Authenticated user: ${profile.email}');
+            } on ApiException catch (error) {
+              messenger.showSnackBar(
+                SnackBar(content: Text(error.message)),
+              );
+            } catch (error, stackTrace) {
+              debugPrint('Failed to sync user: $error\n$stackTrace');
+              messenger.showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to sync user information.'),
+                ),
+              );
+            }
+
             Navigator.of(context).pushReplacementNamed(kHomeRoute);
           }),
           fui.AuthStateChangeAction<fui.UserCreated>((context, state) {

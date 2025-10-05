@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/network/api_service.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_app_bar.dart';
@@ -71,7 +72,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) {
       await Share.share(shareText);
-      if (!mounted) return;
+      if (!sheetContext.mounted) return;
       Navigator.of(sheetContext).pop();
       return;
     }
@@ -95,7 +96,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     } catch (_) {
       await Share.share(shareText);
     }
-    if (!mounted) return;
+    if (!sheetContext.mounted) return;
     Navigator.of(sheetContext).pop();
   }
 
@@ -105,8 +106,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     final loc = AppLocalizations.of(context)!;
 
     if (boundary == null) {
-      if (!mounted) return;
+      if (!sheetContext.mounted) return;
       Navigator.of(sheetContext).pop();
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
       return;
@@ -118,8 +120,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        if (!mounted) return;
+        if (!sheetContext.mounted) return;
         Navigator.of(sheetContext).pop();
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
         return;
@@ -132,8 +135,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         quality: 100,
       );
 
-      if (!mounted) return;
+      if (!sheetContext.mounted) return;
       Navigator.of(sheetContext).pop();
+      if (!context.mounted) return;
 
       final success = result is Map &&
           (result['isSuccess'] == true || result['success'] == true);
@@ -144,8 +148,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         ),
       );
     } catch (_) {
-      if (!mounted) return;
+      if (!sheetContext.mounted) return;
       Navigator.of(sheetContext).pop();
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
     }
@@ -175,7 +180,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   void _loadOrganizerProfile({bool force = false}) {
     final organizerId = (widget.event.organizer?.id ?? '').trim();
     if (organizerId.isEmpty) {
-      if (force && mounted) {
+      if (force && context.mounted) {
         setState(() {
           _resetHostStateValues();
           _following = false;
@@ -186,7 +191,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     if (!force && _hostProfile != null && _hostProfile!.id == organizerId) {
       return;
     }
-    if (force && mounted) {
+    if (force && context.mounted) {
       setState(_resetHostStateValues);
     }
     Future.microtask(() => _fetchOrganizerProfile(organizerId));
@@ -200,15 +205,16 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   Future<void> _fetchOrganizerProfile(String organizerId) async {
     _loadingOrganizerId = organizerId;
-    if (mounted) {
+    if (context.mounted) {
       setState(() {
         _isLoadingHost = true;
       });
     }
     try {
+      final ApiService apiService = ref.read(apiServiceProvider);
       final profile =
-          await ref.read(apiServiceProvider).getUserProfileSummary(organizerId);
-      if (!mounted || _loadingOrganizerId != organizerId) {
+          await apiService.getUserProfileSummary(organizerId);
+      if (!context.mounted || _loadingOrganizerId != organizerId) {
         return;
       }
       final normalizedProfile = profile.isFollowing == null
@@ -219,7 +225,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         _following = normalizedProfile.isFollowing ?? _following;
       });
     } catch (error) {
-      if (!mounted || _loadingOrganizerId != organizerId) {
+      if (!context.mounted || _loadingOrganizerId != organizerId) {
         return;
       }
       final message = _resolveErrorMessage(error);
@@ -227,7 +233,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         _showSnackBar(message);
       }
     } finally {
-      if (!mounted || _loadingOrganizerId != organizerId) {
+      if (!context.mounted || _loadingOrganizerId != organizerId) {
         return;
       }
       setState(() {
@@ -250,7 +256,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   void _showSnackBar(String message) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );

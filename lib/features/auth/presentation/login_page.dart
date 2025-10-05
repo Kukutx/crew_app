@@ -33,7 +33,10 @@ class LoginPage extends ConsumerWidget {
     ];
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         title: Text(
           loc.login_title,
           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -47,33 +50,106 @@ class LoginPage extends ConsumerWidget {
         ),
         elevation: 0,
       ),
-      body: fui.SignInScreen(
-        providers: providers,
-        headerBuilder: (context, constraints, _) => Column(
-          children: const [
-            SizedBox(height: 32),
-            Icon(
-              Icons.nightlight_round, // 这里可以换成你自己的 logo 图片
-              size: 80,
-              color: Colors.blueAccent,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final maxContentWidth = constraints.maxWidth.clamp(360.0, 480.0);
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF4A90E2), Color(0xFF9013FE)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-            SizedBox(height: 16),
-          ],
-        ),
-        subtitleBuilder: (context, action) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(loc.login_subtitle),
-        ),
-        footerBuilder: (context, action) => Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Text(loc.login_footer),
-        ),
-        actions: [
-          fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
-            final messenger = ScaffoldMessenger.of(context);
-            try {
-              await ref
-                  .read(authServiceProvider)
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxContentWidth),
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 32,
+                        ),
+                        child: fui.SignInScreen(
+                          providers: providers,
+                          showAuthActionSwitch: false,
+                          headerBuilder: (context, constraints, _) => Column(
+                            children: [
+                              const SizedBox(height: 8),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFF4A90E2), Color(0xFF7B61FF)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(18),
+                                  child: Icon(
+                                    Icons.nightlight_round,
+                                    size: 44,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                loc.login_title,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                loc.login_subtitle,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.grey[600]),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+                          ),
+                          subtitleBuilder: (context, action) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Text(
+                              action == fui.AuthAction.signIn
+                                  ? loc.login_subtitle
+                                  : loc.login_footer,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          footerBuilder: (context, action) => Column(
+                            children: [
+                              const Divider(height: 32),
+                              Text(
+                                loc.login_footer,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
+                          actions: [
+            fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                await ref
+                    .read(authServiceProvider)
                   .getIdToken(forceRefresh: true);
 
               final profile = await ref
@@ -107,13 +183,39 @@ class LoginPage extends ConsumerWidget {
             Navigator.of(context).pushReplacementNamed(kHomeRoute);
           }),
         ],
-        sideBuilder: (context, constraints) => Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            loc.login_side_info,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
+                          sideBuilder: (context, constraints) => Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  loc.login_side_info,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  loc.login_footer,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -236,6 +236,12 @@ abstract class AppLocalizations {
   /// **'Restore default'**
   String get action_restore_defaults;
 
+  /// No description provided for @action_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get action_retry;
+
   /// No description provided for @browsing_history.
   ///
   /// In en, this message translates to:
@@ -613,6 +619,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get profile_title;
+
+  /// No description provided for @profile_roles_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Roles'**
+  String get profile_roles_label;
+
+  /// No description provided for @profile_subscription_status_active.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription active'**
+  String get profile_subscription_status_active;
+
+  /// No description provided for @profile_subscription_status_inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'No active subscription'**
+  String get profile_subscription_status_inactive;
+
+  /// No description provided for @profile_sync_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to sync profile details'**
+  String get profile_sync_error;
 
   /// No description provided for @registration_not_implemented.
   ///

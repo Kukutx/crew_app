@@ -82,6 +82,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_restore_defaults => '恢复默认';
 
   @override
+  String get action_retry => '重试';
+
+  @override
   String get browsing_history => '浏览记录';
 
   @override
@@ -275,6 +278,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profile_title => '个人中心';
+
+  @override
+  String get profile_roles_label => '角色';
+
+  @override
+  String get profile_subscription_status_active => '订阅已激活';
+
+  @override
+  String get profile_subscription_status_inactive => '暂无订阅';
+
+  @override
+  String get profile_sync_error => '无法同步个人信息';
 
   @override
   String get registration_not_implemented => '报名功能尚未实现';

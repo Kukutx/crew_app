@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/di/providers.dart';
+import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as fui;
@@ -76,10 +77,14 @@ class LoginPage extends ConsumerWidget {
                   .getIdToken(forceRefresh: true);
 
               final profile = await ref
-                  .read(apiServiceProvider)
-                  .getAuthenticatedUserDetail();
+                  .read(authenticatedUserProvider.notifier)
+                  .refreshProfile();
 
-              debugPrint('Authenticated user: ${profile.email}');
+              if (profile != null) {
+                debugPrint('Authenticated user: ${profile.email}');
+              } else {
+                debugPrint('Authenticated user profile not available.');
+              }
             } on ApiException catch (error) {
               messenger.showSnackBar(
                 SnackBar(content: Text(error.message)),

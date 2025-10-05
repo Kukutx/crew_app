@@ -83,6 +83,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_restore_defaults => 'Restore default';
 
   @override
+  String get action_retry => 'Retry';
+
+  @override
   String get browsing_history => 'Browsing history';
 
   @override
@@ -280,6 +283,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profile_title => 'Profile';
+
+  @override
+  String get profile_roles_label => 'Roles';
+
+  @override
+  String get profile_subscription_status_active => 'Subscription active';
+
+  @override
+  String get profile_subscription_status_inactive => 'No active subscription';
+
+  @override
+  String get profile_sync_error => 'Unable to sync profile details';
 
   @override
   String get registration_not_implemented =>

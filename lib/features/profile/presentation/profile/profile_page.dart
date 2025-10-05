@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
+import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +30,9 @@ class ProfilePage extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
     final user = authState.value ?? ref.watch(currentUserProvider);
 
+    final profileState = ref.watch(authenticatedUserProvider);
+    final backendUser = profileState.asData?.value;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.profile_title),
@@ -38,45 +44,63 @@ class ProfilePage extends ConsumerWidget {
           },
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const _ProfileHeader(),
-          const SizedBox(height: 16),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.favorite_border),
-                  title: Text(loc.my_favorites),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/favorites'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.history),
-                  title: Text(loc.browsing_history),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/history'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.verified_user),
-                  title: Text(loc.verification_preferences),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/preferences'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.settings_outlined),
-                  title: Text(loc.settings),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, '/settings'),
-                ),
-              ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(authenticatedUserProvider.notifier).refreshProfile();
+        },
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            const _ProfileHeader(),
+            const SizedBox(height: 16),
+            if (profileState.isLoading && backendUser == null)
+              const _ProfileLoadingCard(),
+            if (profileState.hasError)
+              _ProfileErrorCard(
+                message: _profileErrorMessage(profileState.error, loc),
+                onRetry: () =>
+                    ref.read(authenticatedUserProvider.notifier).refreshProfile(),
+              ),
+            if (backendUser != null) ...[
+              _BackendProfileCard(user: backendUser, loc: loc),
+              const SizedBox(height: 16),
+            ],
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.favorite_border),
+                    title: Text(loc.my_favorites),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/favorites'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.history),
+                    title: Text(loc.browsing_history),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/history'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.verified_user),
+                    title: Text(loc.verification_preferences),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/preferences'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.settings_outlined),
+                    title: Text(loc.settings),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/settings'),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: Container(
         color: isDark ? theme.colorScheme.surface : Colors.transparent,
@@ -123,6 +147,8 @@ class _ProfileHeader extends ConsumerWidget {
     final loc = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateProvider);
     final user = authState.value ?? ref.watch(currentUserProvider);
+    final profileState = ref.watch(authenticatedUserProvider);
+    final backendUser = profileState.asData?.value;
 
     if (user == null) {
       return Card(
@@ -156,6 +182,9 @@ class _ProfileHeader extends ConsumerWidget {
     }
 
     final customPath = ref.watch(avatarProvider);
+    final displayName = _resolveDisplayName(user, backendUser, loc);
+    final email = _resolveEmail(user, backendUser, loc);
+    final avatarImage = _resolveAvatarImage(customPath, backendUser, user);
 
     return Card(
       child: Padding(
@@ -168,12 +197,8 @@ class _ProfileHeader extends ConsumerWidget {
                 tag: 'profile_avatar',
                 child: CircleAvatar(
                   radius: 32,
-                  foregroundImage: customPath != null
-                      ? FileImage(File(customPath))
-                      : (user.photoURL != null
-                          ? NetworkImage(user.photoURL!)
-                          : null),
-                  child: (customPath == null && user.photoURL == null)
+                  foregroundImage: avatarImage,
+                  child: avatarImage == null
                       ? const Icon(Icons.person, size: 32)
                       : null,
                 ),
@@ -184,11 +209,9 @@ class _ProfileHeader extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.displayName ?? loc.user_display_name_fallback,
-                      style: theme.textTheme.titleMedium),
+                  Text(displayName, style: theme.textTheme.titleMedium),
                   const SizedBox(height: 4),
-                  Text(user.email ?? loc.email_unbound,
-                      style: theme.textTheme.bodySmall),
+                  Text(email, style: theme.textTheme.bodySmall),
                 ],
               ),
             ),
@@ -358,6 +381,279 @@ class _ZoomableAvatar extends StatelessWidget {
           fit: BoxFit.contain,
         ),
       ),
+    );
+  }
+}
+
+String _resolveDisplayName(
+  fa.User user,
+  AuthenticatedUserDto? backendUser,
+  AppLocalizations loc,
+) {
+  final backendName = backendUser?.displayName?.trim();
+  if (backendName != null && backendName.isNotEmpty) {
+    return backendName;
+  }
+
+  final firebaseName = user.displayName?.trim();
+  if (firebaseName != null && firebaseName.isNotEmpty) {
+    return firebaseName;
+  }
+
+  return loc.user_display_name_fallback;
+}
+
+String _resolveEmail(
+  fa.User user,
+  AuthenticatedUserDto? backendUser,
+  AppLocalizations loc,
+) {
+  final backendEmail = backendUser?.email.trim();
+  if (backendEmail != null && backendEmail.isNotEmpty) {
+    return backendEmail;
+  }
+
+  final firebaseEmail = user.email?.trim();
+  if (firebaseEmail != null && firebaseEmail.isNotEmpty) {
+    return firebaseEmail;
+  }
+
+  return loc.email_unbound;
+}
+
+ImageProvider? _resolveAvatarImage(
+  String? customPath,
+  AuthenticatedUserDto? backendUser,
+  fa.User user,
+) {
+  if (customPath != null) {
+    return FileImage(File(customPath));
+  }
+
+  final backendPhoto = backendUser?.photoUrl?.trim();
+  if (backendPhoto != null && backendPhoto.isNotEmpty) {
+    return NetworkImage(backendPhoto);
+  }
+
+  final firebasePhoto = user.photoURL?.trim();
+  if (firebasePhoto != null && firebasePhoto.isNotEmpty) {
+    return NetworkImage(firebasePhoto);
+  }
+
+  return null;
+}
+
+String _profileErrorMessage(Object? error, AppLocalizations loc) {
+  if (error is ApiException && error.message.isNotEmpty) {
+    return error.message;
+  }
+
+  if (error != null) {
+    final message = error.toString().trim();
+    if (message.isNotEmpty && message != 'null') {
+      return message;
+    }
+  }
+
+  return loc.load_failed;
+}
+
+class _ProfileLoadingCard extends StatelessWidget {
+  const _ProfileLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Card(
+      child: ListTile(
+        leading: const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        title: Text(loc.city_loading),
+      ),
+    );
+  }
+}
+
+class _ProfileErrorCard extends StatelessWidget {
+  const _ProfileErrorCard({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      color: colorScheme.errorContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              loc.profile_sync_error,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onErrorContainer,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onErrorContainer,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: onRetry,
+                style: TextButton.styleFrom(
+                  foregroundColor: colorScheme.onErrorContainer,
+                ),
+                child: Text(loc.action_retry),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BackendProfileCard extends StatelessWidget {
+  const _BackendProfileCard({
+    required this.user,
+    required this.loc,
+  });
+
+  final AuthenticatedUserDto user;
+  final AppLocalizations loc;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final subscriptionLabel = user.hasActiveSubscription
+        ? loc.profile_subscription_status_active
+        : loc.profile_subscription_status_inactive;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              loc.settings_account_info,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _InfoRow(
+              icon: Icons.badge_outlined,
+              label: loc.settings_account_uid_label,
+              value: user.id,
+            ),
+            const SizedBox(height: 12),
+            _InfoRow(
+              icon: Icons.mail_outline,
+              label: loc.settings_account_email_label,
+              value: user.email,
+            ),
+            const SizedBox(height: 16),
+            if (user.roles.isNotEmpty) ...[
+              Text(
+                loc.profile_roles_label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: user.roles
+                    .map(
+                      (role) => Chip(
+                        label: Text(role),
+                        backgroundColor:
+                            colorScheme.primaryContainer.withValues(alpha: 0.4),
+                        labelStyle: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    )
+                    .toList(growable: false),
+              ),
+              const SizedBox(height: 16),
+            ],
+            _InfoRow(
+              icon: Icons.workspace_premium_outlined,
+              label: loc.settings_subscription_current_plan,
+              value: subscriptionLabel,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: colorScheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

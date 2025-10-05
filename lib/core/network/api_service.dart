@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 
 import '../../features/events/data/event.dart';
 import '../../features/user/data/authenticated_user_dto.dart';
+import '../../features/user/data/user_profile_summary.dart';
 import '../error/api_exception.dart';
 import 'auth/auth_service.dart';
 
@@ -63,6 +64,28 @@ class ApiService {
           return AuthenticatedUserDto.fromJson(data);
         }
         throw ApiException('Unexpected user payload type');
+      }
+      throw ApiException(
+        'Failed to load user detail',
+        statusCode: response.statusCode,
+      );
+    } on ApiException {
+      rethrow;
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<UserProfileSummary> getUserProfileSummary(String userId) async {
+    try {
+      final response = await _dio.get('/Users/$userId');
+      if (response.statusCode == 200) {
+        final data = _unwrapUserObject(response.data);
+        return UserProfileSummary.fromJson(data);
       }
       throw ApiException(
         'Failed to load user detail',
@@ -206,6 +229,38 @@ bool _isKnownEmptyCollection(dynamic data) {
     }
   }
   return false;
+}
+
+Map<String, dynamic> _unwrapUserObject(dynamic data) {
+  final directMap = _tryCastMap(data);
+  if (directMap != null) {
+    for (final key in const ['data', 'user', 'value', 'profile', 'result']) {
+      final nested = _tryCastMap(directMap[key]);
+      if (nested != null) {
+        return nested;
+      }
+    }
+    return directMap;
+  }
+  if (data is List) {
+    for (final item in data) {
+      final nested = _tryCastMap(item);
+      if (nested != null) {
+        return nested;
+      }
+    }
+  }
+  throw ApiException('Unexpected user payload type');
+}
+
+Map<String, dynamic>? _tryCastMap(dynamic value) {
+  if (value is Map<String, dynamic>) {
+    return value;
+  }
+  if (value is Map) {
+    return value.map((key, value) => MapEntry(key.toString(), value));
+  }
+  return null;
 }
 
 List<Map<String, dynamic>> _unwrapEventList(dynamic data) {

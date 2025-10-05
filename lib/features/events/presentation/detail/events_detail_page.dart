@@ -1,27 +1,31 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_share_sheet.dart';
+import 'package:crew_app/features/user/data/user_profile_summary.dart';
 import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
-class EventDetailPage extends StatefulWidget {
+class EventDetailPage extends ConsumerStatefulWidget {
   final Event event;
   const EventDetailPage({super.key, required this.event});
 
   @override
-  State<EventDetailPage> createState() => _EventDetailPageState();
+  ConsumerState<EventDetailPage> createState() => _EventDetailPageState();
 }
 
-class _EventDetailPageState extends State<EventDetailPage> {
+class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
@@ -33,6 +37,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
   );
 
   bool _following = false;
+  bool _isLoadingHost = false;
+  String? _loadingOrganizerId;
+  UserProfileSummary? _hostProfile;
 
   String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
 
@@ -150,6 +157,113 @@ class _EventDetailPageState extends State<EventDetailPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadOrganizerProfile();
+  }
+
+  @override
+  void didUpdateWidget(covariant EventDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldOrganizerId = (oldWidget.event.organizer?.id ?? '').trim();
+    final newOrganizerId = (widget.event.organizer?.id ?? '').trim();
+    if (oldWidget.event.id != widget.event.id || oldOrganizerId != newOrganizerId) {
+      _loadOrganizerProfile(force: true);
+    }
+  }
+
+  void _loadOrganizerProfile({bool force = false}) {
+    final organizerId = (widget.event.organizer?.id ?? '').trim();
+    if (organizerId.isEmpty) {
+      if (force && mounted) {
+        setState(() {
+          _resetHostStateValues();
+          _following = false;
+        });
+      }
+      return;
+    }
+    if (!force && _hostProfile != null && _hostProfile!.id == organizerId) {
+      return;
+    }
+    if (force && mounted) {
+      setState(_resetHostStateValues);
+    }
+    Future.microtask(() => _fetchOrganizerProfile(organizerId));
+  }
+
+  void _resetHostStateValues() {
+    _hostProfile = null;
+    _isLoadingHost = false;
+    _loadingOrganizerId = null;
+  }
+
+  Future<void> _fetchOrganizerProfile(String organizerId) async {
+    _loadingOrganizerId = organizerId;
+    if (mounted) {
+      setState(() {
+        _isLoadingHost = true;
+      });
+    }
+    try {
+      final profile =
+          await ref.read(apiServiceProvider).getUserProfileSummary(organizerId);
+      if (!mounted || _loadingOrganizerId != organizerId) {
+        return;
+      }
+      final normalizedProfile = profile.isFollowing == null
+          ? profile.copyWith(isFollowing: _following)
+          : profile;
+      setState(() {
+        _hostProfile = normalizedProfile;
+        _following = normalizedProfile.isFollowing ?? _following;
+      });
+    } catch (error) {
+      if (!mounted || _loadingOrganizerId != organizerId) {
+        return;
+      }
+      final message = _resolveErrorMessage(error);
+      if (message != null) {
+        _showSnackBar(message);
+      }
+    } finally {
+      if (!mounted || _loadingOrganizerId != organizerId) {
+        return;
+      }
+      setState(() {
+        _isLoadingHost = false;
+        _loadingOrganizerId = null;
+      });
+    }
+  }
+
+  String? _resolveErrorMessage(Object error) {
+    if (error is ApiException && error.message.isNotEmpty) {
+      return error.message;
+    }
+    final message = error.toString();
+    if (message.isEmpty || message == 'null') {
+      return null;
+    }
+    return message;
+  }
+
+  void _showSnackBar(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    });
+  }
+
+  String? _nonEmpty(String? value) {
+    if (value == null) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  @override
   void dispose() {
     _pageCtrl.dispose();
     super.dispose();
@@ -160,15 +274,21 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final event = widget.event;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
-    final hostName = (organizer?.name.isNotEmpty ?? false)
-        ? organizer!.name
-        : _fallbackHost.name;
-    final hostBio = (organizer?.bio?.isNotEmpty ?? false)
-        ? organizer!.bio!
-        : _fallbackHost.bio;
-    final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
-        ? organizer!.avatarUrl!
-        : _fallbackHost.avatar;
+    final hostProfile = _hostProfile;
+    final hostName = _nonEmpty(hostProfile?.name) ??
+        ((organizer?.name.isNotEmpty ?? false)
+            ? organizer!.name
+            : _fallbackHost.name);
+    final hostBio = _nonEmpty(hostProfile?.bio) ??
+        ((organizer?.bio?.isNotEmpty ?? false)
+            ? organizer!.bio!
+            : _fallbackHost.bio);
+    final hostAvatar = _nonEmpty(hostProfile?.avatarUrl) ??
+        ((organizer?.avatarUrl?.isNotEmpty ?? false)
+            ? organizer!.avatarUrl!
+            : _fallbackHost.avatar);
+    final isHostLoading = _isLoadingHost && hostProfile == null;
+    final isFollowing = hostProfile?.isFollowing ?? _following;
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7E9),
       extendBodyBehindAppBar: true,
@@ -205,14 +325,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
         },
         onToggleFollow: () async {
           // TODO: integrate backend follow logic
-          setState(() => _following = !_following);
+          setState(() {
+            _following = !_following;
+            if (_hostProfile != null) {
+              _hostProfile = _hostProfile!.copyWith(isFollowing: _following);
+            }
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(_following ? loc.followed : loc.unfollowed),
             ),
           );
         },
-        isFollowing: _following,
+        isFollowing: isFollowing,
+        isHostLoading: isHostLoading,
         onTapLocation: () => Navigator.pop(context, widget.event),
       ),
     );

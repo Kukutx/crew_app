@@ -10,6 +10,7 @@ class EventHostCard extends StatelessWidget {
   final VoidCallback onTapProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
+  final bool isLoading;
 
   const EventHostCard({
     super.key,
@@ -20,6 +21,7 @@ class EventHostCard extends StatelessWidget {
     required this.onTapProfile,
     required this.onToggleFollow,
     required this.isFollowing,
+    this.isLoading = false,
   });
 
   @override
@@ -74,31 +76,54 @@ class EventHostCard extends StatelessWidget {
               const SizedBox(width: 8),
               SizedBox(
                 height: 36,
-                child: isFollowing
-                    ? OutlinedButton.icon(
-                        onPressed: onToggleFollow,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.orange,
-                          side: BorderSide(color: Colors.orange.shade300),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  child: isLoading
+                      ? SizedBox(
+                          key: const ValueKey('host_loading'),
+                          width: 36,
+                          child: Center(
+                            child: SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.4,
+                                color: Colors.orange.shade400,
+                              ),
+                            ),
                           ),
-                        ),
-                        icon: const Icon(Icons.check, size: 18),
-                        label: Text(loc.action_following),
-                      )
-                    : ElevatedButton.icon(
-                        onPressed: onToggleFollow,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        icon: const Icon(Icons.person_add_alt_1, size: 18),
-                        label: Text(loc.action_follow),
-                      ),
+                        )
+                      : isFollowing
+                          ? OutlinedButton.icon(
+                              key: const ValueKey('host_following'),
+                              onPressed: onToggleFollow,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.orange,
+                                side:
+                                    BorderSide(color: Colors.orange.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              icon: const Icon(Icons.check, size: 18),
+                              label: Text(loc.action_following),
+                            )
+                          : ElevatedButton.icon(
+                              key: const ValueKey('host_follow'),
+                              onPressed: onToggleFollow,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              icon: const Icon(Icons.person_add_alt_1, size: 18),
+                              label: Text(loc.action_follow),
+                            ),
+                ),
               ),
             ],
           ),

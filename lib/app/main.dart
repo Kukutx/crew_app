@@ -8,7 +8,7 @@ import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
-import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
+import 'package:crew_app/features/chat/user_event/presentation/user_events_page.dart';
 import 'package:crew_app/features/profile/presentation/favorites/favorites_page.dart';
 import 'package:crew_app/features/profile/presentation/history/history_page.dart';
 import 'package:crew_app/features/profile/presentation/preferences/preferences_page.dart';

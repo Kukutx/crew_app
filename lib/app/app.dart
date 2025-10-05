@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:crew_app/features/chat/user_event/prestantion/user_events_page.dart';
+import 'package:crew_app/features/chat/user_event/presentation/user_events_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';

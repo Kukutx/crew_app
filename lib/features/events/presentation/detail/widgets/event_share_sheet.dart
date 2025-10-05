@@ -287,6 +287,7 @@ class SharePreviewCard extends StatelessWidget {
                                     ClipboardData(text: shareLink),
                                   );
                                   HapticFeedback.lightImpact();
+                                              if (!context.mounted) return;
                                   ScaffoldMessenger.of(context)
                                     ..hideCurrentSnackBar()
                                     ..showSnackBar(

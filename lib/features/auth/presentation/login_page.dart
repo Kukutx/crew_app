@@ -26,8 +26,9 @@ class LoginPage extends ConsumerWidget {
       // fui.PhoneAuthProvider(), // ← 使用 firebase_ui_auth 的 PhoneAuthProvider
       // 3) Google（clientId 请替换成你自己的）
       GoogleProvider(
-          clientId:
-              '417490407531-111poe29m187rdr8d43mp93v9fq92of1.apps.googleusercontent.com'),
+        clientId:
+            '417490407531-111poe29m187rdr8d43mp93v9fq92of1.apps.googleusercontent.com',
+      ),
       // 4) Apple（iOS 必须提供 Sign in with Apple，如果你启用了其他第三方登录）
       if (Theme.of(context).platform == TargetPlatform.iOS) AppleProvider(),
     ];
@@ -86,9 +87,7 @@ class LoginPage extends ConsumerWidget {
                 debugPrint('Authenticated user profile not available.');
               }
             } on ApiException catch (error) {
-              messenger.showSnackBar(
-                SnackBar(content: Text(error.message)),
-              );
+              messenger.showSnackBar(SnackBar(content: Text(error.message)));
             } catch (error, stackTrace) {
               debugPrint('Failed to sync user: $error\n$stackTrace');
               messenger.showSnackBar(
@@ -97,7 +96,7 @@ class LoginPage extends ConsumerWidget {
                 ),
               );
             }
-
+            if (!context.mounted) return;
             Navigator.of(context).pushReplacementNamed(kHomeRoute);
           }),
           fui.AuthStateChangeAction<fui.UserCreated>((context, state) {

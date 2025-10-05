@@ -64,7 +64,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) {
       await Share.share(shareText);
-      if (!mounted) return;
+      if (!sheetContext.mounted) return;
       Navigator.of(sheetContext).pop();
       return;
     }
@@ -88,7 +88,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     } catch (_) {
       await Share.share(shareText);
     }
-    if (!mounted) return;
+    if (!sheetContext.mounted) return;
     Navigator.of(sheetContext).pop();
   }
 
@@ -111,7 +111,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        if (!mounted) return;
+        if (!sheetContext.mounted|| !mounted) return;
         Navigator.of(sheetContext).pop();
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
@@ -125,7 +125,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         quality: 100,
       );
 
-      if (!mounted) return;
+      if (!sheetContext.mounted || !mounted) return;
       Navigator.of(sheetContext).pop();
 
       final success = result is Map &&
@@ -137,7 +137,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         ),
       );
     } catch (_) {
-      if (!mounted) return;
+      if (!sheetContext.mounted || !mounted) return;
       Navigator.of(sheetContext).pop();
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));

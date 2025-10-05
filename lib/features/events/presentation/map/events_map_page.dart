@@ -67,17 +67,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _api = ref.read(apiServiceProvider);
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
-    _mapFocusSubscription = ref.listenManual(
-      mapFocusEventProvider,
-      (previous, next) {
-        final event = next;
-        if (event == null) {
-          return;
-        }
-        _focusOnEvent(event);
-        ref.read(mapFocusEventProvider.notifier).state = null;
-      },
-    );
+    _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
+      previous,
+      next,
+    ) {
+      final event = next;
+      if (event == null) {
+        return;
+      }
+      _focusOnEvent(event);
+      ref.read(mapFocusEventProvider.notifier).state = null;
+    });
   }
 
   @override
@@ -126,8 +126,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onTagToggle: (t, v) => setState(() {
           v ? _selectedTags.add(t) : _selectedTags.remove(t);
           // TODO: 将标签映射到 _filter 并刷新 Provider
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
         }),
         onOpenFilter: () async {
           final res = await showEventFilterSheet(
@@ -137,8 +138,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           );
           if (res != null) setState(() => _filter = res);
           // TODO: 根据 _filter 刷新数据
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
         },
         onResultTap: _onSearchResultTap,
         showResults: _showSearchResults,
@@ -190,8 +192,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               _map.move(loc, 14);
               _map.rotate(0);
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Unable to get location")));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("Unable to get location")));
             }
           },
           child: const Icon(Icons.my_location),
@@ -208,11 +211,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!await _ensureDisclaimerAccepted()) {
       return;
     }
-
+    if (!mounted) return;
     final data = await showCreateEventBottomSheet(context, latlng);
     if (data == null || data.title.trim().isEmpty) return;
 
-    await ref.read(eventsProvider.notifier).createEvent(
+    await ref
+        .read(eventsProvider.notifier)
+        .createEvent(
           title: data.title.trim(),
           description: data.description.trim(),
           pos: latlng,
@@ -282,9 +287,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     if (lookupHost.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(offlineMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(offlineMessage)));
       }
       return false;
     }
@@ -295,18 +300,18 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           result.isNotEmpty && result.first.rawAddress.isNotEmpty;
 
       if (!hasConnection && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(offlineMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(offlineMessage)));
       }
 
       return hasConnection;
     } on SocketException catch (error) {
       debugPrint('Network check failed for $lookupHost: $error');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(offlineMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(offlineMessage)));
       }
       return false;
     }

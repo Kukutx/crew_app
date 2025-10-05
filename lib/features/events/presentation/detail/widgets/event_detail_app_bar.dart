@@ -7,6 +7,8 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onBack;
   final VoidCallback onShare;
   final VoidCallback onFavorite;
+  final bool isFavorite;
+  final bool isFavoriteLoading;
 
   const EventDetailAppBar({
     super.key,
@@ -14,6 +16,8 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onBack,
     required this.onShare,
     required this.onFavorite,
+    required this.isFavorite,
+    required this.isFavoriteLoading,
   });
 
   @override
@@ -35,8 +39,17 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onShare,
         ),
         IconButton(
-          icon: const Icon(Icons.favorite_border, color: Colors.black),
-          onPressed: onFavorite,
+          icon: isFavoriteLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.redAccent : Colors.black,
+                ),
+          onPressed: isFavoriteLoading ? null : onFavorite,
         ),
         const SizedBox(width: 8),
       ],

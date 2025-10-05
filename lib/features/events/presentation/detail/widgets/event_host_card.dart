@@ -10,6 +10,7 @@ class EventHostCard extends StatelessWidget {
   final VoidCallback onTapProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
+  final bool isProcessing;
 
   const EventHostCard({
     super.key,
@@ -20,6 +21,7 @@ class EventHostCard extends StatelessWidget {
     required this.onTapProfile,
     required this.onToggleFollow,
     required this.isFollowing,
+    this.isProcessing = false,
   });
 
   @override
@@ -76,7 +78,7 @@ class EventHostCard extends StatelessWidget {
                 height: 36,
                 child: isFollowing
                     ? OutlinedButton.icon(
-                        onPressed: onToggleFollow,
+                        onPressed: isProcessing ? null : onToggleFollow,
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.orange,
                           side: BorderSide(color: Colors.orange.shade300),
@@ -84,11 +86,18 @@ class EventHostCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        icon: const Icon(Icons.check, size: 18),
+                        icon: isProcessing
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.check, size: 18),
                         label: Text(loc.action_following),
                       )
                     : ElevatedButton.icon(
-                        onPressed: onToggleFollow,
+                        onPressed: isProcessing ? null : onToggleFollow,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
@@ -96,7 +105,14 @@ class EventHostCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        icon: const Icon(Icons.person_add_alt_1, size: 18),
+                        icon: isProcessing
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.person_add_alt_1, size: 18),
                         label: Text(loc.action_follow),
                       ),
               ),

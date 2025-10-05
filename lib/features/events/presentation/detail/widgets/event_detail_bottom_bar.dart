@@ -6,6 +6,7 @@ class EventDetailBottomBar extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onFavorite;
   final VoidCallback onRegister;
+  final bool isFavoriteLoading;
 
   const EventDetailBottomBar({
     super.key,
@@ -13,6 +14,7 @@ class EventDetailBottomBar extends StatelessWidget {
     required this.isFavorite,
     required this.onFavorite,
     required this.onRegister,
+    this.isFavoriteLoading = false,
   });
 
   @override
@@ -24,8 +26,17 @@ class EventDetailBottomBar extends StatelessWidget {
         child: Row(
           children: [
             IconButton(
-              icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-              onPressed: onFavorite,
+              icon: isFavoriteLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.redAccent : null,
+                    ),
+              onPressed: isFavoriteLoading ? null : onFavorite,
             ),
             const SizedBox(width: 12),
             Expanded(

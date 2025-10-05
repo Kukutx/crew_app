@@ -67,6 +67,8 @@
   "followed": "Followed",
   "favorites_empty": "No favorites yet~",
   "favorites_title": "Favorites",
+  "added_to_favorites": "Added to favorites",
+  "removed_from_favorites": "Removed from favorites",
   "history_empty": "No history yet~",
   "history_title": "History",
   "industry_label_optional": "Industry (optional)",

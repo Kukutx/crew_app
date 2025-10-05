@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 
 import '../../features/events/data/event.dart';
 import '../../features/user/data/authenticated_user_dto.dart';
+import '../../features/user/data/user_follow_summary.dart';
 import '../error/api_exception.dart';
 import 'auth/auth_service.dart';
 
@@ -79,6 +80,108 @@ class ApiService {
     }
   }
 
+  Future<List<UserFollowSummary>> getFollowers(String uid) async {
+    final path = '/api/users/${Uri.encodeComponent(uid)}/followers';
+    try {
+      final response = await _dio.get(path);
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        final items = _unwrapObjectList(response.data)
+            .map(UserFollowSummary.fromJson)
+            .toList(growable: false);
+        if (items.isNotEmpty || _isKnownEmptyCollection(response.data)) {
+          return items;
+        }
+        throw ApiException('Unexpected followers payload type');
+      }
+      throw ApiException(
+        'Failed to load followers',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<List<UserFollowSummary>> getFollowing(String uid) async {
+    final path = '/api/users/${Uri.encodeComponent(uid)}/following';
+    try {
+      final response = await _dio.get(path);
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        final items = _unwrapObjectList(response.data)
+            .map(UserFollowSummary.fromJson)
+            .toList(growable: false);
+        if (items.isNotEmpty || _isKnownEmptyCollection(response.data)) {
+          return items;
+        }
+        throw ApiException('Unexpected following payload type');
+      }
+      throw ApiException(
+        'Failed to load following',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> followUser(String uid) async {
+    final path = '/api/users/${Uri.encodeComponent(uid)}/followers';
+    try {
+      final headers = await _buildAuthHeaders(required: true);
+      final response = await _dio.post(
+        path,
+        options: Options(headers: headers),
+      );
+      if (!_isSuccessStatus(response.statusCode)) {
+        throw ApiException(
+          'Failed to follow user',
+          statusCode: response.statusCode,
+        );
+      }
+    } on ApiException {
+      rethrow;
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> unfollowUser(String uid) async {
+    final path = '/api/users/${Uri.encodeComponent(uid)}/followers';
+    try {
+      final headers = await _buildAuthHeaders(required: true);
+      final response = await _dio.delete(
+        path,
+        options: Options(headers: headers),
+      );
+      if (!_isSuccessStatus(response.statusCode)) {
+        throw ApiException(
+          'Failed to unfollow user',
+          statusCode: response.statusCode,
+        );
+      }
+    } on ApiException {
+      rethrow;
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
   Future<List<Event>> getEvents() async {
     try {
       final response = await _dio.get('/events');
@@ -95,6 +198,88 @@ class ApiService {
         'Failed to load events',
         statusCode: response.statusCode,
       );
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<List<Event>> getUserFavorites(String uid) async {
+    final path = '/api/users/${Uri.encodeComponent(uid)}/favorites';
+    try {
+      final headers = await _buildAuthHeaders();
+      final response = await _dio.get(
+        path,
+        options: Options(headers: headers.isEmpty ? null : headers),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        final events = _unwrapEventList(response.data)
+            .map(Event.fromJson)
+            .toList(growable: false);
+        if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
+          return events;
+        }
+        throw ApiException('Unexpected favorites payload type');
+      }
+      throw ApiException(
+        'Failed to load favorites',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> addFavoriteEvent(String uid, String eventId) async {
+    final path =
+        '/api/users/${Uri.encodeComponent(uid)}/favorites/${Uri.encodeComponent(eventId)}';
+    try {
+      final headers = await _buildAuthHeaders(required: true);
+      final response = await _dio.post(
+        path,
+        options: Options(headers: headers),
+      );
+      if (!_isSuccessStatus(response.statusCode)) {
+        throw ApiException(
+          'Failed to add favorite',
+          statusCode: response.statusCode,
+        );
+      }
+    } on ApiException {
+      rethrow;
+    } on DioException catch (e) {
+      final message = _extractErrorMessage(e) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> removeFavoriteEvent(String uid, String eventId) async {
+    final path =
+        '/api/users/${Uri.encodeComponent(uid)}/favorites/${Uri.encodeComponent(eventId)}';
+    try {
+      final headers = await _buildAuthHeaders(required: true);
+      final response = await _dio.delete(
+        path,
+        options: Options(headers: headers),
+      );
+      if (!_isSuccessStatus(response.statusCode)) {
+        throw ApiException(
+          'Failed to remove favorite',
+          statusCode: response.statusCode,
+        );
+      }
+    } on ApiException {
+      rethrow;
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
       throw ApiException(
@@ -171,7 +356,7 @@ class ApiService {
     }
   }
 
-  String? _extractErrorMessage(DioException exception) {
+String? _extractErrorMessage(DioException exception) {
     final data = exception.response?.data;
     if (data is Map<String, dynamic>) {
       final message = data['message'];
@@ -185,6 +370,13 @@ class ApiService {
     }
     return exception.message;
   }
+}
+
+bool _isSuccessStatus(int? statusCode) {
+  if (statusCode == null) {
+    return false;
+  }
+  return statusCode >= 200 && statusCode < 300;
 }
 
 bool _isKnownEmptyCollection(dynamic data) {
@@ -206,6 +398,36 @@ bool _isKnownEmptyCollection(dynamic data) {
     }
   }
   return false;
+}
+
+List<Map<String, dynamic>> _unwrapObjectList(dynamic data) {
+  if (data is List) {
+    return data
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: false);
+  }
+  if (data is Map<String, dynamic>) {
+    for (final key in const ['items', 'data', 'results', 'value']) {
+      final value = data[key];
+      if (value is List) {
+        return value
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList(growable: false);
+      }
+      if (value is Map<String, dynamic>) {
+        final nested = _unwrapObjectList(value);
+        if (nested.isNotEmpty || _isKnownEmptyCollection(value)) {
+          return nested;
+        }
+      }
+    }
+  }
+  if (data == null) {
+    return const <Map<String, dynamic>>[];
+  }
+  throw ApiException('Unexpected payload type');
 }
 
 List<Map<String, dynamic>> _unwrapEventList(dynamic data) {

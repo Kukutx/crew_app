@@ -440,6 +440,18 @@ abstract class AppLocalizations {
   /// **'Favorites'**
   String get favorites_title;
 
+  /// No description provided for @added_to_favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to favorites'**
+  String get added_to_favorites;
+
+  /// No description provided for @removed_from_favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favorites'**
+  String get removed_from_favorites;
+
   /// No description provided for @history_empty.
   ///
   /// In en, this message translates to:

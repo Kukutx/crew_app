@@ -184,6 +184,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get favorites_title => '收藏';
 
   @override
+  String get added_to_favorites => '已添加到收藏';
+
+  @override
+  String get removed_from_favorites => '已从收藏移除';
+
+  @override
   String get history_empty => '暂无历史记录~';
 
   @override

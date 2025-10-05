@@ -4,6 +4,7 @@ class EventOrganizer {
   final String? avatarUrl;
   final String? bio;
   final String? username;
+  final bool isFollowed;
 
   const EventOrganizer({
     required this.id,
@@ -11,11 +12,28 @@ class EventOrganizer {
     this.avatarUrl,
     this.bio,
     this.username,
+    this.isFollowed = false,
   });
 
   factory EventOrganizer.fromJson(Map<String, dynamic> json) {
     final profile = _asMap(json['profile']);
     String? parseString(dynamic value) => value?.toString();
+    bool? parseBool(dynamic value) {
+      if (value is bool) return value;
+      if (value is String) {
+        final normalized = value.toLowerCase();
+        if (normalized == 'true' || normalized == '1') {
+          return true;
+        }
+        if (normalized == 'false' || normalized == '0') {
+          return false;
+        }
+      }
+      if (value is num) {
+        return value != 0;
+      }
+      return null;
+    }
     return EventOrganizer(
       id: parseString(
             json['id'] ??
@@ -44,6 +62,13 @@ class EventOrganizer {
       ),
       bio: parseString(json['bio'] ?? profile?['bio']),
       username: parseString(json['userName'] ?? profile?['userName']),
+      isFollowed: parseBool(
+            json['isFollowed'] ??
+                json['followed'] ??
+                json['isFollowing'] ??
+                profile?['isFollowed'],
+          ) ??
+          false,
     );
   }
 
@@ -53,7 +78,17 @@ class EventOrganizer {
         if (avatarUrl != null) 'avatarUrl': avatarUrl,
         if (bio != null) 'bio': bio,
         if (username != null) 'userName': username,
+        'isFollowed': isFollowed,
       };
+
+  EventOrganizer copyWith({bool? isFollowed}) => EventOrganizer(
+        id: id,
+        name: name,
+        avatarUrl: avatarUrl,
+        bio: bio,
+        username: username,
+        isFollowed: isFollowed ?? this.isFollowed,
+      );
 }
 
 class Event {
@@ -102,6 +137,53 @@ class Event {
     this.tags = const <String>[],
     this.organizer,
   });
+
+  Event copyWith({
+    String? id,
+    String? title,
+    String? location,
+    String? description,
+    double? latitude,
+    double? longitude,
+    List<String>? imageUrls,
+    String? coverImageUrl,
+    String? address,
+    DateTime? startTime,
+    DateTime? endTime,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? maxParticipants,
+    int? currentParticipants,
+    bool? isFavorite,
+    bool? isRegistered,
+    bool? isFree,
+    double? price,
+    List<String>? tags,
+    EventOrganizer? organizer,
+  }) =>
+      Event(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        location: location ?? this.location,
+        description: description ?? this.description,
+        latitude: latitude ?? this.latitude,
+        longitude: longitude ?? this.longitude,
+        imageUrls: imageUrls ?? this.imageUrls,
+        coverImageUrl: coverImageUrl ?? this.coverImageUrl,
+        address: address ?? this.address,
+        startTime: startTime ?? this.startTime,
+        endTime: endTime ?? this.endTime,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        maxParticipants: maxParticipants ?? this.maxParticipants,
+        currentParticipants: currentParticipants ?? this.currentParticipants,
+        isFavorite: isFavorite ?? this.isFavorite,
+        isRegistered: isRegistered ?? this.isRegistered,
+        isFree: isFree ?? this.isFree,
+        price: price ?? this.price,
+        tags: tags ?? this.tags,
+        organizer: organizer ?? this.organizer,
+      );
 
   factory Event.fromJson(Map<String, dynamic> json) {
     final locationJson = _asMap(json['location']) ?? _asMap(json['meetingPoint']);

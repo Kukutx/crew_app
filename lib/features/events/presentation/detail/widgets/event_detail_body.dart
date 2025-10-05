@@ -19,6 +19,7 @@ class EventDetailBody extends StatelessWidget {
   final VoidCallback onToggleFollow;
   final bool isFollowing;
   final VoidCallback onTapLocation;
+  final bool followActionInProgress;
 
   const EventDetailBody({
     super.key,
@@ -34,6 +35,7 @@ class EventDetailBody extends StatelessWidget {
     required this.onToggleFollow,
     required this.isFollowing,
     required this.onTapLocation,
+    this.followActionInProgress = false,
   });
 
   @override
@@ -57,6 +59,7 @@ class EventDetailBody extends StatelessWidget {
             onTapProfile: onTapHostProfile,
             onToggleFollow: onToggleFollow,
             isFollowing: isFollowing,
+            isProcessing: followActionInProgress,
           ),
           const SizedBox(height: 10),
           SizedBox(

@@ -109,6 +109,8 @@
   "followed": "已关注",
   "favorites_empty": "暂无收藏~",
   "favorites_title": "收藏",
+  "added_to_favorites": "已添加到收藏",
+  "removed_from_favorites": "已从收藏移除",
   "history_empty": "暂无历史记录~",
   "history_title": "历史记录",
   "industry_label_optional": "行业（选填）",

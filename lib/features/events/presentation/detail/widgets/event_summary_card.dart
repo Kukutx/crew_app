@@ -62,7 +62,6 @@ class EventSummaryCard extends StatelessWidget {
           style: const TextStyle(fontSize: 12, color: Colors.orange),
         ),
       );
-}
 
   List<Widget> _buildTags(AppLocalizations loc) {
     final tags = event.tags;
@@ -75,3 +74,4 @@ class EventSummaryCard extends StatelessWidget {
     }
     return tags.take(6).map(_tagChip).toList(growable: false);
   }
+}

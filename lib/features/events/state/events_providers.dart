@@ -1,4 +1,3 @@
-// lib/features/events/presentation/events_providers.dart
 import 'dart:async';
 
 import 'package:crew_app/core/state/di/providers.dart';
@@ -12,7 +11,7 @@ final eventsProvider =
 
 final mapFocusEventProvider = StateProvider<Event?>((ref) => null);
 
-class EventsCtrl extends AsyncNotifier<List<Event>>{
+class EventsCtrl extends AsyncNotifier<List<Event>> {
   Timer? _pollingTimer;
 
   @override

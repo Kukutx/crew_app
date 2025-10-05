@@ -2,11 +2,11 @@ import 'package:crew_app/features/chat/group_chat/data/group_message.dart';
 import 'package:crew_app/features/chat/group_chat/data/group_participant.dart';
 import 'package:crew_app/features/chat/group_chat/presentation/group_chat_page.dart';
 import 'package:crew_app/features/chat/user_event/data/user_event.dart';
-import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_favorites_grid.dart';
-import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_registered_list.dart';
-import 'package:crew_app/features/chat/user_event/prestantion/widgets/user_events_tab_bar.dart';
-export 'package:crew_app/features/chat/user_event/prestantion/widgets/user_event_list_tile.dart';
-export 'package:crew_app/features/chat/user_event/prestantion/widgets/user_event_tab_chip.dart';
+import 'package:crew_app/features/chat/user_event/presentation/widgets/user_events_favorites_grid.dart';
+import 'package:crew_app/features/chat/user_event/presentation/widgets/user_events_registered_list.dart';
+import 'package:crew_app/features/chat/user_event/presentation/widgets/user_events_tab_bar.dart';
+export 'package:crew_app/features/chat/user_event/presentation/widgets/user_event_list_tile.dart';
+export 'package:crew_app/features/chat/user_event/presentation/widgets/user_event_tab_chip.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 

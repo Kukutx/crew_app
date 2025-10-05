@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+
+import 'package:crew_app/core/config/environment.dart';
 import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/legal/disclaimer_bottom_sheet.dart';
@@ -292,6 +294,50 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
 
     return acknowledged;
+  }
+
+  Future<bool> _ensureNetworkAvailable() async {
+    const offlineMessage = 'No internet connection detected.';
+    final host = Uri.parse(Env.current).host;
+    var lookupHost = host;
+
+    if (lookupHost.isEmpty) {
+      debugPrint(
+        'Env.current host is empty; falling back to example.com for connectivity checks.',
+      );
+      lookupHost = 'example.com';
+    }
+
+    if (lookupHost.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(offlineMessage)),
+        );
+      }
+      return false;
+    }
+
+    try {
+      final result = await InternetAddress.lookup(lookupHost);
+      final hasConnection =
+          result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+
+      if (!hasConnection && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(offlineMessage)),
+        );
+      }
+
+      return hasConnection;
+    } on SocketException catch (error) {
+      debugPrint('Network check failed for $lookupHost: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(offlineMessage)),
+        );
+      }
+      return false;
+    }
   }
 
   /// 搜索框事件

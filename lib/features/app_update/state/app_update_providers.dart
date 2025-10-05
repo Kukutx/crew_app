@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crew_app/core/config/remote_config_keys.dart';
 import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
-import 'package:crew_app/shared/update/app_update_info.dart';
+import 'package:crew_app/features/app_update/domain/models/app_update_info.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 

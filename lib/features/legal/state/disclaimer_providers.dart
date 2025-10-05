@@ -1,9 +1,11 @@
 import 'package:crew_app/core/config/remote_config_providers.dart';
-import 'package:crew_app/shared/legal/data/disclaimer.dart';
-import 'package:crew_app/shared/legal/disclaimer_sources.dart';
+import 'package:crew_app/core/monitoring/monitoring_providers.dart';
+import 'package:crew_app/features/legal/data/repositories/disclaimer_repository.dart';
+import 'package:crew_app/features/legal/data/sources/local_disclaimer_source.dart';
+import 'package:crew_app/features/legal/data/sources/remote_disclaimer_source.dart';
+import 'package:crew_app/features/legal/domain/models/disclaimer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import '../../monitoring/monitoring_providers.dart';
 
 final disclaimerRepoProvider = Provider<DisclaimerRepository>((ref) {
   final remoteConfig = ref.watch(remoteConfigProvider);

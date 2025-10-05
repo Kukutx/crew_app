@@ -1,5 +1,5 @@
+import 'package:crew_app/features/legal/domain/models/disclaimer.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/legal/data/disclaimer.dart';
 import 'package:flutter/material.dart';
 
 Future<bool> showDisclaimerBottomSheet({

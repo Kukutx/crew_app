@@ -55,15 +55,25 @@ void showEventBottomSheet({
                         child: SizedBox(
                           width: 96,
                           height: 96,
-                          child: CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => const Center(
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2)),
-                            errorWidget: (_, __, ___) =>
-                                const Center(child: Icon(Icons.error)),
-                          ),
+                          child: imageUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => const Center(
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2)),
+                                  errorWidget: (_, __, ___) =>
+                                      const Center(child: Icon(Icons.error)),
+                                )
+                              : const ColoredBox(
+                                  color: Colors.black12,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.black38,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -91,12 +101,15 @@ void showEventBottomSheet({
                                             onShowOnMap?.call(result);
                                           }
                                         },
-                                    child: Text(event.title,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700)),
+                                        child: Text(
+                                          event.title,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     IconButton(

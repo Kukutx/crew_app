@@ -220,34 +220,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         );
   }
 
-  Future<bool> _ensureNetworkAvailable() async {
-    bool hasConnection = false;
-
-    try {
-      final result = await InternetAddress.lookup('example.com')
-          .timeout(const Duration(seconds: 3));
-      hasConnection = result.isNotEmpty && result.first.rawAddress.isNotEmpty;
-    } on SocketException {
-      hasConnection = false;
-    } on TimeoutException {
-      hasConnection = false;
-    } catch (_) {
-      hasConnection = false;
-    }
-
-    if (!mounted) {
-      return hasConnection;
-    }
-
-    if (!hasConnection) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('网络未连接')));
-      return false;
-    }
-
-    return true;
-  }
-
   void _showEventCard(Event ev) {
     if (!mounted) {
       return;

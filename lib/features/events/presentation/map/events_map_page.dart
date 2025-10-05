@@ -167,7 +167,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             // OSM图层已内置在 MapCanvas 里，这里只放标记层
             events.when(
               loading: () => const MarkersLayer(markers: []),
-              error: (_, __) => const MarkersLayer(markers: []),
+              error: (_, _) => const MarkersLayer(markers: []),
               data: (list) => MarkersLayer.fromEvents(
                 events: list,
                 userLoc: userLoc,

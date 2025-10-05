@@ -206,7 +206,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       itemCount: results.length,
-      separatorBuilder: (_, __) => const Divider(height: 1, thickness: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1, thickness: 1),
       itemBuilder: (context, index) {
         final event = results[index];
         return ListTile(

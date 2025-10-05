@@ -47,7 +47,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: NestedScrollView(
-          headerSliverBuilder: (_, __) => [
+          headerSliverBuilder: (_, _) => [
             SliverAppBar(
               pinned: true,
               stretch: true,
@@ -308,7 +308,7 @@ class _ActivitiesList extends ConsumerWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (_, i) {
         final e = items[i];
         return _ActivityTile(e: e);

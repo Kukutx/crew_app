@@ -66,7 +66,7 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
           },
           loading: () =>
               const _CenteredScrollable(child: CircularProgressIndicator()),
-          error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+          error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
         ),
       ),
     );
@@ -157,7 +157,7 @@ class EventGridItem extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       ),
-                      errorWidget: (c, _, __) =>
+                      errorWidget: (c, _, _) =>
                           const EventImagePlaceholder(aspectRatio: 1),
                     )
                   : const EventImagePlaceholder(aspectRatio: 1),

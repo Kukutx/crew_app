@@ -25,7 +25,7 @@ class HistoryPage extends ConsumerWidget {
           ? Center(child: Text(loc.history_empty))
           : ListView.separated(
               itemCount: history.length,
-              separatorBuilder: (_, __) => const Divider(),
+              separatorBuilder: (_, _) => const Divider(),
               itemBuilder: (context, index) {
                 final item = history[index];
                 return ListTile(

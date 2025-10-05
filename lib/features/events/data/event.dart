@@ -7,6 +7,7 @@ class Event {
   final double longitude;
   final List<String> imageUrls;
   final String coverImageUrl;
+  final DateTime? startTime;
 
   Event({
     required this.id,
@@ -17,9 +18,17 @@ class Event {
     required this.longitude,
     required this.imageUrls,
     required this.coverImageUrl,
+    this.startTime,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
+    DateTime? startTime;
+    final rawStart = json['startTime'] ?? json['start_time'] ?? json['scheduledAt'];
+    if (rawStart is String && rawStart.isNotEmpty) {
+      startTime = DateTime.tryParse(rawStart);
+    } else if (rawStart is int) {
+      startTime = DateTime.fromMillisecondsSinceEpoch(rawStart);
+    }
     return Event(
       id: json['id'] as int,
       title: json['title'] as String,
@@ -31,6 +40,7 @@ class Event {
           .map((e) => e.toString())
           .toList(),
       coverImageUrl: json['coverImageUrl'] as String? ?? '',
+      startTime: startTime,
     );
   }
 

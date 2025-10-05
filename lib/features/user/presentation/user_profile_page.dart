@@ -5,8 +5,12 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/di/providers.dart';
+import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/data/activity_item.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key});
@@ -20,12 +24,11 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
   static const double _tabBarHeight = 48;
 
   late final TabController _tabCtrl;
-  final _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
 
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: _tabs.length, vsync: this);
+    _tabCtrl = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -34,14 +37,26 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
     super.dispose();
   }
 
-  Future<void> _onRefresh() async =>
-      Future<void>.delayed(const Duration(milliseconds: 800));
+  Future<void> _onRefresh() async {
+    await Future.wait([
+      ref.refresh(_profileProvider.future),
+      ref.refresh(_activitiesProvider.future),
+      ref.refresh(_favoritesProvider.future),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final profile = ref.watch(_profileProvider);
+    final profileAsync = ref.watch(_profileProvider);
     final theme = Theme.of(context);
     final topPad = MediaQuery.paddingOf(context).top;
+    final loc = AppLocalizations.of(context)!;
+    final tabs = [
+      Tab(text: loc.my_events),
+      Tab(text: loc.events_tab_favorites),
+    ];
+    final profile = profileAsync.valueOrNull;
+    final coverUrl = profile?.cover;
 
     return Scaffold(
       body: RefreshIndicator(
@@ -68,8 +83,15 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                     fit: StackFit.expand,
                     children: [
                       // 封面
-                      CachedNetworkImage(
-                          imageUrl: profile.cover, fit: BoxFit.cover),
+                      if (coverUrl != null && coverUrl.isNotEmpty)
+                        CachedNetworkImage(
+                          imageUrl: coverUrl,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) =>
+                              const _DefaultCoverPlaceholder(),
+                        )
+                      else
+                        const _DefaultCoverPlaceholder(),
                       // 渐变压暗
                       const DecoratedBox(
                         decoration: BoxDecoration(
@@ -90,12 +112,12 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                             opacity: Curves.easeOut.transform(t),
                             child: Transform.scale(
                               scale: lerpDouble(0.92, 1, t)!,
-                              child: _HeaderCard(userProfile: profile),
+                              child: _HeaderCard(profile: profileAsync),
                             ),
                           ),
                         ),
                       // 折叠后的头像
-                      if (collapseProgress > 0)
+                      if (collapseProgress > 0 && profile != null)
                         Positioned(
                           top: topPad + (kToolbarHeight - 48) / 2,
                           left: 0,
@@ -126,7 +148,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                   color: theme.scaffoldBackgroundColor,
                   child: TabBar(
                     controller: _tabCtrl,
-                    tabs: _tabs,
+                    tabs: tabs,
                     indicatorSize: TabBarIndicatorSize.tab,
                   ),
                 ),
@@ -144,63 +166,92 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
 }
 
 /// ====== 头部卡片（头像、签名、统计、按钮） ======
-class _HeaderCard extends ConsumerWidget {
-  const _HeaderCard({required this.userProfile});
-  final User userProfile;
+class _HeaderCard extends StatelessWidget {
+  const _HeaderCard({required this.profile});
+
+  final AsyncValue<User> profile;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = Theme.of(context).textTheme;
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Material(
-          // 用 Material 带阴影/表面色
           elevation: 6,
           color: Colors.white.withValues(alpha: 0.12),
           surfaceTintColor: Colors.white,
-          child: Container(
+          child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(48),
-                  child: CachedNetworkImage(
-                      imageUrl: userProfile.avatar,
-                      width: 64,
-                      height: 64,
-                      fit: BoxFit.cover),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DefaultTextStyle(
-                    style: t.bodyMedium!.copyWith(color: Colors.white),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(userProfile.name,
-                            style: t.titleMedium!.copyWith(
+            child: profile.when(
+              data: (userProfile) {
+                final bio = userProfile.bio?.trim();
+                return Row(
+                  children: [
+                    _ProfileAvatar(avatarUrl: userProfile.avatar),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DefaultTextStyle(
+                        style:
+                            textTheme.bodyMedium!.copyWith(color: Colors.white),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userProfile.name,
+                              style: textTheme.titleMedium!.copyWith(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 4),
-                        Text(userProfile.bio,
-                            maxLines: 2, overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 8),
-                        Row(children: [
-                          _Stat('粉丝', userProfile.followers),
-                          _Dot(),
-                          _Stat('关注', userProfile.following),
-                          _Dot(),
-                          _Stat('获赞', userProfile.likes),
-                        ]),
-                      ],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              (bio != null && bio.isNotEmpty) ? bio : '--',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                _Stat('粉丝', userProfile.followers),
+                                _Dot(),
+                                _Stat('关注', userProfile.following),
+                                _Dot(),
+                                _Stat('获赞', userProfile.likes),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const _FollowButton(),
+                  ],
+                );
+              },
+              loading: () => const SizedBox(
+                height: 72,
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+              error: (error, stack) {
+                final message =
+                    error is ApiException ? error.message : loc.load_failed;
+                return SizedBox(
+                  height: 72,
+                  child: Center(
+                    child: Text(
+                      message,
+                      style: textTheme.bodyMedium!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                _FollowButton(),
-              ],
+                );
+              },
             ),
           ),
         ),
@@ -244,26 +295,83 @@ class _Stat extends StatelessWidget {
   }
 }
 
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({required this.avatarUrl});
+
+  final String? avatarUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    if (avatarUrl != null && avatarUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(48),
+        child: CachedNetworkImage(
+          imageUrl: avatarUrl!,
+          width: 64,
+          height: 64,
+          fit: BoxFit.cover,
+          errorWidget: (_, __, ___) => const _AvatarPlaceholder(size: 64),
+        ),
+      );
+    }
+    return const _AvatarPlaceholder(size: 64);
+  }
+}
+
+class _AvatarPlaceholder extends StatelessWidget {
+  const _AvatarPlaceholder({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(size),
+      ),
+      child: const Icon(Icons.person, color: Colors.white70, size: 32),
+    );
+  }
+}
+
 class _FollowButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(_profileProvider);
-    final followed = profile.followed;
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: followed ? Colors.white10 : Colors.white,
-        foregroundColor: followed ? Colors.white : Colors.black,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      onPressed: () {
-        final current = ref.read(_profileProvider);
-        ref.read(_profileProvider.notifier).state = current.copyWith(
-          followed: !current.followed,
-          followers:
-              current.followed ? current.followers - 1 : current.followers + 1,
+    final loc = AppLocalizations.of(context)!;
+    return profile.when(
+      data: (value) {
+        final followed = value.followed;
+        return ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: followed ? Colors.white10 : Colors.white,
+            foregroundColor: followed ? Colors.white : Colors.black,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(loc.feature_not_ready)),
+            );
+          },
+          child: Text(followed ? '已关注' : '关注'),
         );
       },
-      child: Text(followed ? '已关注' : '关注'),
+      loading: () => const SizedBox(
+        height: 40,
+        width: 96,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      error: (error, stack) => SizedBox(
+        height: 40,
+        child: OutlinedButton(
+          onPressed: () => ref.invalidate(_profileProvider),
+          child: Text(loc.load_failed),
+        ),
+      ),
     );
   }
 }
@@ -291,7 +399,12 @@ class _CollapsedAvatar extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         child: CircleAvatar(
           radius: 20,
-          backgroundImage: CachedNetworkImageProvider(user.avatar),
+          backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
+              ? CachedNetworkImageProvider(user.avatar!)
+              : null,
+          child: (user.avatar == null || user.avatar!.isEmpty)
+              ? const Icon(Icons.person, color: Colors.black54)
+              : null,
         ),
       ),
     );
@@ -304,25 +417,76 @@ class _ActivitiesList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(_activitiesProvider);
-    return ListView.separated(
-      padding: const EdgeInsets.all(12),
-      itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (_, i) {
-        final e = items[i];
-        return _ActivityTile(e: e);
+    final activities = ref.watch(_activitiesProvider);
+    final loc = AppLocalizations.of(context)!;
+    return activities.when(
+      data: (items) {
+        if (items.isEmpty) {
+          return _buildPlaceholderScroll(
+            context: context,
+            child: Text(loc.history_empty),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.all(12),
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
+          itemCount: items.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          itemBuilder: (_, i) {
+            final e = items[i];
+            return _ActivityTile(item: e);
+          },
+        );
+      },
+      loading: () => _buildPlaceholderScroll(
+        context: context,
+        child: const CircularProgressIndicator(),
+      ),
+      error: (error, stack) {
+        final message =
+            error is ApiException ? error.message : loc.load_failed;
+        return _buildPlaceholderScroll(
+          context: context,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                message,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              IconButton(
+                onPressed: () => ref.invalidate(_activitiesProvider),
+                icon: const Icon(Icons.refresh),
+                tooltip: loc.load_failed,
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 }
 
 class _ActivityTile extends StatelessWidget {
-  const _ActivityTile({required this.e});
-  final ActivityItem e;
+  const _ActivityTile({required this.item});
+  final ActivityItem item;
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = item.imageUrl;
+    final metaParts = <String>[];
+    final location = item.location?.trim();
+    if (location != null && location.isNotEmpty) {
+      metaParts.add(location);
+    }
+    final time = item.time;
+    if (time != null) {
+      metaParts.add(_fmtDate(time));
+    }
+    final metaText = metaParts.isEmpty ? '--' : metaParts.join(' · ');
+
     return InkWell(
       onTap: () {/* TODO: 跳到活动详情 */},
       child: Container(
@@ -342,11 +506,18 @@ class _ActivityTile extends StatelessWidget {
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(14),
                   bottomLeft: Radius.circular(14)),
-              child: CachedNetworkImage(
-                  imageUrl: e.imageUrl,
-                  width: 120,
-                  height: 90,
-                  fit: BoxFit.cover),
+              child: SizedBox(
+                width: 120,
+                height: 90,
+                child: imageUrl != null && imageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: (_, __, ___) =>
+                            const _ActivityImagePlaceholder(),
+                      )
+                    : const _ActivityImagePlaceholder(),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -355,13 +526,15 @@ class _ActivityTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(e.title,
+                    Text(item.title,
                         style: Theme.of(context).textTheme.titleMedium,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 6),
-                    Text('${e.location} · ${_fmtDate(e.time)}',
-                        style: Theme.of(context).textTheme.bodySmall),
+                    Text(
+                      metaText,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                 ),
               ),
@@ -383,53 +556,214 @@ class _FavoritesGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final images = ref.watch(_favoritesProvider);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        itemCount: images.length,
-        itemBuilder: (_, i) => ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: AspectRatio(
-            aspectRatio: i.isOdd ? 3 / 4 : 1,
-            child: CachedNetworkImage(imageUrl: images[i], fit: BoxFit.cover),
+    final favorites = ref.watch(_favoritesProvider);
+    final loc = AppLocalizations.of(context)!;
+    return favorites.when(
+      data: (events) {
+        if (events.isEmpty) {
+          return _buildPlaceholderScroll(
+            context: context,
+            child: Text(loc.favorites_empty),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: MasonryGridView.count(
+            physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics()),
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            itemCount: events.length,
+            itemBuilder: (_, i) {
+              final event = events[i];
+              final imageUrl = event.firstAvailableImageUrl;
+              final aspectRatio = i.isOdd ? 3 / 4 : 1.0;
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: AspectRatio(
+                  aspectRatio: aspectRatio,
+                  child: imageUrl != null && imageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) =>
+                              const _FavoriteImagePlaceholder(),
+                        )
+                      : const _FavoriteImagePlaceholder(),
+                ),
+              );
+            },
           ),
+        );
+      },
+      loading: () => _buildPlaceholderScroll(
+        context: context,
+        child: const CircularProgressIndicator(),
+      ),
+      error: (error, stack) {
+        final message =
+            error is ApiException ? error.message : loc.load_failed;
+        return _buildPlaceholderScroll(
+          context: context,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                message,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              IconButton(
+                onPressed: () => ref.invalidate(_favoritesProvider),
+                icon: const Icon(Icons.refresh),
+                tooltip: loc.load_failed,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ActivityImagePlaceholder extends StatelessWidget {
+  const _ActivityImagePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      color: colorScheme.surfaceVariant,
+      child: Icon(
+        Icons.event,
+        color: colorScheme.onSurface.withValues(alpha: 0.6),
+      ),
+    );
+  }
+}
+
+class _FavoriteImagePlaceholder extends StatelessWidget {
+  const _FavoriteImagePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      color: colorScheme.surfaceVariant,
+      child: Icon(
+        Icons.photo,
+        color: colorScheme.onSurface.withValues(alpha: 0.6),
+      ),
+    );
+  }
+}
+
+class _DefaultCoverPlaceholder extends StatelessWidget {
+  const _DefaultCoverPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.primary.withValues(alpha: 0.45),
+            colorScheme.primaryContainer.withValues(alpha: 0.35),
+          ],
         ),
       ),
     );
   }
 }
 
-/// ====== 假数据 Provider ======
-final _profileProvider = StateProvider<User>((ref) {
-  return User(
-    uid: 'u_001',
-    name: 'Luna',
-    bio: '爱户外、爱分享 | Crew 资深爱好者',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
-    cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
-    followers: 1280,
-    following: 96,
-    likes: 345,
-    followed: false,
-  );
-});
-
-final _activitiesProvider = Provider<List<ActivityItem>>((ref) => List.generate(
-      8,
-      (i) => ActivityItem(
-        id: 'act_$i',
-        title: '城市慢跑 #$i',
-        imageUrl: 'https://picsum.photos/seed/act$i/300/200',
-        time: DateTime.now().subtract(Duration(days: i * 2)),
-        location: 'Milan, IT',
+Widget _buildPlaceholderScroll({
+  required BuildContext context,
+  required Widget child,
+}) {
+  final size = MediaQuery.of(context).size;
+  return ListView(
+    physics: const AlwaysScrollableScrollPhysics(
+      parent: BouncingScrollPhysics(),
+    ),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+    children: [
+      SizedBox(
+        height: size.height * 0.25,
+        child: Center(child: child),
       ),
-    ));
+    ],
+  );
+}
 
-final _favoritesProvider = Provider<List<String>>((ref) => List.generate(
-      12,
-      (i) => 'https://picsum.photos/seed/fav$i/400/600',
-    ));
+final _profileProvider =
+    AsyncNotifierProvider<_ProfileNotifier, User>(_ProfileNotifier.new);
+
+final _activitiesProvider = AsyncNotifierProvider<_ActivitiesNotifier,
+    List<ActivityItem>>(_ActivitiesNotifier.new);
+
+final _favoritesProvider = AsyncNotifierProvider<_FavoritesNotifier,
+    List<Event>>(_FavoritesNotifier.new);
+
+class _ProfileNotifier extends AsyncNotifier<User> {
+  @override
+  Future<User> build() => _fetch();
+
+  Future<User> _fetch() async {
+    final api = ref.read(apiServiceProvider);
+    final dto = await api.getAuthenticatedUserDetail();
+    final displayName = _normalizeText(dto.displayName);
+    final name = displayName ?? _nameFromEmail(dto.email);
+    return User(
+      uid: dto.id,
+      name: name,
+      bio: _normalizeText(dto.bio),
+      avatar: _normalizeUrl(dto.photoUrl),
+      cover: _normalizeUrl(dto.coverUrl),
+      followers: dto.followers ?? 0,
+      following: dto.following ?? 0,
+      likes: dto.likes ?? 0,
+      followed: dto.isFollowed ?? false,
+    );
+  }
+}
+
+class _ActivitiesNotifier extends AsyncNotifier<List<ActivityItem>> {
+  @override
+  Future<List<ActivityItem>> build() async {
+    final api = ref.read(apiServiceProvider);
+    return api.getUserEvents();
+  }
+}
+
+class _FavoritesNotifier extends AsyncNotifier<List<Event>> {
+  @override
+  Future<List<Event>> build() async {
+    final api = ref.read(apiServiceProvider);
+    return api.getUserFavoriteEvents();
+  }
+}
+
+String _nameFromEmail(String email) {
+  final trimmed = email.trim();
+  final atIndex = trimmed.indexOf('@');
+  if (atIndex > 0) {
+    return trimmed.substring(0, atIndex);
+  }
+  return trimmed;
+}
+
+String? _normalizeText(String? value) {
+  if (value == null) return null;
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? null : trimmed;
+}
+
+String? _normalizeUrl(String? value) {
+  if (value == null) return null;
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? null : trimmed;
+}

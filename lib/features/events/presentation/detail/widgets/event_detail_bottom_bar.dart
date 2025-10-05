@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 
 class EventDetailBottomBar extends StatelessWidget {
   final AppLocalizations loc;
+  final bool isFavorite;
   final VoidCallback onFavorite;
   final VoidCallback onRegister;
 
   const EventDetailBottomBar({
     super.key,
     required this.loc,
+    required this.isFavorite,
     required this.onFavorite,
     required this.onRegister,
   });
@@ -22,7 +24,7 @@ class EventDetailBottomBar extends StatelessWidget {
         child: Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.favorite_border),
+              icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: onFavorite,
             ),
             const SizedBox(width: 12),

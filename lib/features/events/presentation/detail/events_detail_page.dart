@@ -26,11 +26,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
 
-  final _host = (
-    name: 'Luca B.',
-    bio: 'Milan · 徒步/咖啡/摄影',
+  static const _fallbackHost = (
+    name: 'Crew Host',
+    bio: 'Crew · 活动主理人',
     avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe',
-    userId: 'user_123',
   );
 
   bool _following = false;
@@ -160,6 +159,16 @@ class _EventDetailPageState extends State<EventDetailPage> {
   Widget build(BuildContext context) {
     final event = widget.event;
     final loc = AppLocalizations.of(context)!;
+    final organizer = event.organizer;
+    final hostName = (organizer?.name?.isNotEmpty ?? false)
+        ? organizer!.name
+        : _fallbackHost.name;
+    final hostBio = (organizer?.bio?.isNotEmpty ?? false)
+        ? organizer!.bio!
+        : _fallbackHost.bio;
+    final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
+        ? organizer!.avatarUrl!
+        : _fallbackHost.avatar;
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7E9),
       extendBodyBehindAppBar: true,
@@ -171,6 +180,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
       ),
       bottomNavigationBar: EventDetailBottomBar(
         loc: loc,
+        isFavorite: event.isFavorite,
         onFavorite: () => _onFavoriteNotReady(loc),
         onRegister: () {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -184,13 +194,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
         pageController: _pageCtrl,
         currentPage: _page,
         onPageChanged: (index) => setState(() => _page = index),
-        hostName: _host.name,
-        hostBio: _host.bio,
-        hostAvatarUrl: _host.avatar,
+        hostName: hostName,
+        hostBio: hostBio,
+        hostAvatarUrl: hostAvatar,
         onTapHostProfile: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => UserProfilePage(/*userId: _host.userId*/)),
+            MaterialPageRoute(builder: (_) => UserProfilePage()),
           );
         },
         onToggleFollow: () async {

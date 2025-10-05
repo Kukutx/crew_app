@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 class EventHostCard extends StatelessWidget {
   final AppLocalizations loc;
   final String name;
-  final String bio;
-  final String avatarUrl;
+  final String? bio;
+  final String? avatarUrl;
   final VoidCallback onTapProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
@@ -15,8 +15,8 @@ class EventHostCard extends StatelessWidget {
     super.key,
     required this.loc,
     required this.name,
-    required this.bio,
-    required this.avatarUrl,
+    this.bio,
+    this.avatarUrl,
     required this.onTapProfile,
     required this.onToggleFollow,
     required this.isFollowing,
@@ -24,6 +24,10 @@ class EventHostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final description = (bio != null && bio!.isNotEmpty)
+        ? bio!
+        : loc.share_card_subtitle;
+    final avatar = avatarUrl;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -37,8 +41,13 @@ class EventHostCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundImage: CachedNetworkImageProvider(avatarUrl),
+                backgroundImage: (avatar != null && avatar.isNotEmpty)
+                    ? CachedNetworkImageProvider(avatar)
+                    : null,
                 backgroundColor: Colors.orange.shade50,
+                child: (avatar == null || avatar.isEmpty)
+                    ? Icon(Icons.person, color: Colors.orange.shade400)
+                    : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -54,7 +63,7 @@ class EventHostCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      bio,
+                      description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontSize: 13, color: Colors.black54),

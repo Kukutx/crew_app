@@ -83,9 +83,13 @@ class ApiService {
     try {
       final response = await _dio.get('/events');
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Event.fromJson(e))
-            .toList();
+        final events = _unwrapEventList(response.data)
+            .map(Event.fromJson)
+            .toList(growable: false);
+        if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
+          return events;
+        }
+        throw ApiException('Unexpected events payload type');
       }
       throw ApiException(
         'Failed to load events',
@@ -108,7 +112,7 @@ class ApiService {
     double lng,
   ) async {
     try {
-      final headers = await _buildAuthHeaders();
+      final headers = await _buildAuthHeaders(required: true);
       final response = await _dio.post(
         '/events',
         data: {
@@ -118,10 +122,10 @@ class ApiService {
           'latitude': lat,
           'longitude': lng,
         },
-        options: headers.isEmpty ? null : Options(headers: headers),
+        options: Options(headers: headers),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return Event.fromJson(response.data);
+        return Event.fromJson(_unwrapEventObject(response.data));
       }
       throw ApiException(
         'Failed to create event',
@@ -146,8 +150,13 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final List data = response.data;
-        return data.map((e) => Event.fromJson(e)).toList();
+        final events = _unwrapEventList(response.data)
+            .map(Event.fromJson)
+            .toList(growable: false);
+        if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
+          return events;
+        }
+        throw ApiException('Unexpected events payload type');
       }
       throw ApiException(
         'Failed to load events',
@@ -176,4 +185,70 @@ class ApiService {
     }
     return exception.message;
   }
+}
+
+bool _isKnownEmptyCollection(dynamic data) {
+  if (data is List && data.isEmpty) {
+    return true;
+  }
+  if (data is Map<String, dynamic>) {
+    for (final key in const ['items', 'data', 'events', 'results', 'value']) {
+      final value = data[key];
+      if (value == null) {
+        continue;
+      }
+      if (value is List && value.isEmpty) {
+        return true;
+      }
+      if (value is Map<String, dynamic> && _isKnownEmptyCollection(value)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+List<Map<String, dynamic>> _unwrapEventList(dynamic data) {
+  final rawList = _extractEventList(data);
+  return rawList
+      .whereType<Map>()
+      .map((item) => Map<String, dynamic>.from(item as Map))
+      .toList(growable: false);
+}
+
+Map<String, dynamic> _unwrapEventObject(dynamic data) {
+  if (data is Map<String, dynamic>) {
+    for (final key in const ['data', 'event', 'result', 'value']) {
+      final value = data[key];
+      if (value is Map<String, dynamic>) {
+        return value;
+      }
+    }
+    return data;
+  }
+  throw ApiException('Unexpected event payload type');
+}
+
+List<dynamic> _extractEventList(dynamic data) {
+  if (data is List<dynamic>) {
+    return data;
+  }
+  if (data is Map<String, dynamic>) {
+    for (final key in const ['items', 'data', 'events', 'results', 'value']) {
+      final value = data[key];
+      if (value is List<dynamic>) {
+        return value;
+      }
+      if (value is Map<String, dynamic>) {
+        final nested = _extractEventList(value);
+        if (nested.isNotEmpty || _isKnownEmptyCollection(value)) {
+          return nested;
+        }
+      }
+    }
+  }
+  if (data == null) {
+    return const <dynamic>[];
+  }
+  throw ApiException('Unexpected events payload type');
 }

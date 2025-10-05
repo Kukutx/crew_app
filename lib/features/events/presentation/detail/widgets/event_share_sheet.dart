@@ -4,6 +4,7 @@ import 'package:crew_app/features/events/presentation/widgets/event_image_placeh
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class EventShareSheet extends StatelessWidget {
@@ -95,6 +96,12 @@ class SharePreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final timeLabel = event.startTime != null
+        ? DateFormat('MM.dd HH:mm').format(event.startTime!.toLocal())
+        : loc.to_be_announced;
+    final participantsLabel =
+        event.participantSummary ?? loc.to_be_announced;
+    final organizerName = event.organizer?.name;
     return RepaintBoundary(
       key: previewKey,
       child: Container(
@@ -153,14 +160,14 @@ class SharePreviewCard extends StatelessWidget {
                           backgroundColor: Colors.orange,
                         ),
                         _StatusChip(
-                          label: loc.to_be_announced,
+                          label: timeLabel,
                           textColor: Colors.grey.shade800,
                           backgroundColor: Colors.orange.shade50,
                           icon: Icons.calendar_today,
                           iconColor: Colors.orange.shade300,
                         ),
                         _StatusChip(
-                          label: loc.to_be_announced,
+                          label: participantsLabel,
                           textColor: Colors.grey.shade800,
                           backgroundColor: Colors.orange.shade50,
                           icon: Icons.people,
@@ -195,7 +202,9 @@ class SharePreviewCard extends StatelessWidget {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                event.location,
+                                event.address?.isNotEmpty == true
+                                    ? event.address!
+                                    : event.location,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),
@@ -205,6 +214,18 @@ class SharePreviewCard extends StatelessWidget {
                             ),
                           ],
                         ),
+                        if (organizerName != null && organizerName.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              organizerName,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                       ],
                     ),
                   ),

@@ -4,6 +4,7 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/events_detail_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// 地图报名页 事件
 void showEventBottomSheet({
@@ -11,12 +12,13 @@ void showEventBottomSheet({
   required Event event,
   ValueChanged<Event>? onShowOnMap,
 }) {
-  // Tips： 判断imageUrls是否有值，否则用coverImageUrl
-  // (这是当前后端的问题，因为目前后端只有在创建的时候才会自动赋值coverImageUrl，而用SeedDataService预先插入的数据没用自动首页逻辑)，日后待看获取直接用event.coverImageUrl
-  final imageUrl = (event.imageUrls.isNotEmpty)
-      ? event.imageUrls.first
-      : event.coverImageUrl;
+  final imageUrl = event.firstAvailableImageUrl;
   final loc = AppLocalizations.of(context)!;
+  final participantSummary = event.participantSummary ?? loc.to_be_announced;
+  final startTime = event.startTime;
+  final timeLabel = startTime != null
+      ? DateFormat('MM.dd HH:mm').format(startTime.toLocal())
+      : loc.to_be_announced;
 
   showModalBottomSheet(
     context: context,
@@ -89,7 +91,7 @@ void showEventBottomSheet({
                                             onShowOnMap?.call(result);
                                           }
                                         },
-                                        child: Text(event.title,
+                                    child: Text(event.title,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
@@ -99,7 +101,9 @@ void showEventBottomSheet({
                                     ),
                                     IconButton(
                                       visualDensity: VisualDensity.compact,
-                                      icon: const Icon(Icons.favorite_border),
+                                      icon: Icon(event.isFavorite
+                                          ? Icons.favorite
+                                          : Icons.favorite_border),
                                       onPressed: () {
                                         // TODO: 收藏
                                         ScaffoldMessenger.of(context)
@@ -131,16 +135,17 @@ void showEventBottomSheet({
                                 const Icon(Icons.groups,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 2),
-                                const Text(/*ev.peopleText ?? */ '3-5人',
-                                    style: TextStyle(color: Colors.black54)),
+                                Text(participantSummary,
+                                    style: const TextStyle(color: Colors.black54)),
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
                                 const Icon(Icons.event,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 4),
-                                const Text(/*ev.timeText ??*/ '12.28 8:00',
-                                    style: TextStyle(color: Colors.black87)),
+                                Text(timeLabel,
+                                    style:
+                                        const TextStyle(color: Colors.black87)),
                                 const Spacer(),
                                 SizedBox(
                                   height: 36,

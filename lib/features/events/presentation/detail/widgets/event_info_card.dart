@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EventInfoCard extends StatelessWidget {
   final Event event;
@@ -16,6 +17,8 @@ class EventInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final timeText = _formatTime();
+    final participantText = event.participantSummary ?? loc.to_be_announced;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
@@ -33,14 +36,14 @@ class EventInfoCard extends StatelessWidget {
             ),
             const Divider(height: 20),
             const SizedBox(height: 12),
-            _detailRow(Icons.calendar_today, loc.event_time_title, loc.to_be_announced),
-            _detailRow(Icons.people, loc.event_participants_title, loc.to_be_announced),
+            _detailRow(Icons.calendar_today, loc.event_time_title, timeText),
+            _detailRow(Icons.people, loc.event_participants_title, participantText),
             InkWell(
               onTap: onTapLocation,
               child: _detailRow(
                 Icons.place,
                 loc.event_meeting_point_title,
-                event.location,
+                event.address?.isNotEmpty == true ? event.address! : event.location,
               ),
             ),
           ],
@@ -68,4 +71,18 @@ class EventInfoCard extends StatelessWidget {
           ],
         ),
       );
+
+  String _formatTime() {
+    final start = event.startTime;
+    final end = event.endTime;
+    if (start == null) {
+      return loc.to_be_announced;
+    }
+    final startFmt = DateFormat('MM.dd HH:mm').format(start.toLocal());
+    if (end == null) {
+      return startFmt;
+    }
+    final endFmt = DateFormat('HH:mm').format(end.toLocal());
+    return '$startFmt - $endFmt';
+  }
 }

@@ -36,12 +36,8 @@ class EventSummaryCard extends StatelessWidget {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                _tagChip(loc.tag_city_explore),
-                _tagChip(loc.tag_easy_social),
-                _tagChip(loc.tag_walk_friendly),
-              ],
+              runSpacing: 8,
+              children: _buildTags(loc),
             ),
             const SizedBox(height: 16),
             Text(
@@ -67,3 +63,15 @@ class EventSummaryCard extends StatelessWidget {
         ),
       );
 }
+
+  List<Widget> _buildTags(AppLocalizations loc) {
+    final tags = event.tags;
+    if (tags.isEmpty) {
+      return [
+        _tagChip(loc.tag_city_explore),
+        _tagChip(loc.tag_easy_social),
+        _tagChip(loc.tag_walk_friendly),
+      ];
+    }
+    return tags.take(6).map(_tagChip).toList(growable: false);
+  }

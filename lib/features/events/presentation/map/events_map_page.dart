@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:crew_app/core/state/legal/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/legal/disclaimer_bottom_sheet.dart';
@@ -199,6 +199,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _onMapLongPress(TapPosition _, LatLng latlng) async {
+    if (!await _ensureNetworkAvailable()) {
+      return;
+    }
+
     if (!await _ensureDisclaimerAccepted()) {
       return;
     }
@@ -212,6 +216,34 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           pos: latlng,
           locationName: data.locationName,
         );
+  }
+
+  Future<bool> _ensureNetworkAvailable() async {
+    bool hasConnection = false;
+
+    try {
+      final result = await InternetAddress.lookup('example.com')
+          .timeout(const Duration(seconds: 3));
+      hasConnection = result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+    } on SocketException {
+      hasConnection = false;
+    } on TimeoutException {
+      hasConnection = false;
+    } catch (_) {
+      hasConnection = false;
+    }
+
+    if (!mounted) {
+      return hasConnection;
+    }
+
+    if (!hasConnection) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('网络未连接')));
+      return false;
+    }
+
+    return true;
   }
 
   void _showEventCard(Event ev) {
@@ -248,15 +280,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return false;
     }
-    if (!state.needsReconsent) {
+    if (!state.needsReconsent || state.toShow == null) {
       return true;
     }
 
     final accept = ref.read(acceptDisclaimerProvider);
     final acknowledged = await showDisclaimerBottomSheet(
       context: context,
-      d: state.toShow,
-      onAccept: () => accept(state.toShow.version),
+      d: state.toShow!,
+      onAccept: () => accept(state.toShow!.version),
     );
 
     return acknowledged;

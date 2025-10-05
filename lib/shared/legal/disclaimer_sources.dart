@@ -1,28 +1,19 @@
-// 数据源与仓库（本地兜底 + 线上拉取）
-/* App 内置 assets/disclaimer_v1.json 作为兜底展示；
-  启动时并行：读本地缓存（上次已同意的版本）+ 拉线上配置（Firebase Remote Config 或你自己的 API）；
+// 数据源与仓库（缓存 + 线上拉取）
+/* 启动时并行：读本地缓存（上次已同意的版本）+ 拉线上配置（Firebase Remote Config 或你自己的 API）；
   若线上版本号 > 已同意版本号 → 弹出对话框，用户同意后把“已同意版本号”写入本地；
-  离线时：展示内置版本或缓存的上次线上内容。
+  离线时：展示缓存的上次线上内容。
   */
 
 import 'dart:convert';
 import 'package:crew_app/core/config/remote_config_keys.dart';
 import 'package:crew_app/shared/legal/data/disclaimer.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 
 const _kCacheKey = 'legal.disclaimer.cached.json';
 const _kAcceptedVersionKey = 'legal.disclaimer.accepted.version';
-
-class LocalAssetDisclaimerSource {
-  Future<Disclaimer> loadBundled() async {
-    final raw = await rootBundle.loadString('assets/legal/disclaimer_v1.json');
-    return Disclaimer.fromJson(json.decode(raw) as Map<String, dynamic>);
-  }
-}
 
 class LocalCacheDisclaimerSource {
   Future<Disclaimer?> loadCached() async {
@@ -102,20 +93,17 @@ class ApiDisclaimerSource implements RemoteDisclaimerSource {
 
 class DisclaimerRepository {
   DisclaimerRepository({
-    required this.asset,
     required this.cache,
     required this.remote,
   });
 
-  final LocalAssetDisclaimerSource asset;
   final LocalCacheDisclaimerSource cache;
   final RemoteDisclaimerSource remote;
 
-  /// 启动时使用：先拿**可展示**版本（优先缓存，其次资产），并尝试后台拉取线上
-  Future<({Disclaimer show, Disclaimer? latest, int acceptedVersion})> bootstrap() async {
-    final bundled = await asset.loadBundled();
+  /// 启动时使用：先拿**可展示**版本（缓存），并尝试后台拉取线上
+  Future<({Disclaimer? show, Disclaimer? latest, int acceptedVersion})> bootstrap() async {
     final cached = await cache.loadCached();
-    final show = cached ?? bundled;
+    Disclaimer? show = cached;
     final accepted = await cache.loadAcceptedVersion();
 
     Disclaimer? latest;
@@ -123,11 +111,12 @@ class DisclaimerRepository {
       latest = await remote.fetchLatest();
       if (latest != null) {
         await cache.saveCached(latest);
+        show = latest;
       }
     } catch (_) {
       // 静默失败，保留 show
     }
-    return (show: latest ?? show, latest: latest, acceptedVersion: accepted);
+    return (show: show, latest: latest, acceptedVersion: accepted);
   }
 
   Future<void> markAccepted(int version) => cache.saveAcceptedVersion(version);

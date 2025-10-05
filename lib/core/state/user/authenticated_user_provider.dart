@@ -2,39 +2,66 @@ import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final authenticatedUserProvider = AutoDisposeAsyncNotifierProvider<
-    AuthenticatedUserNotifier, AuthenticatedUserDto?>(
-  AuthenticatedUserNotifier.new,
-);
+final authenticatedUserProvider =
+    StateNotifierProvider.autoDispose<AuthenticatedUserNotifier,
+        AsyncValue<AuthenticatedUserDto?>>((ref) {
+  return AuthenticatedUserNotifier(ref);
+});
 
 class AuthenticatedUserNotifier
-    extends AutoDisposeAsyncNotifier<AuthenticatedUserDto?> {
-  @override
-  Future<AuthenticatedUserDto?> build() async {
-    final user = ref.watch(currentUserProvider);
+    extends StateNotifier<AsyncValue<AuthenticatedUserDto?>> {
+  AuthenticatedUserNotifier(this._ref)
+      : super(const AsyncValue<AuthenticatedUserDto?>.data(null)) {
+    _listenToAuthChanges();
+    _initialize();
+  }
+
+  final Ref _ref;
+
+  void _listenToAuthChanges() {
+    _ref.listen<User?>(currentUserProvider, (previous, next) {
+      final previousUser = previous;
+      final currentUser = next;
+
+      if (currentUser == null) {
+        state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+        return;
+      }
+
+      if (previousUser == null || previousUser.uid != currentUser.uid) {
+        refreshProfile();
+      }
+    });
+  }
+
+  Future<void> _initialize() async {
+    final user = _ref.read(currentUserProvider);
     if (user == null) {
-      return null;
+      state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+      return;
     }
 
-    return _loadProfile();
+    state = const AsyncValue<AuthenticatedUserDto?>.loading();
+    state = await AsyncValue.guard(_loadProfile);
   }
 
   Future<AuthenticatedUserDto?> refreshProfile() async {
-    final user = ref.read(currentUserProvider);
+    final user = _ref.read(currentUserProvider);
     if (user == null) {
-      state = const AsyncData(null);
+      state = const AsyncValue<AuthenticatedUserDto?>.data(null);
       return null;
     }
 
-    state = const AsyncLoading();
+    state = const AsyncValue<AuthenticatedUserDto?>.loading();
     state = await AsyncValue.guard(_loadProfile);
     return state.asData?.value;
   }
 
   Future<AuthenticatedUserDto?> _loadProfile() async {
-    final api = ref.read(apiServiceProvider);
+    final api = _ref.read(apiServiceProvider);
 
     try {
       return await api.getAuthenticatedUserDetail();

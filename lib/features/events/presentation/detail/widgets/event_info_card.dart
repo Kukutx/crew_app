@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EventInfoCard extends StatelessWidget {
   final Event event;
@@ -16,6 +17,17 @@ class EventInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locale = loc.localeName;
+    final startTimeText = event.startTime != null
+        ? DateFormat.yMMMd(locale)
+            .add_Hm()
+            .format(event.startTime!.toLocal())
+        : loc.to_be_announced;
+    final peopleText = event.peopleText ?? loc.to_be_announced;
+    final meetingPoint = event.location.isNotEmpty
+        ? event.location
+        : loc.to_be_announced;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
@@ -33,14 +45,14 @@ class EventInfoCard extends StatelessWidget {
             ),
             const Divider(height: 20),
             const SizedBox(height: 12),
-            _detailRow(Icons.calendar_today, loc.event_time_title, loc.to_be_announced),
-            _detailRow(Icons.people, loc.event_participants_title, loc.to_be_announced),
+            _detailRow(Icons.calendar_today, loc.event_time_title, startTimeText),
+            _detailRow(Icons.people, loc.event_participants_title, peopleText),
             InkWell(
               onTap: onTapLocation,
               child: _detailRow(
                 Icons.place,
                 loc.event_meeting_point_title,
-                event.location,
+                meetingPoint,
               ),
             ),
           ],

@@ -14,10 +14,11 @@ class EventDetailBody extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final String hostName;
   final String hostBio;
-  final String hostAvatarUrl;
+  final String? hostAvatarUrl;
   final VoidCallback onTapHostProfile;
-  final VoidCallback onToggleFollow;
+  final VoidCallback? onToggleFollow;
   final bool isFollowing;
+  final bool followEnabled;
   final VoidCallback onTapLocation;
 
   const EventDetailBody({
@@ -33,6 +34,7 @@ class EventDetailBody extends StatelessWidget {
     required this.onTapHostProfile,
     required this.onToggleFollow,
     required this.isFollowing,
+    required this.followEnabled,
     required this.onTapLocation,
   });
 
@@ -57,6 +59,7 @@ class EventDetailBody extends StatelessWidget {
             onTapProfile: onTapHostProfile,
             onToggleFollow: onToggleFollow,
             isFollowing: isFollowing,
+            followEnabled: followEnabled,
           ),
           const SizedBox(height: 10),
           SizedBox(

@@ -17,6 +17,13 @@ void showEventBottomSheet({
       ? event.imageUrls.first
       : event.coverImageUrl;
   final loc = AppLocalizations.of(context)!;
+  final locale = loc.localeName;
+  final status = _resolveEventStatus(loc, event);
+  final peopleLabel = event.peopleText ?? loc.to_be_announced;
+  final timeLabel =
+      event.formattedStartTime(locale, pattern: 'M.d HH:mm') ?? loc.to_be_announced;
+  final registerLabel =
+      status.isOpen ? loc.action_register_now : loc.event_registration_closed;
 
   showModalBottomSheet(
     context: context,
@@ -126,21 +133,29 @@ void showEventBottomSheet({
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
-                                _smallChip(loc.registration_open),
+                                _smallChip(status.label,
+                                    backgroundColor: status.isOpen
+                                        ? const Color(0xFFFFE7C2)
+                                        : Colors.grey.shade200,
+                                    textColor: status.isOpen
+                                        ? Colors.black87
+                                        : Colors.grey.shade600),
                                 const SizedBox(width: 6),
                                 const Icon(Icons.groups,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 2),
-                                const Text(/*ev.peopleText ?? */ '3-5人',
-                                    style: TextStyle(color: Colors.black54)),
+                                Text(peopleLabel,
+                                    style:
+                                        const TextStyle(color: Colors.black54)),
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
                                 const Icon(Icons.event,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 4),
-                                const Text(/*ev.timeText ??*/ '12.28 8:00',
-                                    style: TextStyle(color: Colors.black87)),
+                                Text(timeLabel,
+                                    style:
+                                        const TextStyle(color: Colors.black87)),
                                 const Spacer(),
                                 SizedBox(
                                   height: 36,
@@ -152,18 +167,20 @@ void showEventBottomSheet({
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                     ),
-                                    onPressed: () {
-                                      // TODO: 报名逻辑
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              loc.registration_not_implemented),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(loc.action_register_now),
+                                    onPressed: status.isOpen
+                                        ? () {
+                                            // TODO: 报名逻辑
+                                            Navigator.pop(context);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(loc
+                                                    .registration_not_implemented),
+                                              ),
+                                            );
+                                          }
+                                        : null,
+                                    child: Text(registerLabel),
                                   ),
                                 ),
                               ]),
@@ -179,10 +196,36 @@ void showEventBottomSheet({
   );
 }
 
-Widget _smallChip(String text) => Container(
+Widget _smallChip(String text,
+        {Color backgroundColor = const Color(0xFFFFE7C2),
+        Color textColor = Colors.black87}) =>
+    Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-          color: Color(0xFFFFE7C2), borderRadius: BorderRadius.circular(8)),
+          color: backgroundColor, borderRadius: BorderRadius.circular(8)),
       child: Text(text,
-          style: const TextStyle(fontSize: 11, color: Colors.black87)),
+          style: TextStyle(fontSize: 11, color: textColor)),
     );
+
+class _EventStatusState {
+  const _EventStatusState({
+    required this.label,
+    required this.isOpen,
+  });
+
+  final String label;
+  final bool isOpen;
+}
+
+_EventStatusState _resolveEventStatus(AppLocalizations loc, Event event) {
+  final lowerStatus = event.status?.toLowerCase();
+  if (event.isFull || lowerStatus == 'full') {
+    return _EventStatusState(label: loc.event_status_full, isOpen: false);
+  }
+  final now = DateTime.now();
+  final hasStarted = event.startTime != null && event.startTime!.isBefore(now);
+  if (lowerStatus == 'closed' || lowerStatus == 'ended' || hasStarted) {
+    return _EventStatusState(label: loc.event_status_closed, isOpen: false);
+  }
+  return _EventStatusState(label: loc.registration_open, isOpen: true);
+}

@@ -26,15 +26,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
 
-  final _host = (
-    name: 'Luca B.',
-    bio: 'Milan · 徒步/咖啡/摄影',
-    avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe',
-    userId: 'user_123',
-  );
-
-  bool _following = false;
-
   String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
 
   String _buildShareMessage() {
@@ -184,25 +175,22 @@ class _EventDetailPageState extends State<EventDetailPage> {
         pageController: _pageCtrl,
         currentPage: _page,
         onPageChanged: (index) => setState(() => _page = index),
-        hostName: _host.name,
-        hostBio: _host.bio,
-        hostAvatarUrl: _host.avatar,
+        hostName: event.organizerName?.isNotEmpty == true
+            ? event.organizerName!
+            : loc.unknown,
+        hostBio: event.organizerBio?.isNotEmpty == true
+            ? event.organizerBio!
+            : loc.to_be_announced,
+        hostAvatarUrl: event.organizerAvatar,
+        followEnabled: false,
         onTapHostProfile: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => UserProfilePage(/*userId: _host.userId*/)),
+            MaterialPageRoute(builder: (_) => const UserProfilePage()),
           );
         },
-        onToggleFollow: () async {
-          // TODO: integrate backend follow logic
-          setState(() => _following = !_following);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_following ? loc.followed : loc.unfollowed),
-            ),
-          );
-        },
-        isFollowing: _following,
+        onToggleFollow: null,
+        isFollowing: false,
         onTapLocation: () => Navigator.pop(context, widget.event),
       ),
     );

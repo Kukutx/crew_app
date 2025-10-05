@@ -194,6 +194,12 @@ abstract class AppLocalizations {
   /// **'Following'**
   String get action_following;
 
+  /// No description provided for @action_follow_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow unavailable'**
+  String get action_follow_disabled;
+
   /// No description provided for @action_login.
   ///
   /// In en, this message translates to:
@@ -313,6 +319,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Participants'**
   String get event_participants_title;
+
+  /// No description provided for @event_registration_closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration closed'**
+  String get event_registration_closed;
+
+  /// No description provided for @event_status_closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get event_status_closed;
+
+  /// No description provided for @event_status_full.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get event_status_full;
 
   /// No description provided for @event_time_title.
   ///

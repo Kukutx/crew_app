@@ -62,6 +62,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_following => 'Following';
 
   @override
+  String get action_follow_disabled => 'Follow unavailable';
+
+  @override
   String get action_login => 'Log in';
 
   @override
@@ -120,6 +123,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get event_participants_title => 'Participants';
+
+  @override
+  String get event_registration_closed => 'Registration closed';
+
+  @override
+  String get event_status_closed => 'Closed';
+
+  @override
+  String get event_status_full => 'Full';
 
   @override
   String get event_time_title => 'Event time';

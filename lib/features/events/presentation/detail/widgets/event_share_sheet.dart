@@ -95,6 +95,12 @@ class SharePreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final locale = loc.localeName;
+    final statusInfo = _buildStatus(loc, event);
+    final startTimeLabel =
+        event.formattedStartTime(locale, pattern: 'M.d HH:mm') ??
+            loc.to_be_announced;
+    final peopleLabel = event.peopleText ?? loc.to_be_announced;
     return RepaintBoundary(
       key: previewKey,
       child: Container(
@@ -144,28 +150,29 @@ class SharePreviewCard extends StatelessWidget {
                     top: 18,
                     left: 20,
                     right: 20,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _StatusChip(
-                          label: loc.registration_open,
-                          backgroundColor: Colors.orange,
-                        ),
-                        _StatusChip(
-                          label: loc.to_be_announced,
-                          textColor: Colors.grey.shade800,
-                          backgroundColor: Colors.orange.shade50,
-                          icon: Icons.calendar_today,
-                          iconColor: Colors.orange.shade300,
-                        ),
-                        _StatusChip(
-                          label: loc.to_be_announced,
-                          textColor: Colors.grey.shade800,
-                          backgroundColor: Colors.orange.shade50,
-                          icon: Icons.people,
-                          iconColor: Colors.orange.shade300,
-                        ),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _StatusChip(
+                        label: statusInfo.label,
+                        backgroundColor: statusInfo.backgroundColor,
+                        textColor: statusInfo.textColor,
+                      ),
+                      _StatusChip(
+                        label: startTimeLabel,
+                        textColor: Colors.grey.shade800,
+                        backgroundColor: Colors.orange.shade50,
+                        icon: Icons.calendar_today,
+                        iconColor: Colors.orange.shade300,
+                      ),
+                      _StatusChip(
+                        label: peopleLabel,
+                        textColor: Colors.grey.shade800,
+                        backgroundColor: Colors.orange.shade50,
+                        icon: Icons.people,
+                        iconColor: Colors.orange.shade300,
+                      ),
                       ],
                     ),
                   ),
@@ -319,6 +326,43 @@ class SharePreviewCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StatusLabel {
+  const _StatusLabel({
+    required this.label,
+    required this.backgroundColor,
+    required this.textColor,
+  });
+
+  final String label;
+  final Color backgroundColor;
+  final Color textColor;
+}
+
+_StatusLabel _buildStatus(AppLocalizations loc, Event event) {
+  final lowerStatus = event.status?.toLowerCase();
+  if (event.isFull || lowerStatus == 'full') {
+    return _StatusLabel(
+      label: loc.event_status_full,
+      backgroundColor: Colors.grey.shade300,
+      textColor: Colors.grey.shade800,
+    );
+  }
+  final now = DateTime.now();
+  final hasStarted = event.startTime != null && event.startTime!.isBefore(now);
+  if (lowerStatus == 'closed' || lowerStatus == 'ended' || hasStarted) {
+    return _StatusLabel(
+      label: loc.event_status_closed,
+      backgroundColor: Colors.grey.shade300,
+      textColor: Colors.grey.shade800,
+    );
+  }
+  return _StatusLabel(
+    label: loc.registration_open,
+    backgroundColor: Colors.orange,
+    textColor: Colors.white,
+  );
 }
 
 class _StatusChip extends StatelessWidget {

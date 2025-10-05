@@ -61,6 +61,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_following => '已关注';
 
   @override
+  String get action_follow_disabled => '关注功能暂未开放';
+
+  @override
   String get action_login => '登录';
 
   @override
@@ -119,6 +122,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get event_participants_title => '参与人数';
+
+  @override
+  String get event_registration_closed => '报名已截止';
+
+  @override
+  String get event_status_closed => '已截止';
+
+  @override
+  String get event_status_full => '名额已满';
 
   @override
   String get event_time_title => '活动时间';

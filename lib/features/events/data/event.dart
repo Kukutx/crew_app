@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 class EventOrganizer {
   final String id;
   final String name;
@@ -164,8 +162,8 @@ class Event {
       if (list == null) return const <String>[];
       return list
           .map((item) => item?.toString())
-          .whereNotNull()
-          .map((item) => item.trim())
+          .where((item) => item != null)
+          .map((item) => item!.trim())
           .where((item) => item.isNotEmpty)
           .toList(growable: false);
     }

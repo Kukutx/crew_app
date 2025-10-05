@@ -212,7 +212,7 @@ List<Map<String, dynamic>> _unwrapEventList(dynamic data) {
   final rawList = _extractEventList(data);
   return rawList
       .whereType<Map>()
-      .map((item) => Map<String, dynamic>.from(item as Map))
+      .map((item) => Map<String, dynamic>.from(item))
       .toList(growable: false);
 }
 

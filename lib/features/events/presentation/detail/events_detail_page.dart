@@ -160,7 +160,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final event = widget.event;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
-    final hostName = (organizer?.name?.isNotEmpty ?? false)
+    final hostName = (organizer?.name.isNotEmpty ?? false)
         ? organizer!.name
         : _fallbackHost.name;
     final hostBio = (organizer?.bio?.isNotEmpty ?? false)

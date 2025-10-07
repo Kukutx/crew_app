@@ -1,9 +1,9 @@
 import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
-import 'package:crew_app/features/legal/data/repositories/disclaimer_repository.dart';
-import 'package:crew_app/features/legal/data/sources/local_disclaimer_source.dart';
-import 'package:crew_app/features/legal/data/sources/remote_disclaimer_source.dart';
-import 'package:crew_app/features/legal/domain/models/disclaimer.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/data/repositories/disclaimer_repository.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/data/sources/local_disclaimer_source.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/data/sources/remote_disclaimer_source.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/domain/models/disclaimer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 

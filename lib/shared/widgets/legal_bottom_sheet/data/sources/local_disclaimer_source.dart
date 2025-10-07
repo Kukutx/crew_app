@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:crew_app/features/legal/domain/models/disclaimer.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/domain/models/disclaimer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kCacheKey = 'legal.disclaimer.cached.json';

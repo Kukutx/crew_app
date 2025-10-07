@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:crew_app/core/config/environment.dart';
-import 'package:crew_app/features/legal/presentation/widgets/disclaimer_bottom_sheet.dart';
-import 'package:crew_app/features/legal/state/disclaimer_providers.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/presentation/widgets/disclaimer_bottom_sheet.dart';
+import 'package:crew_app/shared/widgets/legal_bottom_sheet/state/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

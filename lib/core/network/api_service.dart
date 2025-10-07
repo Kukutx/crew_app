@@ -2,7 +2,7 @@ import 'package:crew_app/core/config/environment.dart';
 import 'package:dio/dio.dart';
 
 import '../../features/events/data/event.dart';
-import '../../features/settings/data/authenticated_user_dto.dart';
+import '../../features/user/data/authenticated_user_dto.dart';
 import '../error/api_exception.dart';
 import 'auth/auth_service.dart';
 

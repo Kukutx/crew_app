@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
-import 'package:crew_app/features/settings/data/authenticated_user_dto.dart';
+import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

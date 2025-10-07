@@ -1,12 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
+import 'package:crew_app/features/events/state/events_providers.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/data/activity_item.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key});
@@ -34,8 +35,9 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
     super.dispose();
   }
 
-  Future<void> _onRefresh() async =>
-      Future<void>.delayed(const Duration(milliseconds: 800));
+  Future<void> _onRefresh() async {
+    await ref.refresh(eventsProvider.future);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +137,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
           ],
           body: TabBarView(
             controller: _tabCtrl,
-            children: const [_ActivitiesList(), _FavoritesGrid()],
+            children: const [_ActivitiesGrid(), _FavoritesGrid()],
           ),
         ),
       ),
@@ -298,83 +300,46 @@ class _CollapsedAvatar extends StatelessWidget {
   }
 }
 
-/// ====== Tab 内容：活动（列表） ======
-class _ActivitiesList extends ConsumerWidget {
-  const _ActivitiesList();
+/// ====== Tab 内容：活动（瀑布流） ======
+class _ActivitiesGrid extends ConsumerWidget {
+  const _ActivitiesGrid();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(_activitiesProvider);
-    return ListView.separated(
-      padding: const EdgeInsets.all(12),
-      itemCount: items.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (_, i) {
-        final e = items[i];
-        return _ActivityTile(e: e);
+    final loc = AppLocalizations.of(context)!;
+    final eventsAsync = ref.watch(eventsProvider);
+
+    return eventsAsync.when(
+      data: (events) {
+        final registered = events
+            .where((event) => event.isRegistered)
+            .toList(growable: false);
+
+        if (registered.isEmpty) {
+          return _CenteredScrollable(child: Text(loc.no_events));
+        }
+
+        return AppMasonryGrid(
+          padding: const EdgeInsets.all(12),
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          itemCount: registered.length,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final event = registered[index];
+            return EventGridCard(
+              event: event,
+              heroTag: 'profile_activity_${event.id}_$index',
+            );
+          },
+        );
       },
+      loading: () =>
+          const _CenteredScrollable(child: CircularProgressIndicator()),
+      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
     );
   }
-}
-
-class _ActivityTile extends StatelessWidget {
-  const _ActivityTile({required this.e});
-  final ActivityItem e;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {/* TODO: 跳到活动详情 */},
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: const Offset(0, 2))
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(14),
-                  bottomLeft: Radius.circular(14)),
-              child: CachedNetworkImage(
-                  imageUrl: e.imageUrl,
-                  width: 120,
-                  height: 90,
-                  fit: BoxFit.cover),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(e.title,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 6),
-                    Text('${e.location} · ${_fmtDate(e.time)}',
-                        style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _fmtDate(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
 /// ====== Tab 内容：收藏（瀑布流） ======
@@ -383,22 +348,61 @@ class _FavoritesGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final images = ref.watch(_favoritesProvider);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        itemCount: images.length,
-        itemBuilder: (_, i) => ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: AspectRatio(
-            aspectRatio: i.isOdd ? 3 / 4 : 1,
-            child: CachedNetworkImage(imageUrl: images[i], fit: BoxFit.cover),
-          ),
-        ),
-      ),
+    final loc = AppLocalizations.of(context)!;
+    final eventsAsync = ref.watch(eventsProvider);
+
+    return eventsAsync.when(
+      data: (events) {
+        final favorites = events
+            .where((event) => event.isFavorite)
+            .toList(growable: false);
+
+        if (favorites.isEmpty) {
+          return _CenteredScrollable(child: Text(loc.favorites_empty));
+        }
+
+        return AppMasonryGrid(
+          padding: const EdgeInsets.all(12),
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          itemCount: favorites.length,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final event = favorites[index];
+            return EventGridCard(
+              event: event,
+              heroTag: 'profile_favorite_${event.id}_$index',
+            );
+          },
+        );
+      },
+      loading: () =>
+          const _CenteredScrollable(child: CircularProgressIndicator()),
+      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+    );
+  }
+}
+
+class _CenteredScrollable extends StatelessWidget {
+  const _CenteredScrollable({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: constraints.maxHeight,
+              child: Center(child: child),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -417,19 +421,3 @@ final _profileProvider = StateProvider<User>((ref) {
     followed: false,
   );
 });
-
-final _activitiesProvider = Provider<List<ActivityItem>>((ref) => List.generate(
-      8,
-      (i) => ActivityItem(
-        id: 'act_$i',
-        title: '城市慢跑 #$i',
-        imageUrl: 'https://picsum.photos/seed/act$i/300/200',
-        time: DateTime.now().subtract(Duration(days: i * 2)),
-        location: 'Milan, IT',
-      ),
-    ));
-
-final _favoritesProvider = Provider<List<String>>((ref) => List.generate(
-      12,
-      (i) => 'https://picsum.photos/seed/fav$i/400/600',
-    ));

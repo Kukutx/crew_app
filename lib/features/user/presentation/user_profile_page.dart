@@ -8,6 +8,7 @@ import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key});

@@ -269,7 +269,7 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ],
             ),
-             _SettingsSection(
+          _SettingsSection(
             title: loc.settings_section_account,
             children: [
               ListTile(
@@ -279,21 +279,9 @@ class SettingsPage extends ConsumerWidget {
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            displayName,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
                           if (email != null)
-                            Text(
-                              '${loc.settings_account_email_label}: $email',
-                            ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${loc.settings_account_uid_label}: $uid',
-                          ),
+                            Text('${loc.settings_account_email_label}: $email'),
+                          Text('${loc.settings_account_uid_label}: $uid'),
                         ],
                       )
                     : Text(loc.login_prompt),
@@ -350,9 +338,9 @@ class SettingsPage extends ConsumerWidget {
     await ref.read(signOutProvider)();
     if (!context.mounted) return;
     final loc = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(loc.logout_success)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(loc.logout_success)));
   }
 
   void _showSubscriptionPlanSheet(
@@ -516,10 +504,7 @@ String _resolveEmail(
   return loc.email_unbound;
 }
 
-String _resolveUid(
-  fa.User user,
-  AuthenticatedUserDto? backendUser,
-) {
+String _resolveUid(fa.User user, AuthenticatedUserDto? backendUser) {
   final backendId = backendUser?.id.trim();
   if (backendId != null && backendId.isNotEmpty) {
     return backendId;

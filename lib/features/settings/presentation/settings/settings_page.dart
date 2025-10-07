@@ -465,24 +465,6 @@ class _SettingsSection extends StatelessWidget {
   }
 }
 
-String _resolveDisplayName(
-  fa.User user,
-  AuthenticatedUserDto? backendUser,
-  AppLocalizations loc,
-) {
-  final backendName = backendUser?.displayName?.trim();
-  if (backendName != null && backendName.isNotEmpty) {
-    return backendName;
-  }
-
-  final firebaseName = user.displayName?.trim();
-  if (firebaseName != null && firebaseName.isNotEmpty) {
-    return firebaseName;
-  }
-
-  return loc.user_display_name_fallback;
-}
-
 String _resolveEmail(
   fa.User user,
   AuthenticatedUserDto? backendUser,

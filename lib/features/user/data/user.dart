@@ -6,7 +6,7 @@ class User {
   final String cover;
   final int followers;
   final int following;
-  final int likes;
+  final int events;
   final bool followed;
   User({
     required this.uid,
@@ -16,7 +16,7 @@ class User {
     required this.cover,
     required this.followers,
     required this.following,
-    required this.likes,
+    required this.events,
     required this.followed,
   });
 
@@ -28,7 +28,7 @@ class User {
         cover: cover,
         followers: followers ?? this.followers,
         following: following,
-        likes: likes,
+        events: events,
         followed: followed ?? this.followed,
       );
 }

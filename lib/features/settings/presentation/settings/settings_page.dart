@@ -1,18 +1,14 @@
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/settings/settings_providers.dart';
 import 'package:crew_app/features/settings/presentation/about/about_page.dart';
-import 'package:crew_app/features/settings/presentation/test/test_page.dart';
+import 'package:crew_app/features/settings/presentation/developer_test/crash_test_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-enum LocationPermissionOption {
-  allow,
-  whileUsing,
-  deny,
-}
+enum LocationPermissionOption { allow, whileUsing, deny }
 
 extension LocationPermissionOptionLabel on LocationPermissionOption {
   String label(AppLocalizations loc) {
@@ -43,10 +39,12 @@ extension SubscriptionPlanLabel on SubscriptionPlan {
 }
 
 final locationPermissionProvider = StateProvider<LocationPermissionOption>(
-    (ref) => LocationPermissionOption.allow);
-final subscriptionPlanProvider =
-    StateProvider<SubscriptionPlan>((ref) => SubscriptionPlan.free);
-final activityReminderProvider = StateProvider<bool>((ref) => true);
+  (ref) => LocationPermissionOption.allow,
+);
+final subscriptionPlanProvider = StateProvider<SubscriptionPlan>(
+  (ref) => SubscriptionPlan.free,
+);
+final eventReminderProvider = StateProvider<bool>((ref) => true);
 final followingUpdatesProvider = StateProvider<bool>((ref) => true);
 final pushNotificationProvider = StateProvider<bool>((ref) => true);
 
@@ -60,7 +58,7 @@ class SettingsPage extends ConsumerWidget {
     final selectedLanguage = settings.locale.languageCode == 'zh' ? 'zh' : 'en';
     final currentPermission = ref.watch(locationPermissionProvider);
     final currentPlan = ref.watch(subscriptionPlanProvider);
-    final activityReminderEnabled = ref.watch(activityReminderProvider);
+    final activityReminderEnabled = ref.watch(eventReminderProvider);
     final followingUpdatesEnabled = ref.watch(followingUpdatesProvider);
     final pushNotificationEnabled = ref.watch(pushNotificationProvider);
 
@@ -113,8 +111,9 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: Text(loc.settings_help_feedback_subtitle),
                 onTap: () async {
                   final feedbackService = ref.read(feedbackServiceProvider);
-                  final submitted =
-                      await feedbackService.collectFeedback(context);
+                  final submitted = await feedbackService.collectFeedback(
+                    context,
+                  );
                   if (!context.mounted) {
                     return;
                   }
@@ -133,9 +132,7 @@ class SettingsPage extends ConsumerWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AboutPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const AboutPage()),
                   );
                 },
               ),
@@ -181,7 +178,11 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: Text(currentPermission.label(loc)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showLocationPermissionSheet(
-                    context, ref, loc, currentPermission),
+                  context,
+                  ref,
+                  loc,
+                  currentPermission,
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.block_outlined),
@@ -196,50 +197,6 @@ class SettingsPage extends ConsumerWidget {
             ],
           ),
           _SettingsSection(
-            title: loc.settings_section_account,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.person_outline),
-                title: Text(loc.settings_account_info),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        '${loc.settings_account_email_label}: crew@example.com'),
-                    const SizedBox(height: 4),
-                    Text('${loc.settings_account_uid_label}: UID-000000'),
-                  ],
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.history),
-                title: Text(loc.browsing_history),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/history'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.verified_user),
-                title: Text(loc.verification_preferences),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/preferences'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: Text(loc.action_logout),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(loc.logout_success)),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: Text(loc.settings_account_delete),
-                onTap: () => _showComingSoon(context, loc),
-              ),
-            ],
-          ),
-          _SettingsSection(
             title: loc.settings_section_notifications,
             children: [
               SwitchListTile.adaptive(
@@ -248,7 +205,7 @@ class SettingsPage extends ConsumerWidget {
                 title: Text(loc.settings_notifications_activity),
                 value: activityReminderEnabled,
                 onChanged: (value) {
-                  ref.read(activityReminderProvider.notifier).state = value;
+                  ref.read(eventReminderProvider.notifier).state = value;
                   _showSavedSnackBar(context, loc);
                 },
               ),
@@ -287,13 +244,58 @@ class SettingsPage extends ConsumerWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const TestPage(),
+                        builder: (context) => const CrashTestPage(),
                       ),
                     );
                   },
                 ),
               ],
             ),
+          _SettingsSection(
+            title: loc.settings_section_account,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text(loc.settings_account_info),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${loc.settings_account_email_label}: crew@example.com',
+                    ),
+                    const SizedBox(height: 4),
+                    Text('${loc.settings_account_uid_label}: UID-000000'),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.history),
+                title: Text(loc.browsing_history),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.pushNamed(context, '/history'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.verified_user),
+                title: Text(loc.verification_preferences),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.pushNamed(context, '/preferences'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text(loc.action_logout),
+                onTap: () {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(loc.logout_success)));
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline),
+                title: Text(loc.settings_account_delete),
+                onTap: () => _showComingSoon(context, loc),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -371,23 +373,20 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showComingSoon(BuildContext context, AppLocalizations loc) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(loc.feature_not_ready)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
   }
 
   void _showSavedSnackBar(BuildContext context, AppLocalizations loc) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(loc.settings_saved_toast)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(loc.settings_saved_toast)));
   }
 }
 
 class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({
-    required this.title,
-    required this.children,
-  });
+  const _SettingsSection({required this.title, required this.children});
 
   final String title;
   final List<Widget> children;
@@ -404,8 +403,9 @@ class _SettingsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               title,
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 8),

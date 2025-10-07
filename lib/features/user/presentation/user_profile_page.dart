@@ -195,7 +195,7 @@ class _HeaderCard extends ConsumerWidget {
                           _Dot(),
                           _Stat('关注', userProfile.following),
                           _Dot(),
-                          _Stat('获赞', userProfile.likes),
+                          _Stat('活动', userProfile.events),
                         ]),
                       ],
                     ),
@@ -418,7 +418,7 @@ final _profileProvider = StateProvider<User>((ref) {
     cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
     followers: 1280,
     following: 96,
-    likes: 345,
+    events: 345,
     followed: false,
   );
 });

@@ -212,6 +212,18 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
               ListTile(
+                leading: const Icon(Icons.history),
+                title: Text(loc.browsing_history),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.pushNamed(context, '/history'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.verified_user),
+                title: Text(loc.verification_preferences),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.pushNamed(context, '/preferences'),
+              ),
+              ListTile(
                 leading: const Icon(Icons.logout),
                 title: Text(loc.action_logout),
                 onTap: () {

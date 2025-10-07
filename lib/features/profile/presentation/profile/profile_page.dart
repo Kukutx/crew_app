@@ -77,20 +77,6 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.history),
-                    title: Text(loc.browsing_history),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.pushNamed(context, '/history'),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.verified_user),
-                    title: Text(loc.verification_preferences),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.pushNamed(context, '/preferences'),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
                     leading: const Icon(Icons.settings_outlined),
                     title: Text(loc.settings),
                     trailing: const Icon(Icons.chevron_right),

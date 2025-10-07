@@ -9,10 +9,20 @@ import 'package:crew_app/features/events/presentation/group_chat_room/group_chat
 export 'package:crew_app/features/events/presentation/group_chat/widgets/group_chat_list_tile.dart';
 export 'package:crew_app/features/events/presentation/group_chat/widgets/group_chat_tab_chip.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/app_sheet_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class GroupChatPage extends StatefulWidget {
-  const GroupChatPage({super.key});
+  const GroupChatPage({
+    super.key,
+    this.scrollController,
+    this.onClose,
+    this.showAsSheet = false,
+  });
+
+  final ScrollController? scrollController;
+  final VoidCallback? onClose;
+  final bool showAsSheet;
 
   @override
   State<GroupChatPage> createState() => _UserEventsPageState();
@@ -20,6 +30,11 @@ class GroupChatPage extends StatefulWidget {
 
 class _UserEventsPageState extends State<GroupChatPage> {
   int _tab = 1; // 0=我喜欢的 1=我报名的
+
+  ScrollController? _internalController;
+
+  ScrollController get _controller =>
+      widget.scrollController ?? _internalController!;
 
   late final List<GroupChatPreview> _sampleEvents = [
     const GroupChatPreview(
@@ -188,54 +203,83 @@ class _UserEventsPageState extends State<GroupChatPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.scrollController == null) {
+      _internalController = ScrollController();
+    }
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(loc.my_events),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list_alt),
-            tooltip: loc.filter,
-            onPressed: () {},
-          ),
-        ],
+    final tabs = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: GroupChatTabBar(
+        selectedIndex: _tab,
+        favoritesLabel: loc.events_tab_favorites,
+        registeredLabel: loc.events_tab_registered,
+        onChanged: (value) => setState(() => _tab = value),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: GroupChatTabBar(
-              selectedIndex: _tab,
-              favoritesLabel: loc.events_tab_favorites,
-              registeredLabel: loc.events_tab_registered,
-              onChanged: (value) => setState(() => _tab = value),
+    );
+
+    final content = Column(
+      children: [
+        tabs,
+        Expanded(
+          child: _tab == 0
+              ? GroupChatFavoritesGrid(
+                  events: _sampleEvents,
+                  controller: _controller,
+                  onEventTap: (index) =>
+                      _openChat(_sampleEvents[index], index),
+                )
+              : GroupChatRegisteredList(
+                  events: _sampleEvents,
+                  controller: _controller,
+                  onEventTap: (index) =>
+                      _openChat(_sampleEvents[index], index),
+                ),
+        ),
+      ],
+    );
+
+    if (!widget.showAsSheet) {
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(loc.my_events),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.filter_list_alt),
+              tooltip: loc.filter,
+              onPressed: () {},
             ),
-          ),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
-              child: _tab == 0
-                  ? GroupChatFavoritesGrid(
-                      key: const ValueKey('favorites'),
-                      events: _sampleEvents,
-                      onEventTap: (index) =>
-                          _openChat(_sampleEvents[index], index),
-                    )
-                  : GroupChatRegisteredList(
-                      key: const ValueKey('registered'),
-                      events: _sampleEvents,
-                      onEventTap: (index) =>
-                          _openChat(_sampleEvents[index], index),
-                    ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+        body: content,
+      );
+    }
+
+    return AppSheetScaffold(
+      title: loc.my_events,
+      controller: _controller,
+      onClose: widget.onClose,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.filter_list_alt),
+          tooltip: loc.filter,
+          onPressed: () {},
+        ),
+      ],
+      child: content,
     );
   }
 }

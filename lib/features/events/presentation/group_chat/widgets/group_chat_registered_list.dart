@@ -7,10 +7,12 @@ class GroupChatRegisteredList extends StatelessWidget {
     super.key,
     required this.events,
     this.onEventTap,
+    this.controller,
   });
 
   final List<GroupChatPreview> events;
   final ValueChanged<int>? onEventTap;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,7 @@ class GroupChatRegisteredList extends StatelessWidget {
       key: const PageStorageKey('user-events-registered-list'),
       padding: const EdgeInsets.only(bottom: 24),
       physics: const BouncingScrollPhysics(),
+      controller: controller,
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];

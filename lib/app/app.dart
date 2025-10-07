@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/events/presentation/events_list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
+import '../shared/playground/profile/profile_page.dart';
 import 'state/app_overlay_provider.dart';
 
 class App extends ConsumerStatefulWidget {
@@ -21,8 +22,11 @@ class _AppState extends ConsumerState<App> {
   int _index = 1; // 默认打开“地图”
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
-  late final PageController _overlayController = PageController(initialPage: 1);
   ProviderSubscription<int>? _overlayIndexSubscription;
+
+  static const double _sheetMinExtent = 0.46;
+  static const double _sheetInitialExtent = 0.68;
+  static const double _sheetMaxExtent = 0.95;
 
   @override
   void initState() {
@@ -39,18 +43,12 @@ class _AppState extends ConsumerState<App> {
             _isScrolling = false;
           }
         });
-        _overlayController.animateToPage(
-          next,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
       },
     );
   }
 
   @override
   void dispose() {
-    _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _overlayIndexSubscription?.close();
     super.dispose();
@@ -120,6 +118,7 @@ class _AppState extends ConsumerState<App> {
     ];
 
     final isOverlayOpen = _index != 1;
+    final selectedDestination = _index == 3 ? 1 : _index;
 
     return Scaffold(
       extendBody: true,
@@ -130,38 +129,52 @@ class _AppState extends ConsumerState<App> {
             listenToPointerActivity: true,
             child: const EventsMapPage(),
           ),
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: !isOverlayOpen,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 240),
+                color: isOverlayOpen
+                    ? Colors.black.withValues(alpha: 0.08)
+                    : Colors.transparent,
+              ),
+            ),
+          ),
           IgnorePointer(
             ignoring: !isOverlayOpen,
-            child: PageView(
-              controller: _overlayController,
-              physics: isOverlayOpen
-                  ? const PageScrollPhysics()
-                  : const NeverScrollableScrollPhysics(),
-              onPageChanged: (page) {
-                final shouldUpdateIndex = _index != page;
-                final shouldResetScroll = page == 1 && _isScrolling;
-                if (!shouldUpdateIndex && !shouldResetScroll) {
-                  return;
-                }
-                setState(() {
-                  _index = page;
-                  if (page == 1) {
-                    _isScrolling = false;
-                  }
-                });
-                ref.read(appOverlayIndexProvider.notifier).state = page;
-              },
-              children: [
-                ScrollActivityListener(
-                  onScrollActivityChanged: _handleScrollActivity,
-                  child: const EventsListPage(),
-                ),
-                const SizedBox.expand(),
-                ScrollActivityListener(
-                  onScrollActivityChanged: _handleScrollActivity,
-                  child: const GroupChatPage(),
-                ),
-              ],
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeInOut,
+                offset: isOverlayOpen ? Offset.zero : const Offset(0, 1),
+                child: isOverlayOpen
+                    ? DraggableScrollableSheet(
+                        initialChildSize: _sheetInitialExtent,
+                        minChildSize: _sheetMinExtent,
+                        maxChildSize: _sheetMaxExtent,
+                        snap: true,
+                        snapSizes: const [
+                          _sheetMinExtent,
+                          _sheetInitialExtent,
+                          _sheetMaxExtent,
+                        ],
+                        builder: (context, controller) {
+                          return ScrollActivityListener(
+                            onScrollActivityChanged: _handleScrollActivity,
+                            listenToPointerActivity: true,
+                            child: _OverlayContent(
+                              index: _index,
+                              controller: controller,
+                              onClose: () => ref
+                                  .read(appOverlayIndexProvider.notifier)
+                                  .state = 1,
+                            ),
+                          );
+                        },
+                      )
+                    : const SizedBox.shrink(),
+              ),
             ),
           ),
         ],
@@ -214,29 +227,26 @@ class _AppState extends ConsumerState<App> {
                         ),
                       ),
                     ),
-                    child: NavigationBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      selectedIndex: _index,
-                      onDestinationSelected: (i) {
-                        if (_index == i) {
-                          return;
+                  child: NavigationBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    selectedIndex: selectedDestination,
+                    onDestinationSelected: (i) {
+                      final targetIndex = i;
+                      if (_index == targetIndex) {
+                        return;
+                      }
+                      setState(() {
+                        _index = targetIndex;
+                        if (targetIndex == 1) {
+                          _isScrolling = false;
                         }
-                        setState(() {
-                          _index = i;
-                          if (i == 1) {
-                            _isScrolling = false;
-                          }
-                        });
-                        ref.read(appOverlayIndexProvider.notifier).state = i;
-                        _overlayController.animateToPage(
-                          i,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      destinations: destinations,
-                    ),
+                      });
+                      ref.read(appOverlayIndexProvider.notifier).state =
+                          targetIndex;
+                    },
+                    destinations: destinations,
+                  ),
                   ),
                 ),
               ),
@@ -245,5 +255,42 @@ class _AppState extends ConsumerState<App> {
         ),
       ),
     );
+  }
+}
+
+class _OverlayContent extends StatelessWidget {
+  const _OverlayContent({
+    required this.index,
+    required this.controller,
+    required this.onClose,
+  });
+
+  final int index;
+  final ScrollController controller;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (index) {
+      case 0:
+        return EventsListPage(
+          showAsSheet: true,
+          scrollController: controller,
+          onClose: onClose,
+        );
+      case 2:
+        return GroupChatPage(
+          showAsSheet: true,
+          scrollController: controller,
+          onClose: onClose,
+        );
+      case 3:
+        return ProfileSheet(
+          controller: controller,
+          onClose: onClose,
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }

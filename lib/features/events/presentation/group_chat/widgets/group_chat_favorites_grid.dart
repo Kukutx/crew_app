@@ -10,10 +10,12 @@ class GroupChatFavoritesGrid extends StatelessWidget {
     super.key,
     required this.events,
     this.onEventTap,
+    this.controller,
   });
 
   final List<GroupChatPreview> events;
   final GroupChatTap? onEventTap;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,7 @@ class GroupChatFavoritesGrid extends StatelessWidget {
       key: const PageStorageKey('user-events-favorites-grid'),
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       physics: const BouncingScrollPhysics(),
+      controller: controller,
       crossAxisCount: 2,
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,

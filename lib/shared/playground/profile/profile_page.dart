@@ -3,6 +3,7 @@ import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/app_sheet_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
@@ -18,8 +19,6 @@ class ProfilePage extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
-    final profileState = ref.watch(authenticatedUserProvider);
-    final backendUser = profileState.asData?.value;
 
     return Scaffold(
       appBar: AppBar(
@@ -28,53 +27,12 @@ class ProfilePage extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
-            Navigator.of(context).pop(); // 关闭页面
+            Navigator.of(context).pop();
           },
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await ref.read(authenticatedUserProvider.notifier).refreshProfile();
-        },
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            const _ProfileHeader(),
-            const SizedBox(height: 16),
-            if (profileState.isLoading && backendUser == null)
-              const _ProfileLoadingCard(),
-            if (profileState.hasError)
-              _ProfileErrorCard(
-                message: _profileErrorMessage(profileState.error, loc),
-                onRetry: () =>
-                    ref.read(authenticatedUserProvider.notifier).refreshProfile(),
-              ),
-            if (backendUser != null) ...[
-              _BackendProfileCard(user: backendUser, loc: loc),
-              const SizedBox(height: 16),
-            ],
-            Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.favorite_border),
-                    title: Text(loc.my_favorites),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.pushNamed(context, '/favorites'),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.settings_outlined),
-                    title: Text(loc.settings),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.pushNamed(context, '/settings'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: const ProfileContent(
+        padding: EdgeInsets.all(16),
       ),
       bottomNavigationBar: Container(
         color: isDark ? theme.colorScheme.surface : Colors.transparent,
@@ -88,6 +46,121 @@ class ProfilePage extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ProfileSheet extends ConsumerWidget {
+  const ProfileSheet({
+    super.key,
+    required this.controller,
+    required this.onClose,
+  });
+
+  final ScrollController controller;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
+    return AppSheetScaffold(
+      title: loc.profile_title,
+      controller: controller,
+      onClose: onClose,
+      child: ProfileContent(
+        controller: controller,
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        showVersionFooter: true,
+      ),
+    );
+  }
+}
+
+class ProfileContent extends ConsumerWidget {
+  const ProfileContent({
+    super.key,
+    this.controller,
+    this.padding = const EdgeInsets.all(16),
+    this.showVersionFooter = false,
+  });
+
+  final ScrollController? controller;
+  final EdgeInsetsGeometry padding;
+  final bool showVersionFooter;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
+    final profileState = ref.watch(authenticatedUserProvider);
+    final backendUser = profileState.asData?.value;
+
+    final children = <Widget>[
+      const _ProfileHeader(),
+      const SizedBox(height: 16),
+      if (profileState.isLoading && backendUser == null)
+        const _ProfileLoadingCard(),
+      if (profileState.hasError)
+        _ProfileErrorCard(
+          message: _profileErrorMessage(profileState.error, loc),
+          onRetry: () =>
+              ref.read(authenticatedUserProvider.notifier).refreshProfile(),
+        ),
+      if (backendUser != null) ...[
+        _BackendProfileCard(user: backendUser, loc: loc),
+        const SizedBox(height: 16),
+      ],
+      Card(
+        child: Column(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.favorite_border),
+              title: Text(loc.my_favorites),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, '/favorites'),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: Text(loc.settings),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, '/settings'),
+            ),
+          ],
+        ),
+      ),
+    ];
+
+    if (showVersionFooter) {
+      children.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text(
+            loc.version_label('1.0.0'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await ref.read(authenticatedUserProvider.notifier).refreshProfile();
+      },
+      child: ListView(
+        controller: controller,
+        padding: padding,
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        children: [
+          ...children,
+          SizedBox(height: MediaQuery.paddingOf(context).bottom + 16),
+        ],
       ),
     );
   }

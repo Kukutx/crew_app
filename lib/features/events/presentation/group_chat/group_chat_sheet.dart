@@ -11,14 +11,14 @@ export 'package:crew_app/features/events/presentation/group_chat/widgets/group_c
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class GroupChatPage extends StatefulWidget {
-  const GroupChatPage({super.key});
+class GroupChatSheet extends StatefulWidget {
+  const GroupChatSheet({super.key});
 
   @override
-  State<GroupChatPage> createState() => _UserEventsPageState();
+  State<GroupChatSheet> createState() => _UserEventsSheetState();
 }
 
-class _UserEventsPageState extends State<GroupChatPage> {
+class _UserEventsSheetState extends State<GroupChatSheet> {
   int _tab = 1; // 0=我喜欢的 1=我报名的
 
   late final List<GroupChatPreview> _sampleEvents = [
@@ -191,50 +191,66 @@ class _UserEventsPageState extends State<GroupChatPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(loc.my_events),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list_alt),
-            tooltip: loc.filter,
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: GroupChatTabBar(
-              selectedIndex: _tab,
-              favoritesLabel: loc.events_tab_favorites,
-              registeredLabel: loc.events_tab_registered,
-              onChanged: (value) => setState(() => _tab = value),
+    final theme = Theme.of(context);
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 4, 8),
+              child: Row(
+                children: [
+                  Text(
+                    loc.my_events,
+                    style: theme.textTheme.titleLarge,
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.filter_list_alt),
+                    tooltip: loc.filter,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
-              child: _tab == 0
-                  ? GroupChatFavoritesGrid(
-                      key: const ValueKey('favorites'),
-                      events: _sampleEvents,
-                      onEventTap: (index) =>
-                          _openChat(_sampleEvents[index], index),
-                    )
-                  : GroupChatRegisteredList(
-                      key: const ValueKey('registered'),
-                      events: _sampleEvents,
-                      onEventTap: (index) =>
-                          _openChat(_sampleEvents[index], index),
-                    ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: GroupChatTabBar(
+                selectedIndex: _tab,
+                favoritesLabel: loc.events_tab_favorites,
+                registeredLabel: loc.events_tab_registered,
+                onChanged: (value) => setState(() => _tab = value),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: _tab == 0
+                    ? GroupChatFavoritesGrid(
+                        key: const ValueKey('favorites'),
+                        events: _sampleEvents,
+                        onEventTap: (index) =>
+                            _openChat(_sampleEvents[index], index),
+                      )
+                    : GroupChatRegisteredList(
+                        key: const ValueKey('registered'),
+                        events: _sampleEvents,
+                        onEventTap: (index) =>
+                            _openChat(_sampleEvents[index], index),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

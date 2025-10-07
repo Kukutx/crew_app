@@ -21,6 +21,7 @@ class App extends ConsumerStatefulWidget {
 
 class _AppState extends ConsumerState<App> {
   int _index = 1; // 默认打开“地图”
+  int _navigationIndex = 1;
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
   late final PageController _overlayController = PageController(initialPage: 1);
@@ -255,15 +256,32 @@ class _AppState extends ConsumerState<App> {
                     child: NavigationBar(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
-                      selectedIndex: 1,
-                      onDestinationSelected: (i) {
+                      selectedIndex: _navigationIndex,
+                      onDestinationSelected: (i) async {
                         if (i == 0) {
-                          unawaited(_showEventsListSheet(context));
+                          if (_navigationIndex != 0) {
+                            setState(() => _navigationIndex = 0);
+                          }
+                          await _showEventsListSheet(context);
+                          if (!mounted) return;
+                          if (_navigationIndex != 1) {
+                            setState(() => _navigationIndex = 1);
+                          }
                           return;
                         }
                         if (i == 2) {
-                          unawaited(_showGroupChatSheet(context));
+                          if (_navigationIndex != 2) {
+                            setState(() => _navigationIndex = 2);
+                          }
+                          await _showGroupChatSheet(context);
+                          if (!mounted) return;
+                          if (_navigationIndex != 1) {
+                            setState(() => _navigationIndex = 1);
+                          }
                           return;
+                        }
+                        if (_navigationIndex != 1) {
+                          setState(() => _navigationIndex = 1);
                         }
                         if (_index != 1) {
                           ref.read(appOverlayIndexProvider.notifier).state = 1;

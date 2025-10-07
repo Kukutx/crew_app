@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
 
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
@@ -40,6 +41,56 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
     await ref.refresh(eventsProvider.future);
   }
 
+  void _showMoreActions(BuildContext context, User profile) {
+    final messenger = ScaffoldMessenger.of(context);
+    final link = 'https://crew.app/users/${profile.uid}';
+
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.block),
+                title: const Text('拉黑'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('已拉黑该用户（示例）')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.flag),
+                title: const Text('举报'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('举报成功（示例）')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: const Text('复制链接'),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await Clipboard.setData(ClipboardData(text: link));
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('已复制链接：$link')),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(_profileProvider);
@@ -55,6 +106,12 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
               pinned: true,
               stretch: true,
               expandedHeight: _expandedHeight, // 给卡片留空间
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () => _showMoreActions(context, profile),
+                ),
+              ],
               flexibleSpace: LayoutBuilder(
                 builder: (context, c) {
                   final currentHeight = c.biggest.height;

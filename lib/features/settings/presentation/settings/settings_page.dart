@@ -57,7 +57,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
+    Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final loc = AppLocalizations.of(context)!;
     final selectedLanguage = settings.locale.languageCode == 'zh' ? 'zh' : 'en';
@@ -70,9 +70,6 @@ class SettingsPage extends ConsumerWidget {
     final firebaseUser = authState.value ?? ref.watch(currentUserProvider);
     final profileState = ref.watch(authenticatedUserProvider);
     final backendUser = profileState.asData?.value;
-    final displayName = firebaseUser != null
-        ? _resolveDisplayName(firebaseUser, backendUser, loc)
-        : loc.settings_account_info;
     final email = firebaseUser != null
         ? _resolveEmail(firebaseUser, backendUser, loc)
         : null;

@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/data/event_data.dart';
+import 'package:crew_app/features/events/data/event_create_modal.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
@@ -13,7 +13,7 @@ class _CreateEventImage {
   final Uint8List bytes;
 }
 
-Future<EventData?> showCreateEventBottomSheet(BuildContext context, LatLng pos) {
+Future<EventCreateModel?> showCreateEventBottomSheet(BuildContext context, LatLng pos) {
   final loc = AppLocalizations.of(context)!;
   final title = TextEditingController();
   final desc = TextEditingController();
@@ -46,7 +46,7 @@ Future<EventData?> showCreateEventBottomSheet(BuildContext context, LatLng pos) 
       city.text = loc.unknown;
     }
   }();
-  return showModalBottomSheet<EventData>(
+  return showModalBottomSheet<EventCreateModel>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
@@ -312,7 +312,7 @@ Future<EventData?> showCreateEventBottomSheet(BuildContext context, LatLng pos) 
                           }
                           Navigator.pop(
                             context,
-                            EventData(
+                            EventCreateModel(
                               title: title.text,
                               description: desc.text,
                               locationName: city.text.trim().isEmpty

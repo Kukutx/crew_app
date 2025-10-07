@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:crew_app/features/events/presentation/group_chat/group_chat_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/playground/profile/profile_page.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../features/events/presentation/events_list/events_list_page.dart';
 import '../features/events/presentation/map/events_map_page.dart';
+import '../features/trips/presentation/create_road_trip_page.dart';
 import 'state/app_overlay_provider.dart';
 
 class App extends ConsumerStatefulWidget {
@@ -154,12 +154,20 @@ class _AppState extends ConsumerState<App> {
               children: [
                 ScrollActivityListener(
                   onScrollActivityChanged: _handleScrollActivity,
-                  child: const EventsListPage(),
+                  child: CreateRoadTripPage(
+                    onClose: () {
+                      ref.read(appOverlayIndexProvider.notifier).state = 1;
+                    },
+                  ),
                 ),
                 const SizedBox.expand(),
                 ScrollActivityListener(
                   onScrollActivityChanged: _handleScrollActivity,
-                  child: const GroupChatPage(),
+                  child: ProfilePage(
+                    onClose: () {
+                      ref.read(appOverlayIndexProvider.notifier).state = 1;
+                    },
+                  ),
                 ),
               ],
             ),

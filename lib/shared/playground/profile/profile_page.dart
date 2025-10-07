@@ -11,7 +11,9 @@ import '../../../core/state/auth/auth_providers.dart';
 import '../../../core/state/user/avatar/avatar_provider.dart';
 
 class ProfilePage extends ConsumerWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, this.onClose});
+
+  final VoidCallback? onClose;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,9 +29,7 @@ class ProfilePage extends ConsumerWidget {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.of(context).pop(); // 关闭页面
-          },
+          onPressed: onClose ?? () => Navigator.of(context).pop(),
         ),
       ),
       body: RefreshIndicator(

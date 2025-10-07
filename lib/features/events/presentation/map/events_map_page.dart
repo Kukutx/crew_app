@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/core/config/environment.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/presentation/widgets/disclaimer_sheet.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_providers.dart';
@@ -120,6 +121,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onSearch: _onSearchSubmitted,
         onChanged: _onQueryChanged,
         onClear: _onSearchClear,
+        onCreateRoadTripTap: _onCreateRoadTripTap,
         onAvatarTap: _onAvatarTap,
         tags: _quickTags,
         selected: _selectedTags,
@@ -246,12 +248,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _showEventCard(event);
   }
 
-  void _onAvatarTap(bool authed) {
-    if (authed) {
-      Navigator.pushNamed(context, '/profile');
-    } else {
-      Navigator.pushNamed(context, '/profile');
+  void _onCreateRoadTripTap() {
+    if (_searchFocusNode.hasFocus) {
+      _searchFocusNode.unfocus();
     }
+    if (_showSearchResults) {
+      setState(() => _showSearchResults = false);
+    }
+    ref.read(appOverlayIndexProvider.notifier).state = 0;
+  }
+
+  void _onAvatarTap(bool _) {
+    if (_searchFocusNode.hasFocus) {
+      _searchFocusNode.unfocus();
+    }
+    if (_showSearchResults) {
+      setState(() => _showSearchResults = false);
+    }
+    ref.read(appOverlayIndexProvider.notifier).state = 2;
   }
 
   Future<bool> _ensureDisclaimerAccepted() async {

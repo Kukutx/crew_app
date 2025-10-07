@@ -6,6 +6,7 @@ import 'package:crew_app/features/events/presentation/detail/widgets/event_detai
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_share_sheet.dart';
+import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -170,6 +171,32 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
         ? organizer!.avatarUrl!
         : _fallbackHost.avatar;
+    int _absHash(String value) {
+      final hash = value.hashCode;
+      return hash < 0 ? -hash : hash;
+    }
+
+    final statsSeed = (organizer?.id.isNotEmpty ?? false)
+        ? organizer!.id
+        : (widget.event.id.isNotEmpty ? widget.event.id : hostName);
+    final baseHash = _absHash(statsSeed);
+    final hostCover = widget.event.coverImageUrl ??
+        (widget.event.imageUrls.isNotEmpty
+            ? widget.event.imageUrls.first
+            : hostAvatar);
+    final hostProfile = User(
+      uid: (organizer?.id.isNotEmpty ?? false)
+          ? organizer!.id
+          : 'host_${widget.event.id}',
+      name: hostName,
+      bio: hostBio,
+      avatar: hostAvatar,
+      cover: hostCover,
+      followers: baseHash % 8000 + 200,
+      following: baseHash % 500 + 30,
+      events: (baseHash ~/ 7) % 180 + 1,
+      followed: _following,
+    );
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7E9),
       extendBodyBehindAppBar: true,
@@ -201,7 +228,14 @@ class _EventDetailPageState extends State<EventDetailPage> {
         onTapHostProfile: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => UserProfilePage()),
+            MaterialPageRoute(
+              builder: (_) => UserProfilePage(
+                profile: hostProfile,
+                onFollowChanged: (followed) {
+                  setState(() => _following = followed);
+                },
+              ),
+            ),
           );
         },
         onToggleFollow: () async {

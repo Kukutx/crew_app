@@ -9,10 +9,21 @@ import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
-  const UserProfilePage({super.key});
+  const UserProfilePage({
+    super.key,
+    required this.profile,
+    this.isCurrentUser = false,
+    this.onFollowChanged,
+    this.onEditProfile,
+  });
+
+  final User profile;
+  final bool isCurrentUser;
+  final ValueChanged<bool>? onFollowChanged;
+  final VoidCallback? onEditProfile;
+
   @override
   ConsumerState<UserProfilePage> createState() => _ProfilePageState();
 }
@@ -24,17 +35,29 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
 
   late final TabController _tabCtrl;
   final _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
+  late User _profile;
 
   @override
   void initState() {
     super.initState();
     _tabCtrl = TabController(length: _tabs.length, vsync: this);
+    _profile = widget.profile;
   }
 
   @override
   void dispose() {
     _tabCtrl.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant UserProfilePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.profile.uid != oldWidget.profile.uid ||
+        widget.profile.followers != oldWidget.profile.followers ||
+        widget.profile.followed != oldWidget.profile.followed) {
+      _profile = widget.profile;
+    }
   }
 
   Future<void> _onRefresh() async {
@@ -91,9 +114,35 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
+  void _onToggleFollow() {
+    if (widget.isCurrentUser) return;
+    final shouldFollow = !_profile.followed;
+    final newFollowers = shouldFollow
+        ? _profile.followers + 1
+        : (_profile.followers - 1).clamp(0, _profile.followers);
+    setState(() {
+      _profile = _profile.copyWith(
+        followed: shouldFollow,
+        followers: newFollowers,
+      );
+    });
+    widget.onFollowChanged?.call(_profile.followed);
+  }
+
+  void _onEditProfile() {
+    if (!widget.isCurrentUser) return;
+    if (widget.onEditProfile != null) {
+      widget.onEditProfile!();
+      return;
+    }
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      const SnackBar(content: Text('编辑资料功能尚未开放')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final profile = ref.watch(_profileProvider);
     final theme = Theme.of(context);
     final topPad = MediaQuery.paddingOf(context).top;
 
@@ -107,10 +156,16 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
               stretch: true,
               expandedHeight: _expandedHeight, // 给卡片留空间
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () => _showMoreActions(context, profile),
-                ),
+                if (widget.isCurrentUser)
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: _onEditProfile,
+                  )
+                else
+                  IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () => _showMoreActions(context, _profile),
+                  ),
               ],
               flexibleSpace: LayoutBuilder(
                 builder: (context, c) {
@@ -129,7 +184,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                     children: [
                       // 封面
                       CachedNetworkImage(
-                          imageUrl: profile.cover, fit: BoxFit.cover),
+                          imageUrl: _profile.cover, fit: BoxFit.cover),
                       // 渐变压暗
                       const DecoratedBox(
                         decoration: BoxDecoration(
@@ -150,7 +205,12 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                             opacity: Curves.easeOut.transform(t),
                             child: Transform.scale(
                               scale: lerpDouble(0.92, 1, t)!,
-                              child: _HeaderCard(userProfile: profile),
+                              child: _HeaderCard(
+                                userProfile: _profile,
+                                isCurrentUser: widget.isCurrentUser,
+                                onToggleFollow: _onToggleFollow,
+                                onEditProfile: _onEditProfile,
+                              ),
                             ),
                           ),
                         ),
@@ -165,7 +225,7 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
                             child: Opacity(
                               opacity: Curves.easeIn.transform(collapseProgress),
                               child: Center(
-                                child: _CollapsedAvatar(user: profile),
+                                child: _CollapsedAvatar(user: _profile),
                               ),
                             ),
                           ),
@@ -204,12 +264,21 @@ class _ProfilePageState extends ConsumerState<UserProfilePage>
 }
 
 /// ====== 头部卡片（头像、签名、统计、按钮） ======
-class _HeaderCard extends ConsumerWidget {
-  const _HeaderCard({required this.userProfile});
+class _HeaderCard extends StatelessWidget {
+  const _HeaderCard({
+    required this.userProfile,
+    required this.isCurrentUser,
+    required this.onToggleFollow,
+    required this.onEditProfile,
+  });
+
   final User userProfile;
+  final bool isCurrentUser;
+  final VoidCallback onToggleFollow;
+  final VoidCallback onEditProfile;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
@@ -259,7 +328,12 @@ class _HeaderCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _FollowButton(),
+                _FollowButton(
+                  isCurrentUser: isCurrentUser,
+                  followed: userProfile.followed,
+                  onToggleFollow: onToggleFollow,
+                  onEditProfile: onEditProfile,
+                ),
               ],
             ),
           ),
@@ -304,25 +378,40 @@ class _Stat extends StatelessWidget {
   }
 }
 
-class _FollowButton extends ConsumerWidget {
+class _FollowButton extends StatelessWidget {
+  const _FollowButton({
+    required this.isCurrentUser,
+    required this.followed,
+    required this.onToggleFollow,
+    required this.onEditProfile,
+  });
+
+  final bool isCurrentUser;
+  final bool followed;
+  final VoidCallback onToggleFollow;
+  final VoidCallback onEditProfile;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(_profileProvider);
-    final followed = profile.followed;
+  Widget build(BuildContext context) {
+    if (isCurrentUser) {
+      return OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: const BorderSide(color: Colors.white70),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        onPressed: onEditProfile,
+        child: const Text('编辑资料'),
+      );
+    }
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: followed ? Colors.white10 : Colors.white,
         foregroundColor: followed ? Colors.white : Colors.black,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      onPressed: () {
-        final current = ref.read(_profileProvider);
-        ref.read(_profileProvider.notifier).state = current.copyWith(
-          followed: !current.followed,
-          followers:
-              current.followed ? current.followers - 1 : current.followers + 1,
-        );
-      },
+      onPressed: onToggleFollow,
       child: Text(followed ? '已关注' : '关注'),
     );
   }
@@ -465,17 +554,3 @@ class _CenteredScrollable extends StatelessWidget {
   }
 }
 
-/// ====== 假数据 Provider ======
-final _profileProvider = StateProvider<User>((ref) {
-  return User(
-    uid: 'u_001',
-    name: 'Luna',
-    bio: '爱户外、爱分享 | Crew 资深爱好者',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
-    cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
-    followers: 1280,
-    following: 96,
-    events: 345,
-    followed: false,
-  );
-});

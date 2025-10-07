@@ -13,23 +13,11 @@ import '../../../../core/state/avatar/avatar_provider.dart';
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
-  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-    await ref.read(signOutProvider)();
-    if (!context.mounted) return;
-    final loc = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(loc.logout_success)),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
-    final authState = ref.watch(authStateProvider);
-    final user = authState.value ?? ref.watch(currentUserProvider);
-
     final profileState = ref.watch(authenticatedUserProvider);
     final backendUser = profileState.asData?.value;
 
@@ -92,31 +80,12 @@ class ProfilePage extends ConsumerWidget {
         color: isDark ? theme.colorScheme.surface : Colors.transparent,
         padding: const EdgeInsets.all(16),
         child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 只有登录状态下显示退出按钮
-              if (user != null)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: theme.colorScheme.error,
-                      foregroundColor: theme.colorScheme.onError,
-                    ),
-                    onPressed: () => _signOut(context, ref),
-                    child: Text(loc.action_logout),
-                  ),
-                ),
-              if (user != null) const SizedBox(height: 16),
-              Text(
-                loc.version_label('1.0.0'),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-            ],
+          child: Text(
+            loc.version_label('1.0.0'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
           ),
         ),
       ),

@@ -8,17 +8,23 @@ class UserEventsRegisteredList extends StatelessWidget {
     super.key,
     required this.events,
     this.onEventTap,
+    this.controller,
+    this.physics,
   });
 
   final List<UserEventPreview> events;
   final ValueChanged<int>? onEventTap;
+  final ScrollController? controller;
+  final ScrollPhysics? physics;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       key: const PageStorageKey('user-events-registered-list'),
       padding: const EdgeInsets.only(bottom: 24),
-      physics: const BouncingScrollPhysics(),
+      controller: controller,
+      physics:
+          physics ?? const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];

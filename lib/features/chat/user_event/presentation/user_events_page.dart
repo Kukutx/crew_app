@@ -11,7 +11,14 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class UserEventsPage extends StatefulWidget {
-  const UserEventsPage({super.key});
+  const UserEventsPage({
+    super.key,
+    this.scrollController,
+    this.useScaffold = true,
+  });
+
+  final ScrollController? scrollController;
+  final bool useScaffold;
 
   @override
   State<UserEventsPage> createState() => _UserEventsPageState();
@@ -19,6 +26,10 @@ class UserEventsPage extends StatefulWidget {
 
 class _UserEventsPageState extends State<UserEventsPage> {
   int _tab = 1; // 0=我喜欢的 1=我报名的
+  ScrollController? _internalController;
+
+  ScrollController get _controller =>
+      widget.scrollController ?? _internalController!;
 
   late final List<UserEventPreview> _sampleEvents = [
     const UserEventPreview(
@@ -170,6 +181,33 @@ class _UserEventsPageState extends State<UserEventsPage> {
     ],
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.scrollController == null) {
+      _internalController = ScrollController();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant UserEventsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scrollController != widget.scrollController) {
+      _internalController?.dispose();
+      if (widget.scrollController == null) {
+        _internalController = ScrollController();
+      } else {
+        _internalController = null;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
+  }
+
   void _openChat(UserEventPreview event, int index) {
     final participants =
         _sampleParticipants[index % _sampleParticipants.length];
@@ -189,20 +227,12 @@ class _UserEventsPageState extends State<UserEventsPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    const physics =
+        BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics());
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(loc.my_events),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list_alt),
-            tooltip: loc.filter,
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
+    final content = PrimaryScrollController(
+      controller: _controller,
+      child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -222,12 +252,16 @@ class _UserEventsPageState extends State<UserEventsPage> {
                   ? UserEventsFavoritesGrid(
                       key: const ValueKey('favorites'),
                       events: _sampleEvents,
+                      controller: _controller,
+                      physics: physics,
                       onEventTap: (index) =>
                           _openChat(_sampleEvents[index], index),
                     )
                   : UserEventsRegisteredList(
                       key: const ValueKey('registered'),
                       events: _sampleEvents,
+                      controller: _controller,
+                      physics: physics,
                       onEventTap: (index) =>
                           _openChat(_sampleEvents[index], index),
                     ),
@@ -236,5 +270,25 @@ class _UserEventsPageState extends State<UserEventsPage> {
         ],
       ),
     );
+
+    if (widget.useScaffold) {
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(loc.my_events),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.filter_list_alt),
+              tooltip: loc.filter,
+              onPressed: () {},
+            ),
+          ],
+        ),
+        body: content,
+      );
+    }
+
+    return content;
   }
 }
+

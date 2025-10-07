@@ -14,6 +14,8 @@ class AppMasonryGrid extends StatelessWidget {
     this.padding,
     this.physics,
     this.shrinkWrap = false,
+    this.controller,
+    this.primary,
   });
 
   final int itemCount;
@@ -24,6 +26,8 @@ class AppMasonryGrid extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final ScrollPhysics? physics;
   final bool shrinkWrap;
+  final ScrollController? controller;
+  final bool? primary;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +39,8 @@ class AppMasonryGrid extends StatelessWidget {
       itemCount: itemCount,
       physics: physics,
       shrinkWrap: shrinkWrap,
+      controller: controller,
+      primary: primary,
       itemBuilder: itemBuilder,
     );
   }

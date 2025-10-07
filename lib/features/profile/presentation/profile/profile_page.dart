@@ -21,7 +21,7 @@ class ProfilePage extends ConsumerWidget {
     final profileState = ref.watch(authenticatedUserProvider);
     final backendUser = profileState.asData?.value;
 
-    return Scaffold(
+    final page = Scaffold(
       appBar: AppBar(
         title: Text(loc.profile_title),
         centerTitle: true,
@@ -89,6 +89,16 @@ class ProfilePage extends ConsumerWidget {
           ),
         ),
       ),
+    );
+    return Dismissible(
+      key: const ValueKey('profile_page_dismissible'),
+      direction: DismissDirection.startToEnd,
+      dismissThresholds: const {DismissDirection.startToEnd: 0.32},
+      background: const SizedBox.shrink(),
+      onDismissed: (_) {
+        Navigator.of(context).maybePop();
+      },
+      child: page,
     );
   }
 }

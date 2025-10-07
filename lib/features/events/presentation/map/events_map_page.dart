@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:crew_app/features/profile/presentation/profile/profile_page.dart';
 
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
@@ -247,11 +248,29 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _onAvatarTap(bool authed) {
-    if (authed) {
-      Navigator.pushNamed(context, '/profile');
-    } else {
-      Navigator.pushNamed(context, '/profile');
-    }
+    Navigator.of(context).push(_profilePageRoute());
+  }
+
+  PageRoute<void> _profilePageRoute() {
+    return PageRouteBuilder<void>(
+      pageBuilder: (_, __, ___) => const ProfilePage(),
+      transitionDuration: const Duration(milliseconds: 300),
+      reverseTransitionDuration: const Duration(milliseconds: 260),
+      transitionsBuilder: (_, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        );
+      },
+    );
   }
 
   Future<bool> _ensureDisclaimerAccepted() async {

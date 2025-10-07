@@ -7,8 +7,7 @@ import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_prov
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
@@ -33,7 +32,8 @@ class EventsMapPage extends ConsumerStatefulWidget {
 }
 
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
-  final _map = MapController();
+  GoogleMapController? _map;
+  bool _mapReady = false;
   bool _movedToSelected = false;
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
   static const _quickTags = [
@@ -87,6 +87,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     _mapFocusSubscription?.close();
+    _map?.dispose();
     super.dispose();
   }
 
@@ -97,13 +98,23 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
       if (!_movedToSelected && widget.selectedEvent == null && loc != null) {
-        _map.move(loc, 14);
+        _moveCamera(loc, zoom: 14);
       }
     });
 
     final events = ref.watch(eventsProvider);
     final userLoc = ref.watch(userLocationProvider).value;
     final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
+
+    final markersLayer = events.when(
+      loading: () => const MarkersLayer(markers: <Marker>{}),
+      error: (_, __) => const MarkersLayer(markers: <Marker>{}),
+      data: (list) => MarkersLayer.fromEvents(
+        events: list,
+        userLoc: userLoc,
+        onEventTap: _showEventCard,
+      ),
+    );
 
     // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -158,25 +169,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           }
         },
         child: MapCanvas(
-          mapController: _map,
           initialCenter: startCenter,
-          onMapReady: () {
-            final loc = ref.read(userLocationProvider).value;
-            if (!_movedToSelected && loc != null) _map.move(loc, 14);
-          },
-          onLongPress: _onMapLongPress,
-          children: [
-            // OSM图层已内置在 MapCanvas 里，这里只放标记层
-            events.when(
-              loading: () => const MarkersLayer(markers: []),
-              error: (_, _) => const MarkersLayer(markers: []),
-              data: (list) => MarkersLayer.fromEvents(
-                events: list,
-                userLoc: userLoc,
-                onEventTap: _showEventCard,
-              ),
-            ),
-          ],
+          onMapCreated: _onMapCreated,
+          onMapReady: _onMapReady,
+          onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
+          markers: markersLayer.markers,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -186,11 +183,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           right: 6,
         ),
         child: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             final loc = ref.read(userLocationProvider).value;
             if (loc != null) {
-              _map.move(loc, 14);
-              _map.rotate(0);
+              await _moveCamera(loc, zoom: 14);
             } else {
               ScaffoldMessenger.of(
                 context,
@@ -203,7 +199,44 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  Future<void> _onMapLongPress(TapPosition _, LatLng latlng) async {
+  void _onMapCreated(GoogleMapController controller) {
+    _map?.dispose();
+    _map = controller;
+    _mapReady = false;
+  }
+
+  void _onMapReady() {
+    if (_mapReady) {
+      return;
+    }
+    _mapReady = true;
+    final loc = ref.read(userLocationProvider).value;
+    if (!_movedToSelected && loc != null) {
+      _moveCamera(loc, zoom: 14);
+    }
+  }
+
+  Future<void> _moveCamera(LatLng target, {double zoom = 14}) async {
+    final controller = _map;
+    if (controller == null) {
+      return;
+    }
+    try {
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: target, zoom: zoom, bearing: 0, tilt: 0),
+        ),
+      );
+    } catch (_) {
+      await controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: target, zoom: zoom, bearing: 0, tilt: 0),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onMapLongPress(LatLng latlng) async {
     if (!await _ensureNetworkAvailable()) {
       return;
     }
@@ -240,9 +273,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    _map.move(LatLng(event.latitude, event.longitude), 14);
+    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
     _movedToSelected = true;
-    _map.rotate(0);
     _showEventCard(event);
   }
 
@@ -418,7 +450,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _currentSearchQuery = '';
       _searchController.text = event.title;
     });
-    _map.move(LatLng(event.latitude, event.longitude), 15);
+    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 15);
     _showEventCard(event);
   }
 

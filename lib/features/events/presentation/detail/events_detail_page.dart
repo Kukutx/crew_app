@@ -123,6 +123,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         pngBytes,
         name: 'crew_event_${widget.event.id}',
         quality: 100,
+        isReturnImagePathOfIOS: true,
       );
 
       if (!sheetContext.mounted || !mounted) return;

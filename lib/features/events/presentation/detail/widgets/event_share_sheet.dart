@@ -84,208 +84,116 @@ class SharePreviewCard extends StatelessWidget {
     final timeLabel = event.startTime != null
         ? DateFormat('MM.dd HH:mm').format(event.startTime!.toLocal())
         : loc.to_be_announced;
-    final participantsLabel =
-        event.participantSummary ?? loc.to_be_announced;
+    final participantsLabel = event.participantSummary ?? loc.to_be_announced;
     final organizerName = event.organizer?.name;
     return RepaintBoundary(
       key: previewKey,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFFF0E0), Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFFFF0E0), Colors.white],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(28)),
-              child: Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: _SharePreviewImage(event: event),
-                  ),
-                  Positioned.fill(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.1),
-                            Colors.black.withValues(alpha: 0.55),
-                          ],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 20),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+                child: Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: _SharePreviewImage(event: event),
+                    ),
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.1),
+                              Colors.black.withValues(alpha: 0.55),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 18,
-                    left: 20,
-                    right: 20,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _StatusChip(
-                          label: loc.registration_open,
-                          backgroundColor: Colors.orange,
-                        ),
-                        _StatusChip(
-                          label: timeLabel,
-                          textColor: Colors.grey.shade800,
-                          backgroundColor: Colors.orange.shade50,
-                          icon: Icons.calendar_today,
-                          iconColor: Colors.orange.shade300,
-                        ),
-                        _StatusChip(
-                          label: participantsLabel,
-                          textColor: Colors.grey.shade800,
-                          backgroundColor: Colors.orange.shade50,
-                          icon: Icons.people,
-                          iconColor: Colors.orange.shade300,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    bottom: 24,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.title,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
+                    Positioned(
+                      top: 18,
+                      left: 20,
+                      right: 20,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _StatusChip(
+                            label: loc.registration_open,
+                            backgroundColor: Colors.orange,
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.place_rounded,
-                              size: 18,
+                          _StatusChip(
+                            label: timeLabel,
+                            textColor: Colors.grey.shade800,
+                            backgroundColor: Colors.orange.shade50,
+                            icon: Icons.calendar_today,
+                            iconColor: Colors.orange.shade300,
+                          ),
+                          _StatusChip(
+                            label: participantsLabel,
+                            textColor: Colors.grey.shade800,
+                            backgroundColor: Colors.orange.shade50,
+                            icon: Icons.people,
+                            iconColor: Colors.orange.shade300,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      bottom: 24,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            event.title,
+                            style: theme.textTheme.titleLarge?.copyWith(
                               color: Colors.white,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                event.address?.isNotEmpty == true
-                                    ? event.address!
-                                    : event.location,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (organizerName != null && organizerName.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              organizerName,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(28)),
-              ),
-              padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    loc.share_card_title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    loc.share_card_subtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.black54,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF3E0),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          const SizedBox(height: 10),
+                          Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                loc.share_card_qr_caption,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.black54,
-                                  height: 1.3,
-                                ),
+                              const Icon(
+                                Icons.place_rounded,
+                                size: 18,
+                                color: Colors.white,
                               ),
-                              const SizedBox(height: 6),
-                              GestureDetector(
-                                onLongPress: () async {
-                                  await Clipboard.setData(
-                                    ClipboardData(text: shareLink),
-                                  );
-                                  HapticFeedback.lightImpact();
-                                              if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(
-                                        content: Text(loc.share_copy_success),
-                                      ),
-                                    );
-                                },
+                              const SizedBox(width: 6),
+                              Expanded(
                                 child: Text(
-                                  shareLink,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: Colors.orange.shade700,
-                                    fontWeight: FontWeight.w600,
+                                  event.address?.isNotEmpty == true
+                                      ? event.address!
+                                      : event.location,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -293,35 +201,133 @@ class SharePreviewCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.06),
-                                blurRadius: 10,
-                                offset: const Offset(0, 6),
+                          if (organizerName != null && organizerName.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                organizerName,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(8),
-                          child: QrImageView(
-                            data: shareLink,
-                            version: QrVersions.auto,
-                            size: 80,
-                            backgroundColor: Colors.white,
-                          ),
-                        ),
-                      ],
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(28),
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      loc.share_card_title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      loc.share_card_subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.black54,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3E0),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  loc.share_card_qr_caption,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.black54,
+                                    height: 1.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                GestureDetector(
+                                  onLongPress: () async {
+                                    await Clipboard.setData(
+                                      ClipboardData(text: shareLink),
+                                    );
+                                    HapticFeedback.lightImpact();
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          content: Text(loc.share_copy_success),
+                                        ),
+                                      );
+                                  },
+                                  child: Text(
+                                    shareLink,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: Colors.orange.shade700,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: QrImageView(
+                              data: shareLink,
+                              version: QrVersions.auto,
+                              size: 80,
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -357,11 +363,7 @@ class _StatusChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 16,
-              color: iconColor ?? textColor,
-            ),
+            Icon(icon, size: 16, color: iconColor ?? textColor),
             const SizedBox(width: 6),
           ],
           Text(
@@ -393,11 +395,9 @@ class _SharePreviewImage extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       width: double.infinity,
-      placeholder: (context, url) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      placeholder: (context, url) =>
+          const Center(child: CircularProgressIndicator()),
       errorWidget: (context, url, error) => const EventImagePlaceholder(),
     );
   }
 }
-

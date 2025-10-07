@@ -4,7 +4,7 @@ import 'package:crew_app/features/events/presentation/widgets/event_image_placeh
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 
 import '../../../../core/state/app/app_overlay_provider.dart';
 import '../../../../core/error/api_exception.dart';
@@ -47,7 +47,7 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
               return _CenteredScrollable(child: Text(loc.no_events));
             }
 
-            return MasonryGridView.count(
+            return AppMasonryGrid(
               padding: const EdgeInsets.all(8),
               crossAxisCount: 2,
               mainAxisSpacing: 8,

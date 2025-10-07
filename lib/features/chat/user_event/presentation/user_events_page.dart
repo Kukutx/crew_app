@@ -11,7 +11,18 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class UserEventsPage extends StatefulWidget {
-  const UserEventsPage({super.key});
+  const UserEventsPage({
+    super.key,
+    this.embedInScaffold = true,
+    this.controller,
+    this.padding,
+    this.physics,
+  });
+
+  final bool embedInScaffold;
+  final ScrollController? controller;
+  final EdgeInsetsGeometry? padding;
+  final ScrollPhysics? physics;
 
   @override
   State<UserEventsPage> createState() => _UserEventsPageState();
@@ -190,6 +201,22 @@ class _UserEventsPageState extends State<UserEventsPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
+    final content = _UserEventsContent(
+      controller: widget.controller,
+      padding: widget.padding,
+      physics: widget.physics,
+      tab: _tab,
+      onTabChanged: (value) => setState(() => _tab = value),
+      events: _sampleEvents,
+      onEventTap: _openChat,
+      favoritesLabel: loc.events_tab_favorites,
+      registeredLabel: loc.events_tab_registered,
+    );
+
+    if (!widget.embedInScaffold) {
+      return content;
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -202,15 +229,51 @@ class _UserEventsPageState extends State<UserEventsPage> {
           ),
         ],
       ),
-      body: Column(
+      body: content,
+    );
+  }
+}
+
+class _UserEventsContent extends StatelessWidget {
+  const _UserEventsContent({
+    required this.controller,
+    required this.padding,
+    required this.physics,
+    required this.tab,
+    required this.onTabChanged,
+    required this.events,
+    required this.onEventTap,
+    required this.favoritesLabel,
+    required this.registeredLabel,
+  });
+
+  final ScrollController? controller;
+  final EdgeInsetsGeometry? padding;
+  final ScrollPhysics? physics;
+  final int tab;
+  final ValueChanged<int> onTabChanged;
+  final List<UserEventPreview> events;
+  final void Function(UserEventPreview event, int index) onEventTap;
+  final String favoritesLabel;
+  final String registeredLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final effectivePhysics =
+        physics ?? const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics());
+
+    return Padding(
+      padding: padding ?? EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: UserEventsTabBar(
-              selectedIndex: _tab,
-              favoritesLabel: loc.events_tab_favorites,
-              registeredLabel: loc.events_tab_registered,
-              onChanged: (value) => setState(() => _tab = value),
+              selectedIndex: tab,
+              favoritesLabel: favoritesLabel,
+              registeredLabel: registeredLabel,
+              onChanged: onTabChanged,
             ),
           ),
           Expanded(
@@ -218,18 +281,22 @@ class _UserEventsPageState extends State<UserEventsPage> {
               duration: const Duration(milliseconds: 250),
               switchInCurve: Curves.easeOut,
               switchOutCurve: Curves.easeIn,
-              child: _tab == 0
+              child: tab == 0
                   ? UserEventsFavoritesGrid(
                       key: const ValueKey('favorites'),
-                      events: _sampleEvents,
+                      events: events,
+                      controller: controller,
+                      physics: effectivePhysics,
                       onEventTap: (index) =>
-                          _openChat(_sampleEvents[index], index),
+                          onEventTap(events[index], index),
                     )
                   : UserEventsRegisteredList(
                       key: const ValueKey('registered'),
-                      events: _sampleEvents,
+                      events: events,
+                      controller: controller,
+                      physics: effectivePhysics,
                       onEventTap: (index) =>
-                          _openChat(_sampleEvents[index], index),
+                          onEventTap(events[index], index),
                     ),
             ),
           ),

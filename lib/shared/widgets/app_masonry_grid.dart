@@ -14,6 +14,7 @@ class AppMasonryGrid extends StatelessWidget {
     this.padding,
     this.physics,
     this.shrinkWrap = false,
+    this.controller,
   });
 
   final int itemCount;
@@ -24,10 +25,12 @@ class AppMasonryGrid extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final ScrollPhysics? physics;
   final bool shrinkWrap;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
     return MasonryGridView.count(
+      controller: controller,
       padding: padding,
       crossAxisCount: crossAxisCount,
       mainAxisSpacing: mainAxisSpacing,

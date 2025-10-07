@@ -17,6 +17,7 @@ import '../../../../core/network/api_service.dart';
 import '../../../../core/state/di/providers.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
+import '../../../../core/state/app/app_overlay_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
@@ -247,11 +248,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _onAvatarTap(bool authed) {
-    if (authed) {
-      Navigator.pushNamed(context, '/profile');
-    } else {
-      Navigator.pushNamed(context, '/profile');
-    }
+    ref.read(appOverlayIndexProvider.notifier).state = 2;
   }
 
   Future<bool> _ensureDisclaimerAccepted() async {

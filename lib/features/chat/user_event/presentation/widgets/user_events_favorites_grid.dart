@@ -11,17 +11,25 @@ class UserEventsFavoritesGrid extends StatelessWidget {
     super.key,
     required this.events,
     this.onEventTap,
+    this.controller,
+    this.physics,
+    this.padding,
   });
 
   final List<UserEventPreview> events;
   final UserEventTap? onEventTap;
+  final ScrollController? controller;
+  final ScrollPhysics? physics;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     return MasonryGridView.count(
       key: const PageStorageKey('user-events-favorites-grid'),
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      physics: const BouncingScrollPhysics(),
+      controller: controller,
+      padding: padding ?? const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      physics:
+          physics ?? const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       crossAxisCount: 2,
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,

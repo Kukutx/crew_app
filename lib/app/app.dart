@@ -19,9 +19,9 @@ class App extends ConsumerStatefulWidget {
 
 class _AppState extends ConsumerState<App> {
   int _index = 1; // 默认打开“地图”
+  int _activeOverlayIndex = 0;
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
-  late final PageController _overlayController = PageController(initialPage: 1);
   ProviderSubscription<int>? _overlayIndexSubscription;
 
   @override
@@ -31,26 +31,25 @@ class _AppState extends ConsumerState<App> {
       appOverlayIndexProvider,
       (previous, next) {
         if (next == _index) {
+          if (next != 1 && _activeOverlayIndex != next) {
+            setState(() => _activeOverlayIndex = next);
+          }
           return;
         }
         setState(() {
           _index = next;
           if (next == 1) {
             _isScrolling = false;
+          } else {
+            _activeOverlayIndex = next;
           }
         });
-        _overlayController.animateToPage(
-          next,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
       },
     );
   }
 
   @override
   void dispose() {
-    _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _overlayIndexSubscription?.close();
     super.dispose();
@@ -130,39 +129,29 @@ class _AppState extends ConsumerState<App> {
             listenToPointerActivity: true,
             child: const EventsMapPage(),
           ),
-          IgnorePointer(
-            ignoring: !isOverlayOpen,
-            child: PageView(
-              controller: _overlayController,
-              physics: isOverlayOpen
-                  ? const PageScrollPhysics()
-                  : const NeverScrollableScrollPhysics(),
-              onPageChanged: (page) {
-                final shouldUpdateIndex = _index != page;
-                final shouldResetScroll = page == 1 && _isScrolling;
-                if (!shouldUpdateIndex && !shouldResetScroll) {
-                  return;
-                }
-                setState(() {
-                  _index = page;
-                  if (page == 1) {
-                    _isScrolling = false;
-                  }
-                });
-                ref.read(appOverlayIndexProvider.notifier).state = page;
-              },
-              children: [
-                ScrollActivityListener(
-                  onScrollActivityChanged: _handleScrollActivity,
-                  child: const EventsListPage(),
+          _OverlayBottomSheet(
+            isVisible: isOverlayOpen,
+            isGroup: _activeOverlayIndex == 2,
+            onScrollActivityChanged: _handleScrollActivity,
+            childBuilder: (scrollController) {
+              if (_activeOverlayIndex == 0) {
+                return EventsListContent(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                );
+              }
+              return UserEventsPage(
+                embedInScaffold: false,
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
                 ),
-                const SizedBox.expand(),
-                ScrollActivityListener(
-                  onScrollActivityChanged: _handleScrollActivity,
-                  child: const UserEventsPage(),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -222,24 +211,150 @@ class _AppState extends ConsumerState<App> {
                         if (_index == i) {
                           return;
                         }
-                        setState(() {
-                          _index = i;
-                          if (i == 1) {
-                            _isScrolling = false;
-                          }
-                        });
                         ref.read(appOverlayIndexProvider.notifier).state = i;
-                        _overlayController.animateToPage(
-                          i,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
                       },
                       destinations: destinations,
                     ),
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OverlayBottomSheet extends StatelessWidget {
+  const _OverlayBottomSheet({
+    required this.isVisible,
+    required this.isGroup,
+    required this.onScrollActivityChanged,
+    required this.childBuilder,
+  });
+
+  final bool isVisible;
+  final bool isGroup;
+  final ValueChanged<bool> onScrollActivityChanged;
+  final Widget Function(ScrollController controller) childBuilder;
+
+  void _showNotReady(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final handleColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.28);
+
+    return IgnorePointer(
+      ignoring: !isVisible,
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeInOut,
+        offset: isVisible ? Offset.zero : const Offset(0, 1.05),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: isVisible ? 1 : 0,
+          child: NotificationListener<DraggableScrollableNotification>(
+            onNotification: (notification) {
+              if (!isVisible) {
+                return false;
+              }
+              final isMoving = notification.extent != notification.minExtent &&
+                  notification.extent != notification.maxExtent;
+              onScrollActivityChanged(isMoving);
+              if (!isMoving) {
+                onScrollActivityChanged(false);
+              }
+              return false;
+            },
+            child: DraggableScrollableSheet(
+              expand: false,
+              minChildSize: 0.2,
+              initialChildSize: 0.45,
+              maxChildSize: 0.92,
+              snap: true,
+              snapSizes: const [0.25, 0.45, 0.85],
+              builder: (context, scrollController) {
+                final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+                return Padding(
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 16 + bottomPadding,
+                  ),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.shadow.withValues(alpha: 0.12),
+                          blurRadius: 30,
+                          offset: const Offset(0, 18),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 12),
+                        Container(
+                          width: 48,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: handleColor,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  isGroup ? loc.group : loc.events_title,
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: loc.feature_not_ready,
+                                onPressed: () =>
+                                    _showNotReady(context, loc.feature_not_ready),
+                                icon: Icon(
+                                  isGroup ? Icons.group_add : Icons.filter_list_alt,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (notification) {
+                              if (notification is ScrollStartNotification) {
+                                onScrollActivityChanged(true);
+                              } else if (notification is ScrollEndNotification) {
+                                onScrollActivityChanged(false);
+                              }
+                              return false;
+                            },
+                            child: childBuilder(scrollController),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),

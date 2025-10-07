@@ -9,20 +9,45 @@ import '../../../../core/state/app/app_overlay_provider.dart';
 import '../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
-class EventsListPage extends ConsumerStatefulWidget {
+class EventsListPage extends ConsumerWidget {
   const EventsListPage({super.key});
 
   @override
-  ConsumerState<EventsListPage> createState() => _EventsListPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(loc.events_title)),
+      body: const EventsListContent(
+        padding: EdgeInsets.all(8),
+        physics: const AlwaysScrollableScrollPhysics(),
+      ),
+    );
+  }
 }
 
-class _EventsListPageState extends ConsumerState<EventsListPage> {
+class EventsListContent extends ConsumerStatefulWidget {
+  const EventsListContent({
+    super.key,
+    this.controller,
+    this.padding,
+    this.physics,
+  });
+
+  final ScrollController? controller;
+  final EdgeInsetsGeometry? padding;
+  final ScrollPhysics? physics;
+
+  @override
+  ConsumerState<EventsListContent> createState() => _EventsListContentState();
+}
+
+class _EventsListContentState extends ConsumerState<EventsListContent> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final eventsAsync = ref.watch(eventsProvider);
 
-    // 刷新列表
     ref.listen<AsyncValue<List<Event>>>(eventsProvider, (prev, next) {
       next.whenOrNull(error: (error, _) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -35,36 +60,42 @@ class _EventsListPageState extends ConsumerState<EventsListPage> {
       });
     });
 
-    return Scaffold(
-      appBar: AppBar(title: Text(loc.events_title)),
-      body: RefreshIndicator(
-        onRefresh: () async => await ref.refresh(eventsProvider.future),
-        child: eventsAsync.when(
-          data: (events) {
-            if (events.isEmpty) {
-              return _CenteredScrollable(child: Text(loc.no_events));
-            }
-
-            return AppMasonryGrid(
-              padding: const EdgeInsets.all(8),
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              itemCount: events.length,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, i) => EventGridCard(
-                event: events[i],
-                heroTag: 'event_$i',
-                onShowOnMap: (event) {
-                  ref.read(appOverlayIndexProvider.notifier).state = 1;
-                  ref.read(mapFocusEventProvider.notifier).state = event;
-                },
-              ),
+    return RefreshIndicator(
+      onRefresh: () async => await ref.refresh(eventsProvider.future),
+      child: eventsAsync.when(
+        data: (events) {
+          if (events.isEmpty) {
+            return _CenteredScrollable(
+              controller: widget.controller,
+              child: Text(loc.no_events),
             );
-          },
-          loading: () =>
-              const _CenteredScrollable(child: CircularProgressIndicator()),
-          error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
+          }
+
+          return AppMasonryGrid(
+            controller: widget.controller,
+            padding: widget.padding ?? const EdgeInsets.all(8),
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            itemCount: events.length,
+            physics: widget.physics,
+            itemBuilder: (context, i) => EventGridCard(
+              event: events[i],
+              heroTag: 'event_$i',
+              onShowOnMap: (event) {
+                ref.read(appOverlayIndexProvider.notifier).state = 1;
+                ref.read(mapFocusEventProvider.notifier).state = event;
+              },
+            ),
+          );
+        },
+        loading: () => _CenteredScrollable(
+          controller: widget.controller,
+          child: const CircularProgressIndicator(),
+        ),
+        error: (_, _) => _CenteredScrollable(
+          controller: widget.controller,
+          child: Text(loc.load_failed),
         ),
       ),
     );
@@ -80,15 +111,20 @@ String _errorMessage(Object error) {
 }
 
 class _CenteredScrollable extends StatelessWidget {
-  final Widget child;
+  const _CenteredScrollable({
+    required this.child,
+    this.controller,
+  });
 
-  const _CenteredScrollable({required this.child});
+  final Widget child;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         return ListView(
+          controller: controller,
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             SizedBox(

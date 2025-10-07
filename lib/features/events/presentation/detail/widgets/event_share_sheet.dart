@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/share/app_share_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -27,54 +28,38 @@ class EventShareSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
     final theme = Theme.of(context);
-    return SafeArea(
-      top: false,
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding + 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SharePreviewCard(
-                event: event,
-                loc: loc,
-                previewKey: previewKey,
-                shareLink: shareLink,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                loc.share_card_subtitle,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.black54,
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 16,
-                runSpacing: 12,
-                children: [
-                  ShareActionButton(
-                    icon: Icons.image_outlined,
-                    label: loc.share_action_save_image,
-                    onTap: onSaveImage,
-                  ),
-                  ShareActionButton(
-                    icon: Icons.ios_share,
-                    label: loc.share_action_share_system,
-                    onTap: onShareSystem,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+    return AppShareSheet(
+      preview: SharePreviewCard(
+        event: event,
+        loc: loc,
+        previewKey: previewKey,
+        shareLink: shareLink,
       ),
+      description: Text(
+        loc.share_card_subtitle,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: Colors.black54,
+          height: 1.4,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        AppShareActionButton(
+          icon: Icons.image_outlined,
+          label: loc.share_action_save_image,
+          onTap: onSaveImage,
+          iconColor: Colors.orange,
+          labelColor: Colors.orange.shade800,
+        ),
+        AppShareActionButton(
+          icon: Icons.ios_share,
+          label: loc.share_action_share_system,
+          onTap: onShareSystem,
+          iconColor: Colors.orange,
+          labelColor: Colors.orange.shade800,
+        ),
+      ],
     );
   }
 }
@@ -416,46 +401,3 @@ class _SharePreviewImage extends StatelessWidget {
   }
 }
 
-
-class ShareActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Future<void> Function() onTap;
-
-  const ShareActionButton({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => onTap(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: Colors.orange),
-              const SizedBox(width: 10),
-              Text(
-                label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.orange.shade800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -55,7 +55,7 @@ class EventGridCard extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       ),
-                      errorWidget: (c, _, __) =>
+                      errorWidget: (c, _, _) =>
                           const EventImagePlaceholder(aspectRatio: 1),
                     )
                   : const EventImagePlaceholder(aspectRatio: 1),

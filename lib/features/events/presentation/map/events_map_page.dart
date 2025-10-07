@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:crew_app/core/config/environment.dart';
-import 'package:crew_app/shared/widgets/legal_bottom_sheet/presentation/widgets/disclaimer_bottom_sheet.dart';
-import 'package:crew_app/shared/widgets/legal_bottom_sheet/state/disclaimer_providers.dart';
+import 'package:crew_app/shared/widgets/sheets/legal_sheet/presentation/widgets/disclaimer_sheet.dart';
+import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,9 +20,9 @@ import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
-import 'sheets/event_filter_sheet.dart';
-import 'sheets/event_bottom_sheet.dart';
-import 'sheets/create_event_sheet.dart';
+import 'sheets/map_event_filter_sheet.dart';
+import 'sheets/map_event_card_sheet.dart';
+import 'sheets/map_create_event_sheet.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;

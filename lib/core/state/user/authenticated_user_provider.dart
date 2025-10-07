@@ -1,7 +1,7 @@
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/core/state/di/providers.dart';
-import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
+import 'package:crew_app/features/settings/data/authenticated_user_dto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';

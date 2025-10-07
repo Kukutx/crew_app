@@ -1,10 +1,10 @@
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
-import 'package:crew_app/core/state/settings/settings_providers.dart';
+import 'package:crew_app/features/settings/state/settings_providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/settings/presentation/about/about_page.dart';
 import 'package:crew_app/features/settings/presentation/developer_test/crash_test_page.dart';
-import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
+import 'package:crew_app/features/settings/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/foundation.dart';

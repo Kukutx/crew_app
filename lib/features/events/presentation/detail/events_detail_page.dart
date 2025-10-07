@@ -6,7 +6,7 @@ import 'package:crew_app/features/events/presentation/detail/widgets/event_detai
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_share_sheet.dart';
-import 'package:crew_app/features/user/presentation/user_profile_page.dart';
+import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

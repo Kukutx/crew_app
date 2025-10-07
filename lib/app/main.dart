@@ -8,10 +8,10 @@ import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/features/user/presentation/settings/state/settings_providers.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
-import 'package:crew_app/features/events/presentation/group_chat/group_chat_page.dart';
+import 'package:crew_app/features/events/presentation/group_chat/group_chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/settings/presentation/history/history_page.dart';
 import 'package:crew_app/features/user/presentation/settings/presentation/preferences/preferences_page.dart';
-import 'package:crew_app/shared/playground/profile/profile_page.dart';
+import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/features/user/presentation/settings/presentation/settings/settings_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:feedback/feedback.dart';
@@ -179,8 +179,8 @@ class MyApp extends ConsumerWidget {
         '/login': (context) => const LoginPage(),
         '/settings': (context) => const SettingsPage(),
         '/preferences': (context) => PreferencesPage(),
-        '/group_chat': (context) => GroupChatPage(),
-        '/profile': (context) => ProfilePage(),
+        '/group_chat': (context) => const GroupChatSheet(),
+        '/profile': (context) => const UserProfilePage(),
         '/history': (context) => HistoryPage(),
       },
     );

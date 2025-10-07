@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:crew_app/features/events/presentation/events_list/events_list_sheet.dart';
+import 'package:crew_app/features/events/presentation/group_chat/group_chat_sheet.dart';
+import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/playground/profile/profile_page.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,6 +75,34 @@ class _AppState extends ConsumerState<App> {
         setState(() => _isScrolling = false);
       }
     });
+  }
+
+  Future<void> _showEventsListSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return FractionallySizedBox(
+          heightFactor: 0.92,
+          child: const EventsListSheet(),
+        );
+      },
+    );
+  }
+
+  Future<void> _showGroupChatSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return FractionallySizedBox(
+          heightFactor: 0.92,
+          child: const GroupChatSheet(),
+        );
+      },
+    );
   }
 
   @override
@@ -163,7 +193,7 @@ class _AppState extends ConsumerState<App> {
                 const SizedBox.expand(),
                 ScrollActivityListener(
                   onScrollActivityChanged: _handleScrollActivity,
-                  child: ProfilePage(
+                  child: UserProfilePage(
                     onClose: () {
                       ref.read(appOverlayIndexProvider.notifier).state = 1;
                     },
@@ -225,23 +255,19 @@ class _AppState extends ConsumerState<App> {
                     child: NavigationBar(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
-                      selectedIndex: _index,
+                      selectedIndex: 1,
                       onDestinationSelected: (i) {
-                        if (_index == i) {
+                        if (i == 0) {
+                          unawaited(_showEventsListSheet(context));
                           return;
                         }
-                        setState(() {
-                          _index = i;
-                          if (i == 1) {
-                            _isScrolling = false;
-                          }
-                        });
-                        ref.read(appOverlayIndexProvider.notifier).state = i;
-                        _overlayController.animateToPage(
-                          i,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
+                        if (i == 2) {
+                          unawaited(_showGroupChatSheet(context));
+                          return;
+                        }
+                        if (_index != 1) {
+                          ref.read(appOverlayIndexProvider.notifier).state = 1;
+                        }
                       },
                       destinations: destinations,
                     ),

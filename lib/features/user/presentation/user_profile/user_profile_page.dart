@@ -13,7 +13,9 @@ import 'package:crew_app/features/user/presentation/user_profile/widgets/profile
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
-  const UserProfilePage({super.key});
+  const UserProfilePage({super.key, this.onClose});
+
+  final VoidCallback? onClose;
 
   @override
   ConsumerState<UserProfilePage> createState() => _UserProfilePageState();
@@ -134,6 +136,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       pinned: true,
       stretch: true,
       expandedHeight: _expandedHeight,
+      automaticallyImplyLeading: widget.onClose == null,
+      leading: widget.onClose == null
+          ? null
+          : IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: widget.onClose,
+            ),
       actions: [
         IconButton(
           icon: const Icon(Icons.more_vert),

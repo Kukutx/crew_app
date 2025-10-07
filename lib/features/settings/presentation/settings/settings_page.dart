@@ -1,8 +1,12 @@
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
+import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/core/state/settings/settings_providers.dart';
+import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/settings/presentation/about/about_page.dart';
 import 'package:crew_app/features/settings/presentation/developer_test/crash_test_page.dart';
+import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,6 +57,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final loc = AppLocalizations.of(context)!;
     final selectedLanguage = settings.locale.languageCode == 'zh' ? 'zh' : 'en';
@@ -61,6 +66,19 @@ class SettingsPage extends ConsumerWidget {
     final activityReminderEnabled = ref.watch(eventReminderProvider);
     final followingUpdatesEnabled = ref.watch(followingUpdatesProvider);
     final pushNotificationEnabled = ref.watch(pushNotificationProvider);
+    final authState = ref.watch(authStateProvider);
+    final firebaseUser = authState.value ?? ref.watch(currentUserProvider);
+    final profileState = ref.watch(authenticatedUserProvider);
+    final backendUser = profileState.asData?.value;
+    final displayName = firebaseUser != null
+        ? _resolveDisplayName(firebaseUser, backendUser, loc)
+        : loc.settings_account_info;
+    final email = firebaseUser != null
+        ? _resolveEmail(firebaseUser, backendUser, loc)
+        : null;
+    final uid = firebaseUser != null
+        ? _resolveUid(firebaseUser, backendUser)
+        : null;
 
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),
@@ -197,6 +215,78 @@ class SettingsPage extends ConsumerWidget {
             ],
           ),
           _SettingsSection(
+            title: loc.settings_section_account,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text(loc.settings_account_info),
+                subtitle: firebaseUser != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayName,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          if (email != null)
+                            Text(
+                              '${loc.settings_account_email_label}: $email',
+                            ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${loc.settings_account_uid_label}: $uid',
+                          ),
+                        ],
+                      )
+                    : Text(loc.login_prompt),
+                isThreeLine: true,
+                trailing: firebaseUser == null
+                    ? TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                        child: Text(loc.action_login),
+                      )
+                    : null,
+                onTap: firebaseUser == null
+                    ? () {
+                        Navigator.pushNamed(context, '/login');
+                      }
+                    : null,
+              ),
+              ListTile(
+                leading: const Icon(Icons.history),
+                title: Text(loc.browsing_history),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.pushNamed(context, '/history'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.verified_user),
+                title: Text(loc.verification_preferences),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.pushNamed(context, '/preferences'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text(loc.action_logout),
+                enabled: firebaseUser != null,
+                onTap: firebaseUser == null
+                    ? null
+                    : () async {
+                        await _signOut(context, ref);
+                      },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline),
+                title: Text(loc.settings_account_delete),
+                onTap: () => _showComingSoon(context, loc),
+              ),
+            ],
+          ),
+          _SettingsSection(
             title: loc.settings_section_notifications,
             children: [
               SwitchListTile.adaptive(
@@ -251,22 +341,48 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ],
             ),
-          _SettingsSection(
+             _SettingsSection(
             title: loc.settings_section_account,
             children: [
               ListTile(
                 leading: const Icon(Icons.person_outline),
                 title: Text(loc.settings_account_info),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${loc.settings_account_email_label}: crew@example.com',
-                    ),
-                    const SizedBox(height: 4),
-                    Text('${loc.settings_account_uid_label}: UID-000000'),
-                  ],
-                ),
+                subtitle: firebaseUser != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayName,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          if (email != null)
+                            Text(
+                              '${loc.settings_account_email_label}: $email',
+                            ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${loc.settings_account_uid_label}: $uid',
+                          ),
+                        ],
+                      )
+                    : Text(loc.login_prompt),
+                isThreeLine: true,
+                trailing: firebaseUser == null
+                    ? TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                        child: Text(loc.action_login),
+                      )
+                    : null,
+                onTap: firebaseUser == null
+                    ? () {
+                        Navigator.pushNamed(context, '/login');
+                      }
+                    : null,
               ),
               ListTile(
                 leading: const Icon(Icons.history),
@@ -283,11 +399,12 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.logout),
                 title: Text(loc.action_logout),
-                onTap: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(loc.logout_success)));
-                },
+                enabled: firebaseUser != null,
+                onTap: firebaseUser == null
+                    ? null
+                    : () async {
+                        await _signOut(context, ref);
+                      },
               ),
               ListTile(
                 leading: const Icon(Icons.delete_outline),
@@ -298,6 +415,15 @@ class SettingsPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
+    await ref.read(signOutProvider)();
+    if (!context.mounted) return;
+    final loc = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(loc.logout_success)),
     );
   }
 
@@ -424,4 +550,52 @@ class _SettingsSection extends StatelessWidget {
       ),
     );
   }
+}
+
+String _resolveDisplayName(
+  fa.User user,
+  AuthenticatedUserDto? backendUser,
+  AppLocalizations loc,
+) {
+  final backendName = backendUser?.displayName?.trim();
+  if (backendName != null && backendName.isNotEmpty) {
+    return backendName;
+  }
+
+  final firebaseName = user.displayName?.trim();
+  if (firebaseName != null && firebaseName.isNotEmpty) {
+    return firebaseName;
+  }
+
+  return loc.user_display_name_fallback;
+}
+
+String _resolveEmail(
+  fa.User user,
+  AuthenticatedUserDto? backendUser,
+  AppLocalizations loc,
+) {
+  final backendEmail = backendUser?.email.trim();
+  if (backendEmail != null && backendEmail.isNotEmpty) {
+    return backendEmail;
+  }
+
+  final firebaseEmail = user.email?.trim();
+  if (firebaseEmail != null && firebaseEmail.isNotEmpty) {
+    return firebaseEmail;
+  }
+
+  return loc.email_unbound;
+}
+
+String _resolveUid(
+  fa.User user,
+  AuthenticatedUserDto? backendUser,
+) {
+  final backendId = backendUser?.id.trim();
+  if (backendId != null && backendId.isNotEmpty) {
+    return backendId;
+  }
+
+  return user.uid;
 }

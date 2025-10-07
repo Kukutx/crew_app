@@ -297,33 +297,34 @@ class SettingsPage extends ConsumerWidget {
                       }
                     : null,
               ),
-              ListTile(
-                leading: const Icon(Icons.history),
-                title: Text(loc.browsing_history),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/history'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.verified_user),
-                title: Text(loc.verification_preferences),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/preferences'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: Text(loc.action_logout),
-                enabled: firebaseUser != null,
-                onTap: firebaseUser == null
-                    ? null
-                    : () async {
-                        await _signOut(context, ref);
-                      },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: Text(loc.settings_account_delete),
-                onTap: () => _showComingSoon(context, loc),
-              ),
+              if (firebaseUser != null)
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: Text(loc.browsing_history),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/history'),
+                ),
+              if (firebaseUser != null)
+                ListTile(
+                  leading: const Icon(Icons.verified_user),
+                  title: Text(loc.verification_preferences),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pushNamed(context, '/preferences'),
+                ),
+              if (firebaseUser != null)
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: Text(loc.action_logout),
+                  onTap: () async {
+                    await _signOut(context, ref);
+                  },
+                ),
+              if (firebaseUser != null)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline),
+                  title: Text(loc.settings_account_delete),
+                  onTap: () => _showComingSoon(context, loc),
+                ),
             ],
           ),
         ],

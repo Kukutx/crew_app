@@ -2,12 +2,12 @@
 import 'package:crew_app/features/messages/data/group_chat_preview.dart';
 import 'package:crew_app/features/messages/data/group_message.dart';
 import 'package:crew_app/features/messages/data/group_participant.dart';
-import 'package:crew_app/features/messages/group_chat/widgets/group_chat_favorites_grid.dart';
-import 'package:crew_app/features/messages/group_chat/widgets/group_chat_registered_list.dart';
-import 'package:crew_app/features/messages/group_chat/widgets/group_chat_tab_bar.dart';
-import 'package:crew_app/features/messages/group_chat_room/group_chat_room_page.dart';
-export 'package:crew_app/features/messages/group_chat/widgets/group_chat_list_tile.dart';
-export 'package:crew_app/features/messages/group_chat/widgets/group_chat_tab_chip.dart';
+import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_favorites_grid.dart';
+import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_registered_list.dart';
+import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_tab_bar.dart';
+import 'package:crew_app/features/messages/presentation/group_chat_room/group_chat_room_page.dart';
+export 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_list_tile.dart';
+export 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_tab_chip.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 

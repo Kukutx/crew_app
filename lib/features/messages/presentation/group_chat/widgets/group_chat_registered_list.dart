@@ -1,5 +1,5 @@
 import 'package:crew_app/features/messages/data/group_chat_preview.dart';
-import 'package:crew_app/features/messages/group_chat/widgets/group_chat_list_tile.dart';
+import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_list_tile.dart';
 import 'package:flutter/material.dart';
 
 class GroupChatRegisteredList extends StatelessWidget {

@@ -54,6 +54,12 @@ class ProfileHeaderCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          userProfile.bio,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         const SizedBox(height: 8),
                         Row(
                           children: [

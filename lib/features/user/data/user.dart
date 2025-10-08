@@ -1,7 +1,6 @@
 class User {
   final String uid;
   final String name;
-  final String bio;
   final String avatar;
   final String cover;
   final int followers;
@@ -11,7 +10,6 @@ class User {
   User({
     required this.uid,
     required this.name,
-    required this.bio,
     required this.avatar,
     required this.cover,
     required this.followers,
@@ -23,7 +21,6 @@ class User {
   User copyWith({bool? followed, int? followers}) => User(
         uid: uid,
         name: name,
-        bio: bio,
         avatar: avatar,
         cover: cover,
         followers: followers ?? this.followers,

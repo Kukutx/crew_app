@@ -19,7 +19,7 @@ class App extends ConsumerStatefulWidget {
   ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends ConsumerState<App> {
+class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
   int _index = 1; // 默认打开“地图”
   int _navigationIndex = 1;
   bool _isScrolling = false;
@@ -78,32 +78,51 @@ class _AppState extends ConsumerState<App> {
     });
   }
 
+  AnimationController _createBottomSheetAnimationController() {
+    final controller = BottomSheet.createAnimationController(this);
+    controller.duration = const Duration(milliseconds: 400);
+    controller.reverseDuration = const Duration(milliseconds: 400);
+    return controller;
+  }
+
   Future<void> _showEventsListSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.92,
-          child: const MapEventsListSheet(),
-        );
-      },
-    );
+    final controller = _createBottomSheetAnimationController();
+    try {
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        transitionAnimationController: controller,
+        builder: (sheetContext) {
+          return FractionallySizedBox(
+            heightFactor: 0.92,
+            child: const MapEventsListSheet(),
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _showGroupChatSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.92,
-          child: const GroupChatSheet(),
-        );
-      },
-    );
+    final controller = _createBottomSheetAnimationController();
+    try {
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        transitionAnimationController: controller,
+        builder: (sheetContext) {
+          return FractionallySizedBox(
+            heightFactor: 0.92,
+            child: const GroupChatSheet(),
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   @override

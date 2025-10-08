@@ -126,7 +126,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: NestedScrollView(
-          headerSliverBuilder: (_, __) => [
+          headerSliverBuilder: (_, _) => [
             _buildSliverAppBar(context, profile, topPadding, theme),
           ],
           body: ProfileTabView(controller: _tabController),

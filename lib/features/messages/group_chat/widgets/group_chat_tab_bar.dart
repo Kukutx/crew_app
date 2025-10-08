@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/presentation/group_chat/widgets/group_chat_tab_chip.dart';
+import 'package:crew_app/features/messages/group_chat/widgets/group_chat_tab_chip.dart';
 import 'package:flutter/material.dart';
 
 typedef GroupChatTabChanged = void Function(int index);

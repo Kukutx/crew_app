@@ -1,5 +1,5 @@
-import 'package:crew_app/features/events/data/group_chat_preview.dart';
-import 'package:crew_app/features/events/presentation/group_chat/widgets/group_chat_grid_card.dart';
+import 'package:crew_app/features/messages/data/group_chat_preview.dart';
+import 'package:crew_app/features/messages/group_chat/widgets/group_chat_grid_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 

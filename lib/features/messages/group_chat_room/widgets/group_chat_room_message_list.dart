@@ -1,5 +1,5 @@
-import 'package:crew_app/features/events/data/group_message.dart';
-import 'package:crew_app/features/events/presentation/group_chat_room/widgets/group_member_message_tile.dart';
+import 'package:crew_app/features/messages/data/group_message.dart';
+import 'package:crew_app/features/messages/group_chat_room/widgets/group_member_message_tile.dart';
 import 'package:flutter/material.dart';
 
 

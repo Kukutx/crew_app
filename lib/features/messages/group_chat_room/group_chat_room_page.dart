@@ -1,8 +1,8 @@
 
-import 'package:crew_app/features/events/data/group_message.dart';
-import 'package:crew_app/features/events/data/group_participant.dart';
-import 'package:crew_app/features/events/presentation/group_chat_room/widgets/group_chat_room_app_bar.dart';
-import 'package:crew_app/features/events/presentation/group_chat_room/widgets/group_chat_room_message_composer.dart';
+import 'package:crew_app/features/messages/data/group_message.dart';
+import 'package:crew_app/features/messages/data/group_participant.dart';
+import 'package:crew_app/features/messages/group_chat_room/widgets/group_chat_room_app_bar.dart';
+import 'package:crew_app/features/messages/group_chat_room/widgets/group_chat_room_message_composer.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 

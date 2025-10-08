@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/data/group_participant.dart';
+import 'package:crew_app/features/messages/data/group_participant.dart';
 
 class GroupMessage {
   const GroupMessage({

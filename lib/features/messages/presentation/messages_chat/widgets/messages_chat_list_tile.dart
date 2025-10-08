@@ -1,15 +1,15 @@
-import 'package:crew_app/features/messages/data/group_chat_preview.dart';
+import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
 import 'package:flutter/material.dart';
 
 
-class GroupChatListTile extends StatelessWidget {
-  const GroupChatListTile({
+class MessagesChatListTile extends StatelessWidget {
+  const MessagesChatListTile({
     super.key,
     required this.event,
     this.onTap,
   });
 
-  final GroupChatPreview event;
+  final MessagesChatPreview event;
   final VoidCallback? onTap;
 
   @override

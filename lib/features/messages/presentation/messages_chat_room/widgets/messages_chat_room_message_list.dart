@@ -1,10 +1,10 @@
 import 'package:crew_app/features/messages/data/group_message.dart';
-import 'package:crew_app/features/messages/presentation/group_chat_room/widgets/group_member_message_tile.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_tile.dart';
 import 'package:flutter/material.dart';
 
 
-class GroupChatRoomMessageList extends StatelessWidget {
-  const GroupChatRoomMessageList({
+class MessagesChatRoomMessageList extends StatelessWidget {
+  const MessagesChatRoomMessageList({
     super.key,
     required this.messages,
     required this.scrollController,
@@ -39,7 +39,7 @@ class GroupChatRoomMessageList extends StatelessWidget {
               ? true
               : !messages[index - 1].isFromSameSender(messages[index]);
 
-          return GroupMemberMessageTile(
+          return MessagesChatRoomMessageTile(
             message: message,
             showAvatar: showAvatar,
             youLabel: youLabel,

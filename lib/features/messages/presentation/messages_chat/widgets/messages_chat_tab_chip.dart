@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GroupChatTabChip extends StatelessWidget {
-  const GroupChatTabChip({
+class MessagesChatTabChip extends StatelessWidget {
+  const MessagesChatTabChip({
     super.key,
     required this.label,
     required this.icon,

@@ -12,5 +12,6 @@ final userProfileProvider = StateProvider<User>((ref) {
     following: 5,
     events: 32,
     followed: false,
+    tags: const ['户外达人', '摄影师', '旅行规划'],
   );
 });

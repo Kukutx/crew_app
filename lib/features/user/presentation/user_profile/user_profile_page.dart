@@ -186,7 +186,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                 Positioned(
                   left: 16,
                   right: 16,
-                  bottom: lerpDouble(16, 72, t)!,
+                  top: lerpDouble(
+                    topPadding + 16,
+                    topPadding + kToolbarHeight + 12,
+                    collapseProgress,
+                  )!,
                   child: Opacity(
                     opacity: Curves.easeOut.transform(t),
                     child: Transform.scale(

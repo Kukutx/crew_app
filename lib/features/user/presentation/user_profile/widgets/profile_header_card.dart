@@ -28,60 +28,79 @@ class ProfileHeaderCard extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.12),
           surfaceTintColor: Colors.white,
           child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(48),
-                  child: CachedNetworkImage(
-                    imageUrl: userProfile.avatar,
-                    width: 64,
-                    height: 64,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DefaultTextStyle(
-                    style: t.bodyMedium!.copyWith(color: Colors.white),
-                    child: Column(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: DefaultTextStyle(
+                style: t.bodyMedium!.copyWith(color: Colors.white),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          userProfile.name,
-                          style: t.titleMedium!.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(48),
+                          child: CachedNetworkImage(
+                            imageUrl: userProfile.avatar,
+                            width: 72,
+                            height: 72,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          userProfile.bio,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userProfile.name,
+                                style: t.headlineSmall!.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                userProfile.bio,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            _ProfileStat(label: '粉丝', value: userProfile.followers),
-                            const _ProfileStatDot(),
-                            _ProfileStat(label: '关注', value: userProfile.following),
-                            const _ProfileStatDot(),
-                            _ProfileStat(label: '活动', value: userProfile.events),
+                            _MessageButton(onPressed: onMessagePressed),
+                            const SizedBox(height: 8),
+                            _FollowButton(
+                              followed: userProfile.followed,
+                              onPressed: onFollowToggle,
+                            ),
                           ],
                         ),
                       ],
                     ),
-                  ),
+                    if (userProfile.tags.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      _ProfileTags(tags: userProfile.tags),
+                    ],
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        _ProfileStat(label: '粉丝', value: userProfile.followers),
+                        const _ProfileStatDot(),
+                        _ProfileStat(label: '关注', value: userProfile.following),
+                        const _ProfileStatDot(),
+                        _ProfileStat(label: '活动', value: userProfile.events),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                _MessageButton(onPressed: onMessagePressed),
-                const SizedBox(width: 8),
-                _FollowButton(
-                  followed: userProfile.followed,
-                  onPressed: onFollowToggle,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -175,6 +194,32 @@ class _MessageButton extends StatelessWidget {
       ),
       icon: const Icon(Icons.mail_outline, size: 18),
       label: const Text('私信'),
+    );
+  }
+}
+
+class _ProfileTags extends StatelessWidget {
+  const _ProfileTags({required this.tags});
+
+  final List<String> tags;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: [
+        for (final tag in tags)
+          Chip(
+            label: Text(tag),
+            labelStyle: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: Colors.white),
+            backgroundColor: Colors.white.withValues(alpha: 0.14),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.24)),
+          ),
+      ],
     );
   }
 }

@@ -139,6 +139,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get events_tab_registered => '我报名的';
 
   @override
+  String get events_tab_invites => '召集';
+
+  @override
+  String get events_tab_plaza => '广场';
+
+  @override
   String get events_title => '活动';
 
   @override

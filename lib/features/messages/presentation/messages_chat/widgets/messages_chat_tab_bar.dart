@@ -10,12 +10,16 @@ class MessagesChatTabBar extends StatelessWidget {
     required this.favoritesLabel,
     required this.registeredLabel,
     required this.onChanged,
+    this.favoritesIcon = Icons.favorite,
+    this.registeredIcon = Icons.autorenew,
   });
 
   final int selectedIndex;
   final String favoritesLabel;
   final String registeredLabel;
   final MessagesChatTabChanged onChanged;
+  final IconData favoritesIcon;
+  final IconData registeredIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +28,14 @@ class MessagesChatTabBar extends StatelessWidget {
       children: [
         MessagesChatTabChip(
           label: favoritesLabel,
-          icon: Icons.favorite,
+          icon: favoritesIcon,
           selected: selectedIndex == 0,
           onTap: () => onChanged(0),
         ),
         const SizedBox(width: 12),
         MessagesChatTabChip(
           label: registeredLabel,
-          icon: Icons.autorenew,
+          icon: registeredIcon,
           selected: selectedIndex == 1,
           onTap: () => onChanged(1),
         ),

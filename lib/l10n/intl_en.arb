@@ -52,6 +52,8 @@
   "events_open_chat": "Open messages",
   "events_tab_favorites": "Liked",
   "events_tab_registered": "Joined",
+  "events_tab_invites": "Invites",
+  "events_tab_plaza": "Plaza",
   "events_title": "Events",
   "create_event_title": "Create Event",
   "feature_not_ready": "This feature is under development.",

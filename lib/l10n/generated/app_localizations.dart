@@ -350,6 +350,18 @@ abstract class AppLocalizations {
   /// **'Joined'**
   String get events_tab_registered;
 
+  /// No description provided for @events_tab_invites.
+  ///
+  /// In en, this message translates to:
+  /// **'Invites'**
+  String get events_tab_invites;
+
+  /// No description provided for @events_tab_plaza.
+  ///
+  /// In en, this message translates to:
+  /// **'Plaza'**
+  String get events_tab_plaza;
+
   /// No description provided for @events_title.
   ///
   /// In en, this message translates to:

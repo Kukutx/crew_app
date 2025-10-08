@@ -9,6 +9,7 @@ class MapCanvas extends StatelessWidget {
   final ValueChanged<GoogleMapController>? onMapCreated;
   final VoidCallback? onMapReady;
   final ValueChanged<LatLng>? onLongPress;
+  final ValueChanged<PointOfInterest>? onPoiTap;
   final Set<Marker> markers;
 
   const MapCanvas({
@@ -18,6 +19,7 @@ class MapCanvas extends StatelessWidget {
     this.onMapCreated,
     this.onMapReady,
     this.onLongPress,
+    this.onPoiTap,
     this.markers = const <Marker>{},
   });
 
@@ -33,6 +35,7 @@ class MapCanvas extends StatelessWidget {
         onMapReady?.call();
       },
       onLongPress: onLongPress,
+      onPoiTap: onPoiTap,
       markers: markers,
       myLocationButtonEnabled: false,
       myLocationEnabled: false,

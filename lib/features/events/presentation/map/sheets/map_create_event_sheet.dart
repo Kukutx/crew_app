@@ -13,11 +13,17 @@ class _CreateEventImage {
   final Uint8List bytes;
 }
 
-Future<EventCreateModel?> showCreateEventBottomSheet(BuildContext context, LatLng pos) {
+Future<EventCreateModel?> showCreateEventBottomSheet(
+  BuildContext context,
+  LatLng pos, {
+  String? initialLocationName,
+}) {
   final loc = AppLocalizations.of(context)!;
   final title = TextEditingController();
   final desc = TextEditingController();
-  final city = TextEditingController(text: loc.city_loading);
+  final city = TextEditingController(
+    text: initialLocationName ?? loc.city_loading,
+  );
   final formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
   final images = <_CreateEventImage>[];
@@ -30,20 +36,24 @@ Future<EventCreateModel?> showCreateEventBottomSheet(BuildContext context, LatLn
         pos.latitude,
         pos.longitude,
       ).timeout(const Duration(seconds: 5));
-      if (list.isNotEmpty) {
-        final p = list.first;
-        // 优先 city/locality，其次 subAdministrativeArea 或 administrativeArea
-        final name = (p.locality?.trim().isNotEmpty == true)
-            ? p.locality!
-            : (p.subAdministrativeArea?.trim().isNotEmpty == true)
-                ? p.subAdministrativeArea!
-                : (p.administrativeArea ?? loc.unknown);
-        city.text = name;
-      } else {
-        city.text = loc.unknown;
+      if (city.text == loc.city_loading) {
+        if (list.isNotEmpty) {
+          final p = list.first;
+          // 优先 city/locality，其次 subAdministrativeArea 或 administrativeArea
+          final name = (p.locality?.trim().isNotEmpty == true)
+              ? p.locality!
+              : (p.subAdministrativeArea?.trim().isNotEmpty == true)
+                  ? p.subAdministrativeArea!
+                  : (p.administrativeArea ?? loc.unknown);
+          city.text = name;
+        } else {
+          city.text = loc.unknown;
+        }
       }
     } catch (_) {
-      city.text = loc.unknown;
+      if (city.text == loc.city_loading) {
+        city.text = loc.unknown;
+      }
     }
   }();
   return showModalBottomSheet<EventCreateModel>(

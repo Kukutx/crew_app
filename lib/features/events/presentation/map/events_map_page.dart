@@ -175,6 +175,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onMapCreated: _onMapCreated,
           onMapReady: _onMapReady,
           onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
+          onPoiTap: _onPoiTap,
           markers: markersLayer.markers,
         ),
       ),
@@ -239,6 +240,21 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _onMapLongPress(LatLng latlng) async {
+    await _createEventAtLatLng(latlng);
+  }
+
+  Future<void> _onPoiTap(PointOfInterest poi) async {
+    final name = poi.name.trim().isEmpty ? null : poi.name.trim();
+    await _createEventAtLatLng(
+      poi.position,
+      locationName: name,
+    );
+  }
+
+  Future<void> _createEventAtLatLng(
+    LatLng latlng, {
+    String? locationName,
+  }) async {
     if (!await _ensureNetworkAvailable()) {
       return;
     }
@@ -247,7 +263,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     if (!mounted) return;
-    final data = await showCreateEventBottomSheet(context, latlng);
+    final data = await showCreateEventBottomSheet(
+      context,
+      latlng,
+      initialLocationName: locationName,
+    );
     if (data == null || data.title.trim().isEmpty) return;
 
     await ref

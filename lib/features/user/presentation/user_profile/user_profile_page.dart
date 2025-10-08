@@ -105,6 +105,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
+  void _startPrivateMessage(BuildContext context, User profile) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      SnackBar(content: Text('已向${profile.name}发起私信（示例）')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
@@ -176,6 +183,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                       child: ProfileHeaderCard(
                         userProfile: profile,
                         onFollowToggle: _toggleFollow,
+                        onMessagePressed: () =>
+                            _startPrivateMessage(context, profile),
                       ),
                     ),
                   ),

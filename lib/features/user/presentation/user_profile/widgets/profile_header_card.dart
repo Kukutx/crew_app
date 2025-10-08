@@ -9,10 +9,12 @@ class ProfileHeaderCard extends StatelessWidget {
     super.key,
     required this.userProfile,
     required this.onFollowToggle,
+    required this.onMessagePressed,
   });
 
   final User userProfile;
   final VoidCallback onFollowToggle;
+  final VoidCallback onMessagePressed;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +74,8 @@ class ProfileHeaderCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                _MessageButton(onPressed: onMessagePressed),
                 const SizedBox(width: 8),
                 _FollowButton(
                   followed: userProfile.followed,
@@ -151,6 +155,26 @@ class _FollowButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: Text(followed ? '已关注' : '关注'),
+    );
+  }
+}
+
+class _MessageButton extends StatelessWidget {
+  const _MessageButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.white,
+        side: const BorderSide(color: Colors.white70),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      icon: const Icon(Icons.mail_outline, size: 18),
+      label: const Text('私信'),
     );
   }
 }

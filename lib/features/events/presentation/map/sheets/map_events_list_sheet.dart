@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 
-import '../../../../app/state/app_overlay_provider.dart';
-import '../../../../core/error/api_exception.dart';
+import '../../../../../app/state/app_overlay_provider.dart';
+import '../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
-class EventsListSheet extends ConsumerStatefulWidget {
-  const EventsListSheet({super.key});
+class MapEventsListSheet extends ConsumerStatefulWidget {
+  const MapEventsListSheet({super.key});
 
   @override
-  ConsumerState<EventsListSheet> createState() => _EventsListSheetState();
+  ConsumerState<MapEventsListSheet> createState() => _MapEventsListSheetState();
 }
 
-class _EventsListSheetState extends ConsumerState<EventsListSheet> {
+class _MapEventsListSheetState extends ConsumerState<MapEventsListSheet> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;

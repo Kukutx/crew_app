@@ -1,8 +1,6 @@
 // widgets/map_canvas.dart
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
-    show PointOfInterest;
 
 /// 地图视图
 class MapCanvas extends StatelessWidget {
@@ -11,7 +9,7 @@ class MapCanvas extends StatelessWidget {
   final ValueChanged<GoogleMapController>? onMapCreated;
   final VoidCallback? onMapReady;
   final ValueChanged<LatLng>? onLongPress;
-  final ValueChanged<PointOfInterest>? onPoiTap;
+  final ValueChanged<LatLng>? onTap;
   final Set<Marker> markers;
 
   const MapCanvas({
@@ -21,7 +19,7 @@ class MapCanvas extends StatelessWidget {
     this.onMapCreated,
     this.onMapReady,
     this.onLongPress,
-    this.onPoiTap,
+    this.onTap,
     this.markers = const <Marker>{},
   });
 
@@ -37,7 +35,7 @@ class MapCanvas extends StatelessWidget {
         onMapReady?.call();
       },
       onLongPress: onLongPress,
-      onPoiTap: onPoiTap,
+      onTap: onTap,
       markers: markers,
       myLocationButtonEnabled: false,
       myLocationEnabled: false,

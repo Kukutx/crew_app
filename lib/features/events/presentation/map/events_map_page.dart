@@ -9,8 +9,6 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
-    show PointOfInterest;
 
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
@@ -177,7 +175,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onMapCreated: _onMapCreated,
           onMapReady: _onMapReady,
           onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
-          onPoiTap: _onPoiTap,
+          onTap: (pos) => unawaited(_onMapTap(pos)),
           markers: markersLayer.markers,
         ),
       ),
@@ -245,12 +243,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     await _createEventAtLatLng(latlng);
   }
 
-  Future<void> _onPoiTap(PointOfInterest poi) async {
-    final name = poi.name.trim().isEmpty ? null : poi.name.trim();
-    await _createEventAtLatLng(
-      poi.position,
-      locationName: name,
-    );
+  Future<void> _onMapTap(LatLng latlng) async {
+    await _createEventAtLatLng(latlng);
   }
 
   Future<void> _createEventAtLatLng(

@@ -1,6 +1,8 @@
 // widgets/map_canvas.dart
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
+    show PointOfInterest;
 
 /// 地图视图
 class MapCanvas extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GroupChatPreview {
-  const GroupChatPreview({
+class MessagesChatPreview {
+  const MessagesChatPreview({
     required this.title,
     required this.subtitle,
     required this.tags,

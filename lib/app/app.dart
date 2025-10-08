@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:crew_app/features/events/presentation/map/sheets/map_events_list_sheet.dart';
-import 'package:crew_app/features/messages/presentation/group_chat/group_chat_sheet.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/messages_chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
@@ -92,7 +92,7 @@ class _AppState extends ConsumerState<App> {
     );
   }
 
-  Future<void> _showGroupChatSheet(BuildContext context) async {
+  Future<void> _showMessagesChatSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -100,7 +100,7 @@ class _AppState extends ConsumerState<App> {
       builder: (sheetContext) {
         return FractionallySizedBox(
           heightFactor: 0.92,
-          child: const GroupChatSheet(),
+          child: const MessagesChatSheet(),
         );
       },
     );
@@ -273,7 +273,7 @@ class _AppState extends ConsumerState<App> {
                           if (_navigationIndex != 2) {
                             setState(() => _navigationIndex = 2);
                           }
-                          await _showGroupChatSheet(context);
+                          await _showMessagesChatSheet(context);
                           if (!mounted) return;
                           if (_navigationIndex != 1) {
                             setState(() => _navigationIndex = 1);

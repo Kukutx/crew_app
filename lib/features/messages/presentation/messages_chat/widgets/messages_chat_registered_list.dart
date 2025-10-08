@@ -1,15 +1,15 @@
-import 'package:crew_app/features/messages/data/group_chat_preview.dart';
-import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_list_tile.dart';
+import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_list_tile.dart';
 import 'package:flutter/material.dart';
 
-class GroupChatRegisteredList extends StatelessWidget {
-  const GroupChatRegisteredList({
+class MessagesChatRegisteredList extends StatelessWidget {
+  const MessagesChatRegisteredList({
     super.key,
     required this.events,
     this.onEventTap,
   });
 
-  final List<GroupChatPreview> events;
+  final List<MessagesChatPreview> events;
   final ValueChanged<int>? onEventTap;
 
   @override
@@ -21,7 +21,7 @@ class GroupChatRegisteredList extends StatelessWidget {
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];
-        return GroupChatListTile(
+        return MessagesChatListTile(
           event: event,
           onTap: onEventTap == null ? null : () => onEventTap!(index),
         );

@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @events_open_chat.
   ///
   /// In en, this message translates to:
-  /// **'Open group chat'**
+  /// **'Open messages'**
   String get events_open_chat;
 
   /// No description provided for @events_tab_favorites.
@@ -533,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @group.
   ///
   /// In en, this message translates to:
-  /// **'Group'**
+  /// **'Messages'**
   String get group;
 
   /// No description provided for @max_interest_selection.

@@ -1,28 +1,27 @@
-
-import 'package:crew_app/features/messages/data/group_chat_preview.dart';
+import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
 import 'package:crew_app/features/messages/data/group_message.dart';
 import 'package:crew_app/features/messages/data/group_participant.dart';
-import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_favorites_grid.dart';
-import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_registered_list.dart';
-import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_tab_bar.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_favorites_grid.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_registered_list.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_bar.dart';
 import 'package:crew_app/features/messages/presentation/group_chat_room/group_chat_room_page.dart';
-export 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_list_tile.dart';
-export 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_tab_chip.dart';
+export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_list_tile.dart';
+export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_chip.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class GroupChatSheet extends StatefulWidget {
-  const GroupChatSheet({super.key});
+class MessagesChatSheet extends StatefulWidget {
+  const MessagesChatSheet({super.key});
 
   @override
-  State<GroupChatSheet> createState() => _UserEventsSheetState();
+  State<MessagesChatSheet> createState() => _MessagesChatSheetState();
 }
 
-class _UserEventsSheetState extends State<GroupChatSheet> {
+class _MessagesChatSheetState extends State<MessagesChatSheet> {
   int _tab = 1; // 0=我喜欢的 1=我报名的
 
-  late final List<GroupChatPreview> _sampleEvents = [
-    const GroupChatPreview(
+  late final List<MessagesChatPreview> _sampleEvents = [
+    const MessagesChatPreview(
       title: '春天一起去爬山吧！',
       status: '报名中',
       timeText: '15:25',
@@ -31,7 +30,7 @@ class _UserEventsSheetState extends State<GroupChatSheet> {
       unreadCount: 3,
       accentColor: Color(0xFF6750A4),
     ),
-    const GroupChatPreview(
+    const MessagesChatPreview(
       title: '线上听歌小组',
       status: '进行中',
       timeText: '11:20',
@@ -40,7 +39,7 @@ class _UserEventsSheetState extends State<GroupChatSheet> {
       unreadCount: 2,
       accentColor: Color(0xFF4C6ED7),
     ),
-    const GroupChatPreview(
+    const MessagesChatPreview(
       title: '米兰市区City Walk 2号',
       status: '报名中',
       timeText: '16:26',
@@ -171,7 +170,7 @@ class _UserEventsSheetState extends State<GroupChatSheet> {
     ],
   ];
 
-  void _openChat(GroupChatPreview event, int index) {
+  void _openChat(MessagesChatPreview event, int index) {
     final participants =
         _sampleParticipants[index % _sampleParticipants.length];
     final messages = _sampleMessages[index % _sampleMessages.length];
@@ -222,7 +221,7 @@ class _UserEventsSheetState extends State<GroupChatSheet> {
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: GroupChatTabBar(
+              child: MessagesChatTabBar(
                 selectedIndex: _tab,
                 favoritesLabel: loc.events_tab_favorites,
                 registeredLabel: loc.events_tab_registered,
@@ -235,13 +234,13 @@ class _UserEventsSheetState extends State<GroupChatSheet> {
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
                 child: _tab == 0
-                    ? GroupChatFavoritesGrid(
+                    ? MessagesChatFavoritesGrid(
                         key: const ValueKey('favorites'),
                         events: _sampleEvents,
                         onEventTap: (index) =>
                             _openChat(_sampleEvents[index], index),
                       )
-                    : GroupChatRegisteredList(
+                    : MessagesChatRegisteredList(
                         key: const ValueKey('registered'),
                         events: _sampleEvents,
                         onEventTap: (index) =>

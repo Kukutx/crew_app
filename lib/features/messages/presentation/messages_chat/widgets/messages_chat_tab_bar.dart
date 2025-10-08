@@ -1,10 +1,10 @@
-import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_tab_chip.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_chip.dart';
 import 'package:flutter/material.dart';
 
-typedef GroupChatTabChanged = void Function(int index);
+typedef MessagesChatTabChanged = void Function(int index);
 
-class GroupChatTabBar extends StatelessWidget {
-  const GroupChatTabBar({
+class MessagesChatTabBar extends StatelessWidget {
+  const MessagesChatTabBar({
     super.key,
     required this.selectedIndex,
     required this.favoritesLabel,
@@ -15,21 +15,21 @@ class GroupChatTabBar extends StatelessWidget {
   final int selectedIndex;
   final String favoritesLabel;
   final String registeredLabel;
-  final GroupChatTabChanged onChanged;
+  final MessagesChatTabChanged onChanged;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        GroupChatTabChip(
+        MessagesChatTabChip(
           label: favoritesLabel,
           icon: Icons.favorite,
           selected: selectedIndex == 0,
           onTap: () => onChanged(0),
         ),
         const SizedBox(width: 12),
-        GroupChatTabChip(
+        MessagesChatTabChip(
           label: registeredLabel,
           icon: Icons.autorenew,
           selected: selectedIndex == 1,

@@ -131,7 +131,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_title_field_label => 'Event Title';
 
   @override
-  String get events_open_chat => 'Open group chat';
+  String get events_open_chat => 'Open messages';
 
   @override
   String get events_tab_favorites => 'Liked';
@@ -236,7 +236,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'Map';
 
   @override
-  String get group => 'Group';
+  String get group => 'Messages';
 
   @override
   String get max_interest_selection => 'You can select up to 5 interest tags.';

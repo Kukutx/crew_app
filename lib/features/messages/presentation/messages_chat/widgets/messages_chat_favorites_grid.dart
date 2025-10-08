@@ -1,19 +1,19 @@
-import 'package:crew_app/features/messages/data/group_chat_preview.dart';
-import 'package:crew_app/features/messages/presentation/group_chat/widgets/group_chat_grid_card.dart';
+import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_grid_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-typedef GroupChatTap = void Function(int index);
+typedef MessagesChatTap = void Function(int index);
 
-class GroupChatFavoritesGrid extends StatelessWidget {
-  const GroupChatFavoritesGrid({
+class MessagesChatFavoritesGrid extends StatelessWidget {
+  const MessagesChatFavoritesGrid({
     super.key,
     required this.events,
     this.onEventTap,
   });
 
-  final List<GroupChatPreview> events;
-  final GroupChatTap? onEventTap;
+  final List<MessagesChatPreview> events;
+  final MessagesChatTap? onEventTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class GroupChatFavoritesGrid extends StatelessWidget {
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];
-        return GroupChatGridCard(
+        return MessagesChatGridCard(
           event: event,
           onTap: onEventTap == null ? null : () => onEventTap!(index),
         );

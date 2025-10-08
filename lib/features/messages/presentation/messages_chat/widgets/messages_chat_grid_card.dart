@@ -1,26 +1,26 @@
-import 'package:crew_app/features/messages/data/group_chat_preview.dart';
+import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
 import 'package:flutter/material.dart';
 
 
-class GroupChatGridCard extends StatelessWidget {
-  const GroupChatGridCard({
+class MessagesChatGridCard extends StatelessWidget {
+  const MessagesChatGridCard({
     super.key,
     required this.event,
     this.onTap,
   });
 
-  final GroupChatPreview event;
+  final MessagesChatPreview event;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Material(
-      color: colorScheme.surface,
-      borderRadius: BorderRadius.circular(20),
-      elevation: 4,
-      shadowColor: colorScheme.shadow.withValues(alpha:0.15),
+      return Material(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        elevation: 4,
+        shadowColor: colorScheme.shadow.withValues(alpha: 0.15),
       surfaceTintColor: Colors.transparent,
       clipBehavior: Clip.antiAlias,
       child: InkWell(

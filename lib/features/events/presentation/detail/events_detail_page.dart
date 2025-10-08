@@ -145,9 +145,42 @@ class _EventDetailPageState extends State<EventDetailPage> {
     }
   }
 
-  void _onFavoriteNotReady(AppLocalizations loc) {
+  void _showFeatureNotReadyMessage(AppLocalizations loc) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
+  }
+
+  void _showMoreActions(AppLocalizations loc) {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(loc.report_issue),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _showFeatureNotReadyMessage(loc);
+                },
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const Icon(Icons.close),
+                title: Text(loc.action_cancel),
+                onTap: () => Navigator.of(sheetContext).pop(),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -177,12 +210,12 @@ class _EventDetailPageState extends State<EventDetailPage> {
         loc: loc,
         onBack: () => Navigator.pop(context),
         onShare: () => _showShareSheet(context),
-        onFavorite: () => _onFavoriteNotReady(loc),
+        onMore: () => _showMoreActions(loc),
       ),
       bottomNavigationBar: EventDetailBottomBar(
         loc: loc,
         isFavorite: event.isFavorite,
-        onFavorite: () => _onFavoriteNotReady(loc),
+        onFavorite: () => _showFeatureNotReadyMessage(loc),
         onRegister: () {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(loc.registration_not_implemented)),

@@ -133,10 +133,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get events_open_chat => '进入消息';
 
   @override
-  String get events_tab_favorites => '我喜欢的';
+  String get events_tab_favorites => '私聊';
 
   @override
-  String get events_tab_registered => '我报名的';
+  String get events_tab_registered => '群聊';
 
   @override
   String get events_title => '活动';

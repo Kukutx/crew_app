@@ -15,7 +15,7 @@ class MessagesChatRegisteredList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      key: const PageStorageKey('user-events-registered-list'),
+      key: const PageStorageKey('messages-chat-group-list'),
       padding: const EdgeInsets.only(bottom: 24),
       physics: const BouncingScrollPhysics(),
       itemCount: events.length,

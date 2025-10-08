@@ -2,8 +2,8 @@ import 'package:crew_app/features/messages/data/group_message.dart';
 import 'package:flutter/material.dart';
 
 
-class GroupMemberMessageTile extends StatelessWidget {
-  const GroupMemberMessageTile({
+class MessagesChatRoomMessageTile extends StatelessWidget {
+  const MessagesChatRoomMessageTile({
     super.key,
     required this.message,
     required this.showAvatar,

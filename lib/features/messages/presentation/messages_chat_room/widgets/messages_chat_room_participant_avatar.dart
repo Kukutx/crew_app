@@ -2,8 +2,11 @@ import 'package:crew_app/features/messages/data/group_participant.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class GroupParticipantAvatar extends StatelessWidget {
-  const GroupParticipantAvatar({super.key, required this.participant});
+class MessagesChatRoomParticipantAvatar extends StatelessWidget {
+  const MessagesChatRoomParticipantAvatar({
+    super.key,
+    required this.participant,
+  });
 
   final GroupParticipant participant;
 

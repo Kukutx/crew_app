@@ -1,10 +1,11 @@
-import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
+import 'package:crew_app/features/messages/data/direct_message_preview.dart';
 import 'package:crew_app/features/messages/data/group_message.dart';
 import 'package:crew_app/features/messages/data/group_participant.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_favorites_grid.dart';
+import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_private_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_registered_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_bar.dart';
-import 'package:crew_app/features/messages/presentation/group_chat_room/group_chat_room_page.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat_room/messages_chat_room_page.dart';
 export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_list_tile.dart';
 export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_chip.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -18,7 +19,41 @@ class MessagesChatSheet extends StatefulWidget {
 }
 
 class _MessagesChatSheetState extends State<MessagesChatSheet> {
-  int _tab = 1; // 0=我喜欢的 1=我报名的
+  int _tab = 0;
+
+  late final List<DirectMessagePreview> _samplePrivateConversations = const [
+    DirectMessagePreview(
+      name: '李想',
+      subtitle: '要不要晚上一起吃饭？',
+      timestamp: '16:45',
+      initials: 'LX',
+      avatarColor: Color(0xFF4C6ED7),
+      isUnread: true,
+    ),
+    DirectMessagePreview(
+      name: 'Marco',
+      subtitle: 'Ci vediamo domani in coworking?',
+      timestamp: '15:12',
+      initials: 'MA',
+      avatarColor: Color(0xFF6750A4),
+      isActive: true,
+    ),
+    DirectMessagePreview(
+      name: '王聪聪',
+      subtitle: '我已经把资料发给你啦～',
+      timestamp: '昨天',
+      initials: 'CC',
+      avatarColor: Color(0xFFE46C5B),
+    ),
+    DirectMessagePreview(
+      name: 'Sara',
+      subtitle: 'Grazie per报名活动！',
+      timestamp: '周一',
+      initials: 'SA',
+      avatarColor: Color(0xFF377D71),
+      isUnread: true,
+    ),
+  ];
 
   late final List<MessagesChatPreview> _sampleEvents = [
     const MessagesChatPreview(
@@ -170,13 +205,24 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     ],
   ];
 
-  void _openChat(MessagesChatPreview event, int index) {
+  void _openPrivateChat(DirectMessagePreview conversation) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    messenger?.hideCurrentSnackBar();
+    messenger?.showSnackBar(
+      SnackBar(
+        content: Text('与${conversation.name}的私聊即将上线'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _openGroupChat(MessagesChatPreview event, int index) {
     final participants =
         _sampleParticipants[index % _sampleParticipants.length];
     final messages = _sampleMessages[index % _sampleMessages.length];
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => GroupChatRoomPage(
+        builder: (_) => MessagesChatRoomPage(
           channelTitle: event.title,
           participants: participants,
           currentUser: _currentUser,
@@ -202,7 +248,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
               child: Row(
                 children: [
                   Text(
-                    loc.my_events,
+                    loc.group,
                     style: theme.textTheme.titleLarge,
                   ),
                   const Spacer(),
@@ -223,8 +269,8 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: MessagesChatTabBar(
                 selectedIndex: _tab,
-                favoritesLabel: loc.events_tab_favorites,
-                registeredLabel: loc.events_tab_registered,
+                privateLabel: loc.events_tab_favorites,
+                groupLabel: loc.events_tab_registered,
                 onChanged: (value) => setState(() => _tab = value),
               ),
             ),
@@ -234,17 +280,17 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
                 child: _tab == 0
-                    ? MessagesChatFavoritesGrid(
-                        key: const ValueKey('favorites'),
-                        events: _sampleEvents,
-                        onEventTap: (index) =>
-                            _openChat(_sampleEvents[index], index),
+                    ? MessagesChatPrivateList(
+                        key: const ValueKey('private'),
+                        conversations: _samplePrivateConversations,
+                        onConversationTap: (index) =>
+                            _openPrivateChat(_samplePrivateConversations[index]),
                       )
                     : MessagesChatRegisteredList(
                         key: const ValueKey('registered'),
                         events: _sampleEvents,
                         onEventTap: (index) =>
-                            _openChat(_sampleEvents[index], index),
+                            _openGroupChat(_sampleEvents[index], index),
                       ),
               ),
             ),

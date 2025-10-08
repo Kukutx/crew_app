@@ -134,10 +134,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events_open_chat => 'Open messages';
 
   @override
-  String get events_tab_favorites => 'Liked';
+  String get events_tab_favorites => 'Private';
 
   @override
-  String get events_tab_registered => 'Joined';
+  String get events_tab_registered => 'Groups';
 
   @override
   String get events_title => 'Events';

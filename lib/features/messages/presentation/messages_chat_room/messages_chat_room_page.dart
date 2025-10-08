@@ -1,15 +1,15 @@
 
 import 'package:crew_app/features/messages/data/group_message.dart';
 import 'package:crew_app/features/messages/data/group_participant.dart';
-import 'package:crew_app/features/messages/presentation/group_chat_room/widgets/group_chat_room_app_bar.dart';
-import 'package:crew_app/features/messages/presentation/group_chat_room/widgets/group_chat_room_message_composer.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_app_bar.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_composer.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/group_chat_room_message_list.dart';
+import 'widgets/messages_chat_room_message_list.dart';
 
-class GroupChatRoomPage extends StatefulWidget {
-  const GroupChatRoomPage({
+class MessagesChatRoomPage extends StatefulWidget {
+  const MessagesChatRoomPage({
     super.key,
     required this.channelTitle,
     required this.currentUser,
@@ -23,10 +23,10 @@ class GroupChatRoomPage extends StatefulWidget {
   final List<GroupMessage> initialMessages;
 
   @override
-  State<GroupChatRoomPage> createState() => _GroupChatPageState();
+  State<MessagesChatRoomPage> createState() => _MessagesChatRoomPageState();
 }
 
-class _GroupChatPageState extends State<GroupChatRoomPage> {
+class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
   late final List<GroupMessage> _messages;
@@ -84,21 +84,21 @@ class _GroupChatPageState extends State<GroupChatRoomPage> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: GroupChatRoomAppBar(
+      appBar: MessagesChatRoomAppBar(
         channelTitle: widget.channelTitle,
         participants: participants,
       ),
       body: Column(
         children: [
           Expanded(
-            child: GroupChatRoomMessageList(
+            child: MessagesChatRoomMessageList(
               messages: _messages,
               scrollController: _scrollController,
               youLabel: loc.chat_you_label,
               repliesLabelBuilder: loc.chat_reply_count,
             ),
           ),
-          GroupChatRoomMessageComposer(
+          MessagesChatRoomMessageComposer(
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,

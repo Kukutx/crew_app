@@ -1,10 +1,10 @@
 import 'package:crew_app/features/messages/data/group_participant.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'group_participant_avatar.dart';
+import 'messages_chat_room_participant_avatar.dart';
 
-class GroupChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const GroupChatRoomAppBar({
+class MessagesChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const MessagesChatRoomAppBar({
     super.key,
     required this.channelTitle,
     required this.participants,
@@ -50,7 +50,7 @@ class GroupChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               final participant = participants[index];
-              return GroupParticipantAvatar(participant: participant);
+              return MessagesChatRoomParticipantAvatar(participant: participant);
             },
             separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemCount: participants.length,

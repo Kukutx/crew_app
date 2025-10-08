@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GroupChatRoomMessageComposer extends StatelessWidget {
-  const GroupChatRoomMessageComposer({
+class MessagesChatRoomMessageComposer extends StatelessWidget {
+  const MessagesChatRoomMessageComposer({
     super.key,
     required this.controller,
     required this.hintText,

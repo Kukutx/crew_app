@@ -2,6 +2,7 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_host_card.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_image_carousel.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_info_card.dart';
+import 'package:crew_app/features/events/presentation/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_summary_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,8 @@ class EventDetailBody extends StatelessWidget {
             loc: loc,
             onTapLocation: onTapLocation,
           ),
+          const SizedBox(height: 10),
+          EventPlazaCard(loc: loc),
           const SizedBox(height: 80),
         ],
       ),

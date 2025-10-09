@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
-import 'package:crew_app/features/messages/presentation/direct_messages/direct_messages_page.dart';
+// import 'package:crew_app/features/messages/presentation/direct_messages/direct_messages_page.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
@@ -108,13 +108,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
-  void _startPrivateMessage(BuildContext context, User profile) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const DirectMessagesPage(),
-      ),
-    );
-  }
+  // void _startPrivateMessage(BuildContext context, User profile) {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (_) => const DirectMessagesPage(),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -191,12 +191,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                     opacity: Curves.easeOut.transform(t),
                     child: Transform.scale(
                       scale: lerpDouble(0.92, 1, t)!,
-                      child: ProfileHeaderCard(
-                        userProfile: profile,
-                        onFollowToggle: _toggleFollow,
-                        onMessagePressed: () =>
-                            _startPrivateMessage(context, profile),
-                      ),
+                      // child: ProfileHeaderCard(
+                      //   userProfile: profile,
+                      //   onFollowToggle: _toggleFollow,
+                      //   onMessagePressed: () =>
+                      //       _startPrivateMessage(context, profile),
+                      // ),
                     ),
                   ),
                 ),

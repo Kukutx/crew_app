@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:crew_app/features/events/presentation/map/sheets/map_events_list_sheet.dart';
+import 'package:crew_app/features/events/presentation/map/sheets/map_events_explore_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/messages_chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -86,7 +86,7 @@ class _AppState extends ConsumerState<App> {
       builder: (sheetContext) {
         return FractionallySizedBox(
           heightFactor: 0.92,
-          child: const MapEventsListSheet(),
+          child: const MapEventsExploreSheet(),
         );
       },
     );

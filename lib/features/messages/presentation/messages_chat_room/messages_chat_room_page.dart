@@ -1,6 +1,6 @@
 
-import 'package:crew_app/features/messages/data/group_message.dart';
-import 'package:crew_app/features/messages/data/group_participant.dart';
+import 'package:crew_app/features/messages/data/messages_chat_message.dart';
+import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_app_bar.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_composer.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

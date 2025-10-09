@@ -1,6 +1,6 @@
-import 'package:crew_app/features/messages/data/direct_message_preview.dart';
-import 'package:crew_app/features/messages/data/group_message.dart';
-import 'package:crew_app/features/messages/data/group_participant.dart';
+import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
+import 'package:crew_app/features/messages/data/messages_chat_message.dart';
+import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
 import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_private_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_registered_list.dart';

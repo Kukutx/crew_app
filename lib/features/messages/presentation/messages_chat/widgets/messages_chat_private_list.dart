@@ -1,4 +1,4 @@
-import 'package:crew_app/features/messages/data/direct_message_preview.dart';
+import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
 import 'package:flutter/material.dart';
 
 class MessagesChatPrivateList extends StatelessWidget {

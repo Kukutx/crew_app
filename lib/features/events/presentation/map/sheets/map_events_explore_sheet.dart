@@ -10,14 +10,14 @@ import '../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
-class MapEventsListSheet extends ConsumerStatefulWidget {
-  const MapEventsListSheet({super.key});
+class MapEventsExploreSheet extends ConsumerStatefulWidget {
+  const MapEventsExploreSheet({super.key});
 
   @override
-  ConsumerState<MapEventsListSheet> createState() => _MapEventsListSheetState();
+  ConsumerState<MapEventsExploreSheet> createState() => _MapEventsExploreSheetState();
 }
 
-class _MapEventsListSheetState extends ConsumerState<MapEventsListSheet> {
+class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
   int _tab = 0;
 
   static const List<_MapEventsPlazaPost> _plazaPosts = [
@@ -188,7 +188,7 @@ class _MapEventsPlazaFeed extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       physics: const AlwaysScrollableScrollPhysics(
-        parent: const BouncingScrollPhysics(),
+        parent: BouncingScrollPhysics(),
       ),
       itemBuilder: (context, index) {
         final post = posts[index];
@@ -207,7 +207,7 @@ class _MapEventsPlazaFeed extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      backgroundColor: post.accentColor.withOpacity(0.15),
+                      backgroundColor: post.accentColor.withValues(alpha: 0.15),
                       child: Text(
                         post.authorInitials,
                         style: TextStyle(
@@ -263,8 +263,8 @@ class _MapEventsPlazaFeed extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            post.accentColor.withOpacity(0.85),
-                            post.accentColor.withOpacity(0.55),
+                            post.accentColor.withValues(alpha: .85),
+                            post.accentColor.withValues(alpha: 0.55),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -353,7 +353,7 @@ class _MapEventsPlazaFeed extends StatelessWidget {
           ),
         );
       },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemCount: posts.length,
     );
   }

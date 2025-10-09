@@ -1,4 +1,4 @@
-import 'package:crew_app/features/messages/data/group_message.dart';
+import 'package:crew_app/features/messages/data/messages_chat_message.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_tile.dart';
 import 'package:flutter/material.dart';
 

@@ -1,9 +1,8 @@
-import 'package:crew_app/features/messages/data/messages_chat_message.dart';
+import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:flutter/material.dart';
 
-
-class MessagesChatRoomMessageTile extends StatelessWidget {
-  const MessagesChatRoomMessageTile({
+class ChatRoomMessageTile extends StatelessWidget {
+  const ChatRoomMessageTile({
     super.key,
     required this.message,
     required this.showAvatar,
@@ -11,7 +10,7 @@ class MessagesChatRoomMessageTile extends StatelessWidget {
     required this.repliesLabelBuilder,
   });
 
-  final MessagesChatMessage message;
+  final ChatMessage message;
   final bool showAvatar;
   final String youLabel;
   final String Function(int) repliesLabelBuilder;
@@ -19,11 +18,17 @@ class MessagesChatRoomMessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isMine = message.isMine;
+    final isMine = message.isFromCurrentUser;
     final bubbleColor = isMine ? colorScheme.primary : colorScheme.surface;
     final textColor = isMine ? colorScheme.onPrimary : colorScheme.onSurface;
     final captionColor =
         isMine ? colorScheme.onPrimary.withValues(alpha: .8) : colorScheme.onSurfaceVariant;
+    final senderColor = Color(
+      message.sender.avatarColorValue ?? colorScheme.primary.value,
+    );
+    final senderInitials = (message.sender.initials ??
+            message.sender.displayName.characters.take(2).toString())
+        .toUpperCase();
 
     return Padding(
       padding: EdgeInsetsDirectional.only(
@@ -43,12 +48,12 @@ class MessagesChatRoomMessageTile extends StatelessWidget {
               child: showAvatar
                   ? CircleAvatar(
                       radius: 18,
-                      backgroundColor: message.sender.avatarColor.withValues(alpha: .15),
+                      backgroundColor: senderColor.withValues(alpha: .15),
                       child: Text(
-                        message.sender.initials,
+                        senderInitials,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: message.sender.avatarColor,
+                          color: senderColor,
                         ),
                       ),
                     )
@@ -64,8 +69,8 @@ class MessagesChatRoomMessageTile extends StatelessWidget {
               children: [
                 Text(
                   isMine
-                      ? '$youLabel · ${message.timeLabel}'
-                      : '${message.sender.name} · ${message.timeLabel}',
+                      ? '$youLabel · ${message.sentAtLabel}'
+                      : '${message.sender.displayName} · ${message.sentAtLabel}',
                   style: TextStyle(
                     fontSize: 12,
                     color: captionColor,
@@ -96,19 +101,19 @@ class MessagesChatRoomMessageTile extends StatelessWidget {
                         isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                     children: [
                       Text(
-                        message.content,
+                        message.body,
                         style: TextStyle(
                           fontSize: 15,
                           height: 1.4,
                           color: textColor,
                         ),
                       ),
-                      if (message.attachmentChips.isNotEmpty) ...[
+                      if (message.attachmentLabels.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: message.attachmentChips
+                          children: message.attachmentLabels
                               .map(
                                 (chip) => Container(
                                   padding: const EdgeInsets.symmetric(

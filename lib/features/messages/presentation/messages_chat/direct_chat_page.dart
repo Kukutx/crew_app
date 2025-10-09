@@ -1,13 +1,13 @@
-import 'package:crew_app/features/messages/data/messages_chat_message.dart';
-import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
-import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_composer.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_list.dart';
+import 'package:crew_app/features/messages/data/chat_message.dart';
+import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class MessagesDirectChatPage extends StatefulWidget {
-  const MessagesDirectChatPage({
+class DirectChatPage extends StatefulWidget {
+  const DirectChatPage({
     super.key,
     required this.preview,
     required this.partner,
@@ -15,26 +15,26 @@ class MessagesDirectChatPage extends StatefulWidget {
     required this.initialMessages,
   });
 
-  final MessagesChatPrivatePreview preview;
-  final MessagesChatParticipant partner;
-  final MessagesChatParticipant currentUser;
-  final List<MessagesChatMessage> initialMessages;
+  final DirectChatPreview preview;
+  final ChatParticipant partner;
+  final ChatParticipant currentUser;
+  final List<ChatMessage> initialMessages;
 
   @override
-  State<MessagesDirectChatPage> createState() => _MessagesDirectChatPageState();
+  State<DirectChatPage> createState() => _DirectChatPageState();
 }
 
-class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
+class _DirectChatPageState extends State<DirectChatPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
-  late final List<MessagesChatMessage> _messages;
+  late final List<ChatMessage> _messages;
 
   @override
   void initState() {
     super.initState();
     _composerController = TextEditingController();
     _scrollController = ScrollController();
-    _messages = List<MessagesChatMessage>.of(widget.initialMessages);
+    _messages = List<ChatMessage>.of(widget.initialMessages);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
@@ -54,10 +54,11 @@ class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
 
     setState(() {
       _messages.add(
-        MessagesChatMessage(
+        ChatMessage(
+          id: 'temp-${DateTime.now().millisecondsSinceEpoch}',
           sender: widget.currentUser,
-          content: raw,
-          timeLabel: timeLabel,
+          body: raw,
+          sentAtLabel: timeLabel,
         ),
       );
     });
@@ -79,11 +80,17 @@ class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final avatarColor =
-        widget.preview.avatarColor ?? colorScheme.primary;
+    final avatarColor = Color(
+      widget.preview.avatarColorValue ??
+          widget.partner.avatarColorValue ??
+          colorScheme.primary.value,
+    );
+    final partnerInitials = (widget.partner.initials ??
+            widget.partner.displayName.characters.take(2).toString())
+        .toUpperCase();
     final statusText = widget.preview.isActive
         ? loc.chat_status_online
-        : loc.chat_last_seen(widget.preview.timestamp);
+        : loc.chat_last_seen(widget.preview.lastMessageTimeLabel);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -98,7 +105,7 @@ class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
               radius: 22,
               backgroundColor: avatarColor.withValues(alpha: .15),
               child: Text(
-                widget.partner.initials,
+                partnerInitials,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: avatarColor,
@@ -111,7 +118,7 @@ class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.preview.name,
+                    widget.preview.displayName,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -145,14 +152,14 @@ class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
       body: Column(
         children: [
           Expanded(
-            child: MessagesChatRoomMessageList(
+            child: ChatRoomMessageList(
               messages: _messages,
               scrollController: _scrollController,
               youLabel: loc.chat_you_label,
               repliesLabelBuilder: loc.chat_reply_count,
             ),
           ),
-          MessagesChatRoomMessageComposer(
+          ChatRoomMessageComposer(
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,

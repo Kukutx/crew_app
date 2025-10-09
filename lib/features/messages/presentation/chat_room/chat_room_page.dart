@@ -1,15 +1,13 @@
-
-import 'package:crew_app/features/messages/data/messages_chat_message.dart';
-import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_app_bar.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_composer.dart';
+import 'package:crew_app/features/messages/data/chat_message.dart';
+import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_app_bar.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/messages_chat_room_message_list.dart';
-
-class MessagesChatRoomPage extends StatefulWidget {
-  const MessagesChatRoomPage({
+class ChatRoomPage extends StatefulWidget {
+  const ChatRoomPage({
     super.key,
     required this.channelTitle,
     required this.currentUser,
@@ -18,25 +16,25 @@ class MessagesChatRoomPage extends StatefulWidget {
   });
 
   final String channelTitle;
-  final MessagesChatParticipant currentUser;
-  final List<MessagesChatParticipant> participants;
-  final List<MessagesChatMessage> initialMessages;
+  final ChatParticipant currentUser;
+  final List<ChatParticipant> participants;
+  final List<ChatMessage> initialMessages;
 
   @override
-  State<MessagesChatRoomPage> createState() => _MessagesChatRoomPageState();
+  State<ChatRoomPage> createState() => _ChatRoomPageState();
 }
 
-class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
+class _ChatRoomPageState extends State<ChatRoomPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
-  late final List<MessagesChatMessage> _messages;
+  late final List<ChatMessage> _messages;
 
   @override
   void initState() {
     super.initState();
     _composerController = TextEditingController();
     _scrollController = ScrollController();
-    _messages = List<MessagesChatMessage>.of(widget.initialMessages);
+    _messages = List<ChatMessage>.of(widget.initialMessages);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
@@ -56,10 +54,11 @@ class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
 
     setState(() {
       _messages.add(
-        MessagesChatMessage(
+        ChatMessage(
+          id: 'group-temp-${DateTime.now().millisecondsSinceEpoch}',
           sender: widget.currentUser,
-          content: raw,
-          timeLabel: timeLabel,
+          body: raw,
+          sentAtLabel: timeLabel,
         ),
       );
     });
@@ -84,21 +83,21 @@ class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: MessagesChatRoomAppBar(
+      appBar: ChatRoomAppBar(
         channelTitle: widget.channelTitle,
         participants: participants,
       ),
       body: Column(
         children: [
           Expanded(
-            child: MessagesChatRoomMessageList(
+            child: ChatRoomMessageList(
               messages: _messages,
               scrollController: _scrollController,
               youLabel: loc.chat_you_label,
               repliesLabelBuilder: loc.chat_reply_count,
             ),
           ),
-          MessagesChatRoomMessageComposer(
+          ChatRoomMessageComposer(
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
@@ -108,11 +107,12 @@ class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
     );
   }
 
-  List<MessagesChatParticipant> _buildParticipants() {
+  List<ChatParticipant> _buildParticipants() {
     return [
       ...widget.participants,
-      if (!widget.participants
-          .any((participant) => participant.name == widget.currentUser.name))
+      if (!widget.participants.any(
+        (participant) => participant.id == widget.currentUser.id,
+      ))
         widget.currentUser,
     ];
   }

@@ -1,24 +1,36 @@
+enum EventDateFilter { today, thisWeek, thisMonth, any }
+
 class EventFilter {
-  final double distanceKm;    // 距离
-  final String date;          // today/week/month/any
-  final bool onlyFree;        // 仅免费
-  final Set<String> categories; // 多选分类
   const EventFilter({
-    this.distanceKm = 5,
-    this.date = 'any',
-    this.onlyFree = false,
-    this.categories = const {},
+    this.maxDistanceKm = 5,
+    this.dateFilter = EventDateFilter.any,
+    this.onlyFreeEvents = false,
+    this.selectedCategories = const <String>{},
   });
 
+  final double maxDistanceKm;
+  final EventDateFilter dateFilter;
+  final bool onlyFreeEvents;
+  final Set<String> selectedCategories;
+
   EventFilter copyWith({
-    double? distanceKm,
-    String? date,
-    bool? onlyFree,
-    Set<String>? categories,
-  }) => EventFilter(
-    distanceKm: distanceKm ?? this.distanceKm,
-    date: date ?? this.date,
-    onlyFree: onlyFree ?? this.onlyFree,
-    categories: categories ?? this.categories,
-  );
+    double? maxDistanceKm,
+    EventDateFilter? dateFilter,
+    bool? onlyFreeEvents,
+    Set<String>? selectedCategories,
+  }) {
+    return EventFilter(
+      maxDistanceKm: maxDistanceKm ?? this.maxDistanceKm,
+      dateFilter: dateFilter ?? this.dateFilter,
+      onlyFreeEvents: onlyFreeEvents ?? this.onlyFreeEvents,
+      selectedCategories: selectedCategories ?? this.selectedCategories,
+    );
+  }
+
+  Map<String, dynamic> toQueryParameters() => {
+        'maxDistanceKm': maxDistanceKm,
+        'dateFilter': dateFilter.name,
+        'onlyFreeEvents': onlyFreeEvents,
+        'selectedCategories': selectedCategories.toList(),
+      };
 }

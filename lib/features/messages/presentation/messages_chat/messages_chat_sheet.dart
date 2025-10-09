@@ -269,8 +269,8 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: MessagesChatTabBar(
                 selectedIndex: _tab,
-                privateLabel: loc.events_tab_favorites,
-                groupLabel: loc.events_tab_registered,
+                firstLabel: loc.events_tab_favorites,
+                secondLabel: loc.events_tab_registered,
                 onChanged: (value) => setState(() => _tab = value),
               ),
             ),

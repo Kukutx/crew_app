@@ -8,7 +8,7 @@ class MessagesChatRoomParticipantAvatar extends StatelessWidget {
     required this.participant,
   });
 
-  final GroupParticipant participant;
+  final MessagesChatParticipant participant;
 
   @override
   Widget build(BuildContext context) {

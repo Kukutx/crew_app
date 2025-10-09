@@ -11,7 +11,7 @@ class MessagesChatRoomMessageTile extends StatelessWidget {
     required this.repliesLabelBuilder,
   });
 
-  final GroupMessage message;
+  final MessagesChatMessage message;
   final bool showAvatar;
   final String youLabel;
   final String Function(int) repliesLabelBuilder;

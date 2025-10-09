@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DirectMessagePreview {
-  const DirectMessagePreview({
+class MessagesChatPrivatePreview {
+  const MessagesChatPrivatePreview({
     required this.name,
     required this.subtitle,
     required this.timestamp,

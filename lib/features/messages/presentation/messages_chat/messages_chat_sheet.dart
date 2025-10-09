@@ -25,8 +25,8 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
   late final TextEditingController _searchController;
   String _searchQuery = '';
 
-  late final List<DirectMessagePreview> _samplePrivateConversations = const [
-    DirectMessagePreview(
+  late final List<MessagesChatPrivatePreview> _samplePrivateConversations = const [
+    MessagesChatPrivatePreview(
       name: '李想',
       subtitle: '要不要晚上一起吃饭？',
       timestamp: '16:45',
@@ -34,7 +34,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
       avatarColor: Color(0xFF4C6ED7),
       isUnread: true,
     ),
-    DirectMessagePreview(
+    MessagesChatPrivatePreview(
       name: 'Marco',
       subtitle: 'Ci vediamo domani in coworking?',
       timestamp: '15:12',
@@ -42,14 +42,14 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
       avatarColor: Color(0xFF6750A4),
       isActive: true,
     ),
-    DirectMessagePreview(
+    MessagesChatPrivatePreview(
       name: '王聪聪',
       subtitle: '我已经把资料发给你啦～',
       timestamp: '昨天',
       initials: 'CC',
       avatarColor: Color(0xFFE46C5B),
     ),
-    DirectMessagePreview(
+    MessagesChatPrivatePreview(
       name: 'Sara',
       subtitle: 'Grazie per报名活动！',
       timestamp: '周一',
@@ -59,16 +59,16 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     ),
   ];
 
-  late final GroupParticipant _currentUser = GroupParticipant(
+  late final MessagesChatParticipant _currentUser = MessagesChatParticipant(
     name: '我',
     initials: 'ME',
     avatarColor: const Color(0xFF6750A4),
     isSelf: true,
   );
 
-  late final List<GroupParticipant> _privateContacts = _samplePrivateConversations
+  late final List<MessagesChatParticipant> _privateContacts = _samplePrivateConversations
       .map(
-        (conversation) => GroupParticipant(
+        (conversation) => MessagesChatParticipant(
           name: conversation.name,
           initials: _resolveInitials(
             conversation.name,
@@ -79,70 +79,70 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
       )
       .toList(growable: false);
 
-  late final List<List<GroupMessage>> _samplePrivateMessages = [
+  late final List<List<MessagesChatMessage>> _samplePrivateMessages = [
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[0],
         content: '今晚想吃川菜还是意面？',
         timeLabel: '16:40',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: '川菜吧，我下班去你那边找你～',
         timeLabel: '16:42',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[0],
         content: '好，那我提前预约。',
         timeLabel: '16:44',
       ),
     ],
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[1],
         content: 'Ti mando la presentazione più tardi.',
         timeLabel: '14:55',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: 'Perfetto, grazie! 明早见～',
         timeLabel: '15:01',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[1],
         content: 'A domani 👋',
         timeLabel: '15:04',
       ),
     ],
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[2],
         content: '你收到我发的资料了吗？',
         timeLabel: '昨天 19:12',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: '收到了，今晚就开始整理。',
         timeLabel: '昨天 19:20',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[2],
         content: '太好了！那我就等你的好消息～',
         timeLabel: '昨天 19:21',
       ),
     ],
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[3],
         content: 'Grazie per l\'invito all\'evento!',
         timeLabel: '周一 10:12',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: '不客气，到时候一起玩～',
         timeLabel: '周一 10:18',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _privateContacts[3],
         content: 'Can\'t wait!',
         timeLabel: '周一 10:20',
@@ -180,53 +180,53 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     ),
   ];
 
-  late final List<List<GroupParticipant>> _sampleParticipants = [
+  late final List<List<MessagesChatParticipant>> _sampleParticipants = [
     const [
-      GroupParticipant(
+      MessagesChatParticipant(
         name: '林雨晴',
         initials: 'YQ',
         avatarColor: Color(0xFF6750A4),
       ),
-      GroupParticipant(
+      MessagesChatParticipant(
         name: 'Marco',
         initials: 'MA',
         avatarColor: Color(0xFF4C6ED7),
       ),
-      GroupParticipant(
+      MessagesChatParticipant(
         name: '王聪聪',
         initials: 'CC',
         avatarColor: Color(0xFFE46C5B),
       ),
     ],
     const [
-      GroupParticipant(
+      MessagesChatParticipant(
         name: 'Leo',
         initials: 'LE',
         avatarColor: Color(0xFF00696B),
       ),
-      GroupParticipant(
+      MessagesChatParticipant(
         name: 'Cici',
         initials: 'CI',
         avatarColor: Color(0xFFD6589F),
       ),
-      GroupParticipant(
+      MessagesChatParticipant(
         name: 'Hannah',
         initials: 'HA',
         avatarColor: Color(0xFFB1974B),
       ),
     ],
     const [
-      GroupParticipant(
+      MessagesChatParticipant(
         name: '米兰小巷',
         initials: 'ML',
         avatarColor: Color(0xFF2F4858),
       ),
-      GroupParticipant(
+      MessagesChatParticipant(
         name: 'Francesca',
         initials: 'FR',
         avatarColor: Color(0xFFB75F89),
       ),
-      GroupParticipant(
+      MessagesChatParticipant(
         name: 'Ken',
         initials: 'KE',
         avatarColor: Color(0xFF377D71),
@@ -234,9 +234,9 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     ],
   ];
 
-  late final List<List<GroupMessage>> _sampleMessages = [
+  late final List<List<MessagesChatMessage>> _sampleMessages = [
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _sampleParticipants[0][0],
         content: '周六记得带上登山杖和保温壶，山上还会有些冷。',
         timeLabel: '09:20',
@@ -244,48 +244,48 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
         replyPreview: '王聪聪：收到！',
         attachmentChips: const ['行程安排.pdf'],
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _sampleParticipants[0][2],
         content: '我可以带两壶热姜茶，大家可以分着喝。',
         timeLabel: '10:02',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: '太贴心了！下午三点在龙泉寺门口集合哦～',
         timeLabel: '10:05',
       ),
     ],
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _sampleParticipants[1][0],
         content: '今晚 8 点开始，提前十分钟上线试一下音频～',
         timeLabel: '15:40',
         replyCount: 2,
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _sampleParticipants[1][1],
         content: '我准备了新的歌单，等会分享链接。',
         timeLabel: '15:44',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: '我能顺便点几首老歌吗？',
         timeLabel: '15:46',
       ),
     ],
     [
-      GroupMessage(
+      MessagesChatMessage(
         sender: _sampleParticipants[2][0],
         content: '路线 2 号有一些石板路，记得穿好走的鞋子。',
         timeLabel: '08:12',
         attachmentChips: const ['路线图.png'],
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _sampleParticipants[2][1],
         content: '咖啡店会提前预约，大家提前 10 分钟到哦。',
         timeLabel: '08:21',
       ),
-      GroupMessage(
+      MessagesChatMessage(
         sender: _currentUser,
         content: '收到，我顺便把城市探索的新朋友拉进来了。',
         timeLabel: '08:30',
@@ -315,7 +315,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     return String.fromCharCodes(codeUnits.take(length)).toUpperCase();
   }
 
-  void _openPrivateChat(DirectMessagePreview conversation) {
+  void _openPrivateChat(MessagesChatPrivatePreview conversation) {
     final index = _samplePrivateConversations.indexOf(conversation);
     if (index < 0 || index >= _samplePrivateMessages.length) {
       return;
@@ -363,7 +363,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
 
     final query = _searchQuery.trim().toLowerCase();
 
-    List<DirectMessagePreview> privateResults;
+    List<MessagesChatPrivatePreview> privateResults;
     if (query.isEmpty) {
       privateResults = _samplePrivateConversations;
     } else {

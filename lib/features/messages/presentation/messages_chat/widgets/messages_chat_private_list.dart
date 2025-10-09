@@ -8,8 +8,8 @@ class MessagesChatPrivateList extends StatelessWidget {
     this.onConversationTap,
   });
 
-  final List<DirectMessagePreview> conversations;
-  final ValueChanged<DirectMessagePreview>? onConversationTap;
+  final List<MessagesChatPrivatePreview> conversations;
+  final ValueChanged<MessagesChatPrivatePreview>? onConversationTap;
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GroupParticipant {
-  const GroupParticipant({
+class MessagesChatParticipant {
+  const MessagesChatParticipant({
     required this.name,
     required this.initials,
     required this.avatarColor,

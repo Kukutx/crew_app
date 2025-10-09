@@ -15,10 +15,10 @@ class MessagesDirectChatPage extends StatefulWidget {
     required this.initialMessages,
   });
 
-  final DirectMessagePreview preview;
-  final GroupParticipant partner;
-  final GroupParticipant currentUser;
-  final List<GroupMessage> initialMessages;
+  final MessagesChatPrivatePreview preview;
+  final MessagesChatParticipant partner;
+  final MessagesChatParticipant currentUser;
+  final List<MessagesChatMessage> initialMessages;
 
   @override
   State<MessagesDirectChatPage> createState() => _MessagesDirectChatPageState();
@@ -27,14 +27,14 @@ class MessagesDirectChatPage extends StatefulWidget {
 class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
-  late final List<GroupMessage> _messages;
+  late final List<MessagesChatMessage> _messages;
 
   @override
   void initState() {
     super.initState();
     _composerController = TextEditingController();
     _scrollController = ScrollController();
-    _messages = List<GroupMessage>.of(widget.initialMessages);
+    _messages = List<MessagesChatMessage>.of(widget.initialMessages);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
@@ -54,7 +54,7 @@ class _MessagesDirectChatPageState extends State<MessagesDirectChatPage> {
 
     setState(() {
       _messages.add(
-        GroupMessage(
+        MessagesChatMessage(
           sender: widget.currentUser,
           content: raw,
           timeLabel: timeLabel,

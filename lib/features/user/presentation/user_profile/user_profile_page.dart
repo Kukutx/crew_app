@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
-// import 'package:crew_app/features/messages/presentation/direct_messages/direct_messages_page.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
@@ -28,10 +27,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   static const double _tabBarHeight = 48;
 
   late final TabController _tabController;
-  final List<Tab> _tabs = const [
-    Tab(text: '活动'),
-    Tab(text: '收藏'),
-  ];
+  final List<Tab> _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
 
   @override
   void initState() {
@@ -53,8 +49,9 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     final current = ref.read(userProfileProvider);
     ref.read(userProfileProvider.notifier).state = current.copyWith(
       followed: !current.followed,
-      followers:
-          current.followed ? current.followers - 1 : current.followers + 1,
+      followers: current.followed
+          ? current.followers - 1
+          : current.followers + 1,
     );
   }
 
@@ -108,13 +105,21 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
-  // void _startPrivateMessage(BuildContext context, User profile) {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (_) => const DirectMessagesPage(),
-  //     ),
-  //   );
-  // }
+  void _startPrivateMessage(BuildContext context, User profile) {
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (_) => const DirectMessagesPage(),
+    //   ),
+    // );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '私信功能尚未开放，敬请期待！',
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,10 +168,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           final currentHeight = constraints.biggest.height;
           final minExtent = topPadding + kToolbarHeight + _tabBarHeight;
           final maxExtent = topPadding + _expandedHeight;
-          final availableExtent =
-              maxExtent - minExtent <= 0 ? 1.0 : maxExtent - minExtent;
-          final t =
-              ((currentHeight - minExtent) / availableExtent).clamp(0.0, 1.0);
+          final availableExtent = maxExtent - minExtent <= 0
+              ? 1.0
+              : maxExtent - minExtent;
+          final t = ((currentHeight - minExtent) / availableExtent).clamp(
+            0.0,
+            1.0,
+          );
           final collapseProgress = 1 - t;
 
           return Stack(
@@ -191,12 +199,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                     opacity: Curves.easeOut.transform(t),
                     child: Transform.scale(
                       scale: lerpDouble(0.92, 1, t)!,
-                      // child: ProfileHeaderCard(
-                      //   userProfile: profile,
-                      //   onFollowToggle: _toggleFollow,
-                      //   onMessagePressed: () =>
-                      //       _startPrivateMessage(context, profile),
-                      // ),
+                      child: ProfileHeaderCard(
+                        userProfile: profile,
+                        onFollowToggle: _toggleFollow,
+                        onMessagePressed: () =>
+                            _startPrivateMessage(context, profile),
+                      ),
                     ),
                   ),
                 ),

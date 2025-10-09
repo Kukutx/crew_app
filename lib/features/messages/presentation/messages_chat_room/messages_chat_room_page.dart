@@ -18,9 +18,9 @@ class MessagesChatRoomPage extends StatefulWidget {
   });
 
   final String channelTitle;
-  final GroupParticipant currentUser;
-  final List<GroupParticipant> participants;
-  final List<GroupMessage> initialMessages;
+  final MessagesChatParticipant currentUser;
+  final List<MessagesChatParticipant> participants;
+  final List<MessagesChatMessage> initialMessages;
 
   @override
   State<MessagesChatRoomPage> createState() => _MessagesChatRoomPageState();
@@ -29,14 +29,14 @@ class MessagesChatRoomPage extends StatefulWidget {
 class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
-  late final List<GroupMessage> _messages;
+  late final List<MessagesChatMessage> _messages;
 
   @override
   void initState() {
     super.initState();
     _composerController = TextEditingController();
     _scrollController = ScrollController();
-    _messages = List<GroupMessage>.of(widget.initialMessages);
+    _messages = List<MessagesChatMessage>.of(widget.initialMessages);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
@@ -56,7 +56,7 @@ class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
 
     setState(() {
       _messages.add(
-        GroupMessage(
+        MessagesChatMessage(
           sender: widget.currentUser,
           content: raw,
           timeLabel: timeLabel,
@@ -108,7 +108,7 @@ class _MessagesChatRoomPageState extends State<MessagesChatRoomPage> {
     );
   }
 
-  List<GroupParticipant> _buildParticipants() {
+  List<MessagesChatParticipant> _buildParticipants() {
     return [
       ...widget.participants,
       if (!widget.participants

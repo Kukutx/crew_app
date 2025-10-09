@@ -11,7 +11,7 @@ class MessagesChatRoomAppBar extends StatelessWidget implements PreferredSizeWid
   });
 
   final String channelTitle;
-  final List<GroupParticipant> participants;
+  final List<MessagesChatParticipant> participants;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 72);

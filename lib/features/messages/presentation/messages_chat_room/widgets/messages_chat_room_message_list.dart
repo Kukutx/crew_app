@@ -12,7 +12,7 @@ class MessagesChatRoomMessageList extends StatelessWidget {
     required this.repliesLabelBuilder,
   });
 
-  final List<GroupMessage> messages;
+  final List<MessagesChatMessage> messages;
   final ScrollController scrollController;
   final String youLabel;
   final String Function(int) repliesLabelBuilder;

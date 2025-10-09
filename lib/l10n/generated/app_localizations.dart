@@ -341,13 +341,13 @@ abstract class AppLocalizations {
   /// No description provided for @events_tab_favorites.
   ///
   /// In en, this message translates to:
-  /// **'Liked'**
+  /// **'Private'**
   String get events_tab_favorites;
 
   /// No description provided for @events_tab_registered.
   ///
   /// In en, this message translates to:
-  /// **'Joined'**
+  /// **'Groups'**
   String get events_tab_registered;
 
   /// No description provided for @events_title.

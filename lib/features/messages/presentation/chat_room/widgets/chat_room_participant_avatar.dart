@@ -1,19 +1,26 @@
-import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class MessagesChatRoomParticipantAvatar extends StatelessWidget {
-  const MessagesChatRoomParticipantAvatar({
+class ChatRoomParticipantAvatar extends StatelessWidget {
+  const ChatRoomParticipantAvatar({
     super.key,
     required this.participant,
   });
 
-  final MessagesChatParticipant participant;
+  final ChatParticipant participant;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final borderColor = participant.isSelf ? colorScheme.primary : colorScheme.surface;
+    final borderColor =
+        participant.isCurrentUser ? colorScheme.primary : colorScheme.surface;
+    final avatarColor = Color(
+      participant.avatarColorValue ?? colorScheme.primary.value,
+    );
+    final initials = (participant.initials ??
+            participant.displayName.characters.take(2).toString())
+        .toUpperCase();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -23,17 +30,17 @@ class MessagesChatRoomParticipantAvatar extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(
               color: borderColor,
-              width: participant.isSelf ? 2 : 1,
+              width: participant.isCurrentUser ? 2 : 1,
             ),
           ),
           child: CircleAvatar(
             radius: 20,
-            backgroundColor: participant.avatarColor.withValues(alpha: .12),
+            backgroundColor: avatarColor.withValues(alpha: .12),
             child: Text(
-              participant.initials,
+              initials,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: participant.avatarColor,
+                color: avatarColor,
               ),
             ),
           ),
@@ -42,9 +49,9 @@ class MessagesChatRoomParticipantAvatar extends StatelessWidget {
         SizedBox(
           width: 64,
           child: Text(
-            participant.isSelf
+            participant.isCurrentUser
                 ? AppLocalizations.of(context)!.chat_you_label
-                : participant.name,
+                : participant.displayName,
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

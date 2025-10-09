@@ -1,294 +1,334 @@
-import 'package:crew_app/features/messages/data/messages_chat_message.dart';
-import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
-import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
-import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/messages_direct_chat_page.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_private_list.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_registered_list.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat_room/messages_chat_room_page.dart';
-export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_list_tile.dart';
+import 'package:crew_app/features/messages/data/chat_message.dart';
+import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
+import 'package:crew_app/features/messages/data/group_chat_preview.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/direct_chat_page.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/direct_chat_list.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/chat_room_page.dart';
+export 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list_tile.dart';
 export 'package:crew_app/shared/widgets/toggle_tab_chip.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class MessagesChatSheet extends StatefulWidget {
-  const MessagesChatSheet({super.key});
+class ChatSheet extends StatefulWidget {
+  const ChatSheet({super.key});
 
   @override
-  State<MessagesChatSheet> createState() => _MessagesChatSheetState();
+  State<ChatSheet> createState() => _ChatSheetState();
 }
 
-class _MessagesChatSheetState extends State<MessagesChatSheet> {
+class _ChatSheetState extends State<ChatSheet> {
   int _tab = 0;
 
   late final TextEditingController _searchController;
   String _searchQuery = '';
 
-  late final List<MessagesChatPrivatePreview> _samplePrivateConversations = const [
-    MessagesChatPrivatePreview(
-      name: '李想',
-      subtitle: '要不要晚上一起吃饭？',
-      timestamp: '16:45',
+  late final List<DirectChatPreview> _samplePrivateConversations = const [
+    DirectChatPreview(
+      id: 'direct-1',
+      displayName: '李想',
+      lastMessagePreview: '要不要晚上一起吃饭？',
+      lastMessageTimeLabel: '16:45',
       initials: 'LX',
-      avatarColor: Color(0xFF4C6ED7),
-      isUnread: true,
+      avatarColorValue: 0xFF4C6ED7,
+      hasUnread: true,
     ),
-    MessagesChatPrivatePreview(
-      name: 'Marco',
-      subtitle: 'Ci vediamo domani in coworking?',
-      timestamp: '15:12',
+    DirectChatPreview(
+      id: 'direct-2',
+      displayName: 'Marco',
+      lastMessagePreview: 'Ci vediamo domani in coworking?',
+      lastMessageTimeLabel: '15:12',
       initials: 'MA',
-      avatarColor: Color(0xFF6750A4),
+      avatarColorValue: 0xFF6750A4,
       isActive: true,
     ),
-    MessagesChatPrivatePreview(
-      name: '王聪聪',
-      subtitle: '我已经把资料发给你啦～',
-      timestamp: '昨天',
+    DirectChatPreview(
+      id: 'direct-3',
+      displayName: '王聪聪',
+      lastMessagePreview: '我已经把资料发给你啦～',
+      lastMessageTimeLabel: '昨天',
       initials: 'CC',
-      avatarColor: Color(0xFFE46C5B),
+      avatarColorValue: 0xFFE46C5B,
     ),
-    MessagesChatPrivatePreview(
-      name: 'Sara',
-      subtitle: 'Grazie per报名活动！',
-      timestamp: '周一',
+    DirectChatPreview(
+      id: 'direct-4',
+      displayName: 'Sara',
+      lastMessagePreview: 'Grazie per报名活动！',
+      lastMessageTimeLabel: '周一',
       initials: 'SA',
-      avatarColor: Color(0xFF377D71),
-      isUnread: true,
+      avatarColorValue: 0xFF377D71,
+      hasUnread: true,
     ),
   ];
 
-  late final MessagesChatParticipant _currentUser = MessagesChatParticipant(
-    name: '我',
+  late final ChatParticipant _currentUser = const ChatParticipant(
+    id: 'user-me',
+    displayName: '我',
     initials: 'ME',
-    avatarColor: const Color(0xFF6750A4),
-    isSelf: true,
+    avatarColorValue: 0xFF6750A4,
+    isCurrentUser: true,
   );
 
-  late final List<MessagesChatParticipant> _privateContacts = _samplePrivateConversations
+  late final List<ChatParticipant> _privateContacts = _samplePrivateConversations
       .map(
-        (conversation) => MessagesChatParticipant(
-          name: conversation.name,
+        (conversation) => ChatParticipant(
+          id: 'direct-participant-${conversation.id}',
+          displayName: conversation.displayName,
           initials: _resolveInitials(
-            conversation.name,
+            conversation.displayName,
             conversation.initials,
           ),
-          avatarColor: conversation.avatarColor ?? const Color(0xFF6750A4),
+          avatarColorValue:
+              conversation.avatarColorValue ?? _currentUser.avatarColorValue,
         ),
       )
       .toList(growable: false);
 
-  late final List<List<MessagesChatMessage>> _samplePrivateMessages = [
+  late final List<List<ChatMessage>> _samplePrivateMessages = [
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-1-msg-1',
         sender: _privateContacts[0],
-        content: '今晚想吃川菜还是意面？',
-        timeLabel: '16:40',
+        body: '今晚想吃川菜还是意面？',
+        sentAtLabel: '16:40',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-1-msg-2',
         sender: _currentUser,
-        content: '川菜吧，我下班去你那边找你～',
-        timeLabel: '16:42',
+        body: '川菜吧，我下班去你那边找你～',
+        sentAtLabel: '16:42',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-1-msg-3',
         sender: _privateContacts[0],
-        content: '好，那我提前预约。',
-        timeLabel: '16:44',
+        body: '好，那我提前预约。',
+        sentAtLabel: '16:44',
       ),
     ],
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-2-msg-1',
         sender: _privateContacts[1],
-        content: 'Ti mando la presentazione più tardi.',
-        timeLabel: '14:55',
+        body: 'Ti mando la presentazione più tardi.',
+        sentAtLabel: '14:55',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-2-msg-2',
         sender: _currentUser,
-        content: 'Perfetto, grazie! 明早见～',
-        timeLabel: '15:01',
+        body: 'Perfetto, grazie! 明早见～',
+        sentAtLabel: '15:01',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-2-msg-3',
         sender: _privateContacts[1],
-        content: 'A domani 👋',
-        timeLabel: '15:04',
+        body: 'A domani 👋',
+        sentAtLabel: '15:04',
       ),
     ],
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-3-msg-1',
         sender: _privateContacts[2],
-        content: '你收到我发的资料了吗？',
-        timeLabel: '昨天 19:12',
+        body: '你收到我发的资料了吗？',
+        sentAtLabel: '昨天 19:12',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-3-msg-2',
         sender: _currentUser,
-        content: '收到了，今晚就开始整理。',
-        timeLabel: '昨天 19:20',
+        body: '收到了，今晚就开始整理。',
+        sentAtLabel: '昨天 19:20',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-3-msg-3',
         sender: _privateContacts[2],
-        content: '太好了！那我就等你的好消息～',
-        timeLabel: '昨天 19:21',
+        body: '太好了！那我就等你的好消息～',
+        sentAtLabel: '昨天 19:21',
       ),
     ],
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-4-msg-1',
         sender: _privateContacts[3],
-        content: 'Grazie per l\'invito all\'evento!',
-        timeLabel: '周一 10:12',
+        body: 'Grazie per l\'invito all\'evento!',
+        sentAtLabel: '周一 10:12',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-4-msg-2',
         sender: _currentUser,
-        content: '不客气，到时候一起玩～',
-        timeLabel: '周一 10:18',
+        body: '不客气，到时候一起玩～',
+        sentAtLabel: '周一 10:18',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'direct-4-msg-3',
         sender: _privateContacts[3],
-        content: 'Can\'t wait!',
-        timeLabel: '周一 10:20',
+        body: 'Can\'t wait!',
+        sentAtLabel: '周一 10:20',
       ),
     ],
   ];
 
-  late final List<MessagesChatPreview> _sampleEvents = [
-    const MessagesChatPreview(
+  late final List<GroupChatPreview> _sampleEvents = const [
+    GroupChatPreview(
+      id: 'group-1',
       title: '春天一起去爬山吧！',
       status: '报名中',
-      timeText: '15:25',
+      lastMessageTimeLabel: '15:25',
       subtitle: '不要忘带保温壶',
       tags: ['户外', '运动'],
       unreadCount: 3,
-      accentColor: Color(0xFF6750A4),
+      accentColorValue: 0xFF6750A4,
     ),
-    const MessagesChatPreview(
+    GroupChatPreview(
+      id: 'group-2',
       title: '线上听歌小组',
       status: '进行中',
-      timeText: '11:20',
+      lastMessageTimeLabel: '11:20',
       subtitle: '王聪聪：开门！开门！开门！',
       tags: ['音乐'],
       unreadCount: 2,
-      accentColor: Color(0xFF4C6ED7),
+      accentColorValue: 0xFF4C6ED7,
     ),
-    const MessagesChatPreview(
+    GroupChatPreview(
+      id: 'group-3',
       title: '米兰市区City Walk 2号',
       status: '报名中',
-      timeText: '16:26',
+      lastMessageTimeLabel: '16:26',
       subtitle: '米兰小巷：我们征集下一条路线~',
       tags: ['社交', '旅行'],
       unreadCount: 0,
-      accentColor: Color(0xFF377D71),
+      accentColorValue: 0xFF377D71,
     ),
   ];
 
-  late final List<List<MessagesChatParticipant>> _sampleParticipants = [
+  late final List<List<ChatParticipant>> _sampleParticipants = [
     const [
-      MessagesChatParticipant(
-        name: '林雨晴',
+      ChatParticipant(
+        id: 'group-1-1',
+        displayName: '林雨晴',
         initials: 'YQ',
-        avatarColor: Color(0xFF6750A4),
+        avatarColorValue: 0xFF6750A4,
       ),
-      MessagesChatParticipant(
-        name: 'Marco',
+      ChatParticipant(
+        id: 'group-1-2',
+        displayName: 'Marco',
         initials: 'MA',
-        avatarColor: Color(0xFF4C6ED7),
+        avatarColorValue: 0xFF4C6ED7,
       ),
-      MessagesChatParticipant(
-        name: '王聪聪',
+      ChatParticipant(
+        id: 'group-1-3',
+        displayName: '王聪聪',
         initials: 'CC',
-        avatarColor: Color(0xFFE46C5B),
+        avatarColorValue: 0xFFE46C5B,
       ),
     ],
     const [
-      MessagesChatParticipant(
-        name: 'Leo',
+      ChatParticipant(
+        id: 'group-2-1',
+        displayName: 'Leo',
         initials: 'LE',
-        avatarColor: Color(0xFF00696B),
+        avatarColorValue: 0xFF00696B,
       ),
-      MessagesChatParticipant(
-        name: 'Cici',
+      ChatParticipant(
+        id: 'group-2-2',
+        displayName: 'Cici',
         initials: 'CI',
-        avatarColor: Color(0xFFD6589F),
+        avatarColorValue: 0xFFD6589F,
       ),
-      MessagesChatParticipant(
-        name: 'Hannah',
+      ChatParticipant(
+        id: 'group-2-3',
+        displayName: 'Hannah',
         initials: 'HA',
-        avatarColor: Color(0xFFB1974B),
+        avatarColorValue: 0xFFB1974B,
       ),
     ],
     const [
-      MessagesChatParticipant(
-        name: '米兰小巷',
+      ChatParticipant(
+        id: 'group-3-1',
+        displayName: '米兰小巷',
         initials: 'ML',
-        avatarColor: Color(0xFF2F4858),
+        avatarColorValue: 0xFF2F4858,
       ),
-      MessagesChatParticipant(
-        name: 'Francesca',
+      ChatParticipant(
+        id: 'group-3-2',
+        displayName: 'Francesca',
         initials: 'FR',
-        avatarColor: Color(0xFFB75F89),
+        avatarColorValue: 0xFFB75F89,
       ),
-      MessagesChatParticipant(
-        name: 'Ken',
+      ChatParticipant(
+        id: 'group-3-3',
+        displayName: 'Ken',
         initials: 'KE',
-        avatarColor: Color(0xFF377D71),
+        avatarColorValue: 0xFF377D71,
       ),
     ],
   ];
 
-  late final List<List<MessagesChatMessage>> _sampleMessages = [
+  late final List<List<ChatMessage>> _sampleMessages = [
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-1-msg-1',
         sender: _sampleParticipants[0][0],
-        content: '周六记得带上登山杖和保温壶，山上还会有些冷。',
-        timeLabel: '09:20',
+        body: '周六记得带上登山杖和保温壶，山上还会有些冷。',
+        sentAtLabel: '09:20',
         replyCount: 3,
         replyPreview: '王聪聪：收到！',
-        attachmentChips: const ['行程安排.pdf'],
+        attachmentLabels: const ['行程安排.pdf'],
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-1-msg-2',
         sender: _sampleParticipants[0][2],
-        content: '我可以带两壶热姜茶，大家可以分着喝。',
-        timeLabel: '10:02',
+        body: '我可以带两壶热姜茶，大家可以分着喝。',
+        sentAtLabel: '10:02',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-1-msg-3',
         sender: _currentUser,
-        content: '太贴心了！下午三点在龙泉寺门口集合哦～',
-        timeLabel: '10:05',
+        body: '太贴心了！下午三点在龙泉寺门口集合哦～',
+        sentAtLabel: '10:05',
       ),
     ],
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-2-msg-1',
         sender: _sampleParticipants[1][0],
-        content: '今晚 8 点开始，提前十分钟上线试一下音频～',
-        timeLabel: '15:40',
+        body: '今晚 8 点开始，提前十分钟上线试一下音频～',
+        sentAtLabel: '15:40',
         replyCount: 2,
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-2-msg-2',
         sender: _sampleParticipants[1][1],
-        content: '我准备了新的歌单，等会分享链接。',
-        timeLabel: '15:44',
+        body: '我准备了新的歌单，等会分享链接。',
+        sentAtLabel: '15:44',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-2-msg-3',
         sender: _currentUser,
-        content: '我能顺便点几首老歌吗？',
-        timeLabel: '15:46',
+        body: '我能顺便点几首老歌吗？',
+        sentAtLabel: '15:46',
       ),
     ],
     [
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-3-msg-1',
         sender: _sampleParticipants[2][0],
-        content: '路线 2 号有一些石板路，记得穿好走的鞋子。',
-        timeLabel: '08:12',
-        attachmentChips: const ['路线图.png'],
+        body: '路线 2 号有一些石板路，记得穿好走的鞋子。',
+        sentAtLabel: '08:12',
+        attachmentLabels: const ['路线图.png'],
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-3-msg-2',
         sender: _sampleParticipants[2][1],
-        content: '咖啡店会提前预约，大家提前 10 分钟到哦。',
-        timeLabel: '08:21',
+        body: '咖啡店会提前预约，大家提前 10 分钟到哦。',
+        sentAtLabel: '08:21',
       ),
-      MessagesChatMessage(
+      ChatMessage(
+        id: 'group-3-msg-3',
         sender: _currentUser,
-        content: '收到，我顺便把城市探索的新朋友拉进来了。',
-        timeLabel: '08:30',
+        body: '收到，我顺便把城市探索的新朋友拉进来了。',
+        sentAtLabel: '08:30',
       ),
     ],
   ];
@@ -315,7 +355,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     return String.fromCharCodes(codeUnits.take(length)).toUpperCase();
   }
 
-  void _openPrivateChat(MessagesChatPrivatePreview conversation) {
+  void _openPrivateChat(DirectChatPreview conversation) {
     final index = _samplePrivateConversations.indexOf(conversation);
     if (index < 0 || index >= _samplePrivateMessages.length) {
       return;
@@ -326,7 +366,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => MessagesDirectChatPage(
+        builder: (_) => DirectChatPage(
           preview: conversation,
           partner: partner,
           currentUser: _currentUser,
@@ -336,7 +376,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     );
   }
 
-  void _openGroupChat(MessagesChatPreview event) {
+  void _openGroupChat(GroupChatPreview event) {
     final index = _sampleEvents.indexOf(event);
     final safeIndex = index >= 0 ? index : 0;
     final participants =
@@ -344,7 +384,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     final messages = _sampleMessages[safeIndex % _sampleMessages.length];
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => MessagesChatRoomPage(
+        builder: (_) => ChatRoomPage(
           channelTitle: event.title,
           participants: participants,
           currentUser: _currentUser,
@@ -363,20 +403,20 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
 
     final query = _searchQuery.trim().toLowerCase();
 
-    List<MessagesChatPrivatePreview> privateResults;
+    List<DirectChatPreview> privateResults;
     if (query.isEmpty) {
       privateResults = _samplePrivateConversations;
     } else {
       privateResults = _samplePrivateConversations
           .where(
             (conversation) =>
-                conversation.name.toLowerCase().contains(query) ||
-                conversation.subtitle.toLowerCase().contains(query),
+                conversation.displayName.toLowerCase().contains(query) ||
+                conversation.lastMessagePreview.toLowerCase().contains(query),
           )
           .toList(growable: false);
     }
 
-    List<MessagesChatPreview> eventResults;
+    List<GroupChatPreview> eventResults;
     if (query.isEmpty) {
       eventResults = _sampleEvents;
     } else {
@@ -463,12 +503,12 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
                 child: _tab == 0
-                    ? MessagesChatPrivateList(
+                    ? DirectChatList(
                         key: ValueKey('private-$query'),
                         conversations: privateResults,
                         onConversationTap: _openPrivateChat,
                       )
-                    : MessagesChatRegisteredList(
+                    : GroupChatList(
                         key: ValueKey('registered-$query'),
                         events: eventResults,
                         onEventTap: _openGroupChat,

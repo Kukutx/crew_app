@@ -1,15 +1,15 @@
-import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
+import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:flutter/material.dart';
 
-class MessagesChatPrivateList extends StatelessWidget {
-  const MessagesChatPrivateList({
+class DirectChatList extends StatelessWidget {
+  const DirectChatList({
     super.key,
     required this.conversations,
     this.onConversationTap,
   });
 
-  final List<MessagesChatPrivatePreview> conversations;
-  final ValueChanged<MessagesChatPrivatePreview>? onConversationTap;
+  final List<DirectChatPreview> conversations;
+  final ValueChanged<DirectChatPreview>? onConversationTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +22,13 @@ class MessagesChatPrivateList extends StatelessWidget {
       itemCount: conversations.length,
       itemBuilder: (context, index) {
         final conversation = conversations[index];
-        final avatarColor =
-            conversation.avatarColor ?? colorScheme.primary;
-        final subtitleColor = conversation.subtitleColor ??
-            colorScheme.onSurfaceVariant.withValues(alpha: .9);
+        final avatarColor = Color(
+          conversation.avatarColorValue ?? colorScheme.primary.value,
+        );
+        final subtitleColor = Color(
+          conversation.subtitleColorValue ??
+              colorScheme.onSurfaceVariant.withValues(alpha: .9).value,
+        );
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -50,7 +53,7 @@ class MessagesChatPrivateList extends StatelessWidget {
                           radius: 24,
                           backgroundColor: avatarColor.withValues(alpha: .12),
                           child: Text(
-                            (conversation.initials ?? conversation.name)
+                            (conversation.initials ?? conversation.displayName)
                                 .characters
                                 .take(2)
                                 .toString()
@@ -89,7 +92,7 @@ class MessagesChatPrivateList extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  conversation.name,
+                                  conversation.displayName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -98,7 +101,7 @@ class MessagesChatPrivateList extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (conversation.isUnread)
+                              if (conversation.hasUnread)
                                 Container(
                                   width: 8,
                                   height: 8,
@@ -111,7 +114,7 @@ class MessagesChatPrivateList extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            conversation.subtitle,
+                            conversation.lastMessagePreview,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -124,7 +127,7 @@ class MessagesChatPrivateList extends StatelessWidget {
                     ),
                     const SizedBox(width: 16),
                     Text(
-                      conversation.timestamp,
+                      conversation.lastMessageTimeLabel,
                       style: TextStyle(
                         fontSize: 12,
                         color: colorScheme.onSurfaceVariant,

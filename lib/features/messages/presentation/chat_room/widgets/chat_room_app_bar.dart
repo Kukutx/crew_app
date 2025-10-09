@@ -1,17 +1,17 @@
-import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_participant_avatar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'messages_chat_room_participant_avatar.dart';
 
-class MessagesChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MessagesChatRoomAppBar({
+class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const ChatRoomAppBar({
     super.key,
     required this.channelTitle,
     required this.participants,
   });
 
   final String channelTitle;
-  final List<MessagesChatParticipant> participants;
+  final List<ChatParticipant> participants;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 72);
@@ -50,9 +50,9 @@ class MessagesChatRoomAppBar extends StatelessWidget implements PreferredSizeWid
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               final participant = participants[index];
-              return MessagesChatRoomParticipantAvatar(participant: participant);
+              return ChatRoomParticipantAvatar(participant: participant);
             },
-            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemCount: participants.length,
           ),
         ),

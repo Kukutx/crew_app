@@ -18,11 +18,11 @@ Future<EventFilter?> showEventFilterSheet({
       final loc = AppLocalizations.of(ctx)!;
       var temp = initial;
       return StatefulBuilder(builder: (ctx, setState) {
-        final dateOptions = <(String, String)>[
-          ('today', loc.filter_date_today),
-          ('week', loc.filter_date_this_week),
-          ('month', loc.filter_date_this_month),
-          ('any', loc.filter_date_any),
+        final dateOptions = <(EventDateFilter, String)>[
+          (EventDateFilter.today, loc.filter_date_today),
+          (EventDateFilter.thisWeek, loc.filter_date_this_week),
+          (EventDateFilter.thisMonth, loc.filter_date_this_month),
+          (EventDateFilter.any, loc.filter_date_any),
         ];
         return Padding(
           padding: EdgeInsets.only(
@@ -36,16 +36,16 @@ Future<EventFilter?> showEventFilterSheet({
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(loc.filter_distance),
-                Text('${temp.distanceKm.toStringAsFixed(0)} km'),
+                Text('${temp.maxDistanceKm.toStringAsFixed(0)} km'),
               ]),
               Slider(
-                value: temp.distanceKm,
+                value: temp.maxDistanceKm,
                 min: 1,
                 max: 50,
                 divisions: 49,
-                label: '${temp.distanceKm.toStringAsFixed(0)} km',
+                label: '${temp.maxDistanceKm.toStringAsFixed(0)} km',
                 onChanged: (v) =>
-                    setState(() => temp = temp.copyWith(distanceKm: v)),
+                    setState(() => temp = temp.copyWith(maxDistanceKm: v)),
               ),
               const SizedBox(height: 8),
               Align(
@@ -57,18 +57,19 @@ Future<EventFilter?> showEventFilterSheet({
                 for (final e in dateOptions)
                   ChoiceChip(
                     label: Text(e.$2),
-                    selected: temp.date == e.$1,
-                    onSelected: (_) =>
-                        setState(() => temp = temp.copyWith(date: e.$1)),
+                    selected: temp.dateFilter == e.$1,
+                    onSelected: (_) => setState(
+                      () => temp = temp.copyWith(dateFilter: e.$1),
+                    ),
                   ),
               ]),
               const SizedBox(height: 8),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(loc.filter_only_free),
-                value: temp.onlyFree,
+                value: temp.onlyFreeEvents,
                 onChanged: (v) =>
-                    setState(() => temp = temp.copyWith(onlyFree: v)),
+                    setState(() => temp = temp.copyWith(onlyFreeEvents: v)),
               ),
               Align(
                 alignment: Alignment.centerLeft,
@@ -79,11 +80,12 @@ Future<EventFilter?> showEventFilterSheet({
                 for (final c in allCategories)
                   FilterChip(
                     label: Text(c),
-                    selected: temp.categories.contains(c),
+                    selected: temp.selectedCategories.contains(c),
                     onSelected: (v) {
-                      final next = {...temp.categories};
+                      final next = {...temp.selectedCategories};
                       v ? next.add(c) : next.remove(c);
-                      setState(() => temp = temp.copyWith(categories: next));
+                      setState(() =>
+                          temp = temp.copyWith(selectedCategories: next));
                     },
                   ),
               ]),

@@ -1,10 +1,9 @@
-import 'package:crew_app/features/messages/data/messages_chat_message.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat_room/widgets/messages_chat_room_message_tile.dart';
+import 'package:crew_app/features/messages/data/chat_message.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_tile.dart';
 import 'package:flutter/material.dart';
 
-
-class MessagesChatRoomMessageList extends StatelessWidget {
-  const MessagesChatRoomMessageList({
+class ChatRoomMessageList extends StatelessWidget {
+  const ChatRoomMessageList({
     super.key,
     required this.messages,
     required this.scrollController,
@@ -12,7 +11,7 @@ class MessagesChatRoomMessageList extends StatelessWidget {
     required this.repliesLabelBuilder,
   });
 
-  final List<MessagesChatMessage> messages;
+  final List<ChatMessage> messages;
   final ScrollController scrollController;
   final String youLabel;
   final String Function(int) repliesLabelBuilder;
@@ -39,7 +38,7 @@ class MessagesChatRoomMessageList extends StatelessWidget {
               ? true
               : !messages[index - 1].isFromSameSender(messages[index]);
 
-          return MessagesChatRoomMessageTile(
+          return ChatRoomMessageTile(
             message: message,
             showAvatar: showAvatar,
             youLabel: youLabel,

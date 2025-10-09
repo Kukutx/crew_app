@@ -1,21 +1,21 @@
-import 'package:flutter/material.dart';
-
-class MessagesChatPreview {
-  const MessagesChatPreview({
+class GroupChatPreview {
+  const GroupChatPreview({
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.tags,
-    required this.accentColor,
+    required this.accentColorValue,
     this.status,
-    this.timeText,
+    this.lastMessageTimeLabel,
     this.unreadCount = 0,
   });
 
+  final String id;
   final String title;
   final String subtitle;
   final List<String> tags;
-  final Color accentColor;
+  final int accentColorValue;
   final String? status;
-  final String? timeText;
+  final String? lastMessageTimeLabel;
   final int unreadCount;
 }

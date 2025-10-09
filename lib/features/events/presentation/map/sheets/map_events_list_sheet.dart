@@ -1,10 +1,10 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
+import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
 import '../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../core/error/api_exception.dart';
@@ -104,7 +104,7 @@ class _MapEventsListSheetState extends ConsumerState<MapEventsListSheet> {
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: MessagesChatTabBar(
+              child: ToggleTabBar(
                 selectedIndex: _tab,
                 firstLabel: loc.events_tab_invites,
                 secondLabel: loc.events_tab_plaza,

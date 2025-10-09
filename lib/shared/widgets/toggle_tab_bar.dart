@@ -1,10 +1,10 @@
-import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_chip.dart';
+import 'package:crew_app/shared/widgets/toggle_tab_chip.dart';
 import 'package:flutter/material.dart';
 
-typedef MessagesChatTabChanged = void Function(int index);
+typedef ToggleTabChanged = void Function(int index);
 
-class MessagesChatTabBar extends StatelessWidget {
-  const MessagesChatTabBar({
+class ToggleTabBar extends StatelessWidget {
+  const ToggleTabBar({
     super.key,
     required this.selectedIndex,
     required this.firstLabel,
@@ -17,7 +17,7 @@ class MessagesChatTabBar extends StatelessWidget {
   final int selectedIndex;
   final String firstLabel;
   final String secondLabel;
-  final MessagesChatTabChanged onChanged;
+  final ToggleTabChanged onChanged;
   final IconData firstIcon;
   final IconData secondIcon;
 
@@ -26,14 +26,14 @@ class MessagesChatTabBar extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        MessagesChatTabChip(
+        ToggleTabChip(
           label: firstLabel,
           icon: firstIcon,
           selected: selectedIndex == 0,
           onTap: () => onChanged(0),
         ),
         const SizedBox(width: 12),
-        MessagesChatTabChip(
+        ToggleTabChip(
           label: secondLabel,
           icon: secondIcon,
           selected: selectedIndex == 1,

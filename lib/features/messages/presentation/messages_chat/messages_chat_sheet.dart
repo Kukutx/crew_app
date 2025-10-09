@@ -4,10 +4,10 @@ import 'package:crew_app/features/messages/data/group_participant.dart';
 import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_private_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_registered_list.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_bar.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat_room/messages_chat_room_page.dart';
 export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_list_tile.dart';
-export 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_tab_chip.dart';
+export 'package:crew_app/shared/widgets/toggle_tab_chip.dart';
+import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -267,7 +267,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: MessagesChatTabBar(
+              child: ToggleTabBar(
                 selectedIndex: _tab,
                 firstLabel: loc.events_tab_favorites,
                 secondLabel: loc.events_tab_registered,

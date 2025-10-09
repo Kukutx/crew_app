@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class MessagesChatTabChip extends StatelessWidget {
-  const MessagesChatTabChip({
+class ToggleTabChip extends StatelessWidget {
+  const ToggleTabChip({
     super.key,
     required this.label,
     required this.icon,

@@ -150,6 +150,14 @@
       "count": {}
     }
   },
+  "chat_search_hint": "搜索聊天",
+  "chat_status_online": "在线",
+  "chat_last_seen": "最近活跃 {time}",
+  "@chat_last_seen": {
+    "placeholders": {
+      "time": {}
+    }
+  },
   "no_events": "暂无活动",
   "no_events_found": "没有找到活动",
   "not_logged_in": "未登录",

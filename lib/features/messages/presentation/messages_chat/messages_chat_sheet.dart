@@ -1,7 +1,8 @@
-import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
 import 'package:crew_app/features/messages/data/messages_chat_message.dart';
 import 'package:crew_app/features/messages/data/messages_chat_participant.dart';
 import 'package:crew_app/features/messages/data/messages_chat_preview.dart';
+import 'package:crew_app/features/messages/data/messages_chat_private_preview.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/messages_direct_chat_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_private_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/messages_chat_registered_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat_room/messages_chat_room_page.dart';
@@ -20,6 +21,9 @@ class MessagesChatSheet extends StatefulWidget {
 
 class _MessagesChatSheetState extends State<MessagesChatSheet> {
   int _tab = 0;
+
+  late final TextEditingController _searchController;
+  String _searchQuery = '';
 
   late final List<DirectMessagePreview> _samplePrivateConversations = const [
     DirectMessagePreview(
@@ -55,6 +59,97 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     ),
   ];
 
+  late final GroupParticipant _currentUser = GroupParticipant(
+    name: '我',
+    initials: 'ME',
+    avatarColor: const Color(0xFF6750A4),
+    isSelf: true,
+  );
+
+  late final List<GroupParticipant> _privateContacts = _samplePrivateConversations
+      .map(
+        (conversation) => GroupParticipant(
+          name: conversation.name,
+          initials: _resolveInitials(
+            conversation.name,
+            conversation.initials,
+          ),
+          avatarColor: conversation.avatarColor ?? const Color(0xFF6750A4),
+        ),
+      )
+      .toList(growable: false);
+
+  late final List<List<GroupMessage>> _samplePrivateMessages = [
+    [
+      GroupMessage(
+        sender: _privateContacts[0],
+        content: '今晚想吃川菜还是意面？',
+        timeLabel: '16:40',
+      ),
+      GroupMessage(
+        sender: _currentUser,
+        content: '川菜吧，我下班去你那边找你～',
+        timeLabel: '16:42',
+      ),
+      GroupMessage(
+        sender: _privateContacts[0],
+        content: '好，那我提前预约。',
+        timeLabel: '16:44',
+      ),
+    ],
+    [
+      GroupMessage(
+        sender: _privateContacts[1],
+        content: 'Ti mando la presentazione più tardi.',
+        timeLabel: '14:55',
+      ),
+      GroupMessage(
+        sender: _currentUser,
+        content: 'Perfetto, grazie! 明早见～',
+        timeLabel: '15:01',
+      ),
+      GroupMessage(
+        sender: _privateContacts[1],
+        content: 'A domani 👋',
+        timeLabel: '15:04',
+      ),
+    ],
+    [
+      GroupMessage(
+        sender: _privateContacts[2],
+        content: '你收到我发的资料了吗？',
+        timeLabel: '昨天 19:12',
+      ),
+      GroupMessage(
+        sender: _currentUser,
+        content: '收到了，今晚就开始整理。',
+        timeLabel: '昨天 19:20',
+      ),
+      GroupMessage(
+        sender: _privateContacts[2],
+        content: '太好了！那我就等你的好消息～',
+        timeLabel: '昨天 19:21',
+      ),
+    ],
+    [
+      GroupMessage(
+        sender: _privateContacts[3],
+        content: 'Grazie per l\'invito all\'evento!',
+        timeLabel: '周一 10:12',
+      ),
+      GroupMessage(
+        sender: _currentUser,
+        content: '不客气，到时候一起玩～',
+        timeLabel: '周一 10:18',
+      ),
+      GroupMessage(
+        sender: _privateContacts[3],
+        content: 'Can\'t wait!',
+        timeLabel: '周一 10:20',
+      ),
+    ],
+  ];
+
   late final List<MessagesChatPreview> _sampleEvents = [
     const MessagesChatPreview(
       title: '春天一起去爬山吧！',
@@ -84,13 +179,6 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
       accentColor: Color(0xFF377D71),
     ),
   ];
-
-  late final GroupParticipant _currentUser = GroupParticipant(
-    name: '我',
-    initials: 'ME',
-    avatarColor: const Color(0xFF6750A4),
-    isSelf: true,
-  );
 
   late final List<List<GroupParticipant>> _sampleParticipants = [
     const [
@@ -205,21 +293,55 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     ],
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  String _resolveInitials(String name, [String? provided]) {
+    final source = (provided ?? name).trim();
+    if (source.isEmpty) {
+      return '';
+    }
+    final codeUnits = source.runes.toList(growable: false);
+    final length = codeUnits.length >= 2 ? 2 : 1;
+    return String.fromCharCodes(codeUnits.take(length)).toUpperCase();
+  }
+
   void _openPrivateChat(DirectMessagePreview conversation) {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    messenger?.hideCurrentSnackBar();
-    messenger?.showSnackBar(
-      SnackBar(
-        content: Text('与${conversation.name}的私聊即将上线'),
-        duration: const Duration(seconds: 2),
+    final index = _samplePrivateConversations.indexOf(conversation);
+    if (index < 0 || index >= _samplePrivateMessages.length) {
+      return;
+    }
+
+    final partner = _privateContacts[index];
+    final messages = _samplePrivateMessages[index];
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MessagesDirectChatPage(
+          preview: conversation,
+          partner: partner,
+          currentUser: _currentUser,
+          initialMessages: messages,
+        ),
       ),
     );
   }
 
-  void _openGroupChat(MessagesChatPreview event, int index) {
+  void _openGroupChat(MessagesChatPreview event) {
+    final index = _sampleEvents.indexOf(event);
+    final safeIndex = index >= 0 ? index : 0;
     final participants =
-        _sampleParticipants[index % _sampleParticipants.length];
-    final messages = _sampleMessages[index % _sampleMessages.length];
+        _sampleParticipants[safeIndex % _sampleParticipants.length];
+    final messages = _sampleMessages[safeIndex % _sampleMessages.length];
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MessagesChatRoomPage(
@@ -237,6 +359,43 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
     final loc = AppLocalizations.of(context)!;
 
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final query = _searchQuery.trim().toLowerCase();
+
+    List<DirectMessagePreview> privateResults;
+    if (query.isEmpty) {
+      privateResults = _samplePrivateConversations;
+    } else {
+      privateResults = _samplePrivateConversations
+          .where(
+            (conversation) =>
+                conversation.name.toLowerCase().contains(query) ||
+                conversation.subtitle.toLowerCase().contains(query),
+          )
+          .toList(growable: false);
+    }
+
+    List<MessagesChatPreview> eventResults;
+    if (query.isEmpty) {
+      eventResults = _sampleEvents;
+    } else {
+      eventResults = _sampleEvents
+          .where(
+            (event) {
+              final lowerTitle = event.title.toLowerCase();
+              final lowerSubtitle = event.subtitle.toLowerCase();
+              final lowerStatus = (event.status ?? '').toLowerCase();
+              final tagsMatch = event.tags
+                  .any((tag) => tag.toLowerCase().contains(query));
+              return lowerTitle.contains(query) ||
+                  lowerSubtitle.contains(query) ||
+                  lowerStatus.contains(query) ||
+                  tagsMatch;
+            },
+          )
+          .toList(growable: false);
+    }
 
     return SafeArea(
       child: Padding(
@@ -244,7 +403,7 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 4, 8),
+              padding: const EdgeInsets.fromLTRB(20, 8, 12, 8),
               child: Row(
                 children: [
                   Text(
@@ -253,15 +412,39 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.filter_list_alt),
-                    tooltip: loc.filter,
-                    onPressed: () {},
-                  ),
-                  IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.of(context).maybePop(),
                   ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) => setState(() => _searchQuery = value),
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: loc.chat_search_hint,
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchQuery.trim().isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        ),
+                  filled: true,
+                  fillColor: colorScheme.surfaceContainerHighest,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                ),
               ),
             ),
             const Divider(height: 1),
@@ -281,16 +464,14 @@ class _MessagesChatSheetState extends State<MessagesChatSheet> {
                 switchOutCurve: Curves.easeIn,
                 child: _tab == 0
                     ? MessagesChatPrivateList(
-                        key: const ValueKey('private'),
-                        conversations: _samplePrivateConversations,
-                        onConversationTap: (index) =>
-                            _openPrivateChat(_samplePrivateConversations[index]),
+                        key: ValueKey('private-$query'),
+                        conversations: privateResults,
+                        onConversationTap: _openPrivateChat,
                       )
                     : MessagesChatRegisteredList(
-                        key: const ValueKey('registered'),
-                        events: _sampleEvents,
-                        onEventTap: (index) =>
-                            _openGroupChat(_sampleEvents[index], index),
+                        key: ValueKey('registered-$query'),
+                        events: eventResults,
+                        onEventTap: _openGroupChat,
                       ),
               ),
             ),

@@ -108,6 +108,14 @@
       "count": {}
     }
   },
+  "chat_search_hint": "Search chats",
+  "chat_status_online": "Online now",
+  "chat_last_seen": "Last active {time}",
+  "@chat_last_seen": {
+    "placeholders": {
+      "time": {}
+    }
+  },
   "no_events": "No events yet",
   "no_events_found": "No events found",
   "not_logged_in": "Not logged in",

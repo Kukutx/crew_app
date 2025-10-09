@@ -270,6 +270,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chat_search_hint => 'Search chats';
+
+  @override
+  String get chat_status_online => 'Online now';
+
+  @override
+  String chat_last_seen(Object time) {
+    return 'Last active $time';
+  }
+
+  @override
   String get no_events => 'No events yet';
 
   @override

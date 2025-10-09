@@ -590,6 +590,24 @@ abstract class AppLocalizations {
   /// **'{count} replies'**
   String chat_reply_count(Object count);
 
+  /// No description provided for @chat_search_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search chats'**
+  String get chat_search_hint;
+
+  /// No description provided for @chat_status_online.
+  ///
+  /// In en, this message translates to:
+  /// **'Online now'**
+  String get chat_status_online;
+
+  /// No description provided for @chat_last_seen.
+  ///
+  /// In en, this message translates to:
+  /// **'Last active {time}'**
+  String chat_last_seen(Object time);
+
   /// No description provided for @no_events.
   ///
   /// In en, this message translates to:

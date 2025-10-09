@@ -265,6 +265,17 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get chat_search_hint => '搜索聊天';
+
+  @override
+  String get chat_status_online => '在线';
+
+  @override
+  String chat_last_seen(Object time) {
+    return '最近活跃 $time';
+  }
+
+  @override
   String get no_events => '暂无活动';
 
   @override

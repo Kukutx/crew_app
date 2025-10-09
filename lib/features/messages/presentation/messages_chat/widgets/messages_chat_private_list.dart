@@ -9,7 +9,7 @@ class MessagesChatPrivateList extends StatelessWidget {
   });
 
   final List<DirectMessagePreview> conversations;
-  final ValueChanged<int>? onConversationTap;
+  final ValueChanged<DirectMessagePreview>? onConversationTap;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class MessagesChatPrivateList extends StatelessWidget {
             child: InkWell(
               onTap: onConversationTap == null
                   ? null
-                  : () => onConversationTap!(index),
+                  : () => onConversationTap!(conversation),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 child: Row(

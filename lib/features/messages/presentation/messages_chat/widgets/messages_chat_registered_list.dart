@@ -10,7 +10,7 @@ class MessagesChatRegisteredList extends StatelessWidget {
   });
 
   final List<MessagesChatPreview> events;
-  final ValueChanged<int>? onEventTap;
+  final ValueChanged<MessagesChatPreview>? onEventTap;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class MessagesChatRegisteredList extends StatelessWidget {
         final event = events[index];
         return MessagesChatListTile(
           event: event,
-          onTap: onEventTap == null ? null : () => onEventTap!(index),
+          onTap: onEventTap == null ? null : () => onEventTap!(event),
         );
       },
     );

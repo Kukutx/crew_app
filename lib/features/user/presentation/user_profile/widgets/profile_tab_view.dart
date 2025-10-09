@@ -59,7 +59,7 @@ class _ActivitiesGrid extends ConsumerWidget {
       loading: () => const _CenteredScrollable(
         child:  CircularProgressIndicator(),
       ),
-      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+      error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
     );
   }
 }

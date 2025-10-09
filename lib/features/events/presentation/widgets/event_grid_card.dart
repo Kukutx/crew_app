@@ -40,42 +40,45 @@ class EventGridCard extends StatelessWidget {
             onShowOnMap?.call(result);
           }
         },
-        child: Stack(
-          children: [
-            Hero(
-              tag: heroTag,
-              child: imageUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      memCacheWidth: memCacheW,
-                      placeholder: (c, _) => const AspectRatio(
-                        aspectRatio: 1,
-                        child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Stack(
+            children: [
+              Hero(
+                tag: heroTag,
+                child: imageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        memCacheWidth: memCacheW,
+                        placeholder: (c, _) => const AspectRatio(
+                          aspectRatio: 1,
+                          child: Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
                         ),
-                      ),
-                      errorWidget: (c, _, _) =>
-                          const EventImagePlaceholder(aspectRatio: 1),
-                    )
-                  : const EventImagePlaceholder(aspectRatio: 1),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                color: Colors.black54,
-                padding: const EdgeInsets.all(6),
-                child: Text(
-                  event.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white),
+                        errorWidget: (c, _, _) =>
+                            const EventImagePlaceholder(aspectRatio: 1),
+                      )
+                    : const EventImagePlaceholder(aspectRatio: 1),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  color: Colors.black54,
+                  padding: const EdgeInsets.all(6),
+                  child: Text(
+                    event.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

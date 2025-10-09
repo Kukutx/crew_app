@@ -140,6 +140,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events_tab_registered => 'Groups';
 
   @override
+  String get events_tab_invites => 'Invites';
+
+  @override
+  String get events_tab_plaza => 'Plaza';
+
+  @override
   String get events_title => 'Events';
 
   @override

@@ -52,6 +52,20 @@ class EventImageCarousel extends StatelessWidget {
             },
           ),
         ),
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.center,
+                colors: [
+                  Colors.black.withValues(alpha: 0.45),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
         if (images.length > 1)
           Positioned(
             bottom: 8,

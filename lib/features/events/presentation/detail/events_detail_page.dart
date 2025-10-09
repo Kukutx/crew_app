@@ -194,6 +194,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final event = widget.event;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
+    final colorScheme = Theme.of(context).colorScheme;
     final hostName = (organizer?.name.isNotEmpty ?? false)
         ? organizer!.name
         : _fallbackHost.name;
@@ -204,7 +205,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         ? organizer!.avatarUrl!
         : _fallbackHost.avatar;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7E9),
+      backgroundColor: colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: EventDetailAppBar(
         loc: loc,
@@ -222,32 +223,44 @@ class _EventDetailPageState extends State<EventDetailPage> {
           );
         },
       ),
-      body: EventDetailBody(
-        event: event,
-        loc: loc,
-        pageController: _pageCtrl,
-        currentPage: _page,
-        onPageChanged: (index) => setState(() => _page = index),
-        hostName: hostName,
-        hostBio: hostBio,
-        hostAvatarUrl: hostAvatar,
-        onTapHostProfile: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => UserProfilePage()),
-          );
-        },
-        onToggleFollow: () async {
-          // TODO: integrate backend follow logic
-          setState(() => _following = !_following);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_following ? loc.followed : loc.unfollowed),
-            ),
-          );
-        },
-        isFollowing: _following,
-        onTapLocation: () => Navigator.pop(context, widget.event),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              colorScheme.surfaceContainerHighest.withValues(alpha: 0.85),
+              colorScheme.surface,
+            ],
+          ),
+        ),
+        child: EventDetailBody(
+          event: event,
+          loc: loc,
+          pageController: _pageCtrl,
+          currentPage: _page,
+          onPageChanged: (index) => setState(() => _page = index),
+          hostName: hostName,
+          hostBio: hostBio,
+          hostAvatarUrl: hostAvatar,
+          onTapHostProfile: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => UserProfilePage()),
+            );
+          },
+          onToggleFollow: () async {
+            // TODO: integrate backend follow logic
+            setState(() => _following = !_following);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(_following ? loc.followed : loc.unfollowed),
+              ),
+            );
+          },
+          isFollowing: _following,
+          onTapLocation: () => Navigator.pop(context, widget.event),
+        ),
       ),
     );
   }

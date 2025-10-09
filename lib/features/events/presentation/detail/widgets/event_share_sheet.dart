@@ -29,6 +29,7 @@ class EventShareSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return AppShareSheet(
       preview: SharePreviewCard(
         event: event,
@@ -39,7 +40,7 @@ class EventShareSheet extends StatelessWidget {
       description: Text(
         loc.share_card_subtitle,
         style: theme.textTheme.bodyMedium?.copyWith(
-          color: Colors.black54,
+          color: colorScheme.onSurfaceVariant,
           height: 1.4,
         ),
         textAlign: TextAlign.center,
@@ -49,15 +50,15 @@ class EventShareSheet extends StatelessWidget {
           icon: Icons.image_outlined,
           label: loc.share_action_save_image,
           onTap: onSaveImage,
-          iconColor: Colors.orange,
-          labelColor: Colors.orange.shade800,
+          iconColor: colorScheme.primary,
+          labelColor: colorScheme.primary,
         ),
         AppShareActionButton(
           icon: Icons.ios_share,
           label: loc.share_action_share_system,
           onTap: onShareSystem,
-          iconColor: Colors.orange,
-          labelColor: Colors.orange.shade800,
+          iconColor: colorScheme.primary,
+          labelColor: colorScheme.primary,
         ),
       ],
     );
@@ -81,6 +82,7 @@ class SharePreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final timeLabel = event.startTime != null
         ? DateFormat('MM.dd HH:mm').format(event.startTime!.toLocal())
         : loc.to_be_announced;
@@ -94,14 +96,17 @@ class SharePreviewCard extends StatelessWidget {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFFF0E0), Colors.white],
+            gradient: LinearGradient(
+              colors: [
+                colorScheme.primaryContainer.withValues(alpha: 0.65),
+                colorScheme.surface,
+              ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
+                color: colorScheme.shadow.withValues(alpha: 0.14),
                 blurRadius: 24,
                 offset: const Offset(0, 20),
               ),
@@ -144,21 +149,28 @@ class SharePreviewCard extends StatelessWidget {
                         children: [
                           _StatusChip(
                             label: loc.registration_open,
-                            backgroundColor: Colors.orange,
+                            backgroundColor: colorScheme.primary,
+                            textColor: colorScheme.onPrimary,
                           ),
                           _StatusChip(
                             label: timeLabel,
-                            textColor: Colors.grey.shade800,
-                            backgroundColor: Colors.orange.shade50,
+                            textColor: colorScheme.onSurface,
+                            backgroundColor:
+                                colorScheme.surfaceContainerHigh.withValues(
+                              alpha: 0.9,
+                            ),
                             icon: Icons.calendar_today,
-                            iconColor: Colors.orange.shade300,
+                            iconColor: colorScheme.primary,
                           ),
                           _StatusChip(
                             label: participantsLabel,
-                            textColor: Colors.grey.shade800,
-                            backgroundColor: Colors.orange.shade50,
+                            textColor: colorScheme.onSurface,
+                            backgroundColor:
+                                colorScheme.surfaceContainerHigh.withValues(
+                              alpha: 0.9,
+                            ),
                             icon: Icons.people,
-                            iconColor: Colors.orange.shade300,
+                            iconColor: colorScheme.primary,
                           ),
                         ],
                       ),
@@ -221,9 +233,9 @@ class SharePreviewCard extends StatelessWidget {
               ),
               Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(28),
                   ),
                 ),
@@ -242,7 +254,7 @@ class SharePreviewCard extends StatelessWidget {
                     Text(
                       loc.share_card_subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.black54,
+                        color: colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),
                     ),
@@ -253,7 +265,7 @@ class SharePreviewCard extends StatelessWidget {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF3E0),
+                        color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Row(
@@ -266,7 +278,7 @@ class SharePreviewCard extends StatelessWidget {
                                 Text(
                                   loc.share_card_qr_caption,
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: Colors.black54,
+                                    color: colorScheme.onSurfaceVariant,
                                     height: 1.3,
                                   ),
                                 ),
@@ -289,7 +301,7 @@ class SharePreviewCard extends StatelessWidget {
                                   child: Text(
                                     shareLink,
                                     style: theme.textTheme.labelSmall?.copyWith(
-                                      color: Colors.orange.shade700,
+                                      color: colorScheme.primary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                     maxLines: 1,
@@ -302,11 +314,11 @@ class SharePreviewCard extends StatelessWidget {
                           const SizedBox(width: 16),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.06),
+                                  color: colorScheme.shadow.withValues(alpha: 0.08),
                                   blurRadius: 10,
                                   offset: const Offset(0, 6),
                                 ),
@@ -317,7 +329,7 @@ class SharePreviewCard extends StatelessWidget {
                               data: shareLink,
                               version: QrVersions.auto,
                               size: 80,
-                              backgroundColor: Colors.white,
+                              backgroundColor: colorScheme.surface,
                             ),
                           ),
                         ],
@@ -339,24 +351,26 @@ class _StatusChip extends StatelessWidget {
   final Color? backgroundColor;
   final IconData? icon;
   final Color? iconColor;
-  final Color textColor;
+  final Color? textColor;
 
   const _StatusChip({
     required this.label,
     this.backgroundColor,
     this.icon,
     this.iconColor,
-    this.textColor = Colors.white,
+    this.textColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.white.withValues(alpha: 0.15),
+        color: backgroundColor ??
+            colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -369,7 +383,7 @@ class _StatusChip extends StatelessWidget {
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: textColor,
+              color: textColor ?? colorScheme.onSurface,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.3,
             ),

@@ -17,14 +17,25 @@ class EventDetailBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(
+            top: BorderSide(color: colorScheme.outlineVariant),
+          ),
+        ),
         child: Row(
           children: [
             IconButton(
               icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+              style: IconButton.styleFrom(
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.08),
+                shape: const CircleBorder(),
+              ),
+              color: colorScheme.primary,
               onPressed: onFavorite,
             ),
             const SizedBox(width: 12),
@@ -34,8 +45,8 @@ class EventDetailBottomBar extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onRegister,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

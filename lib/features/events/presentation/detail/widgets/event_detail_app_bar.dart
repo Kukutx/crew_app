@@ -21,21 +21,36 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final iconColor = Colors.white;
+    final iconBackground = Colors.black.withValues(alpha: 0.25);
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+        style: IconButton.styleFrom(
+          backgroundColor: iconBackground,
+          shape: const CircleBorder(),
+        ),
+        icon: Icon(Icons.arrow_back_ios, color: iconColor, size: 20),
         onPressed: onBack,
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.share_outlined, color: Colors.white),
+          style: IconButton.styleFrom(
+            backgroundColor: iconBackground,
+            shape: const CircleBorder(),
+          ),
+          icon: Icon(Icons.share_outlined, color: iconColor),
           onPressed: onShare,
         ),
         IconButton(
-          icon: const Icon(Icons.more_horiz, color: Colors.white),
+          style: IconButton.styleFrom(
+            backgroundColor: iconBackground,
+            shape: const CircleBorder(),
+          ),
+          icon: Icon(Icons.more_horiz, color: iconColor),
           onPressed: onMore,
         ),
         const SizedBox(width: 8),
@@ -47,12 +62,12 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
             margin: const EdgeInsets.only(top: 15),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.orange,
+              color: colorScheme.primary.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               loc.registration_open,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(color: colorScheme.onPrimary, fontSize: 14),
             ),
           ),
         ),

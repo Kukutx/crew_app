@@ -14,12 +14,16 @@ class EventSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
-      elevation: 2,
+      color: colorScheme.surfaceContainerLow,
+      elevation: 0,
+      shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -27,22 +31,20 @@ class EventSummaryCard extends StatelessWidget {
           children: [
             Text(
               event.title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _buildTags(loc),
+              children: _buildTags(loc, theme, colorScheme),
             ),
             const SizedBox(height: 16),
             Text(
               event.description,
-              style: const TextStyle(fontSize: 14, height: 1.5),
+              style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
             ),
           ],
         ),
@@ -50,28 +52,46 @@ class EventSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _tagChip(String label) => Container(
+  Widget _tagChip(
+    String label,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.orange.shade50,
+          color: colorScheme.primaryContainer.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.shade300),
+          border: Border.all(
+            color: colorScheme.primary.withValues(alpha: 0.3),
+          ),
         ),
         child: Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Colors.orange),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       );
+  }
 
-  List<Widget> _buildTags(AppLocalizations loc) {
+  List<Widget> _buildTags(
+    AppLocalizations loc,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
     final tags = event.tags;
     if (tags.isEmpty) {
       return [
-        _tagChip(loc.tag_city_explore),
-        _tagChip(loc.tag_easy_social),
-        _tagChip(loc.tag_walk_friendly),
+        _tagChip(loc.tag_city_explore, theme, colorScheme),
+        _tagChip(loc.tag_easy_social, theme, colorScheme),
+        _tagChip(loc.tag_walk_friendly, theme, colorScheme),
       ];
     }
-    return tags.take(6).map(_tagChip).toList(growable: false);
+    return tags
+        .take(6)
+        .map((tag) => _tagChip(tag, theme, colorScheme))
+        .toList(growable: false);
   }
 }

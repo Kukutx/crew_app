@@ -24,6 +24,8 @@ class EventHostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final description = (bio != null && bio!.isNotEmpty)
         ? bio!
         : loc.share_card_subtitle;
@@ -31,7 +33,9 @@ class EventHostCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 2,
+      color: colorScheme.surfaceContainerLow,
+      elevation: 0,
+      shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
         onTap: onTapProfile,
@@ -44,9 +48,9 @@ class EventHostCard extends StatelessWidget {
                 backgroundImage: (avatar != null && avatar.isNotEmpty)
                     ? CachedNetworkImageProvider(avatar)
                     : null,
-                backgroundColor: Colors.orange.shade50,
+                backgroundColor: colorScheme.surfaceVariant,
                 child: (avatar == null || avatar.isEmpty)
-                    ? Icon(Icons.person, color: Colors.orange.shade400)
+                    ? Icon(Icons.person, color: colorScheme.onSurfaceVariant)
                     : null,
               ),
               const SizedBox(width: 12),
@@ -56,17 +60,16 @@ class EventHostCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -78,8 +81,10 @@ class EventHostCard extends StatelessWidget {
                     ? OutlinedButton.icon(
                         onPressed: onToggleFollow,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.orange,
-                          side: BorderSide(color: Colors.orange.shade300),
+                          foregroundColor: colorScheme.primary,
+                          side: BorderSide(
+                            color: colorScheme.primary.withValues(alpha: 0.4),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -90,8 +95,8 @@ class EventHostCard extends StatelessWidget {
                     : ElevatedButton.icon(
                         onPressed: onToggleFollow,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

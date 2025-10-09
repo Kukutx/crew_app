@@ -98,9 +98,11 @@ Future<EventDraft?> showCreateEventBottomSheet(BuildContext context, LatLng pos)
           }
           return DraggableScrollableSheet(
             expand: false,
-            minChildSize: 0.4,
-            initialChildSize: 0.7,
+            minChildSize: 0.25,
+            initialChildSize: 0.6,
             maxChildSize: 0.95,
+            snap: true,
+            snapSizes: const [0.25, 0.6, 0.95],
             builder: (context, scrollController) {
               return AnimatedPadding(
                 duration: const Duration(milliseconds: 200),

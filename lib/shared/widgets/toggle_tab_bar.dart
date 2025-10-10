@@ -13,6 +13,8 @@ class ToggleTabBar extends StatelessWidget {
     this.firstIcon = Icons.favorite,
     this.secondIcon = Icons.autorenew,
     this.accessoryBuilder,
+    this.leadingBuilder,
+    this.trailingBuilder,
   });
 
   final int selectedIndex;
@@ -23,30 +25,51 @@ class ToggleTabBar extends StatelessWidget {
   final IconData secondIcon;
   final Widget? Function(BuildContext context, int selectedIndex)?
       accessoryBuilder;
+  final Widget? Function(BuildContext context, int selectedIndex)?
+      leadingBuilder;
+  final Widget? Function(BuildContext context, int selectedIndex)?
+      trailingBuilder;
 
   @override
   Widget build(BuildContext context) {
     final accessory = accessoryBuilder?.call(context, selectedIndex);
+    final leading = leadingBuilder?.call(context, selectedIndex);
+    final trailing = trailingBuilder?.call(context, selectedIndex);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ToggleTabChip(
-              label: firstLabel,
-              icon: firstIcon,
-              selected: selectedIndex == 0,
-              onTap: () => onChanged(0),
+            if (leading != null) ...[
+              leading,
+              const SizedBox(width: 12),
+            ],
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ToggleTabChip(
+                    label: firstLabel,
+                    icon: firstIcon,
+                    selected: selectedIndex == 0,
+                    onTap: () => onChanged(0),
+                  ),
+                  const SizedBox(width: 12),
+                  ToggleTabChip(
+                    label: secondLabel,
+                    icon: secondIcon,
+                    selected: selectedIndex == 1,
+                    onTap: () => onChanged(1),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 12),
-            ToggleTabChip(
-              label: secondLabel,
-              icon: secondIcon,
-              selected: selectedIndex == 1,
-              onTap: () => onChanged(1),
-            ),
+            if (trailing != null) ...[
+              const SizedBox(width: 12),
+              trailing,
+            ],
           ],
         ),
         if (accessory != null) ...[

@@ -133,16 +133,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get events_open_chat => '进入消息';
 
   @override
-  String get events_tab_favorites => '私聊';
+  String get messages_tab_private => '私聊';
 
   @override
-  String get events_tab_registered => '群聊';
+  String get messages_tab_groups => '群聊';
 
   @override
   String get events_tab_invites => '召集';
 
   @override
-  String get events_tab_plaza => '广场';
+  String get events_tab_moments => '瞬间';
 
   @override
   String get events_title => '活动';
@@ -237,7 +237,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map => '地图';
 
   @override
-  String get group => '消息';
+  String get messages => '消息';
 
   @override
   String get max_interest_selection => '最多只能选择 5 个兴趣标签喵~';

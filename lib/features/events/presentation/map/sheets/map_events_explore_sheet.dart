@@ -108,7 +108,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
               child: ToggleTabBar(
                 selectedIndex: _tab,
                 firstLabel: loc.events_tab_invites,
-                secondLabel: loc.events_tab_plaza,
+                secondLabel: loc.events_tab_moments,
                 firstIcon: Icons.campaign,
                 secondIcon: Icons.public,
                 onChanged: (value) => setState(() => _tab = value),

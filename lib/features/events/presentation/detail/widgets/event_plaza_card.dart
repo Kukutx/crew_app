@@ -62,7 +62,7 @@ class EventPlazaCard extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                loc.events_tab_plaza,
+                loc.events_tab_moments,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

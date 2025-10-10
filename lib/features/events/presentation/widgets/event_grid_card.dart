@@ -44,23 +44,25 @@ class EventGridCard extends StatelessWidget {
           aspectRatio: 1,
           child: Stack(
             children: [
-              Hero(
-                tag: heroTag,
-                child: imageUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        memCacheWidth: memCacheW,
-                        placeholder: (c, _) => const AspectRatio(
-                          aspectRatio: 1,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
+              Positioned.fill(
+                child: Hero(
+                  tag: heroTag,
+                  child: imageUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          memCacheWidth: memCacheW,
+                          placeholder: (c, _) => const AspectRatio(
+                            aspectRatio: 1,
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           ),
-                        ),
-                        errorWidget: (c, _, _) =>
-                            const EventImagePlaceholder(aspectRatio: 1),
-                      )
-                    : const EventImagePlaceholder(aspectRatio: 1),
+                          errorWidget: (c, _, _) =>
+                              const EventImagePlaceholder(aspectRatio: 1),
+                        )
+                      : const EventImagePlaceholder(aspectRatio: 1),
+                ),
               ),
               Positioned(
                 left: 0,

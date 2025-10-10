@@ -117,41 +117,6 @@ class ProfileGuestbook extends ConsumerWidget {
                   message.content,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
-                if (message.tags.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: message.tags
-                        .map(
-                          (tag) => Chip(
-                            label: Text('#$tag'),
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                          ),
-                        )
-                        .toList(growable: false),
-                  ),
-                ],
-                if (message.location != null && message.location!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.place_outlined, size: 18),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          message.location!,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: Theme.of(context).hintColor),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -163,11 +128,6 @@ class ProfileGuestbook extends ConsumerWidget {
                     _GuestbookStat(
                       icon: Icons.mode_comment_outlined,
                       count: message.comments,
-                    ),
-                    const SizedBox(width: 16),
-                    _GuestbookStat(
-                      icon: Icons.share_outlined,
-                      count: message.shares,
                     ),
                   ],
                 ),

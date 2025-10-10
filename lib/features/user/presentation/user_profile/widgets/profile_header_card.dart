@@ -54,6 +54,16 @@ class ProfileHeaderCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        if (userProfile.tags.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: userProfile.tags
+                                .map((tag) => _ProfileTag(label: tag))
+                                .toList(),
+                          ),
+                        ],
                         const SizedBox(height: 4),
                         Text(
                           userProfile.bio,
@@ -134,6 +144,31 @@ class _ProfileStatDot extends StatelessWidget {
           color: Colors.white70,
           shape: BoxShape.circle,
         ),
+      ),
+    );
+  }
+}
+
+class _ProfileTag extends StatelessWidget {
+  const _ProfileTag({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context)
+            .textTheme
+            .labelSmall!
+            .copyWith(color: Colors.white, fontWeight: FontWeight.w500),
       ),
     );
   }

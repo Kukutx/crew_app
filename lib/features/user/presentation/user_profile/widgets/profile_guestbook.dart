@@ -204,7 +204,8 @@ class _ProfileGuestbookComposerSheetState
       _contentError = null;
     });
 
-    widget.onSubmit('匿名用户', message);
+    final displayName = '匿名用户';   // 这里以后会通过自动获取用户的昵称
+    widget.onSubmit(displayName, message);
     Navigator.of(context).pop(true);
   }
 

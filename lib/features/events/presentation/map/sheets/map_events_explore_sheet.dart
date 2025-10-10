@@ -122,60 +122,62 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                 firstIcon: Icons.campaign,
                 secondIcon: Icons.public,
                 onChanged: (value) => setState(() => _tab = value),
-                accessoryBuilder: (context, selectedIndex) {
+                leadingBuilder: (context, selectedIndex) {
                   if (selectedIndex != 1) return null;
 
                   final theme = Theme.of(context);
                   final buttonColor = theme.colorScheme.surfaceVariant;
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        PopupMenuButton<String>(
-                          onSelected: (value) {
-                            setState(() {
-                              _selectedCountry = value;
-                            });
-                          },
-                          itemBuilder: (context) => [
-                            for (final country in _countries)
-                              PopupMenuItem<String>(
-                                value: country,
-                                child: Text(country),
-                              ),
-                          ],
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: buttonColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(_selectedCountry ?? '附近'),
-                                const SizedBox(width: 4),
-                                const Icon(Icons.keyboard_arrow_down, size: 18),
-                              ],
-                            ),
+                    padding: const EdgeInsets.only(left: 16),
+                    child: PopupMenuButton<String>(
+                      onSelected: (value) {
+                        setState(() {
+                          _selectedCountry = value;
+                        });
+                      },
+                      itemBuilder: (context) => [
+                        for (final country in _countries)
+                          PopupMenuItem<String>(
+                            value: country,
+                            child: Text(country),
                           ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('添加新的瞬间功能开发中'),
-                              ),
-                            );
-                          },
-                        ),
                       ],
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: buttonColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(_selectedCountry ?? '附近'),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.keyboard_arrow_down, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                trailingBuilder: (context, selectedIndex) {
+                  if (selectedIndex != 1) return null;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('添加新的瞬间功能开发中'),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },

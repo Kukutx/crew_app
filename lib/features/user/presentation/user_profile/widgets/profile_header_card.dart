@@ -29,20 +29,12 @@ class ProfileHeaderCard extends StatelessWidget {
           surfaceTintColor: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(48),
-                  child: CachedNetworkImage(
-                    imageUrl: userProfile.avatar,
-                    width: 64,
-                    height: 64,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DefaultTextStyle(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 420;
+
+                Widget buildProfileDetails() {
+                  return DefaultTextStyle(
                     style: t.bodyMedium!.copyWith(color: Colors.white),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,13 +48,7 @@ class ProfileHeaderCard extends StatelessWidget {
                         ),
                         if (userProfile.tags.isNotEmpty) ...[
                           const SizedBox(height: 6),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 6,
-                            children: userProfile.tags
-                                .map((tag) => _ProfileTag(label: tag))
-                                .toList(),
-                          ),
+                          _ProfileTagList(tags: userProfile.tags),
                         ],
                         const SizedBox(height: 4),
                         Text(
@@ -73,27 +59,123 @@ class ProfileHeaderCard extends StatelessWidget {
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            _ProfileStat(label: '粉丝', value: userProfile.followers),
+                            _ProfileStat(
+                              label: '粉丝',
+                              value: userProfile.followers,
+                            ),
                             const _ProfileStatDot(),
-                            _ProfileStat(label: '关注', value: userProfile.following),
+                            _ProfileStat(
+                              label: '关注',
+                              value: userProfile.following,
+                            ),
                             const _ProfileStatDot(),
-                            _ProfileStat(label: '活动', value: userProfile.events),
+                            _ProfileStat(
+                              label: '活动',
+                              value: userProfile.events,
+                            ),
                           ],
                         ),
                       ],
                     ),
+                  );
+                }
+
+                final actionButtons = Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment:
+                      isCompact ? WrapAlignment.start : WrapAlignment.end,
+                  children: [
+                    _MessageButton(onPressed: onMessagePressed),
+                    _FollowButton(
+                      followed: userProfile.followed,
+                      onPressed: onFollowToggle,
+                    ),
+                  ],
+                );
+
+                final avatar = ClipRRect(
+                  borderRadius: BorderRadius.circular(48),
+                  child: CachedNetworkImage(
+                    imageUrl: userProfile.avatar,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                const SizedBox(width: 8),
-                _MessageButton(onPressed: onMessagePressed),
-                const SizedBox(width: 8),
-                _FollowButton(
-                  followed: userProfile.followed,
-                  onPressed: onFollowToggle,
-                ),
-              ],
+                );
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          avatar,
+                          const SizedBox(width: 12),
+                          Expanded(child: buildProfileDetails()),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      actionButtons,
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    avatar,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: buildProfileDetails()),
+                              const SizedBox(width: 12),
+                              ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 180),
+                                child: actionButtons,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileTagList extends StatelessWidget {
+  const _ProfileTagList({required this.tags});
+
+  final List<String> tags;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.only(right: 4),
+        child: Row(
+          children: [
+            for (var i = 0; i < tags.length; i++) ...[
+              if (i != 0) const SizedBox(width: 8),
+              _ProfileTag(label: tags[i]),
+            ],
+          ],
         ),
       ),
     );

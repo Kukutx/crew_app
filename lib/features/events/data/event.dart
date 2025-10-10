@@ -153,19 +153,83 @@ class Event {
     }
 
     List<String> parseStringList(dynamic value) {
-      Iterable<dynamic>? list;
-      if (value is Iterable<dynamic>) {
-        list = value;
-      } else if (value != null) {
-        list = const [];
+      final urls = <String>{};
+
+      void collect(dynamic input) {
+        if (input == null) {
+          return;
+        }
+
+        if (input is String) {
+          final trimmed = input.trim();
+          final uri = Uri.tryParse(trimmed);
+          if (trimmed.isNotEmpty && uri != null && uri.hasScheme) {
+            urls.add(trimmed);
+          }
+          return;
+        }
+
+        if (input is Iterable<dynamic>) {
+          for (final item in input) {
+            collect(item);
+          }
+          return;
+        }
+
+        if (input is Map) {
+          final map = Map<dynamic, dynamic>.from(input);
+
+          bool handledList = false;
+          for (final key in const [
+            'items',
+            'data',
+            'events',
+            'results',
+            'value',
+            'images',
+            'gallery',
+            'imageUrls',
+            'urls',
+            'values',
+            'list',
+            'photos',
+          ]) {
+            if (map.containsKey(key)) {
+              handledList = true;
+              collect(map[key]);
+            }
+          }
+
+          if (!handledList) {
+            for (final key in const [
+              'url',
+              'imageUrl',
+              'coverUrl',
+              'src',
+              'link',
+              'path',
+            ]) {
+              if (map.containsKey(key)) {
+                collect(map[key]);
+              }
+            }
+            for (final value in map.values) {
+              collect(value);
+            }
+          }
+          return;
+        }
+
+        collect(input.toString());
       }
-      if (list == null) return const <String>[];
-      return list
-          .map((item) => item?.toString())
-          .where((item) => item != null)
-          .map((item) => item!.trim())
-          .where((item) => item.isNotEmpty)
-          .toList(growable: false);
+
+      collect(value);
+
+      if (urls.isEmpty) {
+        return const <String>[];
+      }
+
+      return List.unmodifiable(urls);
     }
 
     String locationName = parseString(

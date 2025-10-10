@@ -180,21 +180,17 @@ class ProfileGuestbookComposerSheet extends StatefulWidget {
 
 class _ProfileGuestbookComposerSheetState
     extends State<ProfileGuestbookComposerSheet> {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
 
   String? _contentError;
-  bool _isAnonymous = false;
 
   @override
   void dispose() {
-    _nameController.dispose();
     _messageController.dispose();
     super.dispose();
   }
 
   void _handleSubmit() {
-    final name = _isAnonymous ? '' : _nameController.text.trim();
     final message = _messageController.text.trim();
 
     if (message.isEmpty) {
@@ -208,8 +204,7 @@ class _ProfileGuestbookComposerSheetState
       _contentError = null;
     });
 
-    final displayName = _isAnonymous || name.isEmpty ? '匿名用户' : name;
-    widget.onSubmit(displayName, message);
+    widget.onSubmit('匿名用户', message);
     Navigator.of(context).pop(true);
   }
 
@@ -232,37 +227,6 @@ class _ProfileGuestbookComposerSheetState
                   ?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '匿名留言',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Switch.adaptive(
-                  value: _isAnonymous,
-                  onChanged: (value) {
-                    setState(() {
-                      _isAnonymous = value;
-                      if (value) {
-                        _nameController.clear();
-                        FocusScope.of(context).unfocus();
-                      }
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _nameController,
-              enabled: !_isAnonymous,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: '昵称（选填）',
-                border: OutlineInputBorder(),
-              ),
-            ),
             const SizedBox(height: 16),
             TextField(
               controller: _messageController,

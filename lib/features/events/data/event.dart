@@ -77,6 +77,9 @@ class Event {
   final bool isFree;
   final double? price;
   final List<String> tags;
+  final List<String> waypoints;
+  final bool? isRoundTrip;
+  final double? distanceKm;
   final EventOrganizer? organizer;
 
   const Event({
@@ -100,6 +103,9 @@ class Event {
     this.isFree = false,
     this.price,
     this.tags = const <String>[],
+    this.waypoints = const <String>[],
+    this.isRoundTrip,
+    this.distanceKm,
     this.organizer,
   });
 
@@ -247,6 +253,31 @@ class Event {
 
     final parsedTags =
         parseStringList(json['tags'] ?? json['categories'] ?? json['labels']);
+    final parsedWaypoints = parseStringList(
+      json['waypoints'] ??
+          json['routePoints'] ??
+          json['stops'] ??
+          json['via'] ??
+          json['viaPoints'] ??
+          locationJson?['waypoints'] ??
+          locationJson?['stops'],
+    );
+    final parsedRoundTrip = parseBool(
+      json['isRoundTrip'] ??
+          json['roundTrip'] ??
+          json['isLoop'] ??
+          json['loop'] ??
+          json['round'],
+    );
+    final parsedDistanceKm = parseDouble(
+      json['distanceKm'] ??
+          json['distance_km'] ??
+          json['distance'] ??
+          json['lengthKm'] ??
+          json['length_km'] ??
+          json['length'] ??
+          json['routeLength'],
+    );
 
     return Event(
       id: parseString(json['id'] ?? json['eventId']) ?? '',
@@ -281,6 +312,9 @@ class Event {
       isFree: isFree,
       price: price,
       tags: List.unmodifiable(parsedTags),
+      waypoints: List.unmodifiable(parsedWaypoints),
+      isRoundTrip: parsedRoundTrip,
+      distanceKm: parsedDistanceKm,
       organizer: organizerJson != null
           ? EventOrganizer.fromJson(organizerJson)
           : (json['organizerId'] != null || json['organizerName'] != null)
@@ -314,6 +348,9 @@ class Event {
         'isFree': isFree,
         'price': price,
         'tags': tags,
+        if (waypoints.isNotEmpty) 'waypoints': waypoints,
+        if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
+        if (distanceKm != null) 'distanceKm': distanceKm,
         if (organizer != null) 'organizer': organizer!.toJson(),
       };
 

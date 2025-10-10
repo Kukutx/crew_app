@@ -49,6 +49,19 @@
   "event_meeting_point_title": "Meeting point",
   "event_participants_title": "Participants",
   "event_time_title": "Event time",
+  "event_waypoints_title": "Waypoints",
+  "event_route_type_title": "Route type",
+  "event_route_type_round": "Round trip",
+  "event_route_type_one_way": "One-way",
+  "event_distance_title": "Distance",
+  "event_distance_value": "{kilometers} km",
+  "@event_distance_value": {
+    "placeholders": {
+      "kilometers": {
+        "type": "String"
+      }
+    }
+  },
   "event_title_field_label": "Event Title",
   "events_open_chat": "Open messages",
   "messages_tab_private": "Private",

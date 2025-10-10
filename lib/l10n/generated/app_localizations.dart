@@ -332,6 +332,42 @@ abstract class AppLocalizations {
   /// **'Event time'**
   String get event_time_title;
 
+  /// No description provided for @event_waypoints_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoints'**
+  String get event_waypoints_title;
+
+  /// No description provided for @event_route_type_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Route type'**
+  String get event_route_type_title;
+
+  /// No description provided for @event_route_type_round.
+  ///
+  /// In en, this message translates to:
+  /// **'Round trip'**
+  String get event_route_type_round;
+
+  /// No description provided for @event_route_type_one_way.
+  ///
+  /// In en, this message translates to:
+  /// **'One-way'**
+  String get event_route_type_one_way;
+
+  /// No description provided for @event_distance_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get event_distance_title;
+
+  /// No description provided for @event_distance_value.
+  ///
+  /// In en, this message translates to:
+  /// **'{kilometers} km'**
+  String event_distance_value(String kilometers);
+
   /// No description provided for @event_title_field_label.
   ///
   /// In en, this message translates to:

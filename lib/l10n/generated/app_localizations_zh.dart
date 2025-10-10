@@ -130,6 +130,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_time_title => '活动时间';
 
   @override
+  String get event_waypoints_title => '途径点';
+
+  @override
+  String get event_route_type_title => '路线类型';
+
+  @override
+  String get event_route_type_round => '往返路线';
+
+  @override
+  String get event_route_type_one_way => '单程路线';
+
+  @override
+  String get event_distance_title => '总里程';
+
+  @override
+  String event_distance_value(String kilometers) {
+    return '$kilometers 公里';
+  }
+
+  @override
   String get event_title_field_label => '活动标题';
 
   @override

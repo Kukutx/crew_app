@@ -131,6 +131,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_time_title => 'Event time';
 
   @override
+  String get event_waypoints_title => 'Waypoints';
+
+  @override
+  String get event_route_type_title => 'Route type';
+
+  @override
+  String get event_route_type_round => 'Round trip';
+
+  @override
+  String get event_route_type_one_way => 'One-way';
+
+  @override
+  String get event_distance_title => 'Distance';
+
+  @override
+  String event_distance_value(String kilometers) {
+    return '$kilometers km';
+  }
+
+  @override
   String get event_title_field_label => 'Event Title';
 
   @override

@@ -183,7 +183,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: AppFloatingActionButton(
         heroTag: 'events_map_my_location_fab',
-        tooltip: '定位到我',
         margin: EdgeInsets.only(
           bottom: 120 + MediaQuery.of(context).viewPadding.bottom,
           right: 6,

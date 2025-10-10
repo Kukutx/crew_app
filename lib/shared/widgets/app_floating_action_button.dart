@@ -5,7 +5,6 @@ class AppFloatingActionButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.child,
-    this.tooltip,
     this.heroTag,
     this.margin = EdgeInsets.zero,
     this.backgroundColor,
@@ -15,7 +14,6 @@ class AppFloatingActionButton extends StatelessWidget {
 
   final VoidCallback onPressed;
   final Widget child;
-  final String? tooltip;
   final Object? heroTag;
   final EdgeInsetsGeometry margin;
   final Color? backgroundColor;
@@ -30,7 +28,6 @@ class AppFloatingActionButton extends StatelessWidget {
       padding: margin,
       child: FloatingActionButton(
         heroTag: heroTag,
-        tooltip: tooltip,
         onPressed: onPressed,
         elevation: elevation,
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,

@@ -272,18 +272,13 @@ class _PlazaPostFab extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return FloatingActionButton.extended(
+    return FloatingActionButton(
       onPressed: onPressed,
+      tooltip: label,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
-      icon: const Icon(Icons.edit),
-      label: Text(
-        label,
-        style: theme.textTheme.labelLarge?.copyWith(
-          color: colorScheme.onPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      shape: const CircleBorder(),
+      child: const Icon(Icons.add),
     );
   }
 }

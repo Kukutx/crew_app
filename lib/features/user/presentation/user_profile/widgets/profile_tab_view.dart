@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
+import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 
@@ -18,6 +19,7 @@ class ProfileTabView extends ConsumerWidget {
       children: const [
         _ActivitiesGrid(),
         _FavoritesGrid(),
+        ProfileGuestbook(),
       ],
     );
   }

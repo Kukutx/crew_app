@@ -27,7 +27,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   static const double _tabBarHeight = 48;
 
   late final TabController _tabController;
-  final List<Tab> _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
+  final List<Tab> _tabs = const [
+    Tab(text: '活动'),
+    Tab(text: '收藏'),
+    Tab(text: '留言簿'),
+  ];
 
   @override
   void initState() {

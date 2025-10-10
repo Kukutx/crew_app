@@ -145,7 +145,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_distance_title => '总里程';
 
   @override
-  String event_distance_value(String kilometers) => '$kilometers 公里';
+  String event_distance_value(String kilometers) {
+    return '$kilometers 公里';
+  }
 
   @override
   String get event_title_field_label => '活动标题';

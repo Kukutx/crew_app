@@ -146,7 +146,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_distance_title => 'Distance';
 
   @override
-  String event_distance_value(String kilometers) => '$kilometers km';
+  String event_distance_value(String kilometers) {
+    return '$kilometers km';
+  }
 
   @override
   String get event_title_field_label => 'Event Title';

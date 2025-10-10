@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
 import '../../../../core/error/api_exception.dart';
@@ -179,24 +181,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(
+      floatingActionButton: AppFloatingActionButton(
+        heroTag: 'events_map_my_location_fab',
+        tooltip: '定位到我',
+        margin: EdgeInsets.only(
           bottom: 120 + MediaQuery.of(context).viewPadding.bottom,
           right: 6,
         ),
-        child: FloatingActionButton(
-          onPressed: () async {
-            final loc = ref.read(userLocationProvider).value;
-            if (loc != null) {
-              await _moveCamera(loc, zoom: 14);
-            } else {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text("Unable to get location")));
-            }
-          },
-          child: const Icon(Icons.my_location),
-        ),
+        onPressed: () async {
+          final loc = ref.read(userLocationProvider).value;
+          if (loc != null) {
+            await _moveCamera(loc, zoom: 14);
+          } else {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("Unable to get location")));
+          }
+        },
+        child: const Icon(Icons.my_location),
       ),
     );
   }

@@ -111,7 +111,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
-      error: (_, __) => const MarkersLayer(markers: <Marker>{}),
+      error: (_, _) => const MarkersLayer(markers: <Marker>{}),
       data: (list) => MarkersLayer.fromEvents(
         events: list,
         userLoc: userLoc,

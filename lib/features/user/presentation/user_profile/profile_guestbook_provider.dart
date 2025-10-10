@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 class ProfileMessage {
   const ProfileMessage({
@@ -21,7 +21,7 @@ class ProfileMessage {
 class ProfileGuestbookNotifier extends StateNotifier<List<ProfileMessage>> {
   ProfileGuestbookNotifier()
       : super(
-          const [
+          [
             ProfileMessage(
               id: 'm1',
               authorName: 'Crew 小助手',

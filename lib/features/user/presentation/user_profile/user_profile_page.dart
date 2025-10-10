@@ -177,7 +177,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       floatingActionButton: _currentTabIndex == 2
           ? AppFloatingActionButton(
               heroTag: 'user_profile_guestbook_fab',
-              margin: EdgeInsets.only(bottom: 24 + bottomPadding, right: 16),
+              margin: EdgeInsets.only(bottom: 120 + bottomPadding, right: 6),
               onPressed: _openGuestbookComposer,
               child: const Icon(Icons.add),
             )

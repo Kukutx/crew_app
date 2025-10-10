@@ -52,7 +52,7 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
               final participant = participants[index];
               return ChatRoomParticipantAvatar(participant: participant);
             },
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemCount: participants.length,
           ),
         ),

@@ -80,18 +80,20 @@ class ProfileHeaderCard extends StatelessWidget {
                   );
                 }
 
-                final actionButtons = Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment:
-                      isCompact ? WrapAlignment.start : WrapAlignment.end,
-                  children: [
-                    _MessageButton(onPressed: onMessagePressed),
-                    _FollowButton(
-                      followed: userProfile.followed,
-                      onPressed: onFollowToggle,
-                    ),
-                  ],
+                final actionButtons = Align(
+                  alignment: Alignment.center,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _MessageButton(onPressed: onMessagePressed),
+                      _FollowButton(
+                        followed: userProfile.followed,
+                        onPressed: onFollowToggle,
+                      ),
+                    ],
+                  ),
                 );
 
                 final avatar = ClipRRect(
@@ -109,7 +111,7 @@ class ProfileHeaderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           avatar,
                           const SizedBox(width: 12),
@@ -123,7 +125,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 }
 
                 return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     avatar,
                     const SizedBox(width: 12),

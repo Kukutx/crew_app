@@ -7,10 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/presentation/user_profile/profile_guestbook_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';
+import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key, this.onClose});
@@ -27,6 +29,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   static const double _tabBarHeight = 48;
 
   late final TabController _tabController;
+  late int _currentTabIndex;
   final List<Tab> _tabs = const [
     Tab(text: '活动'),
     Tab(text: '收藏'),
@@ -37,10 +40,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
+    _currentTabIndex = _tabController.index;
+    _tabController.addListener(_handleTabChanged);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -57,6 +63,19 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           ? current.followers - 1
           : current.followers + 1,
     );
+  }
+
+  void _handleTabChanged() {
+    if (_tabController.indexIsChanging) {
+      return;
+    }
+
+    final nextIndex = _tabController.index;
+    if (nextIndex != _currentTabIndex) {
+      setState(() {
+        _currentTabIndex = nextIndex;
+      });
+    }
   }
 
   void _showMoreActions(BuildContext context, User profile) {
@@ -125,6 +144,27 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
+  Future<void> _openGuestbookComposer() async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return ProfileGuestbookComposerSheet(
+          onSubmit: (name, content) {
+            ref.read(profileGuestbookProvider.notifier).addMessage(name, content);
+          },
+        );
+      },
+    );
+
+    if (result == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('留言成功！')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
@@ -132,6 +172,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     final topPadding = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
+      floatingActionButton: _currentTabIndex == 2
+          ? FloatingActionButton(
+              onPressed: _openGuestbookComposer,
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: NestedScrollView(

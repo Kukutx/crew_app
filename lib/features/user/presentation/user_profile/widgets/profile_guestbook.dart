@@ -4,17 +4,226 @@ import 'package:intl/intl.dart';
 
 import 'package:crew_app/features/user/presentation/user_profile/profile_guestbook_provider.dart';
 
-class ProfileGuestbook extends ConsumerStatefulWidget {
+class ProfileGuestbook extends ConsumerWidget {
   const ProfileGuestbook({super.key});
 
+  static const _emptyPlaceholder = '还没有留言，点击右下角的 “+” 来发表第一条吧！';
+
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inMinutes < 1) {
+      return '刚刚';
+    }
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} 分钟前';
+    }
+    if (difference.inHours < 24) {
+      return '${difference.inHours} 小时前';
+    }
+    if (difference.inDays < 7) {
+      return '${difference.inDays} 天前';
+    }
+
+    final formatter = DateFormat('yyyy年M月d日 HH:mm');
+    return formatter.format(timestamp);
+  }
+
   @override
-  ConsumerState<ProfileGuestbook> createState() => _ProfileGuestbookState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final messages = ref.watch(profileGuestbookProvider);
+
+    if (messages.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 120),
+        children: const [
+          Center(
+            child: Text(
+              _emptyPlaceholder,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      itemCount: messages.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        final displayName = message.authorName.trim().isEmpty
+            ? '匿名用户'
+            : message.authorName.trim();
+        final initial = displayName.characters.first;
+
+        return Card(
+          elevation: 0,
+          color: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      child: Text(initial),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayName,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _formatTimestamp(message.timestamp),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: Theme.of(context).hintColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: '更多操作',
+                      icon: const Icon(Icons.more_horiz),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message.content,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                if (message.tags.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: message.tags
+                        .map(
+                          (tag) => Chip(
+                            label: Text('#$tag'),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                ],
+                if (message.location != null && message.location!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.place_outlined, size: 18),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          message.location!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Theme.of(context).hintColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _GuestbookStat(
+                      icon: Icons.favorite_border,
+                      count: message.likes,
+                    ),
+                    const SizedBox(width: 16),
+                    _GuestbookStat(
+                      icon: Icons.mode_comment_outlined,
+                      count: message.comments,
+                    ),
+                    const SizedBox(width: 16),
+                    _GuestbookStat(
+                      icon: Icons.share_outlined,
+                      count: message.shares,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
-class _ProfileGuestbookState extends ConsumerState<ProfileGuestbook> {
+class _GuestbookStat extends StatelessWidget {
+  const _GuestbookStat({required this.icon, required this.count});
+
+  final IconData icon;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18, color: Theme.of(context).hintColor),
+        const SizedBox(width: 4),
+        Text(
+          '$count',
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: Theme.of(context).hintColor),
+        ),
+      ],
+    );
+  }
+}
+
+class ProfileGuestbookComposerSheet extends StatefulWidget {
+  const ProfileGuestbookComposerSheet({
+    super.key,
+    required this.onSubmit,
+  });
+
+  final void Function(String name, String content) onSubmit;
+
+  @override
+  State<ProfileGuestbookComposerSheet> createState() =>
+      _ProfileGuestbookComposerSheetState();
+}
+
+class _ProfileGuestbookComposerSheetState
+    extends State<ProfileGuestbookComposerSheet> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
-  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+
+  String? _contentError;
 
   @override
   void dispose() {
@@ -23,137 +232,74 @@ class _ProfileGuestbookState extends ConsumerState<ProfileGuestbook> {
     super.dispose();
   }
 
-  void _submitMessage() {
-    final messenger = ScaffoldMessenger.of(context);
-    final rawName = _nameController.text.trim();
-    final content = _messageController.text.trim();
+  void _handleSubmit() {
+    final name = _nameController.text.trim();
+    final message = _messageController.text.trim();
 
-    if (content.isEmpty) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('请输入留言内容')), 
-      );
+    if (message.isEmpty) {
+      setState(() {
+        _contentError = '请输入留言内容';
+      });
       return;
     }
 
-    final displayName = rawName.isEmpty ? '匿名用户' : rawName;
-    ref.read(profileGuestbookProvider.notifier).addMessage(displayName, content);
+    setState(() {
+      _contentError = null;
+    });
 
-    _messageController.clear();
-    messenger.showSnackBar(
-      const SnackBar(content: Text('留言成功！')),
-    );
-    FocusScope.of(context).unfocus();
+    final displayName = name.isEmpty ? '匿名用户' : name;
+    widget.onSubmit(displayName, message);
+    Navigator.of(context).pop(true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(profileGuestbookProvider);
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Column(
-        children: [
-          Expanded(
-            child: messages.isEmpty
-                ? ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(32),
-                    children: const [
-                      SizedBox(
-                        height: 200,
-                        child: Center(
-                          child: Text('还没有留言，快来抢沙发吧！'),
-                        ),
-                      ),
-                    ],
-                  )
-                : ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      final trimmedName = message.authorName.trim();
-                      final initial = trimmedName.isNotEmpty
-                          ? String.fromCharCode(trimmedName.runes.first)
-                          : '客';
-
-                      return Card(
-                        clipBehavior: Clip.antiAlias,
-                        child: ListTile(
-                          leading: CircleAvatar(child: Text(initial)),
-                          title: Text(message.authorName),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  message.content,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _dateFormat.format(message.timestamp),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(color: Theme.of(context).hintColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  ),
-          ),
-          const Divider(height: 1),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: '昵称（选填）',
-                      border: OutlineInputBorder(),
-                    ),
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _messageController,
-                    minLines: 3,
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      labelText: '留言内容',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(),
-                    ),
-                    textInputAction: TextInputAction.newline,
-                  ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton.icon(
-                      onPressed: _submitMessage,
-                      icon: const Icon(Icons.send),
-                      label: const Text('发表'),
-                    ),
-                  ),
-                ],
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + bottomInset),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '发表留言',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _nameController,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: '昵称（选填）',
+                border: OutlineInputBorder(),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            TextField(
+              controller: _messageController,
+              minLines: 4,
+              maxLines: 6,
+              textInputAction: TextInputAction.newline,
+              decoration: InputDecoration(
+                labelText: '留言内容',
+                alignLabelWithHint: true,
+                border: const OutlineInputBorder(),
+                errorText: _contentError,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: _handleSubmit,
+              icon: const Icon(Icons.send),
+              label: const Text('发表'),
+            ),
+          ],
+        ),
       ),
     );
   }

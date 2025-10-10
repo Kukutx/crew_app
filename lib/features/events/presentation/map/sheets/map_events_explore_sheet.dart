@@ -20,6 +20,16 @@ class MapEventsExploreSheet extends ConsumerStatefulWidget {
 
 class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
   int _tab = 0;
+  String? _selectedCountry;
+
+  static const _countries = [
+    '中国',
+    '日本',
+    '美国',
+    '英国',
+    '法国',
+    '德国',
+  ];
 
   static const List<PlazaPost> _plazaPosts = [
     PlazaPost(
@@ -112,6 +122,65 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                 firstIcon: Icons.campaign,
                 secondIcon: Icons.public,
                 onChanged: (value) => setState(() => _tab = value),
+                accessoryBuilder: (context, selectedIndex) {
+                  if (selectedIndex != 1) return null;
+
+                  final theme = Theme.of(context);
+                  final buttonColor = theme.colorScheme.surfaceVariant;
+
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PopupMenuButton<String>(
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedCountry = value;
+                          });
+                        },
+                        itemBuilder: (context) => [
+                          for (final country in _countries)
+                            PopupMenuItem<String>(
+                              value: country,
+                              child: Text(country),
+                            ),
+                        ],
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: buttonColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(_selectedCountry ?? '附近'),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.keyboard_arrow_down, size: 18),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      IconButton.filledTonal(
+                        style: IconButton.styleFrom(
+                          backgroundColor: buttonColor,
+                          minimumSize: const Size.square(40),
+                        ),
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('添加新的瞬间功能开发中'),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             Expanded(
@@ -166,7 +235,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                       )
                     : KeyedSubtree(
                         key: const ValueKey('plaza'),
-                        child: _MapEventsPlazaFeed(posts: _plazaPosts),
+                        child: const _MapEventsPlazaFeed(posts: _plazaPosts),
                       ),
               ),
             ),

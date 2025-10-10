@@ -12,6 +12,7 @@ class ToggleTabBar extends StatelessWidget {
     required this.onChanged,
     this.firstIcon = Icons.favorite,
     this.secondIcon = Icons.autorenew,
+    this.accessoryBuilder,
   });
 
   final int selectedIndex;
@@ -20,11 +21,15 @@ class ToggleTabBar extends StatelessWidget {
   final ToggleTabChanged onChanged;
   final IconData firstIcon;
   final IconData secondIcon;
+  final Widget? Function(BuildContext context, int selectedIndex)?
+      accessoryBuilder;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    final accessory = accessoryBuilder?.call(context, selectedIndex);
+
+    final tabs = Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         ToggleTabChip(
           label: firstLabel,
@@ -38,6 +43,33 @@ class ToggleTabBar extends StatelessWidget {
           icon: secondIcon,
           selected: selectedIndex == 1,
           onTap: () => onChanged(1),
+        ),
+      ],
+    );
+
+    if (accessory == null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [tabs],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Align(
+            alignment: Alignment.center,
+            child: tabs,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Flexible(
+          fit: FlexFit.loose,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: accessory,
+          ),
         ),
       ],
     );

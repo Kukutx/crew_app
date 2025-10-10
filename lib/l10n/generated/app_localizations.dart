@@ -308,6 +308,12 @@ abstract class AppLocalizations {
   /// **'Event details'**
   String get event_details_title;
 
+  /// No description provided for @event_detail_publish_plaza.
+  ///
+  /// In en, this message translates to:
+  /// **'Post to Plaza'**
+  String get event_detail_publish_plaza;
+
   /// No description provided for @event_meeting_point_title.
   ///
   /// In en, this message translates to:

@@ -119,6 +119,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_details_title => 'Event details';
 
   @override
+  String get event_detail_publish_plaza => 'Post to Plaza';
+
+  @override
   String get event_meeting_point_title => 'Meeting point';
 
   @override

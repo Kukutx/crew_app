@@ -118,6 +118,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_details_title => '活动详情';
 
   @override
+  String get event_detail_publish_plaza => '发布广场帖子';
+
+  @override
   String get event_meeting_point_title => '集合地点';
 
   @override

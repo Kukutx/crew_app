@@ -222,6 +222,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
           );
         },
       ),
+      floatingActionButton: _PlazaPostFab(
+        label: loc.event_detail_publish_plaza,
+        onPressed: () => _showFeatureNotReadyMessage(loc),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: EventDetailBody(
         event: event,
         loc: loc,
@@ -248,6 +253,36 @@ class _EventDetailPageState extends State<EventDetailPage> {
         },
         isFollowing: _following,
         onTapLocation: () => Navigator.pop(context, widget.event),
+      ),
+    );
+  }
+}
+
+class _PlazaPostFab extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _PlazaPostFab({
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return FloatingActionButton.extended(
+      onPressed: onPressed,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+      icon: const Icon(Icons.edit),
+      label: Text(
+        label,
+        style: theme.textTheme.labelLarge?.copyWith(
+          color: colorScheme.onPrimary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

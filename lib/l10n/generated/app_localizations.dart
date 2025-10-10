@@ -344,17 +344,17 @@ abstract class AppLocalizations {
   /// **'Open messages'**
   String get events_open_chat;
 
-  /// No description provided for @events_tab_favorites.
+  /// No description provided for @messages_tab_private.
   ///
   /// In en, this message translates to:
   /// **'Private'**
-  String get events_tab_favorites;
+  String get messages_tab_private;
 
-  /// No description provided for @events_tab_registered.
+  /// No description provided for @messages_tab_groups.
   ///
   /// In en, this message translates to:
   /// **'Groups'**
-  String get events_tab_registered;
+  String get messages_tab_groups;
 
   /// No description provided for @events_tab_invites.
   ///
@@ -362,11 +362,11 @@ abstract class AppLocalizations {
   /// **'Invites'**
   String get events_tab_invites;
 
-  /// No description provided for @events_tab_plaza.
+  /// No description provided for @events_tab_moments.
   ///
   /// In en, this message translates to:
-  /// **'Plaza'**
-  String get events_tab_plaza;
+  /// **'Moments'**
+  String get events_tab_moments;
 
   /// No description provided for @events_title.
   ///
@@ -548,11 +548,11 @@ abstract class AppLocalizations {
   /// **'Map'**
   String get map;
 
-  /// No description provided for @group.
+  /// No description provided for @messages.
   ///
   /// In en, this message translates to:
   /// **'Messages'**
-  String get group;
+  String get messages;
 
   /// No description provided for @max_interest_selection.
   ///

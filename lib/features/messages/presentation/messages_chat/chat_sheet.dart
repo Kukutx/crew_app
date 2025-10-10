@@ -447,7 +447,7 @@ class _ChatSheetState extends State<ChatSheet> {
               child: Row(
                 children: [
                   Text(
-                    loc.group,
+                    loc.messages,
                     style: theme.textTheme.titleLarge,
                   ),
                   const Spacer(),
@@ -492,8 +492,8 @@ class _ChatSheetState extends State<ChatSheet> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: ToggleTabBar(
                 selectedIndex: _tab,
-                firstLabel: loc.events_tab_favorites,
-                secondLabel: loc.events_tab_registered,
+                firstLabel: loc.messages_tab_private,
+                secondLabel: loc.messages_tab_groups,
                 onChanged: (value) => setState(() => _tab = value),
               ),
             ),

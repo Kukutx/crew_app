@@ -146,7 +146,7 @@ class _AppState extends ConsumerState<App> {
       NavigationDestination(
         icon: const Icon(Icons.chat_bubble_outline),
         selectedIcon: const Icon(Icons.chat_bubble),
-        label: loc.group,
+        label: loc.messages,
       ),
     ];
 

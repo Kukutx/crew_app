@@ -137,16 +137,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events_open_chat => 'Open messages';
 
   @override
-  String get events_tab_favorites => 'Private';
+  String get messages_tab_private => 'Private';
 
   @override
-  String get events_tab_registered => 'Groups';
+  String get messages_tab_groups => 'Groups';
 
   @override
   String get events_tab_invites => 'Invites';
 
   @override
-  String get events_tab_plaza => 'Plaza';
+  String get events_tab_moments => 'Moments';
 
   @override
   String get events_title => 'Events';
@@ -245,7 +245,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'Map';
 
   @override
-  String get group => 'Messages';
+  String get messages => 'Messages';
 
   @override
   String get max_interest_selection => 'You can select up to 5 interest tags.';

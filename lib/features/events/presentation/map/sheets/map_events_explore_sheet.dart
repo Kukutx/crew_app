@@ -1,5 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,8 +21,8 @@ class MapEventsExploreSheet extends ConsumerStatefulWidget {
 class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
   int _tab = 0;
 
-  static const List<_MapEventsPlazaPost> _plazaPosts = [
-    _MapEventsPlazaPost(
+  static const List<PlazaPost> _plazaPosts = [
+    PlazaPost(
       author: '阿里',
       authorInitials: 'AL',
       timeLabel: '15分钟前',
@@ -34,7 +35,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
       accentColor: Color(0xFF6750A4),
       previewLabel: '日落草坪局',
     ),
-    _MapEventsPlazaPost(
+    PlazaPost(
       author: '米兰小巷',
       authorInitials: 'ML',
       timeLabel: '1小时前',
@@ -46,7 +47,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
       accentColor: Color(0xFF4C6ED7),
       previewLabel: '街角手冲香',
     ),
-    _MapEventsPlazaPost(
+    PlazaPost(
       author: '夏栀',
       authorInitials: 'XZ',
       timeLabel: '昨天',
@@ -177,14 +178,12 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
 }
 
 class _MapEventsPlazaFeed extends StatelessWidget {
-  final List<_MapEventsPlazaPost> posts;
+  final List<PlazaPost> posts;
 
   const _MapEventsPlazaFeed({required this.posts});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       physics: const AlwaysScrollableScrollPhysics(
@@ -192,227 +191,12 @@ class _MapEventsPlazaFeed extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final post = posts[index];
-        return Card(
-          margin: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: post.accentColor.withValues(alpha: 0.15),
-                      child: Text(
-                        post.authorInitials,
-                        style: TextStyle(
-                          color: post.accentColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            post.author,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            post.timeLabel,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: colorScheme.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.more_horiz,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  post.content,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.copyWith(height: 1.5),
-                ),
-                if (post.previewLabel != null) ...[
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      height: 148,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            post.accentColor.withValues(alpha: .85),
-                            post.accentColor.withValues(alpha: 0.55),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        post.previewLabel!,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ),
-                  ),
-                ],
-                if (post.tags.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: post.tags
-                        .map(
-                          (tag) => Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '#$tag',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.place_outlined,
-                        size: 18, color: colorScheme.primary),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        post.location,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _MapEventsPlazaAction(
-                      icon: Icons.favorite_border,
-                      label: post.likes.toString(),
-                    ),
-                    const SizedBox(width: 16),
-                    _MapEventsPlazaAction(
-                      icon: Icons.chat_bubble_outline,
-                      label: post.comments.toString(),
-                    ),
-                    const Spacer(),
-                    _MapEventsPlazaAction(
-                      icon: Icons.share_outlined,
-                      label: '分享',
-                      dense: true,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
+        return PlazaPostCard(post: post);
       },
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemCount: posts.length,
     );
   }
-}
-
-class _MapEventsPlazaAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool dense;
-
-  const _MapEventsPlazaAction({
-    required this.icon,
-    required this.label,
-    this.dense = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-          fontWeight: dense ? FontWeight.w500 : FontWeight.w600,
-        );
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 18, color: colorScheme.onSurfaceVariant),
-        const SizedBox(width: 6),
-        Text(label, style: textStyle),
-      ],
-    );
-  }
-}
-
-class _MapEventsPlazaPost {
-  final String author;
-  final String authorInitials;
-  final String timeLabel;
-  final String content;
-  final String location;
-  final List<String> tags;
-  final int likes;
-  final int comments;
-  final Color accentColor;
-  final String? previewLabel;
-
-  const _MapEventsPlazaPost({
-    required this.author,
-    required this.authorInitials,
-    required this.timeLabel,
-    required this.content,
-    required this.location,
-    required this.tags,
-    required this.likes,
-    required this.comments,
-    required this.accentColor,
-    this.previewLabel,
-  });
 }
 
 String _errorMessage(Object error) {

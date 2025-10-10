@@ -8,6 +8,7 @@ class User {
   final int following;
   final int events;
   final bool followed;
+  final List<String> tags;
   User({
     required this.uid,
     required this.name,
@@ -18,9 +19,10 @@ class User {
     required this.following,
     required this.events,
     required this.followed,
+    this.tags = const [],
   });
 
-  User copyWith({bool? followed, int? followers}) => User(
+  User copyWith({bool? followed, int? followers, List<String>? tags}) => User(
         uid: uid,
         name: name,
         bio: bio,
@@ -30,6 +32,7 @@ class User {
         following: following,
         events: events,
         followed: followed ?? this.followed,
+        tags: tags ?? this.tags,
       );
 }
 

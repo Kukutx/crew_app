@@ -19,6 +19,15 @@ class EventInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final timeText = _formatTime();
     final participantText = event.participantSummary ?? loc.to_be_announced;
+    final waypoints = event.waypoints;
+    final routeType = event.isRoundTrip;
+    final distanceKm = event.distanceKm;
+    final localeTag = Localizations.localeOf(context).toString();
+    final distanceText = distanceKm != null
+        ? loc.event_distance_value(
+            _formatDistance(distanceKm, localeTag),
+          )
+        : null;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
@@ -46,6 +55,19 @@ class EventInfoCard extends StatelessWidget {
                 event.address?.isNotEmpty == true ? event.address! : event.location,
               ),
             ),
+            if (waypoints.isNotEmpty) _waypointsRow(waypoints, loc),
+            if (routeType != null)
+              _detailRow(
+                routeType ? Icons.loop : Icons.trending_flat,
+                loc.event_route_type_title,
+                routeType ? loc.event_route_type_round : loc.event_route_type_one_way,
+              ),
+            if (distanceText != null)
+              _detailRow(
+                Icons.straighten,
+                loc.event_distance_title,
+                distanceText,
+              ),
           ],
         ),
       ),
@@ -72,6 +94,44 @@ class EventInfoCard extends StatelessWidget {
         ),
       );
 
+  Widget _waypointsRow(List<String> waypoints, AppLocalizations loc) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.alt_route, size: 20, color: Colors.orange),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(loc.event_waypoints_title, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: waypoints
+                          .map(
+                            (point) => Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Chip(
+                                label: Text(point),
+                                backgroundColor: Colors.orange.shade50,
+                                labelStyle:
+                                    const TextStyle(fontSize: 13, color: Colors.black87),
+                              ),
+                            ),
+                          )
+                          .toList(growable: false),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
   String _formatTime() {
     final start = event.startTime;
     final end = event.endTime;
@@ -84,5 +144,10 @@ class EventInfoCard extends StatelessWidget {
     }
     final endFmt = DateFormat('HH:mm').format(end.toLocal());
     return '$startFmt - $endFmt';
+  }
+
+  String _formatDistance(double kilometers, String localeTag) {
+    final formatter = NumberFormat('#,##0.0', localeTag);
+    return formatter.format(kilometers);
   }
 }

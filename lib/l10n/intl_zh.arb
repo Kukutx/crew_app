@@ -91,6 +91,19 @@
   "event_meeting_point_title": "集合地点",
   "event_participants_title": "参与人数",
   "event_time_title": "活动时间",
+  "event_waypoints_title": "途径点",
+  "event_route_type_title": "路线类型",
+  "event_route_type_round": "往返路线",
+  "event_route_type_one_way": "单程路线",
+  "event_distance_title": "总里程",
+  "event_distance_value": "{kilometers} 公里",
+  "@event_distance_value": {
+    "placeholders": {
+      "kilometers": {
+        "type": "String"
+      }
+    }
+  },
   "event_title_field_label": "活动标题",
   "events_open_chat": "进入消息",
   "messages_tab_private": "私聊",

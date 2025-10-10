@@ -44,14 +44,19 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   double get _resultsHeight {
     if (!showResults) return 0;
-    if (isLoading) return 72;
-    if (errorText != null || results.isEmpty) return 64;
+
+    // 结果列表容器外部有 Padding(top: 4, bottom: 12)，需要将这 16 像素计入
+    // preferredSize，否则在部分屏幕上会出现底部溢出。
+    const padding = 16.0;
+
+    if (isLoading) return 72 + padding;
+    if (errorText != null || results.isEmpty) return 64 + padding;
 
     const itemHeight = 60.0;
     const maxVisible = 4;
     final visibleCount =
         results.length > maxVisible ? maxVisible : results.length;
-    return visibleCount * itemHeight;
+    return visibleCount * itemHeight + padding;
   }
 
   // 搜索框 ~56 + 间距8 + 标签条44 + 结果列表高度

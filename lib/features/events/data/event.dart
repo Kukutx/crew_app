@@ -64,6 +64,7 @@ class Event {
   final double latitude;
   final double longitude;
   final List<String> imageUrls;
+  final List<String> videoUrls;
   final String? coverImageUrl;
   final String? address;
   final DateTime? startTime;
@@ -90,6 +91,7 @@ class Event {
     required this.latitude,
     required this.longitude,
     required this.imageUrls,
+    this.videoUrls = const <String>[],
     this.coverImageUrl,
     this.address,
     this.startTime,
@@ -206,6 +208,13 @@ class Event {
     final parsedImageUrls = parseStringList(
       mediaJson?['imageUrls'] ?? mediaJson?['images'] ?? json['imageUrls'] ?? json['images'],
     );
+    final parsedVideoUrls = parseStringList(
+      mediaJson?['videoUrls'] ??
+          mediaJson?['videos'] ??
+          json['videoUrls'] ??
+          json['videos'] ??
+          mediaJson?['clips'],
+    );
     final coverImageUrl = parseString(
       mediaJson?['coverImageUrl'] ??
           mediaJson?['cover'] ??
@@ -287,6 +296,7 @@ class Event {
       latitude: latitude,
       longitude: longitude,
       imageUrls: List.unmodifiable(parsedImageUrls),
+      videoUrls: List.unmodifiable(parsedVideoUrls),
       coverImageUrl: coverImageUrl,
       address: parseString(locationJson?['address'] ?? json['address']),
       startTime: parseDate(
@@ -336,6 +346,7 @@ class Event {
         'latitude': latitude,
         'longitude': longitude,
         'imageUrls': imageUrls,
+        if (videoUrls.isNotEmpty) 'videoUrls': videoUrls,
         'coverImageUrl': coverImageUrl,
         'startTime': startTime?.toIso8601String(),
         'endTime': endTime?.toIso8601String(),

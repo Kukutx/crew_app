@@ -1,6 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_host_card.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_image_carousel.dart';
+import 'package:crew_app/features/events/presentation/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_info_card.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_summary_card.dart';
@@ -43,7 +43,7 @@ class EventDetailBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EventImageCarousel(
+          EventMediaCarousel(
             event: event,
             controller: pageController,
             currentPage: currentPage,

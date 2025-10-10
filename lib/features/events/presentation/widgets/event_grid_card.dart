@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import 'package:crew_app/l10n/generated/app_localizations.dart';
+
 import '../../data/event.dart';
 import '../detail/events_detail_page.dart';
 import 'event_image_placeholder.dart';
@@ -17,6 +19,14 @@ class EventGridCard extends StatelessWidget {
   final Event event;
   final String heroTag;
   final ValueChanged<Event>? onShowOnMap;
+
+  void _onFavoriteTap(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final message = loc?.feature_not_ready ?? 'This feature is under development.';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +72,29 @@ class EventGridCard extends StatelessWidget {
                               const EventImagePlaceholder(aspectRatio: 1),
                         )
                       : const EventImagePlaceholder(aspectRatio: 1),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Material(
+                  color: Colors.black54,
+                  shape: const CircleBorder(),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => _onFavoriteTap(context),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(
+                        event.isFavorite
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Positioned(

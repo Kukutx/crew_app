@@ -260,6 +260,67 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map => '地图';
 
   @override
+  String get map_location_info_title => '位置信息';
+
+  @override
+  String get map_location_info_address_loading => '正在解析地址…';
+
+  @override
+  String get map_location_info_address_unavailable => '暂无地址信息';
+
+  @override
+  String get map_location_info_create_event => '在此创建活动';
+
+  @override
+  String get map_place_details_title => '地点信息';
+
+  @override
+  String get map_place_details_not_found => '附近没有找到可用地点。';
+
+  @override
+  String get map_place_details_error => '暂时无法获取地点信息。';
+
+  @override
+  String get map_place_details_missing_api_key => 'Google Places API Key 未配置。';
+
+  @override
+  String map_place_details_rating_value(Object rating) {
+    return '评分 $rating';
+  }
+
+  @override
+  String get map_place_details_no_rating => '暂无评分';
+
+  @override
+  String map_place_details_reviews(int count) {
+    return intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      zero: '暂无评论',
+      one: '1 条评论',
+      other: '$count 条评论',
+    );
+  }
+
+  @override
+  String get map_place_details_price_free => '价格等级：免费';
+
+  @override
+  String get map_place_details_price_inexpensive => '价格等级：\$';
+
+  @override
+  String get map_place_details_price_moderate => '价格等级：\$\$';
+
+  @override
+  String get map_place_details_price_expensive => '价格等级：\$\$\$';
+
+  @override
+  String get map_place_details_price_very_expensive => '价格等级：\$\$\$\$';
+
+  @override
+  String get map_place_details_price_unknown => '价格等级：未知';
+
+  @override
   String get messages => '消息';
 
   @override

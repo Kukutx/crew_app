@@ -104,6 +104,35 @@
   "login_title": "Welcome to Crew",
   "logout_success": "Signed out successfully.",
   "map": "Map",
+  "map_location_info_title": "Location info",
+  "map_location_info_address_loading": "Resolving address…",
+  "map_location_info_address_unavailable": "Address unavailable",
+  "map_location_info_create_event": "Create event here",
+  "map_place_details_title": "Place details",
+  "map_place_details_not_found": "No places found nearby.",
+  "map_place_details_error": "Unable to load place information.",
+  "map_place_details_missing_api_key": "Google Places API key is not configured.",
+  "map_place_details_rating_value": "Rating {rating}",
+  "@map_place_details_rating_value": {
+    "placeholders": {
+      "rating": {}
+    }
+  },
+  "map_place_details_no_rating": "No rating yet",
+  "map_place_details_reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {{count} reviews}}",
+  "@map_place_details_reviews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "map_place_details_price_free": "Price level: Free",
+  "map_place_details_price_inexpensive": "Price level: $",
+  "map_place_details_price_moderate": "Price level: $$",
+  "map_place_details_price_expensive": "Price level: $$$",
+  "map_place_details_price_very_expensive": "Price level: $$$$",
+  "map_place_details_price_unknown": "Price level: unknown",
   "messages": "Messages",
   "max_interest_selection": "You can select up to 5 interest tags.",
   "my_events": "My events",

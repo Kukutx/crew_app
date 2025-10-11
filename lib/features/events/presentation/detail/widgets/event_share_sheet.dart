@@ -143,6 +143,10 @@ class SharePreviewCard extends StatelessWidget {
                         runSpacing: 8,
                         children: [
                           _StatusChip(
+                            label: loc.registration_open,
+                            backgroundColor: Colors.orange,
+                          ),
+                          _StatusChip(
                             label: timeLabel,
                             textColor: Colors.grey.shade800,
                             backgroundColor: Colors.orange.shade50,

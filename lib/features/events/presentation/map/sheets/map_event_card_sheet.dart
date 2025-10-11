@@ -143,6 +143,8 @@ void showEventBottomSheet({
                               ]),
                               const SizedBox(height: 6),
                               Row(children: [
+                                _smallChip(loc.registration_open),
+                                const SizedBox(width: 6),
                                 const Icon(Icons.groups,
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 2),
@@ -194,4 +196,13 @@ void showEventBottomSheet({
     ),
   );
 }
+
+Widget _smallChip(String text) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+          color: const Color(0xFFFFE7C2),
+          borderRadius: BorderRadius.circular(8)),
+      child: Text(text,
+          style: const TextStyle(fontSize: 11, color: Colors.black87)),
+    );
 

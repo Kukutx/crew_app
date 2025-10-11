@@ -217,7 +217,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                 final radius = _currentCornerRadius;
                 final gradientOpacity = _currentGradientOpacity;
                 return Padding(
-                  padding: EdgeInsets.fromLTRB(16, topInset + kToolbarHeight / 2, 16, 0),
+                  padding: EdgeInsets.fromLTRB(16, topInset + 16, 16, 0),
                   child: Semantics(
                     label: widget.event.title,
                     button: true,
@@ -271,14 +271,6 @@ class _EventDetailBodyState extends State<EventDetailBody>
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                left: 16,
-                                bottom: 16,
-                                child: _MediaInfoBadge(
-                                  index: widget.currentPage,
-                                  total: math.max(1, _mediaCount),
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -289,79 +281,37 @@ class _EventDetailBodyState extends State<EventDetailBody>
               },
             ),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: EventHostCard(
-                loc: widget.loc,
-                name: widget.hostName,
-                bio: widget.hostBio,
-                avatarUrl: widget.hostAvatarUrl,
-                onTapProfile: widget.onTapHostProfile,
-                onToggleFollow: widget.onToggleFollow,
-                isFollowing: widget.isFollowing,
-              ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                const SizedBox(height: 16),
+                EventHostCard(
+                  loc: widget.loc,
+                  name: widget.hostName,
+                  bio: widget.hostBio,
+                  avatarUrl: widget.hostAvatarUrl,
+                  onTapProfile: widget.onTapHostProfile,
+                  onToggleFollow: widget.onToggleFollow,
+                  isFollowing: widget.isFollowing,
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: EventSummaryCard(event: widget.event, loc: widget.loc),
+                ),
+                const SizedBox(height: 10),
+                EventInfoCard(
+                  event: widget.event,
+                  loc: widget.loc,
+                  onTapLocation: widget.onTapLocation,
+                ),
+                const SizedBox(height: 10),
+                EventPlazaCard(loc: widget.loc),
+                const SizedBox(height: 120),
+              ],
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: SizedBox(
-                width: double.infinity,
-                child: EventSummaryCard(event: widget.event, loc: widget.loc),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: EventInfoCard(
-                event: widget.event,
-                loc: widget.loc,
-                onTapLocation: widget.onTapLocation,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: EventPlazaCard(loc: widget.loc),
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 120),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MediaInfoBadge extends StatelessWidget {
-  const _MediaInfoBadge({
-    required this.index,
-    required this.total,
-  });
-
-  final int index;
-  final int total;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.black54,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Text(
-          '${index + 1} / $total',
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
       ),
     );
   }

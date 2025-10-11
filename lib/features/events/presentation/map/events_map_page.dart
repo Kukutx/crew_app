@@ -12,6 +12,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_bottom_bar.dart';
+import 'package:crew_app/features/events/presentation/detail/events_detail_page.dart';
 
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
@@ -26,7 +28,6 @@ import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'sheets/map_event_filter_sheet.dart';
-import 'sheets/map_event_card_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import 'sheets/map_location_info_sheet.dart';
@@ -43,6 +44,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   GoogleMapController? _map;
   bool _mapReady = false;
   bool _movedToSelected = false;
+  late final PageController _eventCarouselController;
+  Event? _selectedEvent;
+  List<Event> _cachedEvents = const <Event>[];
+  bool _programmaticPageChange = false;
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
   static const _quickTags = [
     'today',
@@ -75,6 +80,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _api = ref.read(apiServiceProvider);
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
+    _eventCarouselController = PageController(viewportFraction: 0.86);
+    _selectedEvent = widget.selectedEvent;
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -83,7 +90,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       if (event == null) {
         return;
       }
-      _focusOnEvent(event);
+      _jumpToEvent(event, animate: true, moveCamera: true);
       ref.read(mapFocusEventProvider.notifier).state = null;
     });
   }
@@ -95,6 +102,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     _mapFocusSubscription?.close();
+    _eventCarouselController.dispose();
     _map?.dispose();
     super.dispose();
   }
@@ -117,19 +125,22 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
-      data: (list) => MarkersLayer.fromEvents(
-        events: list,
-        userLoc: userLoc,
-        onEventTap: _showEventCard,
-      ),
+      data: (list) {
+        _cachedEvents = list;
+        _ensureSelectedEvent(list);
+        return MarkersLayer.fromEvents(
+          events: list,
+          userLoc: userLoc,
+          onEventTap: _handleMarkerTap,
+        );
+      },
     );
 
-    // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.selectedEvent != null && !_movedToSelected) {
-        _focusOnEvent(widget.selectedEvent!);
-      }
-    });
+    final carousel = events.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (list) => _buildEventCarousel(context, loc, list),
+    );
 
     return Scaffold(
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
@@ -168,29 +179,34 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         results: _searchResults,
         errorText: _searchError,
       ),
-      body: Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) {
-          if (_searchFocusNode.hasFocus) {
-            _searchFocusNode.unfocus();
-          } else if (_showSearchResults) {
-            setState(() => _showSearchResults = false);
-          }
-        },
-        child: MapCanvas(
-          initialCenter: startCenter,
-          onMapCreated: _onMapCreated,
-          onMapReady: _onMapReady,
-          onTap: (pos) => unawaited(_onMapTap(pos)),
-          onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
-          markers: markersLayer.markers,
-        ),
+      body: Stack(
+        children: [
+          Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) {
+              if (_searchFocusNode.hasFocus) {
+                _searchFocusNode.unfocus();
+              } else if (_showSearchResults) {
+                setState(() => _showSearchResults = false);
+              }
+            },
+            child: MapCanvas(
+              initialCenter: startCenter,
+              onMapCreated: _onMapCreated,
+              onMapReady: _onMapReady,
+              onTap: (pos) => unawaited(_onMapTap(pos)),
+              onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
+              markers: markersLayer.markers,
+            ),
+          ),
+          carousel,
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: AppFloatingActionButton(
         heroTag: 'events_map_my_location_fab',
         margin: EdgeInsets.only(
-          bottom: 120 + MediaQuery.of(context).viewPadding.bottom,
+          bottom: 200 + MediaQuery.of(context).viewPadding.bottom,
           right: 6,
         ),
         onPressed: () async {
@@ -277,24 +293,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  void _showEventCard(Event ev) {
-    if (!mounted) {
-      return;
-    }
-    showEventBottomSheet(
-      context: context,
-      event: ev,
-      onShowOnMap: _focusOnEvent,
-    );
-  }
-
-  void _focusOnEvent(Event event) {
-    if (!mounted) {
-      return;
-    }
-    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
-    _movedToSelected = true;
-    _showEventCard(event);
+  void _handleMarkerTap(Event event) {
+    _jumpToEvent(event, animate: true, moveCamera: true);
   }
 
   Future<void> _onMapTap(LatLng position) async {
@@ -358,9 +358,167 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     await ref.read(eventsProvider.notifier).createEvent(
           title: data.title.trim(),
           description: data.description.trim(),
-          pos: latlng,
-          locationName: data.locationName,
+        pos: latlng,
+        locationName: data.locationName,
+      );
+  }
+
+  void _ensureSelectedEvent(List<Event> events) {
+    if (!mounted) {
+      return;
+    }
+    if (events.isEmpty) {
+      if (_selectedEvent != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          setState(() => _selectedEvent = null);
+        });
+      }
+      return;
+    }
+
+    final current = _selectedEvent;
+    if (current == null) {
+      final initial = widget.selectedEvent != null
+          ? events.firstWhere(
+              (e) => e.id == widget.selectedEvent!.id,
+              orElse: () => events.first,
+            )
+          : events.first;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _jumpToEvent(
+          initial,
+          animate: false,
+          moveCamera: widget.selectedEvent != null,
         );
+      });
+      return;
+    }
+
+    final exists = events.any((e) => e.id == current.id);
+    if (!exists) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _jumpToEvent(events.first, animate: false, moveCamera: false);
+      });
+    }
+  }
+
+  void _jumpToEvent(Event event,
+      {required bool animate, required bool moveCamera}) {
+    if (!mounted) {
+      return;
+    }
+
+    final index = _cachedEvents.indexWhere((e) => e.id == event.id);
+    if (index != -1 && _eventCarouselController.hasClients) {
+      _programmaticPageChange = true;
+      if (animate) {
+        _eventCarouselController
+            .animateToPage(
+          index,
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOut,
+        )
+            .whenComplete(() {
+          _programmaticPageChange = false;
+        });
+      } else {
+        _eventCarouselController.jumpToPage(index);
+        _programmaticPageChange = false;
+      }
+    }
+
+    _updateSelectedEvent(event, moveCamera: moveCamera);
+  }
+
+  void _updateSelectedEvent(Event event, {required bool moveCamera}) {
+    if (!mounted) {
+      return;
+    }
+
+    if (_selectedEvent?.id != event.id) {
+      setState(() => _selectedEvent = event);
+    }
+
+    if (moveCamera) {
+      _moveCamera(LatLng(event.latitude, event.longitude), zoom: 15);
+      _movedToSelected = true;
+    }
+  }
+
+  Widget _buildEventCarousel(
+    BuildContext context,
+    AppLocalizations loc,
+    List<Event> events,
+  ) {
+    if (events.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final bottomPadding = 24 + MediaQuery.of(context).viewPadding.bottom;
+
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: bottomPadding,
+      child: SizedBox(
+        height: 190,
+        child: PageView.builder(
+          controller: _eventCarouselController,
+          itemCount: events.length,
+          onPageChanged: (index) {
+            if (_programmaticPageChange) {
+              _programmaticPageChange = false;
+              return;
+            }
+            final event = events[index];
+            _updateSelectedEvent(event, moveCamera: true);
+          },
+          itemBuilder: (context, index) {
+            final event = events[index];
+            final isFocused = _selectedEvent?.id == event.id;
+            final padding = EdgeInsets.only(
+              left: index == 0 ? 16 : 8,
+              right: index == events.length - 1 ? 16 : 8,
+            );
+
+            return AnimatedPadding(
+              duration: const Duration(milliseconds: 220),
+              padding: padding,
+              child: EventDetailBottomBar(
+                loc: loc,
+                event: event,
+                isFavorite: event.isFavorite,
+                onFavorite: () => _showSnackBar(loc.feature_not_ready),
+                onRegister: () => _showSnackBar(loc.registration_not_implemented),
+                onTap: () => _openEventDetail(event),
+                onLocate: () => _updateSelectedEvent(event, moveCamera: true),
+                registerLabel: loc.action_register_now,
+                isFocused: isFocused,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openEventDetail(Event event) async {
+    if (!mounted) {
+      return;
+    }
+    final navigator = Navigator.of(context);
+    final result = await navigator.push<Event>(
+      MaterialPageRoute(builder: (_) => EventDetailPage(event: event)),
+    );
+    if (!mounted) {
+      return;
+    }
+    if (result != null) {
+      _jumpToEvent(result, animate: false, moveCamera: true);
+    }
   }
 
   Future<String?> _reverseGeocode(LatLng latlng) async {
@@ -599,8 +757,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _currentSearchQuery = '';
       _searchController.text = event.title;
     });
-    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 15);
-    _showEventCard(event);
+    _jumpToEvent(event, animate: true, moveCamera: true);
   }
 
   void _clearSearchResults() {

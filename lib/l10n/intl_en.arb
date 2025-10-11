@@ -136,6 +136,7 @@
   "map_place_details_price_expensive": "Price level: $$$",
   "map_place_details_price_very_expensive": "Price level: $$$$",
   "map_place_details_price_unknown": "Price level: unknown",
+  "map_focus_event": "Locate event",
   "messages": "Messages",
   "max_interest_selection": "You can select up to 5 interest tags.",
   "my_events": "My events",

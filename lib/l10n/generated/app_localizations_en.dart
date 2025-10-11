@@ -337,6 +337,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_place_details_price_unknown => 'Price level: unknown';
 
   @override
+  String get map_focus_event => 'Locate event';
+
+  @override
   String get messages => 'Messages';
 
   @override

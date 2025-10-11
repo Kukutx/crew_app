@@ -178,6 +178,7 @@
   "map_place_details_price_expensive": "价格等级：$$$",
   "map_place_details_price_very_expensive": "价格等级：$$$$",
   "map_place_details_price_unknown": "价格等级：未知",
+  "map_focus_event": "定位活动",
   "messages": "消息",
   "max_interest_selection": "最多只能选择 5 个兴趣标签喵~",
   "my_events": "我的活动",

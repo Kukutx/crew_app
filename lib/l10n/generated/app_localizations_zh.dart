@@ -331,6 +331,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_place_details_price_unknown => '价格等级：未知';
 
   @override
+  String get map_focus_event => '定位活动';
+
+  @override
   String get messages => '消息';
 
   @override

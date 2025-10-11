@@ -704,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Price level: unknown'**
   String get map_place_details_price_unknown;
 
+  /// No description provided for @map_focus_event.
+  ///
+  /// In en, this message translates to:
+  /// **'Locate event'**
+  String get map_focus_event;
+
   /// No description provided for @messages.
   ///
   /// In en, this message translates to:

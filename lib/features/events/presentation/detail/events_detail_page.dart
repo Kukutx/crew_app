@@ -271,15 +271,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
         onShare: () => _showShareSheet(context),
         onMore: () => _showMoreActions(loc),
       ),
-      bottomNavigationBar: EventDetailBottomBar(
-        loc: loc,
-        isFavorite: event.isFavorite,
-        onFavorite: () => _showFeatureNotReadyMessage(loc),
-        onRegister: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(loc.registration_not_implemented)),
-          );
-        },
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: EventDetailBottomBar(
+          loc: loc,
+          event: event,
+          isFavorite: event.isFavorite,
+          onFavorite: () => _showFeatureNotReadyMessage(loc),
+          onRegister: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(loc.registration_not_implemented)),
+            );
+          },
+          isFocused: true,
+        ),
       ),
       floatingActionButton: _PlazaPostFab(
         label: loc.event_detail_publish_plaza,

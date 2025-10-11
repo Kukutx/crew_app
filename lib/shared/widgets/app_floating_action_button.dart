@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 class AppFloatingActionButton extends StatelessWidget {
@@ -30,24 +28,17 @@ class AppFloatingActionButton extends StatelessWidget {
     final direction = Directionality.of(context);
     final resolvedMargin = margin.resolve(direction);
     final scaffoldState = Scaffold.maybeOf(context);
-    final geometry = scaffoldState?.geometry;
     final viewPadding = MediaQuery.viewPaddingOf(context).bottom;
-    final screenHeight = MediaQuery.sizeOf(context).height;
 
     double bottomInset = resolvedMargin.bottom;
 
     if (enableBottomNavigationBarAdjustment) {
-      final bottomNavigationBarTop = geometry?.bottomNavigationBarTop;
-      if (bottomNavigationBarTop != null) {
-        final navigationBarHeight =
-            (screenHeight - bottomNavigationBarTop).clamp(0.0, double.infinity);
-        bottomInset += math.max(navigationBarHeight, viewPadding);
-      } else if (scaffoldState?.widget.bottomNavigationBar != null) {
-        const estimatedNavigationBarHeight = 88.0;
-        bottomInset += viewPadding + estimatedNavigationBarHeight;
-      } else {
-        bottomInset += viewPadding;
-      }
+      final navigationBarHeight = _inferBottomNavigationBarHeight(
+        context,
+        scaffoldState?.widget.bottomNavigationBar,
+      );
+
+      bottomInset += viewPadding + navigationBarHeight;
     } else {
       bottomInset += viewPadding;
     }
@@ -68,3 +59,37 @@ class AppFloatingActionButton extends StatelessWidget {
     );
   }
 }
+
+/// Best-effort estimation of the vertical space taken by [bottomNavigationBar].
+///
+/// When the widget does not expose an explicit size, the fallback height keeps
+/// enough room for common Material navigation components.
+double _inferBottomNavigationBarHeight(
+  BuildContext context,
+  Widget? bottomNavigationBar,
+) {
+  if (bottomNavigationBar == null) {
+    return 0;
+  }
+
+  if (bottomNavigationBar is PreferredSizeWidget) {
+    return bottomNavigationBar.preferredSize.height;
+  }
+
+  if (bottomNavigationBar is NavigationBar) {
+    final themedHeight = NavigationBarTheme.of(context).height;
+    return bottomNavigationBar.height ?? themedHeight ?? _kDefaultNavigationBarHeight;
+  }
+
+  if (bottomNavigationBar is BottomNavigationBar) {
+    return kBottomNavigationBarHeight;
+  }
+
+  if (bottomNavigationBar is SizedBox && bottomNavigationBar.height != null) {
+    return bottomNavigationBar.height!;
+  }
+
+  return _kDefaultNavigationBarHeight;
+}
+
+const double _kDefaultNavigationBarHeight = 88.0;

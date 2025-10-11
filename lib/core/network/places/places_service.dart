@@ -138,7 +138,7 @@ class PlacesService {
           headers: {
             'X-Goog-Api-Key': _apiKey,
             'X-Goog-FieldMask':
-                'places.name,places.displayName,places.formattedAddress,places.location,places.photos',
+                'places.name,places.displayName,places.formattedAddress,places.location.latitude,places.location.longitude,places.photos.name',
           },
         ),
       );
@@ -233,7 +233,7 @@ class PlacesService {
           headers: {
             'X-Goog-Api-Key': _apiKey,
             'X-Goog-FieldMask':
-                'name,displayName,formattedAddress,location,rating,userRatingCount,priceLevel',
+                'name,displayName,formattedAddress,location.latitude,location.longitude',
           },
         ),
       );

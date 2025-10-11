@@ -183,8 +183,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: AppFloatingActionButton(
         heroTag: 'events_map_my_location_fab',
-        margin: EdgeInsets.only(
-          bottom: 120 + MediaQuery.of(context).viewPadding.bottom,
+        margin: const EdgeInsets.only(
+          bottom: 16,
           right: 6,
         ),
         onPressed: () async {

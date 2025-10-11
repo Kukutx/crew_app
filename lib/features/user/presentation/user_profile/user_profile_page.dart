@@ -174,13 +174,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     final profile = ref.watch(userProfileProvider);
     final theme = Theme.of(context);
     final topPadding = MediaQuery.paddingOf(context).top;
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     return Scaffold(
       floatingActionButton: _currentTabIndex == 2
           ? AppFloatingActionButton(
               heroTag: 'user_profile_guestbook_fab',
-              margin: EdgeInsets.only(bottom: 120 + bottomPadding, right: 6),
+              margin: const EdgeInsets.only(bottom: 16, right: 6),
               onPressed: _openGuestbookComposer,
               child: const Icon(Icons.add),
             )

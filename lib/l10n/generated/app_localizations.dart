@@ -659,25 +659,25 @@ abstract class AppLocalizations {
   /// No description provided for @map_place_details_price_inexpensive.
   ///
   /// In en, this message translates to:
-  /// **'Price level: $'**
+  /// **'Price level: \$'**
   String get map_place_details_price_inexpensive;
 
   /// No description provided for @map_place_details_price_moderate.
   ///
   /// In en, this message translates to:
-  /// **'Price level: $$'**
+  /// **'Price level: \$\$'**
   String get map_place_details_price_moderate;
 
   /// No description provided for @map_place_details_price_expensive.
   ///
   /// In en, this message translates to:
-  /// **'Price level: $$$'**
+  /// **'Price level: \$\$\$'**
   String get map_place_details_price_expensive;
 
   /// No description provided for @map_place_details_price_very_expensive.
   ///
   /// In en, this message translates to:
-  /// **'Price level: $$$$'**
+  /// **'Price level: \$\$\$\$'**
   String get map_place_details_price_very_expensive;
 
   /// No description provided for @map_place_details_price_unknown.

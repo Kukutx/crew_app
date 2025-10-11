@@ -299,13 +299,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String map_place_details_reviews(int count) {
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      zero: 'No reviews',
-      one: '1 review',
       other: '$count reviews',
+      one: '1 review',
+      zero: 'No reviews',
     );
+    return '$_temp0';
   }
 
   @override

@@ -293,13 +293,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String map_place_details_reviews(int count) {
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      zero: '暂无评论',
-      one: '1 条评论',
       other: '$count 条评论',
+      one: '1 条评论',
+      zero: '暂无评论',
     );
+    return '$_temp0';
   }
 
   @override

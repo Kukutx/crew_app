@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/presentation/user_profile/profile_guestbook_provider.dart';
-import 'package:crew_app/features/user/presentation/user_profile/user_profile_provider.dart';
+import 'package:crew_app/features/user/presentation/user_profile/state/profile_guestbook_provider.dart';
+import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';

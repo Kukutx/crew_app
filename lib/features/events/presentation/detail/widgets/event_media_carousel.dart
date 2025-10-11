@@ -10,6 +10,7 @@ class EventMediaCarousel extends StatefulWidget {
   final PageController controller;
   final int currentPage;
   final ValueChanged<int> onPageChanged;
+  final double? height;
 
   const EventMediaCarousel({
     super.key,
@@ -17,6 +18,7 @@ class EventMediaCarousel extends StatefulWidget {
     required this.controller,
     required this.currentPage,
     required this.onPageChanged,
+    this.height,
   });
 
   @override
@@ -58,31 +60,35 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
     final fallbackUrl = widget.event.firstAvailableImageUrl;
     final hasMedia = mediaItems.isNotEmpty;
 
+    final height = widget.height;
+
+    final mediaContent = hasMedia
+        ? PageView.builder(
+            controller: widget.controller,
+            itemCount: mediaItems.length,
+            onPageChanged: widget.onPageChanged,
+            itemBuilder: (_, index) {
+              final item = mediaItems[index];
+              switch (item.type) {
+                case _EventMediaType.image:
+                  return _NetworkImageSlide(url: item.url);
+                case _EventMediaType.video:
+                  return _EventVideoPlayer(
+                    key: ValueKey(item.url),
+                    url: item.url,
+                    isActive: widget.currentPage == index,
+                  );
+              }
+            },
+          )
+        : _buildFallback(fallbackUrl);
+
     return Stack(
       children: [
-        AspectRatio(
-          aspectRatio: 16 / 10,
-          child: hasMedia
-              ? PageView.builder(
-                  controller: widget.controller,
-                  itemCount: mediaItems.length,
-                  onPageChanged: widget.onPageChanged,
-                  itemBuilder: (_, index) {
-                    final item = mediaItems[index];
-                    switch (item.type) {
-                      case _EventMediaType.image:
-                        return _NetworkImageSlide(url: item.url);
-                      case _EventMediaType.video:
-                        return _EventVideoPlayer(
-                          key: ValueKey(item.url),
-                          url: item.url,
-                          isActive: widget.currentPage == index,
-                        );
-                    }
-                  },
-                )
-              : _buildFallback(fallbackUrl),
-        ),
+        if (height != null)
+          SizedBox(height: height, width: double.infinity, child: mediaContent)
+        else
+          AspectRatio(aspectRatio: 16 / 10, child: mediaContent),
         if (hasMedia && mediaItems.length > 1)
           Positioned(
             bottom: 8,

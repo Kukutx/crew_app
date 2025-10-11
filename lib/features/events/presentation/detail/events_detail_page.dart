@@ -10,6 +10,7 @@ import 'package:crew_app/features/user/presentation/user_profile/user_profile_pa
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
@@ -25,7 +26,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
-
+  SystemUiOverlayStyle? _previousOverlayStyle;
+  
   static const _fallbackHost = (
     name: 'Crew Host',
     bio: 'Crew · 活动主理人',
@@ -33,6 +35,47 @@ class _EventDetailPageState extends State<EventDetailPage> {
   );
 
   bool _following = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _captureCurrentOverlayStyle();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+    );
+  }
+
+  void _captureCurrentOverlayStyle() {
+    // The framework does not expose the currently applied overlay style, so
+    // we best-effort remember the most recently set value via
+    // WidgetsBindingObserver. This page always sets a transparent status bar
+    // with light icons and restores a dark style on dispose to avoid leaving
+    // the app in an unexpected state.
+    _previousOverlayStyle = const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final url = widget.event.firstAvailableImageUrl;
+    if (url != null && url.isNotEmpty) {
+      precacheImage(
+        Image.network(url).image,
+        context,
+        onError: (error, stackTrace) {
+          debugPrint('Failed to precache event image: $error');
+        },
+      );
+    }
+  }
 
   String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
 
@@ -186,6 +229,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
   @override
   void dispose() {
     _pageCtrl.dispose();
+    if (_previousOverlayStyle != null) {
+      SystemChrome.setSystemUIOverlayStyle(_previousOverlayStyle!);
+    }
     super.dispose();
   }
 
@@ -253,6 +299,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         },
         isFollowing: _following,
         onTapLocation: () => Navigator.pop(context, widget.event),
+        heroTag: 'event-media-${event.id}',
       ),
     );
   }

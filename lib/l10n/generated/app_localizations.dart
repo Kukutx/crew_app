@@ -584,6 +584,108 @@ abstract class AppLocalizations {
   /// **'Map'**
   String get map;
 
+  /// No description provided for @map_location_info_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Location info'**
+  String get map_location_info_title;
+
+  /// No description provided for @map_location_info_address_loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolving address…'**
+  String get map_location_info_address_loading;
+
+  /// No description provided for @map_location_info_address_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Address unavailable'**
+  String get map_location_info_address_unavailable;
+
+  /// No description provided for @map_location_info_create_event.
+  ///
+  /// In en, this message translates to:
+  /// **'Create event here'**
+  String get map_location_info_create_event;
+
+  /// No description provided for @map_place_details_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Place details'**
+  String get map_place_details_title;
+
+  /// No description provided for @map_place_details_not_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No places found nearby.'**
+  String get map_place_details_not_found;
+
+  /// No description provided for @map_place_details_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load place information.'**
+  String get map_place_details_error;
+
+  /// No description provided for @map_place_details_missing_api_key.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Places API key is not configured.'**
+  String get map_place_details_missing_api_key;
+
+  /// No description provided for @map_place_details_rating_value.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating {rating}'**
+  String map_place_details_rating_value(Object rating);
+
+  /// No description provided for @map_place_details_no_rating.
+  ///
+  /// In en, this message translates to:
+  /// **'No rating yet'**
+  String get map_place_details_no_rating;
+
+  /// No description provided for @map_place_details_reviews.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0 {No reviews} =1 {1 review} other {{count} reviews}}'**
+  String map_place_details_reviews(int count);
+
+  /// No description provided for @map_place_details_price_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level: Free'**
+  String get map_place_details_price_free;
+
+  /// No description provided for @map_place_details_price_inexpensive.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level: $'**
+  String get map_place_details_price_inexpensive;
+
+  /// No description provided for @map_place_details_price_moderate.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level: $$'**
+  String get map_place_details_price_moderate;
+
+  /// No description provided for @map_place_details_price_expensive.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level: $$$'**
+  String get map_place_details_price_expensive;
+
+  /// No description provided for @map_place_details_price_very_expensive.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level: $$$$'**
+  String get map_place_details_price_very_expensive;
+
+  /// No description provided for @map_place_details_price_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level: unknown'**
+  String get map_place_details_price_unknown;
+
   /// No description provided for @messages.
   ///
   /// In en, this message translates to:

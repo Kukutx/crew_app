@@ -8,6 +8,7 @@ class MapCanvas extends StatelessWidget {
   final double initialZoom;
   final ValueChanged<GoogleMapController>? onMapCreated;
   final VoidCallback? onMapReady;
+  final ValueChanged<LatLng>? onTap;
   final ValueChanged<LatLng>? onLongPress;
   final Set<Marker> markers;
 
@@ -17,6 +18,7 @@ class MapCanvas extends StatelessWidget {
     this.initialZoom = 5,
     this.onMapCreated,
     this.onMapReady,
+    this.onTap,
     this.onLongPress,
     this.markers = const <Marker>{},
   });
@@ -32,13 +34,18 @@ class MapCanvas extends StatelessWidget {
         onMapCreated?.call(controller);
         onMapReady?.call();
       },
+      onTap: onTap,
       onLongPress: onLongPress,
       markers: markers,
       myLocationButtonEnabled: false,
       myLocationEnabled: false,
       zoomControlsEnabled: false,
-      mapToolbarEnabled: false,
-      compassEnabled: false,
+      mapToolbarEnabled: true,
+      compassEnabled: true,
+      rotateGesturesEnabled: true,
+      tiltGesturesEnabled: true,
+      scrollGesturesEnabled: true,
+      zoomGesturesEnabled: true,
     );
   }
 }

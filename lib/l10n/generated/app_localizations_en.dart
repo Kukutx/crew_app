@@ -265,6 +265,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'Map';
 
   @override
+  String get map_location_info_title => 'Location info';
+
+  @override
+  String get map_location_info_address_loading => 'Resolving address…';
+
+  @override
+  String get map_location_info_address_unavailable => 'Address unavailable';
+
+  @override
+  String get map_location_info_create_event => 'Create event here';
+
+  @override
+  String get map_place_details_title => 'Place details';
+
+  @override
+  String get map_place_details_not_found => 'No places found nearby.';
+
+  @override
+  String get map_place_details_error => 'Unable to load place information.';
+
+  @override
+  String get map_place_details_missing_api_key =>
+      'Google Places API key is not configured.';
+
+  @override
+  String map_place_details_rating_value(Object rating) {
+    return 'Rating $rating';
+  }
+
+  @override
+  String get map_place_details_no_rating => 'No rating yet';
+
+  @override
+  String map_place_details_reviews(int count) {
+    return intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      zero: 'No reviews',
+      one: '1 review',
+      other: '$count reviews',
+    );
+  }
+
+  @override
+  String get map_place_details_price_free => 'Price level: Free';
+
+  @override
+  String get map_place_details_price_inexpensive => 'Price level: \$';
+
+  @override
+  String get map_place_details_price_moderate => 'Price level: \$\$';
+
+  @override
+  String get map_place_details_price_expensive => 'Price level: \$\$\$';
+
+  @override
+  String get map_place_details_price_very_expensive => 'Price level: \$\$\$\$';
+
+  @override
+  String get map_place_details_price_unknown => 'Price level: unknown';
+
+  @override
   String get messages => 'Messages';
 
   @override

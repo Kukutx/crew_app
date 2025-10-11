@@ -8,6 +8,7 @@ import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_prov
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
@@ -17,7 +18,9 @@ import '../../data/event_filter.dart';
 import '../../../../core/error/api_exception.dart';
 import '../../../../core/network/api_service.dart';
 import '../../../../core/state/di/providers.dart';
+import '../../../../core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
+import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
@@ -25,6 +28,8 @@ import 'widgets/markers_layer.dart';
 import 'sheets/map_event_filter_sheet.dart';
 import 'sheets/map_event_card_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
+import 'sheets/map_place_details_sheet.dart';
+import 'sheets/map_location_info_sheet.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -176,6 +181,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           initialCenter: startCenter,
           onMapCreated: _onMapCreated,
           onMapReady: _onMapReady,
+          onTap: (pos) => unawaited(_onMapTap(pos)),
           onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
           markers: markersLayer.markers,
         ),
@@ -240,25 +246,21 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _onMapLongPress(LatLng latlng) async {
-    if (!await _ensureNetworkAvailable()) {
+    if (!mounted) {
       return;
     }
 
-    if (!await _ensureDisclaimerAccepted()) {
-      return;
-    }
-    if (!mounted) return;
-    final data = await showCreateEventBottomSheet(context, latlng);
-    if (data == null || data.title.trim().isEmpty) return;
+    final addressFuture = _reverseGeocode(latlng);
 
-    await ref
-        .read(eventsProvider.notifier)
-        .createEvent(
-          title: data.title.trim(),
-          description: data.description.trim(),
-          pos: latlng,
-          locationName: data.locationName,
-        );
+    await showMapLocationInfoSheet(
+      context: context,
+      position: latlng,
+      addressFuture: addressFuture,
+      onCreateEvent: () async {
+        Navigator.of(context).pop();
+        await _createEventAt(latlng);
+      },
+    );
   }
 
   void _showEventCard(Event ev) {
@@ -279,6 +281,124 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
     _movedToSelected = true;
     _showEventCard(event);
+  }
+
+  Future<void> _onMapTap(LatLng position) async {
+    if (!mounted) {
+      return;
+    }
+    final loc = AppLocalizations.of(context)!;
+    final places = ref.read(placesServiceProvider);
+
+    try {
+      final placeId = await places.findPlaceId(position);
+      if (!mounted) {
+        return;
+      }
+      if (placeId == null) {
+        await showMapPlaceDetailsSheet(
+          context: context,
+          detailsFuture: Future<PlaceDetails?>.value(null),
+          emptyMessage: loc.map_place_details_not_found,
+        );
+        return;
+      }
+
+      await showMapPlaceDetailsSheet(
+        context: context,
+        detailsFuture: places.getPlaceDetails(placeId),
+        emptyMessage: loc.map_place_details_not_found,
+      );
+    } on PlacesApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      final message = error.message.contains('not configured')
+          ? loc.map_place_details_missing_api_key
+          : error.message;
+      _showSnackBar(message.isEmpty ? loc.map_place_details_error : message);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      _showSnackBar(loc.map_place_details_error);
+    }
+  }
+
+  Future<void> _createEventAt(LatLng latlng) async {
+    if (!await _ensureNetworkAvailable()) {
+      return;
+    }
+
+    if (!await _ensureDisclaimerAccepted()) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    final data = await showCreateEventBottomSheet(context, latlng);
+    if (data == null || data.title.trim().isEmpty) {
+      return;
+    }
+
+    await ref.read(eventsProvider.notifier).createEvent(
+          title: data.title.trim(),
+          description: data.description.trim(),
+          pos: latlng,
+          locationName: data.locationName,
+        );
+  }
+
+  Future<String?> _reverseGeocode(LatLng latlng) async {
+    try {
+      final list = await placemarkFromCoordinates(
+        latlng.latitude,
+        latlng.longitude,
+      ).timeout(const Duration(seconds: 5));
+      if (list.isEmpty) {
+        return null;
+      }
+      return _formatPlacemark(list.first);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? _formatPlacemark(Placemark place) {
+    final parts = [
+      place.name,
+      place.street,
+      place.subLocality,
+      place.locality,
+      place.subAdministrativeArea,
+      place.administrativeArea,
+      place.country,
+    ];
+    final buffer = <String>[];
+    final seen = <String>{};
+    for (final part in parts) {
+      if (part == null) {
+        continue;
+      }
+      final trimmed = part.trim();
+      if (trimmed.isEmpty || !seen.add(trimmed)) {
+        continue;
+      }
+      buffer.add(trimmed);
+    }
+    if (buffer.isEmpty) {
+      return null;
+    }
+    return buffer.join(', ');
+  }
+
+  void _showSnackBar(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   void _onCreateRoadTripTap() {

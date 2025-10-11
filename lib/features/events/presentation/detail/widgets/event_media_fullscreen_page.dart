@@ -236,6 +236,8 @@ class _FullscreenImageViewer extends StatelessWidget {
         fit: BoxFit.contain,
         fadeInDuration: const Duration(milliseconds: 200),
         fadeOutDuration: const Duration(milliseconds: 200),
+        errorWidget: (context, url, error) =>
+            const _FullscreenErrorPlaceholder(),
       ),
     );
   }
@@ -295,6 +297,15 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer>
   }
 
   Future<void> _initialize() async {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _hasError = false;
+      _initialized = false;
+    });
+
     final uri = Uri.tryParse(widget.url);
     if (uri == null) {
       setState(() {
@@ -407,9 +418,7 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer>
     super.build(context);
 
     if (_hasError) {
-      return const Center(
-        child: Icon(Icons.videocam_off, color: Colors.white, size: 48),
-      );
+      return const _FullscreenErrorPlaceholder();
     }
 
     final chewie = _chewieController;
@@ -454,4 +463,65 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class _FullscreenErrorPlaceholder extends StatelessWidget {
+  const _FullscreenErrorPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final headlineStyle = theme.textTheme.headlineSmall ??
+        const TextStyle(fontSize: 24, fontWeight: FontWeight.w600);
+    final bodyStyle = theme.textTheme.bodyMedium ??
+        const TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 280),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8E7D5),
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.error_outline,
+                  color: Color(0xFFED6C02),
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                '404',
+                style: headlineStyle.copyWith(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '资源不存在或已被移除',
+                textAlign: TextAlign.center,
+                style: bodyStyle.copyWith(
+                  color: Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

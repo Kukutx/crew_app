@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:crew_app/features/events/data/event.dart';
@@ -307,7 +309,11 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer>
 
     ChewieController? chewie;
     try {
-      await controller.initialize();
+      await controller
+          .initialize()
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException('Video initialization timed out for ${widget.url}');
+      });
       await controller.setLooping(true);
       await controller.setVolume(0);
 

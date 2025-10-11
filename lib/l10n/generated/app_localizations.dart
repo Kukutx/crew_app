@@ -686,6 +686,24 @@ abstract class AppLocalizations {
   /// **'Price level: unknown'**
   String get map_place_details_price_unknown;
 
+  /// No description provided for @map_nearby_places_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby places'**
+  String get map_nearby_places_title;
+
+  /// No description provided for @map_nearby_places_swipe_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe the cards to explore nearby points of interest.'**
+  String get map_nearby_places_swipe_hint;
+
+  /// No description provided for @map_nearby_places_more_details.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get map_nearby_places_more_details;
+
   /// No description provided for @messages.
   ///
   /// In en, this message translates to:

@@ -320,6 +320,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_place_details_price_unknown => '价格等级：未知';
+  @override
+  String get map_nearby_places_title => '附近地点';
+  @override
+  String get map_nearby_places_swipe_hint => '左右滑动卡片查看附近的兴趣点。';
+  @override
+  String get map_nearby_places_more_details => '查看详情';
 
   @override
   String get messages => '消息';

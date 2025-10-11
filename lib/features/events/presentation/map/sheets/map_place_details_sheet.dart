@@ -106,7 +106,7 @@ class _MapPlaceDetailsSheet extends StatelessWidget {
           final reviewsText = loc.map_place_details_reviews(
             details.userRatingsTotal ?? 0,
           );
-          final priceLevel = _describePriceLevel(loc, details.priceLevel);
+          final priceLevel = describePlacePriceLevel(loc, details.priceLevel);
 
           return _MapBottomSheetFrame(
             children: [
@@ -181,21 +181,22 @@ class _MapPlaceDetailsSheet extends StatelessWidget {
     );
   }
 
-  String _describePriceLevel(AppLocalizations loc, String? value) {
-    switch (value) {
-      case 'PRICE_LEVEL_FREE':
-        return loc.map_place_details_price_free;
-      case 'PRICE_LEVEL_INEXPENSIVE':
-        return loc.map_place_details_price_inexpensive;
-      case 'PRICE_LEVEL_MODERATE':
-        return loc.map_place_details_price_moderate;
-      case 'PRICE_LEVEL_EXPENSIVE':
-        return loc.map_place_details_price_expensive;
-      case 'PRICE_LEVEL_VERY_EXPENSIVE':
-        return loc.map_place_details_price_very_expensive;
-      default:
-        return loc.map_place_details_price_unknown;
-    }
+}
+
+String describePlacePriceLevel(AppLocalizations loc, String? value) {
+  switch (value) {
+    case 'PRICE_LEVEL_FREE':
+      return loc.map_place_details_price_free;
+    case 'PRICE_LEVEL_INEXPENSIVE':
+      return loc.map_place_details_price_inexpensive;
+    case 'PRICE_LEVEL_MODERATE':
+      return loc.map_place_details_price_moderate;
+    case 'PRICE_LEVEL_EXPENSIVE':
+      return loc.map_place_details_price_expensive;
+    case 'PRICE_LEVEL_VERY_EXPENSIVE':
+      return loc.map_place_details_price_very_expensive;
+    default:
+      return loc.map_place_details_price_unknown;
   }
 }
 

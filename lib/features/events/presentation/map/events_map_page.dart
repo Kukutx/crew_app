@@ -29,6 +29,7 @@ import 'sheets/map_event_filter_sheet.dart';
 import 'sheets/map_event_card_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
+import 'sheets/map_nearby_places_sheet.dart';
 import 'sheets/map_location_info_sheet.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
@@ -291,18 +292,27 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final places = ref.read(placesServiceProvider);
 
     try {
-      final placeId = await places.findPlaceId(position);
+      final future = places.findNearbyPlaces(position);
       if (!mounted) {
         return;
       }
-      if (placeId == null) {
-        return;
-      }
 
-      await showMapPlaceDetailsSheet(
+      await showMapNearbyPlacesSheet(
         context: context,
-        detailsFuture: places.getPlaceDetails(placeId),
+        placesFuture: future,
         emptyMessage: loc.map_place_details_not_found,
+        onPlaceSelected: (place) async {
+          Navigator.of(context).pop();
+          await Future<void>.delayed(Duration.zero);
+          if (!mounted) {
+            return;
+          }
+          await showMapPlaceDetailsSheet(
+            context: context,
+            detailsFuture: Future.value(place),
+            emptyMessage: loc.map_place_details_not_found,
+          );
+        },
       );
     } on PlacesApiException catch (error) {
       if (!mounted) {

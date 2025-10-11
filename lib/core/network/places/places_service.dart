@@ -43,7 +43,11 @@ class PlacesService {
 
   bool get _hasValidKey => _apiKey.trim().isNotEmpty;
 
-  Future<String?> findPlaceId(LatLng position) async {
+  Future<List<PlaceDetails>> findNearbyPlaces(
+    LatLng position, {
+    int radiusMeters = 60,
+    int maxResults = 8,
+  }) async {
     if (!_hasValidKey) {
       throw PlacesApiException('Google Places API key is not configured');
     }
@@ -53,38 +57,45 @@ class PlacesService {
         'places:searchNearby',
         data: {
           'includedTypes': ['point_of_interest'],
-          'maxResultCount': 1,
+          'maxResultCount': maxResults,
           'locationRestriction': {
             'circle': {
               'center': {
                 'latitude': position.latitude,
                 'longitude': position.longitude,
               },
-              'radius': 50,
+              'radius': radiusMeters,
             },
           },
         },
         options: Options(
           headers: {
             'X-Goog-Api-Key': _apiKey,
-            'X-Goog-FieldMask': 'places.name',
+            'X-Goog-FieldMask':
+                'places.name,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.priceLevel',
           },
         ),
       );
       final data = response.data;
-      if (data is Map<String, dynamic>) {
-        final places = data['places'];
-        if (places is List && places.isNotEmpty) {
-          final place = places.first;
-          if (place is Map<String, dynamic>) {
-            final name = place['name'];
-            if (name is String && name.isNotEmpty) {
-              return name;
-            }
-          }
+      if (data is! Map<String, dynamic>) {
+        return const <PlaceDetails>[];
+      }
+      final places = data['places'];
+      if (places is! List) {
+        return const <PlaceDetails>[];
+      }
+
+      final results = <PlaceDetails>[];
+      for (final place in places) {
+        if (place is! Map<String, dynamic>) {
+          continue;
+        }
+        final parsed = _mapToPlaceDetails(place);
+        if (parsed != null) {
+          results.add(parsed);
         }
       }
-      return null;
+      return results;
     } on DioException catch (error) {
       throw PlacesApiException(
         _resolveErrorMessage(error) ?? 'Failed to search places',
@@ -182,5 +193,52 @@ class PlacesService {
       }
     }
     return exception.message;
+  }
+
+  PlaceDetails? _mapToPlaceDetails(Map<String, dynamic> data) {
+    final name = data['name'];
+    if (name is! String || name.isEmpty) {
+      return null;
+    }
+    String? displayName;
+    final displayNameField = data['displayName'];
+    if (displayNameField is Map<String, dynamic>) {
+      final text = displayNameField['text'];
+      if (text is String && text.isNotEmpty) {
+        displayName = text;
+      }
+    } else if (displayNameField is String && displayNameField.isNotEmpty) {
+      displayName = displayNameField;
+    }
+
+    final formattedAddress = data['formattedAddress'] as String?;
+    final locationMap = data['location'];
+    LatLng? location;
+    if (locationMap is Map<String, dynamic>) {
+      final lat = locationMap['latitude'];
+      final lng = locationMap['longitude'];
+      if (lat is num && lng is num) {
+        location = LatLng(lat.toDouble(), lng.toDouble());
+      }
+    }
+    final rating = data['rating'];
+    final ratingValue = rating is num ? rating.toDouble() : null;
+    final ratingCount = data['userRatingCount'];
+    final userRatingsTotal = ratingCount is int
+        ? ratingCount
+        : ratingCount is num
+            ? ratingCount.toInt()
+            : null;
+    final priceLevel = data['priceLevel'] as String?;
+
+    return PlaceDetails(
+      id: name,
+      displayName: displayName ?? name,
+      formattedAddress: formattedAddress,
+      location: location,
+      rating: ratingValue,
+      userRatingsTotal: userRatingsTotal,
+      priceLevel: priceLevel,
+    );
   }
 }

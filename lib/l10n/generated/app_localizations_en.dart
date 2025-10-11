@@ -326,6 +326,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_place_details_price_unknown => 'Price level: unknown';
+  @override
+  String get map_nearby_places_title => 'Nearby places';
+  @override
+  String get map_nearby_places_swipe_hint => 'Swipe the cards to explore nearby points of interest.';
+  @override
+  String get map_nearby_places_more_details => 'View details';
 
   @override
   String get messages => 'Messages';

@@ -102,6 +102,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final bottomPadding = 120 + MediaQuery.of(context).viewPadding.bottom;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
@@ -187,23 +189,49 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: AppFloatingActionButton(
-        heroTag: 'events_map_my_location_fab',
-        margin: EdgeInsets.only(
-          bottom: 120 + MediaQuery.of(context).viewPadding.bottom,
-          right: 6,
-        ),
-        onPressed: () async {
-          final loc = ref.read(userLocationProvider).value;
-          if (loc != null) {
-            await _moveCamera(loc, zoom: 14);
-          } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text("Unable to get location")));
-          }
-        },
-        child: const Icon(Icons.my_location),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: FloatingActionButton(
+              heroTag: 'events_map_add_fab',
+              backgroundColor: theme.colorScheme.secondary,
+              foregroundColor: theme.colorScheme.onSecondary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(loc.feature_not_ready)),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
+          AppFloatingActionButton(
+            heroTag: 'events_map_my_location_fab',
+            margin: EdgeInsets.only(
+              top: 12,
+              bottom: bottomPadding,
+              right: 6,
+            ),
+            onPressed: () async {
+              final loc = ref.read(userLocationProvider).value;
+              if (loc != null) {
+                await _moveCamera(loc, zoom: 14);
+              } else {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(
+                  const SnackBar(content: Text("Unable to get location")),
+                );
+              }
+            },
+            child: const Icon(Icons.my_location),
+          ),
+        ],
       ),
     );
   }

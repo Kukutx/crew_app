@@ -213,69 +213,75 @@ class _EventDetailBodyState extends State<EventDetailBody>
             child: AnimatedBuilder(
               animation: _headerStretchController,
               builder: (context, child) {
-                final height = _currentHeaderHeight;
+                final height = topInset + _currentHeaderHeight;
                 final radius = _currentCornerRadius;
                 final gradientOpacity = _currentGradientOpacity;
-                return Padding(
-                  padding: EdgeInsets.fromLTRB(16, topInset + 16, 16, 0),
-                  child: Semantics(
-                    label: widget.event.title,
-                    button: true,
-                    child: GestureDetector(
-                      onTap: _handleHeaderTap,
-                      onVerticalDragEnd: (details) {
-                        final velocity = details.primaryVelocity ?? 0;
-                        if (velocity < -650 && !_navigatingToFullScreen) {
-                          if (!_hasMedia) {
-                            return;
-                          }
-                          _navigatingToFullScreen = true;
-                          HapticFeedback.mediumImpact();
-                          _openFullScreen();
+                return Semantics(
+                  label: widget.event.title,
+                  button: true,
+                  child: GestureDetector(
+                    onTap: _handleHeaderTap,
+                    onVerticalDragEnd: (details) {
+                      final velocity = details.primaryVelocity ?? 0;
+                      if (velocity < -650 && !_navigatingToFullScreen) {
+                        if (!_hasMedia) {
+                          return;
                         }
+                        _navigatingToFullScreen = true;
+                        HapticFeedback.mediumImpact();
+                        _openFullScreen();
+                      }
+                    },
+                    child: Hero(
+                      tag: widget.heroTag,
+                      flightShuttleBuilder: (_, animation, __, ___, toHero) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: toHero.widget,
+                        );
                       },
-                      child: Hero(
-                        tag: widget.heroTag,
-                        flightShuttleBuilder: (_, animation, __, ___, toHero) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: toHero.widget,
-                          );
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(radius),
-                          child: Stack(
-                            children: [
-                              SizedBox(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(radius),
+                          bottomRight: Radius.circular(radius),
+                        ),
+                        child: Stack(
+                          children: [
+                            SizedBox(
+                              height: height,
+                              width: double.infinity,
+                              child: EventMediaCarousel(
+                                event: widget.event,
+                                controller: widget.pageController,
+                                currentPage: widget.currentPage,
+                                onPageChanged: _handlePageChanged,
                                 height: height,
-                                width: double.infinity,
-                                child: EventMediaCarousel(
-                                  event: widget.event,
-                                  controller: widget.pageController,
-                                  currentPage: widget.currentPage,
-                                  onPageChanged: _handlePageChanged,
-                                  height: height,
-                                ),
                               ),
-                              Positioned.fill(
-                                child: IgnorePointer(
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.black
-                                              .withOpacity(gradientOpacity * 0.65),
-                                          Colors.transparent,
-                                        ],
-                                      ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: IgnorePointer(
+                                ignoring: true,
+                                child: Container(
+                                  height: topInset + 72,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.black.withOpacity(
+                                          math.min(1.0, gradientOpacity * 0.9),
+                                        ),
+                                        Colors.transparent,
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -287,7 +293,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 EventHostCard(
                   loc: widget.loc,
                   name: widget.hostName,

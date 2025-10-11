@@ -15,29 +15,28 @@ class MapEventsExploreSheet extends ConsumerStatefulWidget {
   const MapEventsExploreSheet({super.key});
 
   @override
-  ConsumerState<MapEventsExploreSheet> createState() => _MapEventsExploreSheetState();
+  ConsumerState<MapEventsExploreSheet> createState() =>
+      _MapEventsExploreSheetState();
 }
 
 class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
   int _tab = 0;
   String? _selectedCountry;
 
-  static const _countries = [
-    '中国',
-    '日本',
-    '美国',
-    '英国',
-    '法国',
-    '德国',
-  ];
+  static const _countries = ['附近', '中国', '日本', '美国', '英国', '法国', '德国'];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCountry = _countries.first;
+  }
 
   static const List<PlazaPost> _plazaPosts = [
     PlazaPost(
       author: '阿里',
       authorInitials: 'AL',
       timeLabel: '15分钟前',
-      content:
-          '周末准备在城北绿地举办一次自由野餐。大家可以带上自己的拿手菜和户外桌游，一起分享～',
+      content: '周末准备在城北绿地举办一次自由野餐。大家可以带上自己的拿手菜和户外桌游，一起分享～',
       location: '城北城市绿地',
       tags: ['野餐', '城市漫游'],
       likes: 36,
@@ -78,15 +77,17 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
 
     // 刷新列表
     ref.listen<AsyncValue<List<Event>>>(eventsProvider, (prev, next) {
-      next.whenOrNull(error: (error, _) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          final msg = _errorMessage(error);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(msg)),
-          );
-        });
-      });
+      next.whenOrNull(
+        error: (error, _) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            final msg = _errorMessage(error);
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(msg)));
+          });
+        },
+      );
     });
 
     final theme = Theme.of(context);
@@ -100,10 +101,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
               padding: const EdgeInsets.fromLTRB(20, 8, 4, 8),
               child: Row(
                 children: [
-                  Text(
-                    loc.events_title,
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  Text(loc.events_title, style: theme.textTheme.titleLarge),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -173,9 +171,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                       icon: const Icon(Icons.add),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('添加新的瞬间功能开发中'),
-                          ),
+                          const SnackBar(content: Text('添加新的瞬间功能开发中')),
                         );
                       },
                     ),
@@ -198,7 +194,8 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                             data: (events) {
                               if (events.isEmpty) {
                                 return _CenteredScrollable(
-                                    child: Text(loc.no_events));
+                                  child: Text(loc.no_events),
+                                );
                               }
 
                               return AppMasonryGrid(
@@ -207,19 +204,22 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                                 mainAxisSpacing: 8,
                                 crossAxisSpacing: 8,
                                 itemCount: events.length,
-                                physics:
-                                    const AlwaysScrollableScrollPhysics(),
+                                physics: const AlwaysScrollableScrollPhysics(),
                                 itemBuilder: (context, i) => EventGridCard(
                                   event: events[i],
                                   heroTag: 'event_$i',
                                   onShowOnMap: (event) {
                                     Navigator.of(context).maybePop();
                                     ref
-                                        .read(appOverlayIndexProvider.notifier)
-                                        .state = 1;
+                                            .read(
+                                              appOverlayIndexProvider.notifier,
+                                            )
+                                            .state =
+                                        1;
                                     ref
                                             .read(
-                                                mapFocusEventProvider.notifier)
+                                              mapFocusEventProvider.notifier,
+                                            )
                                             .state =
                                         event;
                                   },
@@ -227,9 +227,11 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                               );
                             },
                             loading: () => const _CenteredScrollable(
-                                child: CircularProgressIndicator()),
-                            error: (_, _) =>
-                                _CenteredScrollable(child: Text(loc.load_failed)),
+                              child: CircularProgressIndicator(),
+                            ),
+                            error: (_, _) => _CenteredScrollable(
+                              child: Text(loc.load_failed),
+                            ),
                           ),
                         ),
                       )
@@ -298,4 +300,3 @@ class _CenteredScrollable extends StatelessWidget {
     );
   }
 }
-

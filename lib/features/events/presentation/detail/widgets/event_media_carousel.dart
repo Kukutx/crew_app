@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:crew_app/features/events/data/event.dart';
@@ -220,7 +222,11 @@ class _EventVideoPlayerState extends State<_EventVideoPlayer>
     var listenerAttached = false;
 
     try {
-      await controller.initialize();
+      await controller
+          .initialize()
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException('Video initialization timed out for ${widget.url}');
+      });
       await controller.setLooping(true);
       await controller.setVolume(0);
       controller.addListener(_handlePlaybackStateChanged);

@@ -216,8 +216,9 @@ class _EventDetailBodyState extends State<EventDetailBody>
                 final height = _currentHeaderHeight;
                 final radius = _currentCornerRadius;
                 final gradientOpacity = _currentGradientOpacity;
+                final topPadding = topInset + 8;
                 return Padding(
-                  padding: EdgeInsets.fromLTRB(16, topInset + 16, 16, 0),
+                  padding: EdgeInsets.fromLTRB(16, topPadding, 16, 0),
                   child: Semantics(
                     label: widget.event.title,
                     button: true,

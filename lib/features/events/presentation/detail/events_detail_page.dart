@@ -253,7 +253,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
       backgroundColor: const Color(0xFFFFF7E9),
       extendBodyBehindAppBar: true,
       appBar: EventDetailAppBar(
-        loc: loc,
         onBack: () => Navigator.pop(context),
         onShare: () => _showShareSheet(context),
         onMore: () => _showMoreActions(loc),

@@ -200,7 +200,9 @@ void showEventBottomSheet({
 Widget _smallChip(String text) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-          color: Color(0xFFFFE7C2), borderRadius: BorderRadius.circular(8)),
+          color: const Color(0xFFFFE7C2),
+          borderRadius: BorderRadius.circular(8)),
       child: Text(text,
           style: const TextStyle(fontSize: 11, color: Colors.black87)),
     );
+

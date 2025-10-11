@@ -87,7 +87,7 @@ class _MapLocationInfoSheet extends StatelessWidget {
             future: addressFuture,
             builder: (context, snapshot) {
               final icon = Icon(
-                Icons.home_pin,
+                Icons.home_outlined,
                 color: Colors.blueGrey.shade600,
               );
               if (snapshot.connectionState == ConnectionState.waiting) {

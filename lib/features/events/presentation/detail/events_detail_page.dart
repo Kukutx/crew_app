@@ -67,7 +67,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
     super.didChangeDependencies();
     final url = widget.event.firstAvailableImageUrl;
     if (url != null && url.isNotEmpty) {
-      precacheImage(Image.network(url).image, context);
+      precacheImage(
+        Image.network(url).image,
+        context,
+        onError: (error, stackTrace) {
+          debugPrint('Failed to precache event image: $error');
+        },
+      );
     }
   }
 

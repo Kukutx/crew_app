@@ -91,15 +91,18 @@ void showEventBottomSheet({
                                         onTap: () async {
                                           final navigator = Navigator.of(context);
                                           navigator.pop(); // 先收起
-                                          final result = await navigator.push<Event>(
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  EventDetailPage(event: event),
-                                            ),
-                                          );
-                                          if (result != null) {
-                                            onShowOnMap?.call(result);
-                                          }
+                                      final result = await navigator.push<Event>(
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              EventDetailPage(event: event),
+                                        ),
+                                      );
+                                      if (result != null) {
+                                        onShowOnMap?.call(result);
+                                        if (navigator.canPop()) {
+                                          navigator.pop();
+                                        }
+                                      }
                                         },
                                         child: Text(
                                           event.title,

@@ -265,6 +265,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
+    _focusOnEvent(ev);
     showEventBottomSheet(
       context: context,
       event: ev,
@@ -278,7 +279,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
     _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
     _movedToSelected = true;
-    _showEventCard(event);
   }
 
   void _onCreateRoadTripTap() {

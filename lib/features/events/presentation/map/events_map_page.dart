@@ -251,11 +251,25 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
 
     final addressFuture = _reverseGeocode(latlng);
+    final placesService = ref.read(placesServiceProvider);
+    Future<List<NearbyPlace>>? nearbyPlacesFuture;
+    try {
+      nearbyPlacesFuture = placesService.searchNearbyPlaces(
+        latlng,
+        radius: 100,
+        maxResults: 8,
+      );
+    } on PlacesApiException catch (error) {
+      nearbyPlacesFuture = Future<List<NearbyPlace>>.error(error);
+    } catch (error) {
+      nearbyPlacesFuture = Future<List<NearbyPlace>>.error(error);
+    }
 
     await showMapLocationInfoSheet(
       context: context,
       position: latlng,
       addressFuture: addressFuture,
+      nearbyPlacesFuture: nearbyPlacesFuture,
       onCreateEvent: () async {
         Navigator.of(context).pop();
         await _createEventAt(latlng);

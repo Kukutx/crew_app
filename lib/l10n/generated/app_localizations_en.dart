@@ -277,6 +277,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_location_info_create_event => 'Create event here';
 
   @override
+  String get map_location_info_nearby_title => 'Nearby places';
+
+  @override
+  String get map_location_info_nearby_empty =>
+      'No places found within 100 m.';
+
+  @override
+  String get map_location_info_nearby_error =>
+      'Unable to load nearby places.';
+
+  @override
   String get map_place_details_title => 'Place details';
 
   @override

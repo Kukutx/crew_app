@@ -33,6 +33,22 @@ class PlaceDetails {
   final String? priceLevel;
 }
 
+class NearbyPlace {
+  const NearbyPlace({
+    required this.id,
+    required this.displayName,
+    this.formattedAddress,
+    this.location,
+    this.photoUrl,
+  });
+
+  final String id;
+  final String displayName;
+  final String? formattedAddress;
+  final LatLng? location;
+  final String? photoUrl;
+}
+
 class PlacesService {
   PlacesService({Dio? dio, String? apiKey})
       : _dio = dio ?? Dio(BaseOptions(baseUrl: 'https://places.googleapis.com/v1/')),
@@ -91,6 +107,116 @@ class PlacesService {
         statusCode: error.response?.statusCode,
       );
     }
+  }
+
+  Future<List<NearbyPlace>> searchNearbyPlaces(
+    LatLng position, {
+    double radius = 100,
+    int maxResults = 10,
+  }) async {
+    if (!_hasValidKey) {
+      throw PlacesApiException('Google Places API key is not configured');
+    }
+
+    try {
+      final response = await _dio.post(
+        'places:searchNearby',
+        data: {
+          'includedTypes': ['point_of_interest'],
+          'maxResultCount': maxResults,
+          'locationRestriction': {
+            'circle': {
+              'center': {
+                'latitude': position.latitude,
+                'longitude': position.longitude,
+              },
+              'radius': radius,
+            },
+          },
+        },
+        options: Options(
+          headers: {
+            'X-Goog-Api-Key': _apiKey,
+            'X-Goog-FieldMask':
+                'places.name,places.displayName,places.formattedAddress,places.location,places.photos',
+          },
+        ),
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        return const [];
+      }
+
+      final places = data['places'];
+      if (places is! List) {
+        return const [];
+      }
+
+      return places
+          .whereType<Map<String, dynamic>>()
+          .map(_mapNearbyPlace)
+          .whereType<NearbyPlace>()
+          .toList(growable: false);
+    } on DioException catch (error) {
+      throw PlacesApiException(
+        _resolveErrorMessage(error) ?? 'Failed to search places',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  NearbyPlace? _mapNearbyPlace(Map<String, dynamic> data) {
+    final name = data['name'];
+    if (name is! String || name.isEmpty) {
+      return null;
+    }
+
+    String? displayName;
+    final displayNameField = data['displayName'];
+    if (displayNameField is Map<String, dynamic>) {
+      final text = displayNameField['text'];
+      if (text is String && text.isNotEmpty) {
+        displayName = text;
+      }
+    } else if (displayNameField is String && displayNameField.isNotEmpty) {
+      displayName = displayNameField;
+    }
+
+    final formattedAddress = data['formattedAddress'] as String?;
+
+    LatLng? location;
+    final locationMap = data['location'];
+    if (locationMap is Map<String, dynamic>) {
+      final lat = locationMap['latitude'];
+      final lng = locationMap['longitude'];
+      if (lat is num && lng is num) {
+        location = LatLng(lat.toDouble(), lng.toDouble());
+      }
+    }
+
+    String? photoUrl;
+    final photos = data['photos'];
+    if (photos is List && photos.isNotEmpty) {
+      final first = photos.first;
+      if (first is Map<String, dynamic>) {
+        final photoName = first['name'];
+        if (photoName is String && photoName.isNotEmpty) {
+          photoUrl = 'https://places.googleapis.com/v1/'
+              '$photoName/media?maxHeightPx=180&key=$_apiKey';
+        }
+      }
+    }
+
+    final resolvedDisplayName = displayName ?? name;
+
+    return NearbyPlace(
+      id: name,
+      displayName: resolvedDisplayName,
+      formattedAddress: formattedAddress,
+      location: location,
+      photoUrl: photoUrl,
+    );
   }
 
   Future<PlaceDetails?> getPlaceDetails(String placeId) async {

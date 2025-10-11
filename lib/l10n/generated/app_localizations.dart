@@ -608,6 +608,24 @@ abstract class AppLocalizations {
   /// **'Create event here'**
   String get map_location_info_create_event;
 
+  /// No description provided for @map_location_info_nearby_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby places'**
+  String get map_location_info_nearby_title;
+
+  /// No description provided for @map_location_info_nearby_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No places found within 100 m.'**
+  String get map_location_info_nearby_empty;
+
+  /// No description provided for @map_location_info_nearby_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load nearby places.'**
+  String get map_location_info_nearby_error;
+
   /// No description provided for @map_place_details_title.
   ///
   /// In en, this message translates to:

@@ -272,6 +272,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_location_info_create_event => '在此创建活动';
 
   @override
+  String get map_location_info_nearby_title => '附近地点';
+
+  @override
+  String get map_location_info_nearby_empty => '100 米内暂无兴趣点。';
+
+  @override
+  String get map_location_info_nearby_error => '无法加载附近地点。';
+
+  @override
   String get map_place_details_title => '地点信息';
 
   @override

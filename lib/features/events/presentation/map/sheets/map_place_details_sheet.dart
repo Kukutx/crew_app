@@ -106,7 +106,6 @@ class _MapPlaceDetailsSheet extends StatelessWidget {
           final reviewsText = loc.map_place_details_reviews(
             details.userRatingsTotal ?? 0,
           );
-          final priceLevel = _describePriceLevel(loc, details.priceLevel);
 
           return _MapBottomSheetFrame(
             children: [
@@ -145,17 +144,6 @@ class _MapPlaceDetailsSheet extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const Icon(Icons.payments_rounded, color: Colors.blueGrey),
-                  const SizedBox(width: 8),
-                  Text(
-                    priceLevel,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
               if (details.location != null) ...[
                 const SizedBox(height: 12),
                 Row(
@@ -181,22 +169,6 @@ class _MapPlaceDetailsSheet extends StatelessWidget {
     );
   }
 
-  String _describePriceLevel(AppLocalizations loc, String? value) {
-    switch (value) {
-      case 'PRICE_LEVEL_FREE':
-        return loc.map_place_details_price_free;
-      case 'PRICE_LEVEL_INEXPENSIVE':
-        return loc.map_place_details_price_inexpensive;
-      case 'PRICE_LEVEL_MODERATE':
-        return loc.map_place_details_price_moderate;
-      case 'PRICE_LEVEL_EXPENSIVE':
-        return loc.map_place_details_price_expensive;
-      case 'PRICE_LEVEL_VERY_EXPENSIVE':
-        return loc.map_place_details_price_very_expensive;
-      default:
-        return loc.map_place_details_price_unknown;
-    }
-  }
 }
 
 class _MapBottomSheetFrame extends StatelessWidget {

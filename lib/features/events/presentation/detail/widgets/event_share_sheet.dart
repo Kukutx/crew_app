@@ -135,7 +135,7 @@ class SharePreviewCard extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      top: 18,
+                      top: 12,
                       left: 20,
                       right: 20,
                       child: Wrap(

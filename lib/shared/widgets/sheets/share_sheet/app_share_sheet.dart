@@ -41,7 +41,36 @@ class AppShareSheet extends StatelessWidget {
                 runSpacing: actionRunSpacing,
                 children: actions,
               ),
+              const SizedBox(height: 28),
+              const _CloseSheetButton(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CloseSheetButton extends StatelessWidget {
+  const _CloseSheetButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Material(
+      shape: const CircleBorder(),
+      elevation: 6,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      color: Colors.white,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () => Navigator.of(context).maybePop(),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Icon(
+            Icons.close,
+            size: 22,
+            color: onSurface.withValues(alpha: 0.72),
           ),
         ),
       ),

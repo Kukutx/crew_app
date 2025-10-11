@@ -182,7 +182,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onMapCreated: _onMapCreated,
           onMapReady: _onMapReady,
           onTap: (pos) => unawaited(_onMapTap(pos)),
-          onPoiTap: (poi) => unawaited(_onPoiTap(poi)),
           onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
           markers: markersLayer.markers,
         ),
@@ -308,42 +307,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       await showMapPlaceDetailsSheet(
         context: context,
         detailsFuture: places.getPlaceDetails(placeId),
-        emptyMessage: loc.map_place_details_not_found,
-      );
-    } on PlacesApiException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      final message = error.message.contains('not configured')
-          ? loc.map_place_details_missing_api_key
-          : error.message;
-      _showSnackBar(message.isEmpty ? loc.map_place_details_error : message);
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      _showSnackBar(loc.map_place_details_error);
-    }
-  }
-
-  Future<void> _onPoiTap(PointOfInterest poi) async {
-    if (!mounted) {
-      return;
-    }
-    final loc = AppLocalizations.of(context)!;
-    final places = ref.read(placesServiceProvider);
-
-    try {
-      final placeId = poi.placeId;
-      if (placeId == null || placeId.isEmpty) {
-        await _onMapTap(poi.position);
-        return;
-      }
-
-      await showMapPlaceDetailsSheet(
-        context: context,
-        detailsFuture: places.getPlaceDetails(placeId),
-        fallbackName: poi.name,
         emptyMessage: loc.map_place_details_not_found,
       );
     } on PlacesApiException catch (error) {

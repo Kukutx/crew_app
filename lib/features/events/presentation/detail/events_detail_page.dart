@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
@@ -27,7 +26,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
   SystemUiOverlayStyle? _previousOverlayStyle;
-  
+
   static const _fallbackHost = (
     name: 'Crew Host',
     bio: 'Crew · 活动主理人',
@@ -104,21 +103,24 @@ class _EventDetailPageState extends State<EventDetailPage> {
   Future<void> _shareThroughSystem(BuildContext sheetContext) async {
     final shareText = _buildShareMessage();
     final boundary =
-        _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+        _sharePreviewKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     if (boundary == null) {
-      await Share.share(shareText);
+      await SharePlus.instance.share(ShareParams(text: shareText));
       if (!sheetContext.mounted) return;
       Navigator.of(sheetContext).pop();
       return;
     }
 
     try {
-      final ui.Image image =
-          await boundary.toImage(pixelRatio: MediaQuery.of(context).devicePixelRatio);
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final ui.Image image = await boundary.toImage(
+        pixelRatio: MediaQuery.of(context).devicePixelRatio,
+      );
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       if (byteData == null) {
-        await Share.share(shareText);
+        await SharePlus.instance.share(ShareParams(text: shareText));
       } else {
         final Uint8List pngBytes = byteData.buffer.asUint8List();
         final xFile = XFile.fromData(
@@ -126,10 +128,12 @@ class _EventDetailPageState extends State<EventDetailPage> {
           mimeType: 'image/png',
           name: 'crew_event_share.png',
         );
-        await Share.shareXFiles([xFile], text: shareText);
+        await SharePlus.instance.share(
+          ShareParams(text: shareText, files: [xFile]),
+        );
       }
     } catch (_) {
-      await Share.share(shareText);
+      await SharePlus.instance.share(ShareParams(text: shareText));
     }
     if (!sheetContext.mounted) return;
     Navigator.of(sheetContext).pop();
@@ -137,27 +141,32 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   Future<void> _saveShareImage(BuildContext sheetContext) async {
     final boundary =
-        _sharePreviewKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+        _sharePreviewKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     final loc = AppLocalizations.of(context)!;
 
     if (boundary == null) {
       if (!mounted) return;
       Navigator.of(sheetContext).pop();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
       return;
     }
 
     try {
-      final ui.Image image = await boundary
-          .toImage(pixelRatio: MediaQuery.of(context).devicePixelRatio);
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final ui.Image image = await boundary.toImage(
+        pixelRatio: MediaQuery.of(context).devicePixelRatio,
+      );
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       if (byteData == null) {
-        if (!sheetContext.mounted|| !mounted) return;
+        if (!sheetContext.mounted || !mounted) return;
         Navigator.of(sheetContext).pop();
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
         return;
       }
 
@@ -172,25 +181,30 @@ class _EventDetailPageState extends State<EventDetailPage> {
       if (!sheetContext.mounted || !mounted) return;
       Navigator.of(sheetContext).pop();
 
-      final success = result is Map &&
+      final success =
+          result is Map &&
           (result['isSuccess'] == true || result['success'] == true);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? loc.share_save_success : loc.share_save_failure),
+          content: Text(
+            success ? loc.share_save_success : loc.share_save_failure,
+          ),
         ),
       );
     } catch (_) {
       if (!sheetContext.mounted || !mounted) return;
       Navigator.of(sheetContext).pop();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(loc.share_save_failure)));
     }
   }
 
   void _showFeatureNotReadyMessage(AppLocalizations loc) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
   }
 
   void _showMoreActions(AppLocalizations loc) {
@@ -291,9 +305,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
           // TODO: integrate backend follow logic
           setState(() => _following = !_following);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_following ? loc.followed : loc.unfollowed),
-            ),
+            SnackBar(content: Text(_following ? loc.followed : loc.unfollowed)),
           );
         },
         isFollowing: _following,
@@ -308,10 +320,7 @@ class _PlazaPostFab extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const _PlazaPostFab({
-    required this.label,
-    required this.onPressed,
-  });
+  const _PlazaPostFab({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

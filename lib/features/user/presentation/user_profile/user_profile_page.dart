@@ -53,7 +53,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   }
 
   Future<void> _onRefresh() async {
-    await ref.refresh(eventsProvider.future);
+    ref.invalidate(eventsProvider); 
+    await ref.read(eventsProvider.future); 
   }
 
   void _toggleFollow() {
@@ -153,16 +154,18 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       builder: (sheetContext) {
         return ProfileGuestbookComposerSheet(
           onSubmit: (name, content) {
-            ref.read(profileGuestbookProvider.notifier).addMessage(name, content);
+            ref
+                .read(profileGuestbookProvider.notifier)
+                .addMessage(name, content);
           },
         );
       },
     );
 
     if (result == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('留言成功！')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('留言成功！')));
     }
   }
 

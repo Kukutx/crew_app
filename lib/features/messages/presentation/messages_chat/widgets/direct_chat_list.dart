@@ -23,11 +23,11 @@ class DirectChatList extends StatelessWidget {
       itemBuilder: (context, index) {
         final conversation = conversations[index];
         final avatarColor = Color(
-          conversation.avatarColorValue ?? colorScheme.primary.value,
+          conversation.avatarColorValue ?? colorScheme.primary.toARGB32(),
         );
         final subtitleColor = Color(
           conversation.subtitleColorValue ??
-              colorScheme.onSurfaceVariant.withValues(alpha: .9).value,
+              colorScheme.onSurfaceVariant.withValues(alpha: .9).toARGB32(),
         );
 
         return Padding(

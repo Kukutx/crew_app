@@ -24,7 +24,7 @@ class ChatRoomMessageTile extends StatelessWidget {
     final captionColor =
         isMine ? colorScheme.onPrimary.withValues(alpha: .8) : colorScheme.onSurfaceVariant;
     final senderColor = Color(
-      message.sender.avatarColorValue ?? colorScheme.primary.value,
+      message.sender.avatarColorValue ?? colorScheme.primary.toARGB32(),
     );
     final senderInitials = (message.sender.initials ??
             message.sender.displayName.characters.take(2).toString())

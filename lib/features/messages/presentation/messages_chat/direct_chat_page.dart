@@ -83,7 +83,7 @@ class _DirectChatPageState extends State<DirectChatPage> {
     final avatarColor = Color(
       widget.preview.avatarColorValue ??
           widget.partner.avatarColorValue ??
-          colorScheme.primary.value,
+          colorScheme.primary.toARGB32(),
     );
     final partnerInitials = (widget.partner.initials ??
             widget.partner.displayName.characters.take(2).toString())

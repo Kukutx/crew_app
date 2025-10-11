@@ -110,7 +110,7 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
                     shape: BoxShape.circle,
                     color: index == widget.currentPage
                         ? Colors.white
-                        : Colors.white.withOpacity(0.5),
+                        : Colors.white.withValues(alpha: .5),
                   ),
                 ),
               ),

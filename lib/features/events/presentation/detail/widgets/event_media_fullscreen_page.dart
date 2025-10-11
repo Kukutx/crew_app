@@ -20,7 +20,8 @@ class EventMediaFullscreenPage extends StatefulWidget {
   final String heroTag;
 
   @override
-  State<EventMediaFullscreenPage> createState() => _EventMediaFullscreenPageState();
+  State<EventMediaFullscreenPage> createState() =>
+      _EventMediaFullscreenPageState();
 }
 
 class _EventMediaFullscreenPageState extends State<EventMediaFullscreenPage>
@@ -119,10 +120,12 @@ class _EventMediaFullscreenPageState extends State<EventMediaFullscreenPage>
       );
     }
 
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pop(_currentPage);
-        return false;
+    return PopScope(
+      canPop: false, 
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Navigator.of(context).pop(_currentPage);
+        }
       },
       child: GestureDetector(
         onVerticalDragEnd: _onVerticalDragEnd,
@@ -134,23 +137,22 @@ class _EventMediaFullscreenPageState extends State<EventMediaFullscreenPage>
               children: [
                 Hero(
                   tag: widget.heroTag,
-                  child: Material(
-                    color: Colors.black,
-                    child: viewer,
-                  ),
+                  child: Material(color: Colors.black, child: viewer),
                 ),
                 Positioned(
                   top: 16,
                   left: 16,
                   child: DecoratedBox(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black54,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
                       onPressed: () => Navigator.of(context).pop(_currentPage),
-                      tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).closeButtonTooltip,
                     ),
                   ),
                 ),
@@ -190,10 +192,7 @@ class _EventMediaFullscreenPageState extends State<EventMediaFullscreenPage>
 }
 
 class _FullscreenPageIndicator extends StatelessWidget {
-  const _FullscreenPageIndicator({
-    required this.current,
-    required this.total,
-  });
+  const _FullscreenPageIndicator({required this.current, required this.total});
 
   final int current;
   final int total;
@@ -220,9 +219,7 @@ class _FullscreenPageIndicator extends StatelessWidget {
 }
 
 class _FullscreenImageViewer extends StatelessWidget {
-  const _FullscreenImageViewer({
-    required this.url,
-  });
+  const _FullscreenImageViewer({required this.url});
 
   final String url;
 
@@ -320,11 +317,14 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer>
 
     ChewieController? chewie;
     try {
-      await controller
-          .initialize()
-          .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw TimeoutException('Video initialization timed out for ${widget.url}');
-      });
+      await controller.initialize().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw TimeoutException(
+            'Video initialization timed out for ${widget.url}',
+          );
+        },
+      );
       await controller.setLooping(true);
       await controller.setVolume(0);
 
@@ -471,9 +471,11 @@ class _FullscreenErrorPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final headlineStyle = theme.textTheme.headlineSmall ??
+    final headlineStyle =
+        theme.textTheme.headlineSmall ??
         const TextStyle(fontSize: 24, fontWeight: FontWeight.w600);
-    final bodyStyle = theme.textTheme.bodyMedium ??
+    final bodyStyle =
+        theme.textTheme.bodyMedium ??
         const TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
 
     return Center(
@@ -513,10 +515,7 @@ class _FullscreenErrorPlaceholder extends StatelessWidget {
               Text(
                 '资源不存在或已被移除',
                 textAlign: TextAlign.center,
-                style: bodyStyle.copyWith(
-                  color: Colors.black54,
-                  height: 1.4,
-                ),
+                style: bodyStyle.copyWith(color: Colors.black54, height: 1.4),
               ),
             ],
           ),

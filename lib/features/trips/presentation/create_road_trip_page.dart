@@ -298,7 +298,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
 
               // 车辆类型
               DropdownButtonFormField<String>(
-                value: _carType,
+                initialValue: _carType,
                 decoration: const InputDecoration(labelText: '车辆类型（可选）'),
                 items: const [
                   DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
@@ -315,7 +315,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
 
               // 隐私
               DropdownButtonFormField<String>(
-                value: _privacy,
+                initialValue: _privacy,
                 decoration: const InputDecoration(labelText: '可见性'),
                 items: const [
                   DropdownMenuItem(value: 'public', child: Text('公开')),

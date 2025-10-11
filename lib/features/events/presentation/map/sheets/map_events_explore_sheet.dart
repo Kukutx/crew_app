@@ -124,7 +124,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
                   if (selectedIndex != 1) return null;
 
                   final theme = Theme.of(context);
-                  final buttonColor = theme.colorScheme.surfaceVariant;
+                  final buttonColor = theme.colorScheme.surfaceContainerHighest;
 
                   return Padding(
                     padding: const EdgeInsets.only(left: 16),
@@ -264,7 +264,7 @@ class _MapEventsPlazaFeed extends StatelessWidget {
         final post = posts[index];
         return PlazaPostCard(post: post);
       },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemCount: posts.length,
     );
   }

@@ -16,7 +16,7 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
     final borderColor =
         participant.isCurrentUser ? colorScheme.primary : colorScheme.surface;
     final avatarColor = Color(
-      participant.avatarColorValue ?? colorScheme.primary.value,
+      participant.avatarColorValue ?? colorScheme.primary.toARGB32(),
     );
     final initials = (participant.initials ??
             participant.displayName.characters.take(2).toString())

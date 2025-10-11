@@ -143,7 +143,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
     debugPrint('Analytics: event_fullscreen_enter_${widget.event.id}');
     final result = await Navigator.of(context).push<int>(
       PageRouteBuilder<int>(
-        pageBuilder: (_, animation, __) {
+        pageBuilder: (_, animation, _) {
           return FadeTransition(
             opacity: animation,
             child: EventMediaFullscreenPage(
@@ -180,7 +180,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
       _baseHeaderHeight + _extraStretchHeight * _headerStretchController.value;
 
   double get _currentCornerRadius =>
-      _maxCornerRadius * (1 - _headerStretchController.value);
+      _maxCornerRadius * (.6 - _headerStretchController.value);
 
   double get _currentGradientOpacity =>
       0.25 + 0.55 * _headerStretchController.value;
@@ -234,7 +234,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                     },
                     child: Hero(
                       tag: widget.heroTag,
-                      flightShuttleBuilder: (_, animation, __, ___, toHero) {
+                      flightShuttleBuilder: (_, animation, _, _, toHero) {
                         return FadeTransition(
                           opacity: animation,
                           child: toHero.widget,
@@ -271,7 +271,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        Colors.black.withOpacity(
+                                        Colors.black.withValues(alpha: 
                                           math.min(1.0, gradientOpacity * 0.9),
                                         ),
                                         Colors.transparent,

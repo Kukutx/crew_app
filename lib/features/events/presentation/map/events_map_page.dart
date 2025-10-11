@@ -296,11 +296,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         return;
       }
       if (placeId == null) {
-        await showMapPlaceDetailsSheet(
-          context: context,
-          detailsFuture: Future<PlaceDetails?>.value(null),
-          emptyMessage: loc.map_place_details_not_found,
-        );
         return;
       }
 

@@ -133,8 +133,11 @@ class PlazaPostCard extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

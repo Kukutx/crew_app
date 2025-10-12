@@ -887,7 +887,7 @@ abstract class AppLocalizations {
   /// No description provided for @chat_attachment_files.
   ///
   /// In en, this message translates to:
-  /// **'Files'**
+  /// **'Quick attachment'**
   String get chat_attachment_files;
 
   /// No description provided for @chat_attachment_media.

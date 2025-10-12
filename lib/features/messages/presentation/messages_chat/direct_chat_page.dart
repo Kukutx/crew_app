@@ -234,8 +234,6 @@ class _DirectChatPageState extends State<DirectChatPage> {
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
-            onAttachTap: () =>
-                _showFeatureComingSoon(loc.chat_attachment_files),
             onMoreOptionsTap: _showAttachmentSheet,
           ),
         ],

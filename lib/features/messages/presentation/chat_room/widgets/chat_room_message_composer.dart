@@ -8,7 +8,6 @@ class ChatRoomMessageComposer extends StatelessWidget {
     required this.hintText,
     required this.onSend,
     this.onEmojiTap,
-    this.onAttachTap,
     this.onMoreOptionsTap,
   });
 
@@ -16,7 +15,6 @@ class ChatRoomMessageComposer extends StatelessWidget {
   final String hintText;
   final VoidCallback onSend;
   final VoidCallback? onEmojiTap;
-  final VoidCallback? onAttachTap;
   final VoidCallback? onMoreOptionsTap;
 
   @override
@@ -63,15 +61,6 @@ class ChatRoomMessageComposer extends StatelessWidget {
                 icon: Icon(Icons.emoji_emotions_outlined, color: colorScheme.primary),
                 onPressed:
                     withFallback(onEmojiTap, loc.chat_composer_emoji_tooltip),
-              ),
-              IconButton(
-                tooltip: loc.chat_composer_attach_tooltip,
-                icon: Icon(
-                  Icons.insert_drive_file_outlined,
-                  color: colorScheme.primary,
-                ),
-                onPressed:
-                    withFallback(onAttachTap, loc.chat_composer_attach_tooltip),
               ),
               IconButton(
                 tooltip: loc.chat_composer_more_tooltip,

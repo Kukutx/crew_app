@@ -409,9 +409,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get chat_action_voice_call => '语音通话';
-
-  @override
   String get chat_action_video_call => '视频通话';
 
   @override
@@ -432,7 +429,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_attachment_more => '更多功能';
 
   @override
-  String get chat_attachment_files => '文件';
+  String get chat_attachment_files => '快速附件';
 
   @override
   String get chat_attachment_media => '图片与视频';

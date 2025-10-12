@@ -131,11 +131,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         participants: participants,
         onOpenSettings: () => _openSettings(participants),
         onSearchTap: () => _showFeatureComingSoon(loc.chat_search_hint),
-        onVoiceCallTap: () => _showFeatureComingSoon(loc.chat_action_voice_call),
         onVideoCallTap: () =>
             _showFeatureComingSoon(loc.chat_action_video_call),
-        onPhoneCallTap: () =>
-            _showFeatureComingSoon(loc.chat_action_phone_call),
       ),
       body: Column(
         children: [

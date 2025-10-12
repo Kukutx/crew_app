@@ -16,7 +16,7 @@ class ChatAttachmentSheet extends StatelessWidget {
 
     final options = [
       _AttachmentOption(
-        icon: Icons.insert_drive_file_outlined,
+        icon: Icons.attach_file,
         label: loc.chat_attachment_files,
         color: colorScheme.primary,
       ),

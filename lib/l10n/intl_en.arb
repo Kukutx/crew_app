@@ -175,7 +175,6 @@
       "time": {}
     }
   },
-  "chat_action_voice_call": "Voice call",
   "chat_action_video_call": "Video call",
   "chat_action_phone_call": "Phone call",
   "chat_action_more_options": "More actions",
@@ -187,7 +186,7 @@
     }
   },
   "chat_attachment_more": "More actions",
-  "chat_attachment_files": "Files",
+  "chat_attachment_files": "Quick attachment",
   "chat_attachment_media": "Photos & videos",
   "chat_attachment_live_location": "Share live location",
   "chat_composer_emoji_tooltip": "Emojis",

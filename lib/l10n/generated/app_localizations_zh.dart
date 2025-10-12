@@ -124,6 +124,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_meeting_point_title => '集合地点';
 
   @override
+  String get event_copy_address_button => '复制地址';
+
+  @override
+  String get event_copy_address_success => '地址已复制';
+
+  @override
   String get event_participants_title => '参与人数';
 
   @override

@@ -320,6 +320,18 @@ abstract class AppLocalizations {
   /// **'Meeting point'**
   String get event_meeting_point_title;
 
+  /// No description provided for @event_copy_address_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy address'**
+  String get event_copy_address_button;
+
+  /// No description provided for @event_copy_address_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Address copied to clipboard'**
+  String get event_copy_address_success;
+
   /// No description provided for @event_participants_title.
   ///
   /// In en, this message translates to:

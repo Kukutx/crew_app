@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class EventInfoCard extends StatelessWidget {
@@ -25,6 +26,8 @@ class EventInfoCard extends StatelessWidget {
     final routeType = event.isRoundTrip;
     final distanceKm = event.distanceKm;
     final localeTag = Localizations.localeOf(context).toString();
+    final addressText =
+        event.address?.isNotEmpty == true ? event.address! : event.location;
     final distanceText = distanceKm != null
         ? loc.event_distance_value(
             _formatDistance(distanceKm, localeTag),
@@ -55,12 +58,28 @@ class EventInfoCard extends StatelessWidget {
               child: _detailRow(
                 Icons.place,
                 loc.event_meeting_point_title,
-                event.address?.isNotEmpty == true ? event.address! : event.location,
+                addressText,
                 valueStyle: TextStyle(
                   fontSize: 14,
                   color: linkColor,
                   decoration: TextDecoration.underline,
                   decorationColor: linkColor,
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.copy, size: 18),
+                  color: linkColor,
+                  tooltip: loc.event_copy_address_button,
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: addressText));
+                    if (!context.mounted) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(loc.event_copy_address_success),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -90,6 +109,7 @@ class EventInfoCard extends StatelessWidget {
     String title,
     String value, {
     TextStyle? valueStyle,
+    Widget? trailing,
   }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -108,6 +128,10 @@ class EventInfoCard extends StatelessWidget {
                     const TextStyle(fontSize: 14, color: Colors.black54),
               ),
             ),
+            if (trailing != null) ...[
+              const SizedBox(width: 4),
+              trailing,
+            ],
           ],
         ),
       );

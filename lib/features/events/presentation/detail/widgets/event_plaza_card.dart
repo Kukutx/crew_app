@@ -1,3 +1,5 @@
+import 'package:crew_app/features/events/presentation/plaza/plaza_post_comments_sheet.dart';
+import 'package:crew_app/features/events/presentation/plaza/plaza_post_detail_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,24 @@ class EventPlazaCard extends StatelessWidget {
       comments: 12,
       accentColor: Color(0xFF6750A4),
       previewLabel: '日落草坪局',
+      mediaAssets: const [
+        'assets/images/crew.png',
+        'assets/images/crew.png',
+        'assets/images/crew.png',
+        'assets/images/crew.png',
+      ],
+      commentItems: const [
+        PlazaComment(
+          author: 'Lydia',
+          message: '带上我最爱的野餐布和小蛋糕，一起享受日落吧～',
+          timeLabel: '10分钟前',
+        ),
+        PlazaComment(
+          author: '橙子汽水',
+          message: '天气不错的话我可以带飞盘，顺便拍点照片。',
+          timeLabel: '刚刚',
+        ),
+      ],
     ),
     PlazaPost(
       author: '米兰小巷',
@@ -34,6 +54,23 @@ class EventPlazaCard extends StatelessWidget {
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
       previewLabel: '街角手冲香',
+      mediaAssets: const [
+        'assets/images/crew.png',
+        'assets/images/crew.png',
+        'assets/images/crew.png',
+      ],
+      commentItems: const [
+        PlazaComment(
+          author: '阿毛',
+          message: '推荐一家藏在巷子里的手冲店，豆子超香！',
+          timeLabel: '45分钟前',
+        ),
+        PlazaComment(
+          author: '蓝莓司康',
+          message: '我可以带胶片机一起去取景～',
+          timeLabel: '30分钟前',
+        ),
+      ],
     ),
     PlazaPost(
       author: '夏栀',
@@ -46,6 +83,22 @@ class EventPlazaCard extends StatelessWidget {
       comments: 7,
       accentColor: Color(0xFF377D71),
       previewLabel: '河畔清风局',
+      mediaAssets: const [
+        'assets/images/crew.png',
+        'assets/images/crew.png',
+      ],
+      commentItems: const [
+        PlazaComment(
+          author: '晨跑小队',
+          message: '夜跑完可以去河对岸那家椰子店，超级解暑。',
+          timeLabel: '20小时前',
+        ),
+        PlazaComment(
+          author: '夏天的风',
+          message: '我带上音响，跑完拉伸顺便听会儿歌。',
+          timeLabel: '18小时前',
+        ),
+      ],
     ),
   ];
 
@@ -80,8 +133,14 @@ class EventPlazaCard extends StatelessWidget {
           PlazaPostCard(
             post: _posts[i],
             margin: EdgeInsets.fromLTRB(16, i == 0 ? 0 : 12, 16, 0),
+            onTap: () => _openPostDetail(context, _posts[i]),
+            onCommentTap: () => showPlazaPostCommentsSheet(context, _posts[i]),
           ),
       ],
     );
   }
+}
+
+void _openPostDetail(BuildContext context, PlazaPost post) {
+  Navigator.of(context).push(PlazaPostDetailPage.route(post: post));
 }

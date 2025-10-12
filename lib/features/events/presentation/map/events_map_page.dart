@@ -26,6 +26,7 @@ import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
+import 'widgets/user_location_icon.dart';
 import 'widgets/map_event_floating_card.dart';
 import 'sheets/map_event_filter_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
@@ -74,6 +75,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   String _currentSearchQuery = '';
   Timer? _searchDebounce;
   ProviderSubscription<Event?>? _mapFocusSubscription;
+  BitmapDescriptor? _userLocationIcon;
 
   @override
   void initState() {
@@ -82,6 +84,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _eventCardController = PageController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
+    _loadUserLocationIcon();
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -119,23 +122,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
     final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
     // 跟随定位（只在无选中事件时）
-    ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
+    ref.listen<AsyncValue<UserLocation?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
       if (!_movedToSelected && widget.selectedEvent == null && loc != null) {
-        _moveCamera(loc, zoom: 14);
+        _moveCamera(loc.position, zoom: 14);
       }
     });
 
     final events = ref.watch(eventsProvider);
     final userLoc = ref.watch(userLocationProvider).value;
-    final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
+    final startCenter = userLoc?.position ?? const LatLng(48.8566, 2.3522);
 
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
       data: (list) => MarkersLayer.fromEvents(
         events: list,
-        userLoc: userLoc,
+        userLocation: userLoc,
+        userLocationIcon: _userLocationIcon,
         onEventTap: _focusOnEvent,
       ),
     );
@@ -239,7 +243,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             onPressed: () async {
               final loc = ref.read(userLocationProvider).value;
               if (loc != null) {
-                await _moveCamera(loc, zoom: 14);
+                await _moveCamera(loc.position, zoom: 14);
               } else {
                 ScaffoldMessenger.of(
                   context,
@@ -253,6 +257,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _loadUserLocationIcon() async {
+    try {
+      final icon = await createUserLocationIcon(size: 96);
+      if (mounted) {
+        setState(() => _userLocationIcon = icon);
+      }
+    } catch (_) {
+      // Ignore icon load failures and fall back to default markers.
+    }
   }
 
   Widget _buildEventCardOverlay(double safeBottom) {
@@ -359,7 +374,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _mapReady = true;
     final loc = ref.read(userLocationProvider).value;
     if (!_movedToSelected && loc != null) {
-      _moveCamera(loc, zoom: 14);
+      _moveCamera(loc.position, zoom: 14);
     }
   }
 

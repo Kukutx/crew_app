@@ -162,6 +162,47 @@
       "time": {}
     }
   },
+  "chat_action_voice_call": "Voice call",
+  "chat_action_video_call": "Video call",
+  "chat_action_phone_call": "Phone call",
+  "chat_action_open_settings": "Chat settings",
+  "chat_action_unavailable": "{feature} is coming soon.",
+  "@chat_action_unavailable": {
+    "placeholders": {
+      "feature": {}
+    }
+  },
+  "chat_attachment_more": "More actions",
+  "chat_attachment_files": "Files",
+  "chat_attachment_media": "Photos & videos",
+  "chat_attachment_live_location": "Share live location",
+  "chat_composer_emoji_tooltip": "Emojis",
+  "chat_composer_attach_tooltip": "Quick attachment",
+  "chat_composer_more_tooltip": "More",
+  "chat_composer_send_tooltip": "Send message",
+  "chat_settings_title": "Chat settings",
+  "chat_settings_share": "Share",
+  "chat_settings_leave_group": "Leave group",
+  "chat_settings_remove_friend": "Remove contact",
+  "chat_settings_notifications": "Notifications",
+  "chat_settings_notifications_subtitle": "Mute or enable alerts",
+  "chat_settings_shared_files": "Shared files",
+  "chat_settings_shared_files_subtitle": "Browse documents, media and links",
+  "chat_settings_members_section": "Members",
+  "chat_settings_contact_section": "Contact info",
+  "chat_settings_contact_id": "ID: {id}",
+  "@chat_settings_contact_id": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "chat_settings_group_overview": "Group · {memberLabel}",
+  "@chat_settings_group_overview": {
+    "placeholders": {
+      "memberLabel": {}
+    }
+  },
+  "chat_settings_direct_overview": "Direct chat",
   "no_events": "No events yet",
   "no_events_found": "No events found",
   "not_logged_in": "Not logged in",

@@ -770,6 +770,162 @@ abstract class AppLocalizations {
   /// **'Last active {time}'**
   String chat_last_seen(Object time);
 
+  /// No description provided for @chat_action_voice_call.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice call'**
+  String get chat_action_voice_call;
+
+  /// No description provided for @chat_action_video_call.
+  ///
+  /// In en, this message translates to:
+  /// **'Video call'**
+  String get chat_action_video_call;
+
+  /// No description provided for @chat_action_phone_call.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone call'**
+  String get chat_action_phone_call;
+
+  /// No description provided for @chat_action_open_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat settings'**
+  String get chat_action_open_settings;
+
+  /// No description provided for @chat_action_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is coming soon.'**
+  String chat_action_unavailable(Object feature);
+
+  /// No description provided for @chat_attachment_more.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get chat_attachment_more;
+
+  /// No description provided for @chat_attachment_files.
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get chat_attachment_files;
+
+  /// No description provided for @chat_attachment_media.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos & videos'**
+  String get chat_attachment_media;
+
+  /// No description provided for @chat_attachment_live_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Share live location'**
+  String get chat_attachment_live_location;
+
+  /// No description provided for @chat_composer_emoji_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Emojis'**
+  String get chat_composer_emoji_tooltip;
+
+  /// No description provided for @chat_composer_attach_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick attachment'**
+  String get chat_composer_attach_tooltip;
+
+  /// No description provided for @chat_composer_more_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get chat_composer_more_tooltip;
+
+  /// No description provided for @chat_composer_send_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Send message'**
+  String get chat_composer_send_tooltip;
+
+  /// No description provided for @chat_settings_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat settings'**
+  String get chat_settings_title;
+
+  /// No description provided for @chat_settings_share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get chat_settings_share;
+
+  /// No description provided for @chat_settings_leave_group.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave group'**
+  String get chat_settings_leave_group;
+
+  /// No description provided for @chat_settings_remove_friend.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove contact'**
+  String get chat_settings_remove_friend;
+
+  /// No description provided for @chat_settings_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get chat_settings_notifications;
+
+  /// No description provided for @chat_settings_notifications_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute or enable alerts'**
+  String get chat_settings_notifications_subtitle;
+
+  /// No description provided for @chat_settings_shared_files.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared files'**
+  String get chat_settings_shared_files;
+
+  /// No description provided for @chat_settings_shared_files_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse documents, media and links'**
+  String get chat_settings_shared_files_subtitle;
+
+  /// No description provided for @chat_settings_members_section.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get chat_settings_members_section;
+
+  /// No description provided for @chat_settings_contact_section.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact info'**
+  String get chat_settings_contact_section;
+
+  /// No description provided for @chat_settings_contact_id.
+  ///
+  /// In en, this message translates to:
+  /// **'ID: {id}'**
+  String chat_settings_contact_id(Object id);
+
+  /// No description provided for @chat_settings_group_overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Group · {memberLabel}'**
+  String chat_settings_group_overview(Object memberLabel);
+
+  /// No description provided for @chat_settings_direct_overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct chat'**
+  String get chat_settings_direct_overview;
+
   /// No description provided for @no_events.
   ///
   /// In en, this message translates to:

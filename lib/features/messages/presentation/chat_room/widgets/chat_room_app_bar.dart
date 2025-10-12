@@ -8,10 +8,20 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.channelTitle,
     required this.participants,
+    required this.onOpenSettings,
+    this.onSearchTap,
+    this.onVoiceCallTap,
+    this.onVideoCallTap,
+    this.onPhoneCallTap,
   });
 
   final String channelTitle;
   final List<ChatParticipant> participants;
+  final VoidCallback onOpenSettings;
+  final VoidCallback? onSearchTap;
+  final VoidCallback? onVoiceCallTap;
+  final VoidCallback? onVideoCallTap;
+  final VoidCallback? onPhoneCallTap;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 72);
@@ -20,6 +30,21 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final loc = AppLocalizations.of(context)!;
+
+    void showUnavailable(String label) {
+      final messenger = ScaffoldMessenger.of(context);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(loc.chat_action_unavailable(label)),
+          ),
+        );
+    }
+
+    VoidCallback withFallback(VoidCallback? callback, String label) {
+      return callback ?? () => showUnavailable(label);
+    }
 
     return AppBar(
       elevation: 0,
@@ -33,12 +58,32 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
+          tooltip: loc.chat_search_hint,
           icon: const Icon(Icons.search),
-          onPressed: () {},
+          onPressed: withFallback(onSearchTap, loc.chat_search_hint),
         ),
         IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {},
+          tooltip: loc.chat_action_voice_call,
+          icon: const Icon(Icons.mic_none_outlined),
+          onPressed:
+              withFallback(onVoiceCallTap, loc.chat_action_voice_call),
+        ),
+        IconButton(
+          tooltip: loc.chat_action_video_call,
+          icon: const Icon(Icons.videocam_outlined),
+          onPressed:
+              withFallback(onVideoCallTap, loc.chat_action_video_call),
+        ),
+        IconButton(
+          tooltip: loc.chat_action_phone_call,
+          icon: const Icon(Icons.call_outlined),
+          onPressed:
+              withFallback(onPhoneCallTap, loc.chat_action_phone_call),
+        ),
+        IconButton(
+          tooltip: loc.chat_action_open_settings,
+          icon: const Icon(Icons.settings_outlined),
+          onPressed: onOpenSettings,
         ),
       ],
       bottom: PreferredSize(
@@ -52,7 +97,7 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
               final participant = participants[index];
               return ChatRoomParticipantAvatar(participant: participant);
             },
-            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemCount: participants.length,
           ),
         ),

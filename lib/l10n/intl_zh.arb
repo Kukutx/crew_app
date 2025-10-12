@@ -204,6 +204,47 @@
       "time": {}
     }
   },
+  "chat_action_voice_call": "语音通话",
+  "chat_action_video_call": "视频通话",
+  "chat_action_phone_call": "电话",
+  "chat_action_open_settings": "聊天设置",
+  "chat_action_unavailable": "{feature} 即将上线",
+  "@chat_action_unavailable": {
+    "placeholders": {
+      "feature": {}
+    }
+  },
+  "chat_attachment_more": "更多功能",
+  "chat_attachment_files": "文件",
+  "chat_attachment_media": "图片与视频",
+  "chat_attachment_live_location": "实时位置共享",
+  "chat_composer_emoji_tooltip": "表情",
+  "chat_composer_attach_tooltip": "快速附件",
+  "chat_composer_more_tooltip": "更多",
+  "chat_composer_send_tooltip": "发送消息",
+  "chat_settings_title": "聊天设置",
+  "chat_settings_share": "分享",
+  "chat_settings_leave_group": "退出群组",
+  "chat_settings_remove_friend": "删除好友",
+  "chat_settings_notifications": "通知提醒",
+  "chat_settings_notifications_subtitle": "静音或开启消息提醒",
+  "chat_settings_shared_files": "共享文件",
+  "chat_settings_shared_files_subtitle": "查看聊天中的文档、媒体与链接",
+  "chat_settings_members_section": "成员信息",
+  "chat_settings_contact_section": "联系人信息",
+  "chat_settings_contact_id": "ID：{id}",
+  "@chat_settings_contact_id": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "chat_settings_group_overview": "群组 · {memberLabel}",
+  "@chat_settings_group_overview": {
+    "placeholders": {
+      "memberLabel": {}
+    }
+  },
+  "chat_settings_direct_overview": "私聊",
   "no_events": "暂无活动",
   "no_events_found": "没有找到活动",
   "not_logged_in": "未登录",

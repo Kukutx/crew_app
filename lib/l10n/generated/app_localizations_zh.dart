@@ -370,6 +370,90 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get chat_action_voice_call => '语音通话';
+
+  @override
+  String get chat_action_video_call => '视频通话';
+
+  @override
+  String get chat_action_phone_call => '电话';
+
+  @override
+  String get chat_action_open_settings => '聊天设置';
+
+  @override
+  String chat_action_unavailable(Object feature) {
+    return '$feature 即将上线';
+  }
+
+  @override
+  String get chat_attachment_more => '更多功能';
+
+  @override
+  String get chat_attachment_files => '文件';
+
+  @override
+  String get chat_attachment_media => '图片与视频';
+
+  @override
+  String get chat_attachment_live_location => '实时位置共享';
+
+  @override
+  String get chat_composer_emoji_tooltip => '表情';
+
+  @override
+  String get chat_composer_attach_tooltip => '快速附件';
+
+  @override
+  String get chat_composer_more_tooltip => '更多';
+
+  @override
+  String get chat_composer_send_tooltip => '发送消息';
+
+  @override
+  String get chat_settings_title => '聊天设置';
+
+  @override
+  String get chat_settings_share => '分享';
+
+  @override
+  String get chat_settings_leave_group => '退出群组';
+
+  @override
+  String get chat_settings_remove_friend => '删除好友';
+
+  @override
+  String get chat_settings_notifications => '通知提醒';
+
+  @override
+  String get chat_settings_notifications_subtitle => '静音或开启消息提醒';
+
+  @override
+  String get chat_settings_shared_files => '共享文件';
+
+  @override
+  String get chat_settings_shared_files_subtitle => '查看聊天中的文档、媒体与链接';
+
+  @override
+  String get chat_settings_members_section => '成员信息';
+
+  @override
+  String get chat_settings_contact_section => '联系人信息';
+
+  @override
+  String chat_settings_contact_id(Object id) {
+    return 'ID：$id';
+  }
+
+  @override
+  String chat_settings_group_overview(Object memberLabel) {
+    return '群组 · $memberLabel';
+  }
+
+  @override
+  String get chat_settings_direct_overview => '私聊';
+
+  @override
   String get no_events => '暂无活动';
 
   @override

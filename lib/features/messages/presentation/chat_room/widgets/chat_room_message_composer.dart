@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomMessageComposer extends StatelessWidget {
@@ -6,15 +7,38 @@ class ChatRoomMessageComposer extends StatelessWidget {
     required this.controller,
     required this.hintText,
     required this.onSend,
+    this.onEmojiTap,
+    this.onAttachTap,
+    this.onMoreOptionsTap,
   });
 
   final TextEditingController controller;
   final String hintText;
   final VoidCallback onSend;
+  final VoidCallback? onEmojiTap;
+  final VoidCallback? onAttachTap;
+  final VoidCallback? onMoreOptionsTap;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
+
+    void showUnavailable(String label) {
+      final messenger = ScaffoldMessenger.of(context);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(loc.chat_action_unavailable(label)),
+          ),
+        );
+    }
+
+    VoidCallback withFallback(VoidCallback? callback, String label) {
+      return callback ?? () => showUnavailable(label);
+    }
+
     return SafeArea(
       top: false,
       child: Padding(
@@ -35,14 +59,22 @@ class ChatRoomMessageComposer extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
-                tooltip: 'emoji',
+                tooltip: loc.chat_composer_emoji_tooltip,
                 icon: Icon(Icons.emoji_emotions_outlined, color: colorScheme.primary),
-                onPressed: () {},
+                onPressed:
+                    withFallback(onEmojiTap, loc.chat_composer_emoji_tooltip),
               ),
               IconButton(
-                tooltip: 'attach',
+                tooltip: loc.chat_composer_attach_tooltip,
                 icon: Icon(Icons.attach_file, color: colorScheme.primary),
-                onPressed: () {},
+                onPressed:
+                    withFallback(onAttachTap, loc.chat_composer_attach_tooltip),
+              ),
+              IconButton(
+                tooltip: loc.chat_composer_more_tooltip,
+                icon: Icon(Icons.add_circle_outline, color: colorScheme.primary),
+                onPressed:
+                    withFallback(onMoreOptionsTap, loc.chat_composer_more_tooltip),
               ),
               Expanded(
                 child: TextField(
@@ -64,6 +96,7 @@ class ChatRoomMessageComposer extends StatelessWidget {
                 ),
                 child: IconButton(
                   icon: Icon(Icons.send_rounded, color: colorScheme.onPrimary),
+                  tooltip: loc.chat_composer_send_tooltip,
                   onPressed: onSend,
                 ),
               ),

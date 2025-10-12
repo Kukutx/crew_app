@@ -1,6 +1,8 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/chat_room_settings_page.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_attachment_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -76,6 +78,48 @@ class _DirectChatPageState extends State<DirectChatPage> {
     );
   }
 
+  void _showFeatureComingSoon(String featureName) {
+    final loc = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(loc.chat_action_unavailable(featureName)),
+        ),
+      );
+  }
+
+  Future<void> _showAttachmentSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: false,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (sheetContext) {
+        return ChatAttachmentSheet(
+          onOptionSelected: (label) {
+            Navigator.of(sheetContext).pop();
+            _showFeatureComingSoon(label);
+          },
+        );
+      },
+    );
+  }
+
+  void _openSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChatRoomSettingsPage(
+          title: widget.preview.displayName,
+          isGroup: false,
+          participants: [widget.partner, widget.currentUser],
+          currentUser: widget.currentUser,
+          partner: widget.partner,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -140,12 +184,27 @@ class _DirectChatPageState extends State<DirectChatPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.call_outlined),
-            onPressed: () {},
+            tooltip: loc.chat_action_voice_call,
+            icon: const Icon(Icons.mic_none_outlined),
+            onPressed: () =>
+                _showFeatureComingSoon(loc.chat_action_voice_call),
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
+            tooltip: loc.chat_action_video_call,
+            icon: const Icon(Icons.videocam_outlined),
+            onPressed: () =>
+                _showFeatureComingSoon(loc.chat_action_video_call),
+          ),
+          IconButton(
+            tooltip: loc.chat_action_phone_call,
+            icon: const Icon(Icons.call_outlined),
+            onPressed: () =>
+                _showFeatureComingSoon(loc.chat_action_phone_call),
+          ),
+          IconButton(
+            tooltip: loc.chat_action_open_settings,
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: _openSettings,
           ),
         ],
       ),
@@ -163,6 +222,7 @@ class _DirectChatPageState extends State<DirectChatPage> {
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
+            onMoreOptionsTap: _showAttachmentSheet,
           ),
         ],
       ),

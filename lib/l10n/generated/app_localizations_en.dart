@@ -376,6 +376,91 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chat_action_voice_call => 'Voice call';
+
+  @override
+  String get chat_action_video_call => 'Video call';
+
+  @override
+  String get chat_action_phone_call => 'Phone call';
+
+  @override
+  String get chat_action_open_settings => 'Chat settings';
+
+  @override
+  String chat_action_unavailable(Object feature) {
+    return '$feature is coming soon.';
+  }
+
+  @override
+  String get chat_attachment_more => 'More actions';
+
+  @override
+  String get chat_attachment_files => 'Files';
+
+  @override
+  String get chat_attachment_media => 'Photos & videos';
+
+  @override
+  String get chat_attachment_live_location => 'Share live location';
+
+  @override
+  String get chat_composer_emoji_tooltip => 'Emojis';
+
+  @override
+  String get chat_composer_attach_tooltip => 'Quick attachment';
+
+  @override
+  String get chat_composer_more_tooltip => 'More';
+
+  @override
+  String get chat_composer_send_tooltip => 'Send message';
+
+  @override
+  String get chat_settings_title => 'Chat settings';
+
+  @override
+  String get chat_settings_share => 'Share';
+
+  @override
+  String get chat_settings_leave_group => 'Leave group';
+
+  @override
+  String get chat_settings_remove_friend => 'Remove contact';
+
+  @override
+  String get chat_settings_notifications => 'Notifications';
+
+  @override
+  String get chat_settings_notifications_subtitle => 'Mute or enable alerts';
+
+  @override
+  String get chat_settings_shared_files => 'Shared files';
+
+  @override
+  String get chat_settings_shared_files_subtitle =>
+      'Browse documents, media and links';
+
+  @override
+  String get chat_settings_members_section => 'Members';
+
+  @override
+  String get chat_settings_contact_section => 'Contact info';
+
+  @override
+  String chat_settings_contact_id(Object id) {
+    return 'ID: $id';
+  }
+
+  @override
+  String chat_settings_group_overview(Object memberLabel) {
+    return 'Group · $memberLabel';
+  }
+
+  @override
+  String get chat_settings_direct_overview => 'Direct chat';
+
+  @override
   String get no_events => 'No events yet';
 
   @override

@@ -1,5 +1,7 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/chat_room_settings_page.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_attachment_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_app_bar.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
@@ -75,6 +77,47 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
+  void _showFeatureComingSoon(String featureName) {
+    final loc = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(loc.chat_action_unavailable(featureName)),
+        ),
+      );
+  }
+
+  Future<void> _showAttachmentSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: false,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (sheetContext) {
+        return ChatAttachmentSheet(
+          onOptionSelected: (label) {
+            Navigator.of(sheetContext).pop();
+            _showFeatureComingSoon(label);
+          },
+        );
+      },
+    );
+  }
+
+  void _openSettings(List<ChatParticipant> participants) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChatRoomSettingsPage(
+          title: widget.channelTitle,
+          isGroup: true,
+          participants: participants,
+          currentUser: widget.currentUser,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -86,6 +129,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       appBar: ChatRoomAppBar(
         channelTitle: widget.channelTitle,
         participants: participants,
+        onOpenSettings: () => _openSettings(participants),
+        onSearchTap: () => _showFeatureComingSoon(loc.chat_search_hint),
+        onVoiceCallTap: () => _showFeatureComingSoon(loc.chat_action_voice_call),
+        onVideoCallTap: () =>
+            _showFeatureComingSoon(loc.chat_action_video_call),
+        onPhoneCallTap: () =>
+            _showFeatureComingSoon(loc.chat_action_phone_call),
       ),
       body: Column(
         children: [
@@ -101,6 +151,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
+            onMoreOptionsTap: _showAttachmentSheet,
           ),
         ],
       ),

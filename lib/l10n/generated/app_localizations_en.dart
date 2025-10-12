@@ -417,9 +417,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get chat_action_voice_call => 'Voice call';
-
-  @override
   String get chat_action_video_call => 'Video call';
 
   @override
@@ -440,7 +437,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_attachment_more => 'More actions';
 
   @override
-  String get chat_attachment_files => 'Files';
+  String get chat_attachment_files => 'Quick attachment';
 
   @override
   String get chat_attachment_media => 'Photos & videos';

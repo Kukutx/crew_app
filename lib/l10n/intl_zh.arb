@@ -217,7 +217,6 @@
       "time": {}
     }
   },
-  "chat_action_voice_call": "语音通话",
   "chat_action_video_call": "视频通话",
   "chat_action_phone_call": "电话",
   "chat_action_more_options": "更多操作",
@@ -229,7 +228,7 @@
     }
   },
   "chat_attachment_more": "更多功能",
-  "chat_attachment_files": "文件",
+  "chat_attachment_files": "快速附件",
   "chat_attachment_media": "图片与视频",
   "chat_attachment_live_location": "实时位置共享",
   "chat_composer_emoji_tooltip": "表情",

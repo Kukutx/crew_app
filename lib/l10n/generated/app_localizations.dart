@@ -848,12 +848,6 @@ abstract class AppLocalizations {
   /// **'Last active {time}'**
   String chat_last_seen(Object time);
 
-  /// No description provided for @chat_action_voice_call.
-  ///
-  /// In en, this message translates to:
-  /// **'Voice call'**
-  String get chat_action_voice_call;
-
   /// No description provided for @chat_action_video_call.
   ///
   /// In en, this message translates to:

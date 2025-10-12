@@ -10,7 +10,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.participants,
     required this.onOpenSettings,
     this.onSearchTap,
-    this.onVoiceCallTap,
     this.onVideoCallTap,
     this.onPhoneCallTap,
   });
@@ -19,7 +18,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<ChatParticipant> participants;
   final VoidCallback onOpenSettings;
   final VoidCallback? onSearchTap;
-  final VoidCallback? onVoiceCallTap;
   final VoidCallback? onVideoCallTap;
   final VoidCallback? onPhoneCallTap;
 
@@ -46,8 +44,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
       return callback ?? () => showUnavailable(label);
     }
 
-    final voiceAction =
-        withFallback(onVoiceCallTap, loc.chat_action_voice_call);
     final videoAction =
         withFallback(onVideoCallTap, loc.chat_action_video_call);
     final phoneAction =
@@ -74,13 +70,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.add_circle_outline),
           itemBuilder: (context) => [
             PopupMenuItem(
-              value: _ChatHeaderAction.voiceCall,
-              child: _HeaderActionRow(
-                icon: Icons.mic_none_outlined,
-                label: loc.chat_action_voice_call,
-              ),
-            ),
-            PopupMenuItem(
               value: _ChatHeaderAction.phoneCall,
               child: _HeaderActionRow(
                 icon: Icons.call_outlined,
@@ -97,9 +86,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
           onSelected: (action) {
             switch (action) {
-              case _ChatHeaderAction.voiceCall:
-                voiceAction();
-                break;
               case _ChatHeaderAction.phoneCall:
                 phoneAction();
                 break;
@@ -135,7 +121,7 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-enum _ChatHeaderAction { voiceCall, phoneCall, videoCall }
+enum _ChatHeaderAction { phoneCall, videoCall }
 
 class _HeaderActionRow extends StatelessWidget {
   const _HeaderActionRow({

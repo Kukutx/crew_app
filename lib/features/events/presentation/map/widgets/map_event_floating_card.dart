@@ -114,23 +114,15 @@ class MapEventFloatingCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(Icons.event, size: 16, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                timeLabel,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: Colors.black87),
+                        const SizedBox(height: 4),
+                        Text(
+                          timeLabel,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                          ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
                             const Icon(Icons.place, size: 16, color: Colors.grey),
@@ -148,7 +140,7 @@ class MapEventFloatingCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [

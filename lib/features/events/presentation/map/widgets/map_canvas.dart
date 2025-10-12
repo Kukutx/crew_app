@@ -11,6 +11,8 @@ class MapCanvas extends StatelessWidget {
   final ValueChanged<LatLng>? onTap;
   final ValueChanged<LatLng>? onLongPress;
   final Set<Marker> markers;
+  final bool showUserLocation;
+  final bool showMyLocationButton;
 
   const MapCanvas({
     super.key,
@@ -21,6 +23,8 @@ class MapCanvas extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.markers = const <Marker>{},
+    this.showUserLocation = false,
+    this.showMyLocationButton = false,
   });
 
   @override
@@ -37,8 +41,8 @@ class MapCanvas extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       markers: markers,
-      myLocationButtonEnabled: false,
-      myLocationEnabled: false,
+      myLocationButtonEnabled: showMyLocationButton,
+      myLocationEnabled: showUserLocation,
       zoomControlsEnabled: false,
       mapToolbarEnabled: true,
       compassEnabled: true,

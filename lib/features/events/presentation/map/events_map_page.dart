@@ -202,6 +202,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               onTap: (pos) => unawaited(_onMapTap(pos)),
               onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
               markers: markersLayer.markers,
+              showUserLocation: true,
+              showMyLocationButton: true,
             ),
           ),
           _buildEventCardOverlay(safeBottom),

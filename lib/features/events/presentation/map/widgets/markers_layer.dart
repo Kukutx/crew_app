@@ -21,16 +21,6 @@ class MarkersLayer {
         ),
     };
 
-    if (userLoc != null) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('user_location'),
-          position: userLoc,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        ),
-      );
-    }
-
     return MarkersLayer(markers: markers);
   }
 }

@@ -56,7 +56,7 @@ class MapEventFloatingCard extends StatelessWidget {
                           ? CachedNetworkImage(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,
-                              placeholder: (_, __) => const Center(
+                              placeholder: (_, _) => const Center(
                                 child: SizedBox(
                                   width: 24,
                                   height: 24,

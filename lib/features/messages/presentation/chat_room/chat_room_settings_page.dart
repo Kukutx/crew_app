@@ -242,7 +242,7 @@ class _ChatParticipantTile extends StatelessWidget {
             participant.displayName.characters.take(2).toString())
         .toUpperCase();
     final avatarColor = Color(
-      participant.avatarColorValue ?? colorScheme.primary.value,
+      participant.avatarColorValue ?? colorScheme.primary.toARGB32(),
     );
 
     return Card(

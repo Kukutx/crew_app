@@ -45,13 +45,13 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
       comments: 12,
       accentColor: Color(0xFF6750A4),
       previewLabel: '日落草坪局',
-      mediaAssets: const [
+      mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
         'assets/images/crew.png',
         'assets/images/crew.png',
       ],
-      commentItems: const [
+      commentItems: [
         PlazaComment(
           author: 'Lydia',
           message: '带上我最爱的野餐布和小蛋糕，一起享受日落吧～',
@@ -75,12 +75,12 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
       previewLabel: '街角手冲香',
-      mediaAssets: const [
+      mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
         'assets/images/crew.png',
       ],
-      commentItems: const [
+      commentItems: [
         PlazaComment(
           author: '阿毛',
           message: '推荐一家藏在巷子里的手冲店，豆子超香！',
@@ -104,11 +104,11 @@ class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
       comments: 7,
       accentColor: Color(0xFF377D71),
       previewLabel: '河畔清风局',
-      mediaAssets: const [
+      mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
       ],
-      commentItems: const [
+      commentItems: [
         PlazaComment(
           author: '晨跑小队',
           message: '夜跑完可以去河对岸那家椰子店，超级解暑。',

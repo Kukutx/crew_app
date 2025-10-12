@@ -23,7 +23,7 @@ class PlazaPostDetailPage extends StatefulWidget {
     String? heroTag,
   }) {
     return PageRouteBuilder<int>(
-      pageBuilder: (_, animation, __) => FadeTransition(
+      pageBuilder: (_, animation, _) => FadeTransition(
         opacity: animation,
         child: PlazaPostDetailPage(
           post: post,

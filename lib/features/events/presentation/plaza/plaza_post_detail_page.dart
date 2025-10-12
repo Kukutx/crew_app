@@ -26,14 +26,16 @@ class PlazaPostDetailPage extends StatelessWidget {
         title: Text(theme.brightness == Brightness.dark ? '瞬间详情' : '瞬间'),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: EdgeInsets.zero,
         children: [
           _PlazaPostMediaGallery(post: post),
-          const SizedBox(height: 16),
-          PlazaPostCard(
-            post: post,
-            margin: EdgeInsets.zero,
-            onCommentTap: () => showPlazaPostCommentsSheet(context, post),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+            child: PlazaPostCard(
+              post: post,
+              margin: EdgeInsets.zero,
+              onCommentTap: () => showPlazaPostCommentsSheet(context, post),
+            ),
           ),
         ],
       ),
@@ -41,67 +43,121 @@ class PlazaPostDetailPage extends StatelessWidget {
   }
 }
 
-class _PlazaPostMediaGallery extends StatelessWidget {
+class _PlazaPostMediaGallery extends StatefulWidget {
   final PlazaPost post;
 
   const _PlazaPostMediaGallery({required this.post});
 
   @override
+  State<_PlazaPostMediaGallery> createState() => _PlazaPostMediaGalleryState();
+}
+
+class _PlazaPostMediaGalleryState extends State<_PlazaPostMediaGallery> {
+  late final PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final mediaAssets = post.mediaAssets;
+    final mediaAssets = widget.post.mediaAssets;
+    final galleryHeight = max(
+      MediaQuery.of(context).size.height * 0.55,
+      320.0,
+    );
+
     if (mediaAssets.isEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Container(
-          height: 340,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                post.accentColor.withValues(alpha: 0.9),
-                post.accentColor.withValues(alpha: 0.55),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Container(
+            height: galleryHeight,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  widget.post.accentColor.withValues(alpha: 0.9),
+                  widget.post.accentColor.withValues(alpha: 0.55),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            post.previewLabel ?? post.content,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-            textAlign: TextAlign.center,
+            alignment: Alignment.center,
+            child: Text(
+              widget.post.previewLabel ?? widget.post.content,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       );
     }
 
-    final assets = mediaAssets.take(4).toList(growable: false);
-    final crossAxisCount = min(2, assets.length);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: AspectRatio(
-        aspectRatio: 3 / 4,
-        child: GridView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: assets.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 2,
-            crossAxisSpacing: 2,
+    return SizedBox(
+      height: galleryHeight,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: mediaAssets.length,
+            onPageChanged: (index) => setState(() => _currentPage = index),
+            itemBuilder: (context, index) {
+              final asset = mediaAssets[index];
+              return Container(
+                color: Colors.black,
+                alignment: Alignment.center,
+                child: InteractiveViewer(
+                  minScale: 1,
+                  maxScale: 4,
+                  child: Image.asset(
+                    asset,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+              );
+            },
           ),
-          itemBuilder: (context, index) {
-            final asset = assets[index];
-            return Image.asset(
-              asset,
-              fit: BoxFit.cover,
-            );
-          },
-        ),
+          if (mediaAssets.length > 1)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 24,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(mediaAssets.length, (index) {
+                  final isActive = index == _currentPage;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: isActive ? 16 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
       ),
     );
   }

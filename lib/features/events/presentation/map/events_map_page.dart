@@ -12,8 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
-
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
 import '../../../../core/error/api_exception.dart';
@@ -117,7 +115,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final theme = Theme.of(context);
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
     final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
-    final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
+    const overlayHeight = 158.0;
+    const overlayBottomPadding = 24.0;
+    final overlayTopInset = overlayHeight + overlayBottomPadding + safeBottom;
+    final fabBaseBottomInset = safeBottom + 96;
+    final double fabBottomInset = cardVisible
+        ? ((overlayTopInset - 40)
+                .clamp(safeBottom + 32, double.infinity)
+                .toDouble())
+        : fabBaseBottomInset;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
@@ -136,7 +142,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       data: (list) => MarkersLayer.fromEvents(
         events: list,
         userLoc: userLoc,
-        onEventTap: _focusOnEvent,
+        onEventTap: _centerCameraOnEvent,
       ),
     );
 
@@ -208,13 +214,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: FloatingActionButton(
+      floatingActionButton: AnimatedPadding(
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeInOut,
+        padding: EdgeInsets.only(right: 6, bottom: fabBottomInset),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton.small(
               heroTag: 'events_map_add_fab',
               backgroundColor: theme.colorScheme.secondary,
               foregroundColor: theme.colorScheme.onSecondary,
@@ -228,29 +236,28 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               },
               child: const Icon(Icons.add),
             ),
-          ),
-          AppFloatingActionButton(
-            heroTag: 'events_map_my_location_fab',
-            margin: EdgeInsets.only(
-              top: 12,
-              bottom: bottomPadding,
-              right: 6,
+            const SizedBox(height: 12),
+            FloatingActionButton.small(
+              heroTag: 'events_map_my_location_fab',
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              shape: const StadiumBorder(),
+              onPressed: () async {
+                final loc = ref.read(userLocationProvider).value;
+                if (loc != null) {
+                  await _moveCamera(loc, zoom: 14);
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(
+                    const SnackBar(content: Text("Unable to get location")),
+                  );
+                }
+              },
+              child: const Icon(Icons.my_location, size: 20),
             ),
-            onPressed: () async {
-              final loc = ref.read(userLocationProvider).value;
-              if (loc != null) {
-                await _moveCamera(loc, zoom: 14);
-              } else {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
-                  const SnackBar(content: Text("Unable to get location")),
-                );
-              }
-            },
-            child: const Icon(Icons.my_location),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -459,6 +466,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
     _movedToSelected = true;
     _showEventCard(event);
+  }
+
+  void _centerCameraOnEvent(Event event) {
+    if (!mounted) {
+      return;
+    }
+    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
   }
 
   Future<void> _onMapTap(LatLng position) async {

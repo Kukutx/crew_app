@@ -192,6 +192,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           icon: const Icon(Icons.more_vert),
           onPressed: () => _showMoreActions(context, profile),
         ),
+                IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () => Navigator.of(context).pushNamed('/settings'),
+        ),
       ],
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {

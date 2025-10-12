@@ -47,6 +47,8 @@
   "event_details_title": "Event details",
   "event_detail_publish_plaza": "Post to Plaza",
   "event_meeting_point_title": "Meeting point",
+  "event_copy_address_button": "Copy address",
+  "event_copy_address_success": "Address copied to clipboard",
   "event_participants_title": "Participants",
   "event_time_title": "Event time",
   "event_cost_calculator_title": "Cost calculator",

@@ -125,6 +125,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_meeting_point_title => 'Meeting point';
 
   @override
+  String get event_copy_address_button => 'Copy address';
+
+  @override
+  String get event_copy_address_success => 'Address copied to clipboard';
+
+  @override
   String get event_participants_title => 'Participants';
 
   @override

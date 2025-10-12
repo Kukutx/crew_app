@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/events/presentation/map/events_map_page.dart';
 import '../features/trips/presentation/create_road_trip_page.dart';
 import 'state/app_overlay_provider.dart';
+import 'state/bottom_navigation_visibility_provider.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -152,6 +153,8 @@ class _AppState extends ConsumerState<App> {
 
     final isOverlayOpen = _index != 1;
 
+    final showBottomNav = ref.watch(bottomNavigationVisibilityProvider);
+
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -209,85 +212,95 @@ class _AppState extends ConsumerState<App> {
         minimum: const EdgeInsets.only(bottom: 28),
         child: Align(
           alignment: Alignment.bottomCenter,
-          child: FractionallySizedBox(
-            widthFactor: 0.88,
-            child: ClipRRect(
-              borderRadius: borderRadius,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 240),
-                  curve: Curves.easeInOut,
-                  decoration: navDecoration(_isScrolling),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: NavigationBarTheme(
-                    data: theme.navigationBarTheme.copyWith(
-                      backgroundColor: Colors.transparent,
-                      height: 64,
-                      indicatorColor:
-                          colorScheme.primary.withValues(alpha: 0.18),
-                      indicatorShape: const StadiumBorder(),
-                      labelBehavior:
-                          NavigationDestinationLabelBehavior.alwaysShow,
-                      labelTextStyle: WidgetStateProperty.resolveWith(
-                        (states) => theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: states.contains(WidgetState.selected)
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                          color: states.contains(WidgetState.selected)
-                              ? colorScheme.primary
-                              : colorScheme.onSurfaceVariant,
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeInOut,
+            offset: Offset(0, showBottomNav ? 0 : 1.2),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeInOut,
+              opacity: showBottomNav ? 1 : 0,
+              child: FractionallySizedBox(
+                widthFactor: 0.88,
+                child: ClipRRect(
+                  borderRadius: borderRadius,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 240),
+                      curve: Curves.easeInOut,
+                      decoration: navDecoration(_isScrolling),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: NavigationBarTheme(
+                        data: theme.navigationBarTheme.copyWith(
+                          backgroundColor: Colors.transparent,
+                          height: 64,
+                          indicatorColor:
+                              colorScheme.primary.withValues(alpha: 0.18),
+                          indicatorShape: const StadiumBorder(),
+                          labelBehavior:
+                              NavigationDestinationLabelBehavior.alwaysShow,
+                          labelTextStyle: WidgetStateProperty.resolveWith(
+                            (states) => theme.textTheme.labelMedium?.copyWith(
+                              fontWeight: states.contains(WidgetState.selected)
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                              color: states.contains(WidgetState.selected)
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          iconTheme: WidgetStateProperty.resolveWith(
+                            (states) => IconThemeData(
+                              size: states.contains(WidgetState.selected)
+                                  ? 30
+                                  : 26,
+                              color: states.contains(WidgetState.selected)
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        child: NavigationBar(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          selectedIndex: _navigationIndex,
+                          onDestinationSelected: (i) async {
+                            if (i == 0) {
+                              if (_navigationIndex != 0) {
+                                setState(() => _navigationIndex = 0);
+                              }
+                              await _showEventsListSheet(context);
+                              if (!mounted) return;
+                              if (_navigationIndex != 1) {
+                                setState(() => _navigationIndex = 1);
+                              }
+                              return;
+                            }
+                            if (i == 2) {
+                              if (_navigationIndex != 2) {
+                                setState(() => _navigationIndex = 2);
+                              }
+                              await _showChatSheet(context);
+                              if (!mounted) return;
+                              if (_navigationIndex != 1) {
+                                setState(() => _navigationIndex = 1);
+                              }
+                              return;
+                            }
+                            if (_navigationIndex != 1) {
+                              setState(() => _navigationIndex = 1);
+                            }
+                            if (_index != 1) {
+                              ref.read(appOverlayIndexProvider.notifier).state = 1;
+                            }
+                          },
+                          destinations: destinations,
                         ),
                       ),
-                      iconTheme: WidgetStateProperty.resolveWith(
-                        (states) => IconThemeData(
-                          size: states.contains(WidgetState.selected)
-                              ? 30
-                              : 26,
-                          color: states.contains(WidgetState.selected)
-                              ? colorScheme.primary
-                              : colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    child: NavigationBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      selectedIndex: _navigationIndex,
-                      onDestinationSelected: (i) async {
-                        if (i == 0) {
-                          if (_navigationIndex != 0) {
-                            setState(() => _navigationIndex = 0);
-                          }
-                          await _showEventsListSheet(context);
-                          if (!mounted) return;
-                          if (_navigationIndex != 1) {
-                            setState(() => _navigationIndex = 1);
-                          }
-                          return;
-                        }
-                        if (i == 2) {
-                          if (_navigationIndex != 2) {
-                            setState(() => _navigationIndex = 2);
-                          }
-                          await _showChatSheet(context);
-                          if (!mounted) return;
-                          if (_navigationIndex != 1) {
-                            setState(() => _navigationIndex = 1);
-                          }
-                          return;
-                        }
-                        if (_navigationIndex != 1) {
-                          setState(() => _navigationIndex = 1);
-                        }
-                        if (_index != 1) {
-                          ref.read(appOverlayIndexProvider.notifier).state = 1;
-                        }
-                      },
-                      destinations: destinations,
                     ),
                   ),
                 ),

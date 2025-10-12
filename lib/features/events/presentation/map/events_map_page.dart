@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:crew_app/app/state/app_overlay_provider.dart';
+import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/core/config/environment.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/presentation/widgets/disclaimer_sheet.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_providers.dart';
@@ -25,11 +26,12 @@ import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
+import 'widgets/map_event_floating_card.dart';
 import 'sheets/map_event_filter_sheet.dart';
-import 'sheets/map_event_card_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import 'sheets/map_location_info_sheet.dart';
+import '../detail/events_detail_page.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -43,6 +45,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   GoogleMapController? _map;
   bool _mapReady = false;
   bool _movedToSelected = false;
+  late final PageController _eventCardController;
+  bool _isEventCardVisible = false;
+  List<Event> _carouselEvents = const <Event>[];
+  int _activeEventIndex = 0;
   final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
   static const _quickTags = [
     'today',
@@ -73,6 +79,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   void initState() {
     super.initState();
     _api = ref.read(apiServiceProvider);
+    _eventCardController = PageController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
@@ -95,6 +102,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     _mapFocusSubscription?.close();
+    _eventCardController.dispose();
+    final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
+    if (!controller.state) {
+      controller.state = true;
+    }
     _map?.dispose();
     super.dispose();
   }
@@ -103,7 +115,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final bottomPadding = 120 + MediaQuery.of(context).viewPadding.bottom;
+    final safeBottom = MediaQuery.of(context).viewPadding.bottom;
+    final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
+    final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
@@ -122,7 +136,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       data: (list) => MarkersLayer.fromEvents(
         events: list,
         userLoc: userLoc,
-        onEventTap: _showEventCard,
+        onEventTap: _focusOnEvent,
       ),
     );
 
@@ -170,23 +184,28 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         results: _searchResults,
         errorText: _searchError,
       ),
-      body: Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) {
-          if (_searchFocusNode.hasFocus) {
-            _searchFocusNode.unfocus();
-          } else if (_showSearchResults) {
-            setState(() => _showSearchResults = false);
-          }
-        },
-        child: MapCanvas(
-          initialCenter: startCenter,
-          onMapCreated: _onMapCreated,
-          onMapReady: _onMapReady,
-          onTap: (pos) => unawaited(_onMapTap(pos)),
-          onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
-          markers: markersLayer.markers,
-        ),
+      body: Stack(
+        children: [
+          Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) {
+              if (_searchFocusNode.hasFocus) {
+                _searchFocusNode.unfocus();
+              } else if (_showSearchResults) {
+                setState(() => _showSearchResults = false);
+              }
+            },
+            child: MapCanvas(
+              initialCenter: startCenter,
+              onMapCreated: _onMapCreated,
+              onMapReady: _onMapReady,
+              onTap: (pos) => unawaited(_onMapTap(pos)),
+              onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
+              markers: markersLayer.markers,
+            ),
+          ),
+          _buildEventCardOverlay(safeBottom),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Column(
@@ -236,6 +255,97 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
+  Widget _buildEventCardOverlay(double safeBottom) {
+    final loc = AppLocalizations.of(context)!;
+    final visible = _isEventCardVisible && _carouselEvents.isNotEmpty;
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: IgnorePointer(
+        ignoring: !visible,
+        child: AnimatedSlide(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeInOut,
+          offset: Offset(0, visible ? 0 : 1.2),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            opacity: visible ? 1 : 0,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + safeBottom),
+              child: SizedBox(
+                height: 158,
+                child: PageView.builder(
+                  controller: _eventCardController,
+                  physics: _carouselEvents.length > 1
+                      ? const PageScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  onPageChanged: _onEventCardPageChanged,
+                  itemCount: _carouselEvents.length,
+                  itemBuilder: (_, index) {
+                    final event = _carouselEvents[index];
+                    return MapEventFloatingCard(
+                      key: ValueKey(event.id),
+                      event: event,
+                      onTap: () => _openEventDetails(event),
+                      onClose: _hideEventCard,
+                      onRegister: () {
+                        _showSnackBar(loc.registration_not_implemented);
+                      },
+                      onFavorite: () {
+                        _showSnackBar(loc.feature_not_ready);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onEventCardPageChanged(int index) {
+    if (index < 0 || index >= _carouselEvents.length) {
+      return;
+    }
+    setState(() => _activeEventIndex = index);
+    final event = _carouselEvents[index];
+    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
+  }
+
+  Future<void> _openEventDetails(Event event) async {
+    final navigator = Navigator.of(context);
+    final result = await navigator.push<Event>(
+      MaterialPageRoute(builder: (_) => EventDetailPage(event: event)),
+    );
+    if (!mounted) {
+      return;
+    }
+    if (result != null) {
+      _focusOnEvent(result);
+    }
+  }
+
+  void _hideEventCard() {
+    if (!_isEventCardVisible) {
+      return;
+    }
+    setState(() {
+      _isEventCardVisible = false;
+      _carouselEvents = const <Event>[];
+      _activeEventIndex = 0;
+    });
+    _updateBottomNavigation(true);
+  }
+
+  void _updateBottomNavigation(bool visible) {
+    final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
+    if (controller.state != visible) {
+      controller.state = visible;
+    }
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     _map?.dispose();
     _map = controller;
@@ -277,6 +387,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
+    _hideEventCard();
 
     final addressFuture = _reverseGeocode(latlng);
     final placesService = ref.read(placesServiceProvider);
@@ -309,11 +420,36 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    showEventBottomSheet(
-      context: context,
-      event: ev,
-      onShowOnMap: _focusOnEvent,
-    );
+    final asyncEvents = ref.read(eventsProvider);
+    final list = asyncEvents.valueOrNull ?? const <Event>[];
+    List<Event> updatedList;
+    int targetIndex;
+    if (list.isEmpty) {
+      updatedList = <Event>[ev];
+      targetIndex = 0;
+    } else {
+      final index = list.indexWhere((event) => event.id == ev.id);
+      if (index == -1) {
+        updatedList = <Event>[ev, ...list];
+        targetIndex = 0;
+      } else {
+        updatedList = list;
+        targetIndex = index;
+      }
+    }
+
+    setState(() {
+      _carouselEvents = updatedList;
+      _isEventCardVisible = true;
+      _activeEventIndex = targetIndex;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_eventCardController.hasClients) {
+        return;
+      }
+      _eventCardController.jumpToPage(targetIndex);
+    });
+    _updateBottomNavigation(false);
   }
 
   void _focusOnEvent(Event event) {
@@ -329,6 +465,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
+    _hideEventCard();
     final loc = AppLocalizations.of(context)!;
     final places = ref.read(placesServiceProvider);
 
@@ -627,8 +764,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _currentSearchQuery = '';
       _searchController.text = event.title;
     });
-    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 15);
-    _showEventCard(event);
+    _focusOnEvent(event);
   }
 
   void _clearSearchResults() {

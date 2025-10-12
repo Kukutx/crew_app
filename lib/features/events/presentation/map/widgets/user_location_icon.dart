@@ -4,56 +4,100 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 Future<BitmapDescriptor> createUserLocationIcon({
-  double size = 120,
-  Color fillColor = const Color(0xFF1A73E8),
-  Color arrowColor = Colors.white,
-  Color borderColor = Colors.white,
-  double borderWidth = 8,
-  double shadowBlur = 12,
+  double size = 128,
+  double shadowBlur = 16,
 }) async {
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder);
   final center = Offset(size / 2, size / 2);
 
+  final ringRadius = size * 0.32;
+  final wedgeHeight = ringRadius * 2.2;
+  final wedgeWidth = ringRadius * 1.28;
+  final wedgeBottomY = center.dy - ringRadius * 0.18;
+
   if (shadowBlur > 0) {
-    final shadowPath = Path()
-      ..addOval(Rect.fromCircle(center: center, radius: size / 2));
-    canvas.drawShadow(
-      shadowPath,
-      Colors.black.withOpacity(0.45),
-      shadowBlur,
-      true,
+    final shadowPaint = Paint()
+      ..isAntiAlias = true
+      ..color = Colors.black.withOpacity(0.22)
+      ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center + Offset(0, ringRadius * 0.85),
+        width: ringRadius * 2.8,
+        height: ringRadius * 1.5,
+      ),
+      shadowPaint,
     );
   }
 
-  final fillPaint = Paint()
-    ..isAntiAlias = true
-    ..color = fillColor;
-  canvas.drawCircle(center, size / 2, fillPaint);
-
-  if (borderWidth > 0) {
-    final strokePaint = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = borderWidth
-      ..color = borderColor;
-    canvas.drawCircle(center, size / 2 - borderWidth / 2, strokePaint);
-  }
-
-  final arrowHeight = size * 0.6;
-  final arrowWidth = arrowHeight * 0.6;
-  final arrowPath = Path()
-    ..moveTo(center.dx, center.dy - arrowHeight / 2)
-    ..lineTo(center.dx + arrowWidth / 2, center.dy + arrowHeight / 2)
-    ..lineTo(center.dx, center.dy + arrowHeight / 3)
-    ..lineTo(center.dx - arrowWidth / 2, center.dy + arrowHeight / 2)
+  final wedgeRect = Rect.fromLTWH(
+    center.dx - wedgeWidth / 2,
+    center.dy - wedgeHeight,
+    wedgeWidth,
+    wedgeHeight,
+  );
+  final wedgePath = Path()
+    ..moveTo(center.dx, wedgeRect.top)
+    ..lineTo(center.dx + wedgeWidth / 2, wedgeBottomY)
+    ..quadraticBezierTo(
+      center.dx,
+      wedgeBottomY - ringRadius * 0.28,
+      center.dx - wedgeWidth / 2,
+      wedgeBottomY,
+    )
     ..close();
-
-  final arrowPaint = Paint()
+  final wedgePaint = Paint()
     ..isAntiAlias = true
-    ..style = PaintingStyle.fill
-    ..color = arrowColor;
-  canvas.drawPath(arrowPath, arrowPaint);
+    ..shader = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFF0B57D0), Color(0xFF4285F4)],
+    ).createShader(wedgeRect);
+  canvas.drawPath(wedgePath, wedgePaint);
+
+  final outerCircleRect = Rect.fromCircle(center: center, radius: ringRadius);
+  final ringPaint = Paint()
+    ..isAntiAlias = true
+    ..shader = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFF0B57D0), Color(0xFF4F8DFD)],
+    ).createShader(outerCircleRect);
+  canvas.drawCircle(center, ringRadius, ringPaint);
+
+  final rimPaint = Paint()
+    ..isAntiAlias = true
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = ringRadius * 0.22
+    ..color = Colors.white.withOpacity(0.92);
+  canvas.drawCircle(center, ringRadius - rimPaint.strokeWidth / 2, rimPaint);
+
+  final innerCirclePaint = Paint()
+    ..isAntiAlias = true
+    ..color = Colors.white;
+  canvas.drawCircle(center, ringRadius * 0.58, innerCirclePaint);
+
+  final highlightPaint = Paint()
+    ..isAntiAlias = true
+    ..shader = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+    ).createShader(
+      Rect.fromCircle(center: center - Offset(ringRadius * 0.2, ringRadius * 0.2), radius: ringRadius),
+    );
+  canvas.drawCircle(center, ringRadius * 0.62, highlightPaint);
+
+  final bearingIndicator = Path()
+    ..moveTo(center.dx, wedgeRect.top + wedgeHeight * 0.28)
+    ..lineTo(center.dx + wedgeWidth * 0.24, wedgeBottomY)
+    ..lineTo(center.dx - wedgeWidth * 0.24, wedgeBottomY)
+    ..close();
+  final bearingPaint = Paint()
+    ..isAntiAlias = true
+    ..color = Colors.white.withOpacity(0.82);
+  canvas.drawPath(bearingIndicator, bearingPaint);
 
   final picture = recorder.endRecording();
   final image = await picture.toImage(size.toInt(), size.toInt());

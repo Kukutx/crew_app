@@ -421,7 +421,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     final asyncEvents = ref.read(eventsProvider);
-    final list = asyncEvents.valueOrNull ?? const <Event>[];
+    final list = asyncEvents.maybeWhen(
+      data: (events) => events,
+      orElse: () => const <Event>[],
+    );
     List<Event> updatedList;
     int targetIndex;
     if (list.isEmpty) {

@@ -11,6 +11,8 @@ class PlazaPost {
   final int comments;
   final Color accentColor;
   final String? previewLabel;
+  final List<String> mediaAssets;
+  final List<PlazaComment> commentItems;
 
   const PlazaPost({
     required this.author,
@@ -23,17 +25,45 @@ class PlazaPost {
     required this.comments,
     required this.accentColor,
     this.previewLabel,
+    this.mediaAssets = const [],
+    this.commentItems = const [],
   });
+}
+
+class PlazaComment {
+  final String author;
+  final String message;
+  final String timeLabel;
+
+  const PlazaComment({
+    required this.author,
+    required this.message,
+    required this.timeLabel,
+  });
+
+  String get initials {
+    if (author.isEmpty) {
+      return '';
+    }
+    if (author.length == 1) {
+      return author;
+    }
+    return author.substring(0, 2);
+  }
 }
 
 class PlazaPostCard extends StatelessWidget {
   final PlazaPost post;
   final EdgeInsetsGeometry? margin;
+  final VoidCallback? onTap;
+  final VoidCallback? onCommentTap;
 
   const PlazaPostCard({
     super.key,
     required this.post,
     this.margin,
+    this.onTap,
+    this.onCommentTap,
   });
 
   @override
@@ -47,14 +77,16 @@ class PlazaPostCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 CircleAvatar(
                   backgroundColor: post.accentColor.withValues(alpha: 0.15),
                   child: Text(
@@ -167,6 +199,7 @@ class PlazaPostCard extends StatelessWidget {
                 _PlazaPostAction(
                   icon: Icons.chat_bubble_outline,
                   label: post.comments.toString(),
+                  onTap: onCommentTap,
                 ),
               ],
             ),
@@ -181,11 +214,13 @@ class _PlazaPostAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool dense;
+  final VoidCallback? onTap;
 
   const _PlazaPostAction({
     required this.icon,
     required this.label,
     this.dense = false,
+    this.onTap,
   });
 
   @override
@@ -193,23 +228,33 @@ class _PlazaPostAction extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 18,
-          color: colorScheme.onSurfaceVariant,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: dense ? FontWeight.w500 : FontWeight.w600,
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: dense ? FontWeight.w500 : FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

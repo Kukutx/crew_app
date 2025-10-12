@@ -12,7 +12,7 @@ plugins {
 
 dependencies {
   // Import the Firebase BoM
-  implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+  implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
   // Add the dependencies for the Crashlytics NDK and Analytics libraries
   // When using the BoM, you don't specify versions in Firebase library dependencies
   implementation("com.google.firebase:firebase-crashlytics-ndk")

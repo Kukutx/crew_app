@@ -216,7 +216,7 @@ class _NearbyPlacesSection extends StatelessWidget {
                   final place = places[index];
                   return _NearbyPlaceCard(place: place);
                 },
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemCount: places.length,
               );
             },
@@ -286,7 +286,7 @@ class _NearbyPlaceImage extends StatelessWidget {
     if (photoUrl == null) {
       return _PlaceholderImage(
         icon: Icons.image_outlined,
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest ,
       );
     }
     return AspectRatio(
@@ -302,7 +302,7 @@ class _NearbyPlaceImage extends StatelessWidget {
         },
         errorBuilder: (context, error, stackTrace) => _PlaceholderImage(
           icon: Icons.broken_image_outlined,
-          backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest ,
         ),
       ),
     );

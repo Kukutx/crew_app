@@ -162,20 +162,34 @@ class MapEventFloatingCard extends StatelessWidget {
                                     ?.copyWith(color: Colors.black87),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                                minimumSize: const Size(110, 40),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: onRegister,
-                              child: Text(loc.action_register_now),
-                            ),
                           ],
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              minimumSize: const Size(0, 0),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: onRegister,
+                            child: Text(
+                              loc.action_register_now,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(color: Colors.white),
+                            ),
+                          ),
                         ),
                       ],
                     ),

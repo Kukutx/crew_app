@@ -7,12 +7,14 @@ class EventInfoCard extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
   final VoidCallback onTapLocation;
+  final VoidCallback onTapCostCalculator;
 
   const EventInfoCard({
     super.key,
     required this.event,
     required this.loc,
     required this.onTapLocation,
+    required this.onTapCostCalculator,
   });
 
   @override
@@ -68,6 +70,8 @@ class EventInfoCard extends StatelessWidget {
                 loc.event_distance_title,
                 distanceText,
               ),
+            const SizedBox(height: 8),
+            _calculatorRow(context),
           ],
         ),
       ),
@@ -126,6 +130,45 @@ class EventInfoCard extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _calculatorRow(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.calculate_outlined, size: 20, color: Colors.orange),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.event_cost_calculator_title,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    loc.event_cost_calculator_description,
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            FilledButton.tonal(
+              onPressed: onTapCostCalculator,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                minimumSize: const Size(0, 0),
+              ),
+              child: Text(
+                loc.event_cost_calculator_button,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ],

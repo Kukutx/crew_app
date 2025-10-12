@@ -131,6 +131,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_time_title => 'Event time';
 
   @override
+  String get event_cost_calculator_title => 'Cost calculator';
+
+  @override
+  String get event_cost_calculator_description =>
+      'Estimate participant fees, carpool costs and commission splits.';
+
+  @override
+  String get event_cost_calculator_button => 'Calculator';
+
+  @override
+  String get event_cost_calculator_participants_label => 'Participants';
+
+  @override
+  String get event_cost_calculator_fee_label => 'Fee per person (¥)';
+
+  @override
+  String get event_cost_calculator_carpool_label => 'Total carpool cost (¥)';
+
+  @override
+  String get event_cost_calculator_commission_label => 'Commission rate (%)';
+
+  @override
+  String get event_cost_calculator_total_income => 'Total registration income';
+
+  @override
+  String get event_cost_calculator_commission_total => 'Commission payout';
+
+  @override
+  String get event_cost_calculator_carpool_share => 'Carpool cost per person';
+
+  @override
+  String get event_cost_calculator_net_total => 'Net income after costs';
+
+  @override
+  String get event_cost_calculator_net_per_person => 'Net income per person';
+
+  @override
+  String get event_cost_calculator_hint =>
+      'Adjust any number to match the actual expenses for this trip.';
+
+  @override
   String get event_waypoints_title => 'Waypoints';
 
   @override

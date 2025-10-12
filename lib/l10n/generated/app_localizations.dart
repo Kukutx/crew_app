@@ -332,6 +332,84 @@ abstract class AppLocalizations {
   /// **'Event time'**
   String get event_time_title;
 
+  /// No description provided for @event_cost_calculator_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost calculator'**
+  String get event_cost_calculator_title;
+
+  /// No description provided for @event_cost_calculator_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate participant fees, carpool costs and commission splits.'**
+  String get event_cost_calculator_description;
+
+  /// No description provided for @event_cost_calculator_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator'**
+  String get event_cost_calculator_button;
+
+  /// No description provided for @event_cost_calculator_participants_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Participants'**
+  String get event_cost_calculator_participants_label;
+
+  /// No description provided for @event_cost_calculator_fee_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Fee per person (¥)'**
+  String get event_cost_calculator_fee_label;
+
+  /// No description provided for @event_cost_calculator_carpool_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Total carpool cost (¥)'**
+  String get event_cost_calculator_carpool_label;
+
+  /// No description provided for @event_cost_calculator_commission_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission rate (%)'**
+  String get event_cost_calculator_commission_label;
+
+  /// No description provided for @event_cost_calculator_total_income.
+  ///
+  /// In en, this message translates to:
+  /// **'Total registration income'**
+  String get event_cost_calculator_total_income;
+
+  /// No description provided for @event_cost_calculator_commission_total.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission payout'**
+  String get event_cost_calculator_commission_total;
+
+  /// No description provided for @event_cost_calculator_carpool_share.
+  ///
+  /// In en, this message translates to:
+  /// **'Carpool cost per person'**
+  String get event_cost_calculator_carpool_share;
+
+  /// No description provided for @event_cost_calculator_net_total.
+  ///
+  /// In en, this message translates to:
+  /// **'Net income after costs'**
+  String get event_cost_calculator_net_total;
+
+  /// No description provided for @event_cost_calculator_net_per_person.
+  ///
+  /// In en, this message translates to:
+  /// **'Net income per person'**
+  String get event_cost_calculator_net_per_person;
+
+  /// No description provided for @event_cost_calculator_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust any number to match the actual expenses for this trip.'**
+  String get event_cost_calculator_hint;
+
   /// No description provided for @event_waypoints_title.
   ///
   /// In en, this message translates to:

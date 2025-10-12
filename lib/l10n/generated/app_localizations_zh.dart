@@ -130,6 +130,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_time_title => '活动时间';
 
   @override
+  String get event_cost_calculator_title => '费用计算器';
+
+  @override
+  String get event_cost_calculator_description => '估算报名费用、拼车成本和佣金分成。';
+
+  @override
+  String get event_cost_calculator_button => '开始计算';
+
+  @override
+  String get event_cost_calculator_participants_label => '参与人数';
+
+  @override
+  String get event_cost_calculator_fee_label => '人均报名费 (¥)';
+
+  @override
+  String get event_cost_calculator_carpool_label => '拼车总费用 (¥)';
+
+  @override
+  String get event_cost_calculator_commission_label => '佣金比例 (%)';
+
+  @override
+  String get event_cost_calculator_total_income => '报名总收入';
+
+  @override
+  String get event_cost_calculator_commission_total => '佣金支出';
+
+  @override
+  String get event_cost_calculator_carpool_share => '人均拼车成本';
+
+  @override
+  String get event_cost_calculator_net_total => '扣除成本后净收入';
+
+  @override
+  String get event_cost_calculator_net_per_person => '人均净收入';
+
+  @override
+  String get event_cost_calculator_hint => '根据实际情况调整各项费用即可。';
+
+  @override
   String get event_waypoints_title => '途径点';
 
   @override

@@ -53,36 +53,7 @@ class EventInfoCard extends StatelessWidget {
             const SizedBox(height: 12),
             _detailRow(Icons.calendar_today, loc.event_time_title, timeText),
             _detailRow(Icons.people, loc.event_participants_title, participantText),
-            InkWell(
-              onTap: onTapLocation,
-              child: _detailRow(
-                Icons.place,
-                loc.event_meeting_point_title,
-                addressText,
-                valueStyle: TextStyle(
-                  fontSize: 14,
-                  color: linkColor,
-                  decoration: TextDecoration.underline,
-                  decorationColor: linkColor,
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.copy, size: 18),
-                  color: linkColor,
-                  tooltip: loc.event_copy_address_button,
-                  onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: addressText));
-                    if (!context.mounted) {
-                      return;
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(loc.event_copy_address_success),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
+            _meetingPointRow(context, addressText, linkColor),
             if (waypoints.isNotEmpty) _waypointsRow(waypoints, loc),
             if (routeType != null)
               _detailRow(
@@ -109,7 +80,6 @@ class EventInfoCard extends StatelessWidget {
     String title,
     String value, {
     TextStyle? valueStyle,
-    Widget? trailing,
   }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -128,13 +98,65 @@ class EventInfoCard extends StatelessWidget {
                     const TextStyle(fontSize: 14, color: Colors.black54),
               ),
             ),
-            if (trailing != null) ...[
-              const SizedBox(width: 4),
-              trailing,
-            ],
           ],
         ),
       );
+
+  Widget _meetingPointRow(
+    BuildContext context,
+    String addressText,
+    Color linkColor,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.place, size: 20, color: Colors.orange),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(loc.event_meeting_point_title,
+                      style: const TextStyle(fontSize: 14)),
+                  const SizedBox(height: 4),
+                  InkWell(
+                    onTap: onTapLocation,
+                    borderRadius: BorderRadius.circular(4),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text(
+                        addressText,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: linkColor,
+                          decoration: TextDecoration.underline,
+                          decorationColor: linkColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            _CopyAddressButton(
+              addressText: addressText,
+              onCopied: () => _showCopySuccess(context),
+              label: loc.event_copy_address_button,
+            ),
+          ],
+        ),
+      );
+
+  void _showCopySuccess(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(loc.event_copy_address_success),
+      ),
+    );
+  }
 
   Widget _waypointsRow(List<String> waypoints, AppLocalizations loc) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -230,5 +252,41 @@ class EventInfoCard extends StatelessWidget {
   String _formatDistance(double kilometers, String localeTag) {
     final formatter = NumberFormat('#,##0.0', localeTag);
     return formatter.format(kilometers);
+  }
+}
+
+class _CopyAddressButton extends StatelessWidget {
+  final String addressText;
+  final VoidCallback onCopied;
+  final String label;
+
+  const _CopyAddressButton({
+    required this.addressText,
+    required this.onCopied,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return TextButton.icon(
+      onPressed: () async {
+        await Clipboard.setData(ClipboardData(text: addressText));
+        if (!context.mounted) {
+          return;
+        }
+        onCopied();
+      },
+      icon: const Icon(Icons.copy, size: 16),
+      label: Text(label),
+      style: TextButton.styleFrom(
+        foregroundColor: colorScheme.primary,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        minimumSize: const Size(0, 36),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
   }
 }

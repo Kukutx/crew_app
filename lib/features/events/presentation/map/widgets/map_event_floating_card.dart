@@ -117,6 +117,22 @@ class MapEventFloatingCard extends StatelessWidget {
                         const SizedBox(height: 6),
                         Row(
                           children: [
+                            const Icon(Icons.event, size: 16, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                timeLabel,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.black87),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
                             const Icon(Icons.place, size: 16, color: Colors.grey),
                             const SizedBox(width: 4),
                             Expanded(
@@ -134,63 +150,48 @@ class MapEventFloatingCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             _smallChip(context, loc.registration_open),
                             const SizedBox(width: 6),
                             const Icon(Icons.groups, size: 16, color: Colors.grey),
                             const SizedBox(width: 4),
-                            Text(
-                              participantSummary,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: Colors.black54),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(Icons.event, size: 16, color: Colors.grey),
-                            const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                timeLabel,
+                                participantSummary,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
-                                    ?.copyWith(color: Colors.black87),
+                                    ?.copyWith(color: Colors.black54),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                minimumSize: const Size(0, 0),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: onRegister,
+                              child: Text(
+                                loc.action_register_now,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.copyWith(color: Colors.white),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              minimumSize: const Size(0, 0),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: onRegister,
-                            child: Text(
-                              loc.action_register_now,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(color: Colors.white),
-                            ),
-                          ),
-                        ),
+                        const SizedBox(height: 2),
                       ],
                     ),
                   ),

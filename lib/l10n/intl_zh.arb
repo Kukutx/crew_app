@@ -207,6 +207,7 @@
   "chat_action_voice_call": "语音通话",
   "chat_action_video_call": "视频通话",
   "chat_action_phone_call": "电话",
+  "chat_action_more_options": "更多操作",
   "chat_action_open_settings": "聊天设置",
   "chat_action_unavailable": "{feature} 即将上线",
   "@chat_action_unavailable": {
@@ -219,7 +220,7 @@
   "chat_attachment_media": "图片与视频",
   "chat_attachment_live_location": "实时位置共享",
   "chat_composer_emoji_tooltip": "表情",
-  "chat_composer_attach_tooltip": "快速附件",
+  "chat_composer_attach_tooltip": "文件",
   "chat_composer_more_tooltip": "更多",
   "chat_composer_send_tooltip": "发送消息",
   "chat_settings_title": "聊天设置",

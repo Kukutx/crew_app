@@ -788,6 +788,12 @@ abstract class AppLocalizations {
   /// **'Phone call'**
   String get chat_action_phone_call;
 
+  /// No description provided for @chat_action_more_options.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get chat_action_more_options;
+
   /// No description provided for @chat_action_open_settings.
   ///
   /// In en, this message translates to:

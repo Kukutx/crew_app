@@ -385,6 +385,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_action_phone_call => 'Phone call';
 
   @override
+  String get chat_action_more_options => 'More actions';
+
+  @override
   String get chat_action_open_settings => 'Chat settings';
 
   @override
@@ -408,7 +411,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_composer_emoji_tooltip => 'Emojis';
 
   @override
-  String get chat_composer_attach_tooltip => 'Quick attachment';
+  String get chat_composer_attach_tooltip => 'Files';
 
   @override
   String get chat_composer_more_tooltip => 'More';

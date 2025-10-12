@@ -183,23 +183,45 @@ class _DirectChatPageState extends State<DirectChatPage> {
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: loc.chat_action_voice_call,
-            icon: const Icon(Icons.mic_none_outlined),
-            onPressed: () =>
-                _showFeatureComingSoon(loc.chat_action_voice_call),
-          ),
-          IconButton(
-            tooltip: loc.chat_action_video_call,
-            icon: const Icon(Icons.videocam_outlined),
-            onPressed: () =>
-                _showFeatureComingSoon(loc.chat_action_video_call),
-          ),
-          IconButton(
-            tooltip: loc.chat_action_phone_call,
-            icon: const Icon(Icons.call_outlined),
-            onPressed: () =>
-                _showFeatureComingSoon(loc.chat_action_phone_call),
+          PopupMenuButton<_ChatHeaderAction>(
+            tooltip: loc.chat_action_more_options,
+            icon: const Icon(Icons.add_circle_outline),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _ChatHeaderAction.voiceCall,
+                child: _ActionMenuRow(
+                  icon: Icons.mic_none_outlined,
+                  label: loc.chat_action_voice_call,
+                ),
+              ),
+              PopupMenuItem(
+                value: _ChatHeaderAction.phoneCall,
+                child: _ActionMenuRow(
+                  icon: Icons.call_outlined,
+                  label: loc.chat_action_phone_call,
+                ),
+              ),
+              PopupMenuItem(
+                value: _ChatHeaderAction.videoCall,
+                child: _ActionMenuRow(
+                  icon: Icons.videocam_outlined,
+                  label: loc.chat_action_video_call,
+                ),
+              ),
+            ],
+            onSelected: (action) {
+              switch (action) {
+                case _ChatHeaderAction.voiceCall:
+                  _showFeatureComingSoon(loc.chat_action_voice_call);
+                  break;
+                case _ChatHeaderAction.phoneCall:
+                  _showFeatureComingSoon(loc.chat_action_phone_call);
+                  break;
+                case _ChatHeaderAction.videoCall:
+                  _showFeatureComingSoon(loc.chat_action_video_call);
+                  break;
+              }
+            },
           ),
           IconButton(
             tooltip: loc.chat_action_open_settings,
@@ -222,10 +244,41 @@ class _DirectChatPageState extends State<DirectChatPage> {
             controller: _composerController,
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
+            onAttachTap: () =>
+                _showFeatureComingSoon(loc.chat_attachment_files),
             onMoreOptionsTap: _showAttachmentSheet,
           ),
         ],
       ),
+    );
+  }
+}
+
+enum _ChatHeaderAction { voiceCall, phoneCall, videoCall }
+
+class _ActionMenuRow extends StatelessWidget {
+  const _ActionMenuRow({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: color),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
     );
   }
 }

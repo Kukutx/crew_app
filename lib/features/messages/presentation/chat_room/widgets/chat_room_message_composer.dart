@@ -66,7 +66,10 @@ class ChatRoomMessageComposer extends StatelessWidget {
               ),
               IconButton(
                 tooltip: loc.chat_composer_attach_tooltip,
-                icon: Icon(Icons.attach_file, color: colorScheme.primary),
+                icon: Icon(
+                  Icons.insert_drive_file_outlined,
+                  color: colorScheme.primary,
+                ),
                 onPressed:
                     withFallback(onAttachTap, loc.chat_composer_attach_tooltip),
               ),

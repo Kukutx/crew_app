@@ -379,6 +379,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_action_phone_call => '电话';
 
   @override
+  String get chat_action_more_options => '更多操作';
+
+  @override
   String get chat_action_open_settings => '聊天设置';
 
   @override
@@ -402,7 +405,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_composer_emoji_tooltip => '表情';
 
   @override
-  String get chat_composer_attach_tooltip => '快速附件';
+  String get chat_composer_attach_tooltip => '文件';
 
   @override
   String get chat_composer_more_tooltip => '更多';

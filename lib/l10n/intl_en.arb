@@ -165,6 +165,7 @@
   "chat_action_voice_call": "Voice call",
   "chat_action_video_call": "Video call",
   "chat_action_phone_call": "Phone call",
+  "chat_action_more_options": "More actions",
   "chat_action_open_settings": "Chat settings",
   "chat_action_unavailable": "{feature} is coming soon.",
   "@chat_action_unavailable": {
@@ -177,7 +178,7 @@
   "chat_attachment_media": "Photos & videos",
   "chat_attachment_live_location": "Share live location",
   "chat_composer_emoji_tooltip": "Emojis",
-  "chat_composer_attach_tooltip": "Quick attachment",
+  "chat_composer_attach_tooltip": "Files",
   "chat_composer_more_tooltip": "More",
   "chat_composer_send_tooltip": "Send message",
   "chat_settings_title": "Chat settings",

@@ -7,13 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/presentation/user_profile/state/profile_guestbook_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';
-import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook.dart';
-import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook_page.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key, this.onClose});
@@ -34,7 +32,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   final List<Tab> _tabs = const [
     Tab(text: '活动'),
     Tab(text: '收藏'),
-    Tab(text: '留言簿'),
   ];
 
   @override
@@ -146,27 +143,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
-  Future<void> _openGuestbookComposer() async {
-    final result = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return ProfileGuestbookComposerSheet(
-          onSubmit: (name, content) {
-            ref
-                .read(profileGuestbookProvider.notifier)
-                .addMessage(name, content);
-          },
-        );
-      },
+  Future<void> _openGuestbookPage() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const ProfileGuestbookPage(),
+      ),
     );
-
-    if (result == true && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('留言成功！')));
-    }
   }
 
   @override
@@ -174,17 +156,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     final profile = ref.watch(userProfileProvider);
     final theme = Theme.of(context);
     final topPadding = MediaQuery.paddingOf(context).top;
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     return Scaffold(
-      floatingActionButton: _currentTabIndex == 2
-          ? AppFloatingActionButton(
-              heroTag: 'user_profile_guestbook_fab',
-              margin: EdgeInsets.only(bottom: 120 + bottomPadding, right: 6),
-              onPressed: _openGuestbookComposer,
-              child: const Icon(Icons.add),
-            )
-          : null,
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: NestedScrollView(
@@ -261,6 +234,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                         onFollowToggle: _toggleFollow,
                         onMessagePressed: () =>
                             _startPrivateMessage(context, profile),
+                        onGuestbookPressed: _openGuestbookPage,
                       ),
                     ),
                   ),

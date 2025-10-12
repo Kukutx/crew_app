@@ -10,11 +10,13 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.userProfile,
     required this.onFollowToggle,
     required this.onMessagePressed,
+    required this.onGuestbookPressed,
   });
 
   final User userProfile;
   final VoidCallback onFollowToggle;
   final VoidCallback onMessagePressed;
+  final VoidCallback onGuestbookPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -82,15 +84,37 @@ class ProfileHeaderCard extends StatelessWidget {
 
                 final actionButtons = Align(
                   alignment: Alignment.center,
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _MessageButton(onPressed: onMessagePressed),
-                      _FollowButton(
-                        followed: userProfile.followed,
-                        onPressed: onFollowToggle,
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _MessageButton(onPressed: onMessagePressed),
+                          _FollowButton(
+                            followed: userProfile.followed,
+                            onPressed: onFollowToggle,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      TextButton(
+                        onPressed: onGuestbookPressed,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          '查看留言簿',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ],
                   ),

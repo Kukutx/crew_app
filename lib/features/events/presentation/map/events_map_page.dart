@@ -260,44 +260,52 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   Widget _buildEventCardOverlay(double safeBottom) {
     final loc = AppLocalizations.of(context)!;
     final visible = _isEventCardVisible && _carouselEvents.isNotEmpty;
-    return Align(
-      alignment: Alignment.bottomCenter,
+    return Positioned.fill(
       child: IgnorePointer(
         ignoring: !visible,
-        child: AnimatedSlide(
-          duration: const Duration(milliseconds: 260),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 220),
           curve: Curves.easeInOut,
-          offset: Offset(0, visible ? 0 : 1.2),
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            opacity: visible ? 1 : 0,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + safeBottom),
-              child: SizedBox(
-                height: 158,
-                child: PageView.builder(
-                  controller: _eventCardController,
-                  physics: _carouselEvents.length > 1
-                      ? const PageScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  onPageChanged: _onEventCardPageChanged,
-                  itemCount: _carouselEvents.length,
-                  itemBuilder: (_, index) {
-                    final event = _carouselEvents[index];
-                    return MapEventFloatingCard(
-                      key: ValueKey(event.id),
-                      event: event,
-                      onTap: () => _openEventDetails(event),
-                      onClose: _hideEventCard,
-                      onRegister: () {
-                        _showSnackBar(loc.registration_not_implemented);
+          opacity: visible ? 1 : 0,
+          child: Align(
+            alignment: const Alignment(0, 0.35),
+            child: AnimatedSlide(
+              duration: const Duration(milliseconds: 260),
+              curve: Curves.easeInOut,
+              offset: Offset(0, visible ? 0 : 0.15),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, safeBottom + 32),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 360),
+                  child: SizedBox(
+                    height: 360,
+                    child: PageView.builder(
+                      controller: _eventCardController,
+                      physics: _carouselEvents.length > 1
+                          ? const PageScrollPhysics()
+                          : const NeverScrollableScrollPhysics(),
+                      onPageChanged: _onEventCardPageChanged,
+                      itemCount: _carouselEvents.length,
+                      itemBuilder: (_, index) {
+                        final event = _carouselEvents[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: MapEventFloatingCard(
+                            key: ValueKey(event.id),
+                            event: event,
+                            onTap: () => _openEventDetails(event),
+                            onClose: _hideEventCard,
+                            onRegister: () {
+                              _showSnackBar(loc.registration_not_implemented);
+                            },
+                            onFavorite: () {
+                              _showSnackBar(loc.feature_not_ready);
+                            },
+                          ),
+                        );
                       },
-                      onFavorite: () {
-                        _showSnackBar(loc.feature_not_ready);
-                      },
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -461,6 +469,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
+    _map?.hideMarkerInfoWindow(MarkerId('event_${event.id}'));
     _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
     _movedToSelected = true;
     _showEventCard(event);

@@ -16,7 +16,8 @@ class MarkersLayer {
         Marker(
           markerId: MarkerId('event_${ev.id}'),
           position: LatLng(ev.latitude, ev.longitude),
-          infoWindow: InfoWindow(title: ev.title, snippet: ev.location),
+          consumeTapEvents: true,
+          infoWindow: const InfoWindow(title: ''),
           onTap: () => onEventTap(ev),
         ),
     };

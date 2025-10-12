@@ -839,7 +839,7 @@ abstract class AppLocalizations {
   /// No description provided for @chat_composer_attach_tooltip.
   ///
   /// In en, this message translates to:
-  /// **'Quick attachment'**
+  /// **'Files'**
   String get chat_composer_attach_tooltip;
 
   /// No description provided for @chat_composer_more_tooltip.

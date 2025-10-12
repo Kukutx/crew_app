@@ -8,7 +8,6 @@ class MarkersLayer {
 
   factory MarkersLayer.fromEvents({
     required List<Event> events,
-    required LatLng? userLoc,
     required void Function(Event) onEventTap,
   }) {
     final markers = <Marker>{

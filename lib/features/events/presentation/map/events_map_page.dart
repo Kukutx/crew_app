@@ -135,7 +135,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
       data: (list) => MarkersLayer.fromEvents(
         events: list,
-        userLoc: userLoc,
         onEventTap: _focusOnEvent,
       ),
     );

@@ -482,6 +482,12 @@ abstract class AppLocalizations {
   /// **'Moments'**
   String get events_tab_moments;
 
+  /// Label for the button that opens the explore sheet on the events map.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore events'**
+  String get events_map_explore_button;
+
   /// No description provided for @events_title.
   ///
   /// In en, this message translates to:

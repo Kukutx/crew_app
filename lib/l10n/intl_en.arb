@@ -81,6 +81,10 @@
   "messages_tab_groups": "Groups",
   "events_tab_invites": "Invites",
   "events_tab_moments": "Moments",
+  "events_map_explore_button": "Explore events",
+  "@events_map_explore_button": {
+    "description": "Label for the button that opens the explore sheet on the events map."
+  },
   "events_title": "Events",
   "create_event_title": "Create Event",
   "feature_not_ready": "This feature is under development.",

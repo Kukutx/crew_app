@@ -31,6 +31,7 @@ import 'sheets/map_event_filter_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import 'sheets/map_location_info_sheet.dart';
+import 'sheets/map_events_explore_sheet.dart';
 import '../detail/events_detail_page.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
@@ -203,6 +204,28 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               markers: markersLayer.markers,
               showUserLocation: true,
               showMyLocationButton: true,
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12, right: 16),
+                child: FilledButton.icon(
+                  onPressed: _openExploreEventsSheet,
+                  icon: const Icon(Icons.explore),
+                  label: Text(loc.events_map_explore_button),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           _buildEventCardOverlay(safeBottom),
@@ -382,6 +405,23 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         ),
       );
     }
+  }
+
+  Future<void> _openExploreEventsSheet() async {
+    if (!mounted) {
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return const FractionallySizedBox(
+          heightFactor: 0.92,
+          child: MapEventsExploreSheet(),
+        );
+      },
+    );
   }
 
   Future<void> _onMapLongPress(LatLng latlng) async {

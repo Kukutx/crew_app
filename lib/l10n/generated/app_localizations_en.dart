@@ -210,6 +210,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events_tab_moments => 'Moments';
 
   @override
+  String get events_map_explore_button => 'Explore events';
+
+  @override
   String get events_title => 'Events';
 
   @override

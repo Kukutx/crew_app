@@ -207,6 +207,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get events_tab_moments => '瞬间';
 
   @override
+  String get events_map_explore_button => '探索活动';
+
+  @override
   String get events_title => '活动';
 
   @override

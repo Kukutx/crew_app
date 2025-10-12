@@ -63,7 +63,7 @@ class MapEventFloatingCard extends StatelessWidget {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                               ),
-                              errorWidget: (_, __, ___) => const ColoredBox(
+                              errorWidget: (_, _, _) => const ColoredBox(
                                 color: Colors.black12,
                                 child: Center(child: Icon(Icons.error)),
                               ),
@@ -114,7 +114,6 @@ class MapEventFloatingCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           timeLabel,
                           style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -122,7 +121,6 @@ class MapEventFloatingCard extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
-                        const SizedBox(height: 4),
                         Row(
                           children: [
                             const Icon(Icons.place, size: 16, color: Colors.grey),
@@ -140,7 +138,6 @@ class MapEventFloatingCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -183,7 +180,6 @@ class MapEventFloatingCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 2),
                       ],
                     ),
                   ),

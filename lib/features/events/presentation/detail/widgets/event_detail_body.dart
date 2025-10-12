@@ -4,6 +4,7 @@ import 'package:crew_app/features/events/presentation/detail/widgets/event_media
 import 'package:crew_app/features/events/presentation/detail/widgets/event_info_card.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_summary_card.dart';
+import 'package:crew_app/features/events/presentation/detail/widgets/event_cost_calculator_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'dart:math' as math;
 
@@ -176,6 +177,17 @@ class _EventDetailBodyState extends State<EventDetailBody>
     widget.onPageChanged(index);
   }
 
+  void _showCostCalculator() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => EventCostCalculatorSheet(
+        event: widget.event,
+        loc: widget.loc,
+      ),
+    );
+  }
+
   double get _currentHeaderHeight =>
       _baseHeaderHeight + _extraStretchHeight * _headerStretchController.value;
 
@@ -313,6 +325,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   event: widget.event,
                   loc: widget.loc,
                   onTapLocation: widget.onTapLocation,
+                  onTapCostCalculator: _showCostCalculator,
                 ),
                 const SizedBox(height: 10),
                 EventPlazaCard(loc: widget.loc),

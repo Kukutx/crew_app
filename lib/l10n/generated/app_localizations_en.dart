@@ -458,6 +458,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_composer_send_tooltip => 'Send message';
 
   @override
+  String get chat_composer_voice_tooltip => 'Voice message';
+
+  @override
+  String get chat_voice_recording_title => 'Recording voice message';
+
+  @override
+  String get chat_voice_recording_description =>
+      'Release to finish recording, then send or cancel your voice message.';
+
+  @override
+  String get chat_voice_recording_cancel => 'Cancel';
+
+  @override
+  String get chat_voice_recording_send => 'Send';
+
+  @override
+  String get chat_voice_recording_sent_confirmation => 'Voice message sent.';
+
+  @override
+  String get chat_voice_recording_cancelled => 'Recording discarded.';
+
+  @override
   String get chat_settings_title => 'Chat settings';
 
   @override

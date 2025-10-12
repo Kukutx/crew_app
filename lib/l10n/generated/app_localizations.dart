@@ -926,6 +926,48 @@ abstract class AppLocalizations {
   /// **'Send message'**
   String get chat_composer_send_tooltip;
 
+  /// No description provided for @chat_composer_voice_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice message'**
+  String get chat_composer_voice_tooltip;
+
+  /// No description provided for @chat_voice_recording_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording voice message'**
+  String get chat_voice_recording_title;
+
+  /// No description provided for @chat_voice_recording_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to finish recording, then send or cancel your voice message.'**
+  String get chat_voice_recording_description;
+
+  /// No description provided for @chat_voice_recording_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get chat_voice_recording_cancel;
+
+  /// No description provided for @chat_voice_recording_send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get chat_voice_recording_send;
+
+  /// No description provided for @chat_voice_recording_sent_confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice message sent.'**
+  String get chat_voice_recording_sent_confirmation;
+
+  /// No description provided for @chat_voice_recording_cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording discarded.'**
+  String get chat_voice_recording_cancelled;
+
   /// No description provided for @chat_settings_title.
   ///
   /// In en, this message translates to:

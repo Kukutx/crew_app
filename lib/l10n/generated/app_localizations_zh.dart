@@ -450,6 +450,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_composer_send_tooltip => '发送消息';
 
   @override
+  String get chat_composer_voice_tooltip => '语音消息';
+
+  @override
+  String get chat_voice_recording_title => '正在录制语音';
+
+  @override
+  String get chat_voice_recording_description => '松开即可结束录音，可选择发送或取消语音。';
+
+  @override
+  String get chat_voice_recording_cancel => '取消';
+
+  @override
+  String get chat_voice_recording_send => '发送';
+
+  @override
+  String get chat_voice_recording_sent_confirmation => '语音消息已发送。';
+
+  @override
+  String get chat_voice_recording_cancelled => '已取消录音。';
+
+  @override
   String get chat_settings_title => '聊天设置';
 
   @override

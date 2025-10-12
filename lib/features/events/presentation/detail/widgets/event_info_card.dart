@@ -30,6 +30,7 @@ class EventInfoCard extends StatelessWidget {
             _formatDistance(distanceKm, localeTag),
           )
         : null;
+    final linkColor = Theme.of(context).colorScheme.primary;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
@@ -55,6 +56,12 @@ class EventInfoCard extends StatelessWidget {
                 Icons.place,
                 loc.event_meeting_point_title,
                 event.address?.isNotEmpty == true ? event.address! : event.location,
+                valueStyle: TextStyle(
+                  fontSize: 14,
+                  color: linkColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: linkColor,
+                ),
               ),
             ),
             if (waypoints.isNotEmpty) _waypointsRow(waypoints, loc),
@@ -78,7 +85,13 @@ class EventInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _detailRow(IconData icon, String title, String value) => Padding(
+  Widget _detailRow(
+    IconData icon,
+    String title,
+    String value, {
+    TextStyle? valueStyle,
+  }) =>
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           children: [
@@ -91,7 +104,8 @@ class EventInfoCard extends StatelessWidget {
                 value,
                 textAlign: TextAlign.right,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
+                style: valueStyle ??
+                    const TextStyle(fontSize: 14, color: Colors.black54),
               ),
             ),
           ],

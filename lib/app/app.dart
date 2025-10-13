@@ -153,7 +153,8 @@ class _AppState extends ConsumerState<App> {
 
     final isOverlayOpen = _index != 1;
 
-    final showBottomNav = ref.watch(bottomNavigationVisibilityProvider);
+     final showBottomNav =
+        _index == 1 && ref.watch(bottomNavigationVisibilityProvider);
 
     return Scaffold(
       extendBody: true,

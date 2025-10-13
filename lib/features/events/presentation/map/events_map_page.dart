@@ -93,6 +93,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _focusOnEvent(event);
       ref.read(mapFocusEventProvider.notifier).state = null;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _updateBottomNavigation(true);
+    });
   }
 
   @override
@@ -103,10 +109,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchController.dispose();
     _mapFocusSubscription?.close();
     _eventCardController.dispose();
-    final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
-    if (!controller.state) {
-      controller.state = true;
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
+      if (controller.state) {
+        controller.state = false;
+      }
+    });
     _map?.dispose();
     super.dispose();
   }
@@ -133,10 +141,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
-      data: (list) => MarkersLayer.fromEvents(
-        events: list,
-        onEventTap: _focusOnEvent,
-      ),
+      data: (list) =>
+          MarkersLayer.fromEvents(events: list, onEventTap: _focusOnEvent),
     );
 
     // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
@@ -223,28 +229,22 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(loc.feature_not_ready)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
               },
               child: const Icon(Icons.add),
             ),
           ),
           AppFloatingActionButton(
             heroTag: 'events_map_my_location_fab',
-            margin: EdgeInsets.only(
-              top: 12,
-              bottom: bottomPadding,
-              right: 6,
-            ),
+            margin: EdgeInsets.only(top: 12, bottom: bottomPadding, right: 6),
             onPressed: () async {
               final loc = ref.read(userLocationProvider).value;
               if (loc != null) {
                 await _moveCamera(loc, zoom: 14);
               } else {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Unable to get location")),
                 );
               }
@@ -524,7 +524,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
 
-    await ref.read(eventsProvider.notifier).createEvent(
+    await ref
+        .read(eventsProvider.notifier)
+        .createEvent(
           title: data.title.trim(),
           description: data.description.trim(),
           pos: latlng,
@@ -579,9 +581,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _onCreateRoadTripTap() {

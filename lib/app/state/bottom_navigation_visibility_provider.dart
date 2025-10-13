@@ -1,3 +1,3 @@
 import 'package:flutter_riverpod/legacy.dart';
 
-final bottomNavigationVisibilityProvider = StateProvider<bool>((ref) => true);
+final bottomNavigationVisibilityProvider = StateProvider<bool>((ref) => false);

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/chat_room_settings_page.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_attachment_sheet.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_message_search_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_header_actions.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_app_bar.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
@@ -53,6 +56,9 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
   late final List<ChatMessage> _messages;
+  final Map<String, GlobalKey> _messageKeys = <String, GlobalKey>{};
+  String? _highlightedMessageId;
+  Timer? _highlightTimer;
 
   bool get _isGroup => widget.type == ChatConversationType.group;
 
@@ -62,11 +68,13 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     _composerController = TextEditingController();
     _scrollController = ScrollController();
     _messages = List<ChatMessage>.of(widget.initialMessages);
+    _ensureMessageKeys();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
   @override
   void dispose() {
+    _highlightTimer?.cancel();
     _composerController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -81,15 +89,16 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
 
     final prefix = _isGroup ? 'group-temp' : 'direct-temp';
 
+    final newMessage = ChatMessage(
+      id: '$prefix-${DateTime.now().millisecondsSinceEpoch}',
+      sender: widget.currentUser,
+      body: raw,
+      sentAtLabel: timeLabel,
+    );
+
     setState(() {
-      _messages.add(
-        ChatMessage(
-          id: '$prefix-${DateTime.now().millisecondsSinceEpoch}',
-          sender: widget.currentUser,
-          body: raw,
-          sentAtLabel: timeLabel,
-        ),
-      );
+      _messages.add(newMessage);
+      _messageKeys[newMessage.id] = GlobalKey();
     });
     _composerController.clear();
     _scrollToBottom();
@@ -103,6 +112,71 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
+  }
+
+  void _ensureMessageKeys() {
+    for (final message in _messages) {
+      _messageKeys.putIfAbsent(message.id, () => GlobalKey());
+    }
+  }
+
+  Future<void> _scrollToMessage(String messageId) async {
+    if (!_scrollController.hasClients) return;
+
+    final key = _messageKeys[messageId];
+    final index = _messages.indexWhere((message) => message.id == messageId);
+    if (index == -1) return;
+
+    if (key?.currentContext == null) {
+      final targetOffset = _estimateScrollOffsetForIndex(index);
+      try {
+        await _scrollController.animateTo(
+          targetOffset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } catch (_) {
+        // Ignore scroll errors when the controller is no longer attached.
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 16));
+    }
+
+    final context = key?.currentContext;
+    if (context != null) {
+      await Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 300),
+        alignment: 0.1,
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  double _estimateScrollOffsetForIndex(int index) {
+    if (!_scrollController.hasClients) {
+      return 0;
+    }
+
+    final position = _scrollController.position;
+    final maxExtent = position.maxScrollExtent;
+    if (maxExtent <= 0 || _messages.length <= 1) {
+      return maxExtent;
+    }
+
+    final averageExtent = maxExtent / (_messages.length - 1);
+    final estimatedOffset = averageExtent * index;
+    return estimatedOffset.clamp(0, maxExtent).toDouble();
+  }
+
+  void _highlightMessage(String messageId) {
+    _highlightTimer?.cancel();
+    setState(() => _highlightedMessageId = messageId);
+    _highlightTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      if (_highlightedMessageId == messageId) {
+        setState(() => _highlightedMessageId = null);
+      }
+    });
   }
 
   void _showFeatureComingSoon(String featureName) {
@@ -147,6 +221,28 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
+  Future<void> _showSearchSheet() async {
+    final selectedMessage = await showModalBottomSheet<ChatMessage>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: false,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (sheetContext) {
+        return ChatMessageSearchSheet(
+          messages: List<ChatMessage>.of(_messages.reversed),
+          onMessageSelected: (message) {
+            Navigator.of(sheetContext).pop(message);
+          },
+        );
+      },
+    );
+
+    if (selectedMessage == null) return;
+
+    _highlightMessage(selectedMessage.id);
+    await _scrollToMessage(selectedMessage.id);
+  }
+
   PreferredSizeWidget _buildAppBar(
     AppLocalizations loc,
     ColorScheme colorScheme,
@@ -157,7 +253,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         channelTitle: widget.title,
         participants: participants,
         onOpenSettings: () => _openSettings(participants),
-        onSearchTap: () => _showFeatureComingSoon(loc.chat_search_hint),
+        onSearchTap: _showSearchSheet,
         onVideoCallTap: () =>
             _showFeatureComingSoon(loc.chat_action_video_call),
       );
@@ -230,6 +326,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       ),
       actions: [
         ChatHeaderActions(
+          onSearchTap: _showSearchSheet,
           onPhoneCallTap: () =>
               _showFeatureComingSoon(loc.chat_action_phone_call),
           onVideoCallTap: () =>
@@ -257,6 +354,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
               scrollController: _scrollController,
               youLabel: loc.chat_you_label,
               repliesLabelBuilder: loc.chat_reply_count,
+              messageKeys: _messageKeys,
+              highlightedMessageId: _highlightedMessageId,
             ),
           ),
           ChatRoomMessageComposer(

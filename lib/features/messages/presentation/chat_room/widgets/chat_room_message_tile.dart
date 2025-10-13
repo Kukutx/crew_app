@@ -8,12 +8,14 @@ class ChatRoomMessageTile extends StatelessWidget {
     required this.showAvatar,
     required this.youLabel,
     required this.repliesLabelBuilder,
+    this.isHighlighted = false,
   });
 
   final ChatMessage message;
   final bool showAvatar;
   final String youLabel;
   final String Function(int) repliesLabelBuilder;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,9 @@ class ChatRoomMessageTile extends StatelessWidget {
             message.sender.displayName.characters.take(2).toString())
         .toUpperCase();
 
+    final highlightColor =
+        isHighlighted ? colorScheme.primary.withValues(alpha: .08) : Colors.transparent;
+
     return Padding(
       padding: EdgeInsetsDirectional.only(
         start: isMine ? 80 : 16,
@@ -37,10 +42,17 @@ class ChatRoomMessageTile extends StatelessWidget {
         top: 6,
         bottom: 6,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          color: highlightColor,
+          borderRadius: BorderRadius.circular(28),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
           if (!isMine)
             AnimatedOpacity(
               duration: const Duration(milliseconds: 200),

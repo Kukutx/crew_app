@@ -439,6 +439,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_search_hint => 'Search chats';
 
   @override
+  String get chat_search_title => 'Search messages';
+
+  @override
+  String get chat_search_no_results => 'No messages match your search.';
+
+  @override
   String get chat_status_online => 'Online now';
 
   @override

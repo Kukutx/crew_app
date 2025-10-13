@@ -430,6 +430,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_search_hint => '搜索聊天';
 
   @override
+  String get chat_search_title => '搜索消息';
+
+  @override
+  String get chat_search_no_results => '没有符合搜索条件的消息。';
+
+  @override
   String get chat_status_online => '在线';
 
   @override

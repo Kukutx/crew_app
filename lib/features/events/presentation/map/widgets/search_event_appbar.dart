@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'avatar_icon.dart';
 
+const double _resultItemHeight = 72.0;
+
 class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchEventAppBar({
     super.key,
@@ -44,7 +46,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (isLoading) return 72 + padding;
     if (errorText != null || results.isEmpty) return 64 + padding;
 
-    const itemHeight = 60.0;
+    const itemHeight = _resultItemHeight;
     const maxVisible = 4;
     final visibleCount =
         results.length > maxVisible ? maxVisible : results.length;
@@ -180,18 +182,21 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       itemCount: results.length,
-      separatorBuilder: (_, _) => const Divider(height: 1, thickness: 1),
+      separatorBuilder: (_, __) => const Divider(height: 1, thickness: 1),
       itemBuilder: (context, index) {
         final event = results[index];
-        return ListTile(
-          onTap: () => onResultTap(event),
-          title: Text(event.title),
-          subtitle: Text(
-            event.description,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+        return SizedBox(
+          height: _resultItemHeight,
+          child: ListTile(
+            onTap: () => onResultTap(event),
+            title: Text(event.title),
+            subtitle: Text(
+              event.description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            leading: const Icon(Icons.location_on_outlined),
           ),
-          leading: const Icon(Icons.location_on_outlined),
         );
       },
     );

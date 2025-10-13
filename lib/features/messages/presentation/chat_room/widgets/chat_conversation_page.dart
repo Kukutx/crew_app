@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 enum ChatConversationType { group, direct }
 
 class ChatConversationPage extends StatefulWidget {
-  const ChatConversationPage.group({
+  ChatConversationPage.group({
     super.key,
     required String channelTitle,
     required this.currentUser,
@@ -25,14 +25,14 @@ class ChatConversationPage extends StatefulWidget {
         preview = null,
         partner = null;
 
-  const ChatConversationPage.direct({
+  ChatConversationPage.direct({
     super.key,
     required this.preview,
     required this.partner,
     required this.currentUser,
     required this.initialMessages,
   })  : type = ChatConversationType.direct,
-        title = preview.displayName,
+        title = preview?.displayName ?? '',
         participants = List<ChatParticipant>.unmodifiable(
           [partner, currentUser],
         );

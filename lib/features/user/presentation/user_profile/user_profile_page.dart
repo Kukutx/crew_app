@@ -15,6 +15,14 @@ import 'package:crew_app/features/user/presentation/user_profile/widgets/profile
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook_page.dart';
 
+import 'dart:typed_data';
+
+typedef ReportSubmission = ({
+  String type,
+  String description,
+  String? imageName,
+});
+
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key, this.onClose});
 
@@ -28,19 +36,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     with TickerProviderStateMixin {
   static const double _expandedHeight = 320;
   static const double _tabBarHeight = 48;
-  static const List<String> _reportTypes = [
-    '垃圾信息',
-    '辱骂/仇恨',
-    '违规内容',
-    '其他',
-  ];
+  static const List<String> _reportTypes = ['垃圾信息', '辱骂/仇恨', '违规内容', '其他'];
 
   late final TabController _tabController;
   late int _currentTabIndex;
-  final List<Tab> _tabs = const [
-    Tab(text: '活动'),
-    Tab(text: '收藏'),
-  ];
+  final List<Tab> _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
 
   @override
   void initState() {
@@ -58,8 +58,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   }
 
   Future<void> _onRefresh() async {
-    ref.invalidate(eventsProvider); 
-    await ref.read(eventsProvider.future); 
+    ref.invalidate(eventsProvider);
+    await ref.read(eventsProvider.future);
   }
 
   void _toggleFollow() {
@@ -174,21 +174,14 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     Uint8List? selectedImageBytes;
     String? selectedImageName;
 
-    final submission = await showDialog<({
-      String type;
-      String description;
-      String? imageName;
-    })>(
+    final ReportSubmission? submission = await showDialog<ReportSubmission>(
       context: context,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (dialogContext, setState) {
             Future<void> handlePickImage() async {
               final file = await picker.pickImage(source: ImageSource.gallery);
-              if (file == null) {
-                return;
-              }
-
+              if (file == null) return;
               final bytes = await file.readAsBytes();
               setState(() {
                 selectedImageBytes = bytes;
@@ -215,9 +208,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                           .toList(),
                       onChanged: (value) {
                         if (value == null) return;
-                        setState(() {
-                          selectedType = value;
-                        });
+                        setState(() => selectedType = value);
                       },
                       decoration: const InputDecoration(
                         labelText: '举报类型',
@@ -236,10 +227,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      '上传证据图片（可选）',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    Text('上传证据图片（可选）'),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -301,9 +289,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     if (submission != null) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            '已收到对 ${profile.name} 的举报：${submission.type}（示例）',
-          ),
+          content: Text('已收到对 ${profile.name} 的举报：${submission.type}（示例）'),
         ),
       );
     }
@@ -327,9 +313,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
   Future<void> _openGuestbookPage() async {
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const ProfileGuestbookPage(),
-      ),
+      MaterialPageRoute<void>(builder: (_) => const ProfileGuestbookPage()),
     );
   }
 
@@ -374,7 +358,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           icon: const Icon(Icons.more_vert),
           onPressed: () => _showMoreActions(context, profile),
         ),
-                IconButton(
+        IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => Navigator.of(context).pushNamed('/settings'),
         ),

@@ -1589,7 +1589,7 @@ abstract class AppLocalizations {
   /// No description provided for @report_event_submit_success.
   ///
   /// In en, this message translates to:
-  /// **'Thank you! We'll review this event shortly.'**
+  /// **'Thank you! We\'ll review this event shortly.'**
   String get report_event_submit_success;
 
   /// No description provided for @feedback_thanks.

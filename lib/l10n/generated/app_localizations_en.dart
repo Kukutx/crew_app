@@ -535,6 +535,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Browse images and videos from this chat';
 
   @override
+  String get chat_settings_report_content => 'Report content';
+
+  @override
+  String get chat_settings_report_content_subtitle =>
+      'Let us know if something in this chat breaks the rules.';
+
+  @override
+  String get chat_settings_report_add_photo => 'Add supporting photo';
+
+  @override
+  String get chat_settings_report_add_photo_subtitle =>
+      'Attach a screenshot to help our review team.';
+
+  @override
   String get chat_shared_media_filter_all => 'All';
 
   @override

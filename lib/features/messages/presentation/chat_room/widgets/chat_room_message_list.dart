@@ -9,12 +9,16 @@ class ChatRoomMessageList extends StatelessWidget {
     required this.scrollController,
     required this.youLabel,
     required this.repliesLabelBuilder,
+    this.messageKeys,
+    this.highlightedMessageId,
   });
 
   final List<ChatMessage> messages;
   final ScrollController scrollController;
   final String youLabel;
   final String Function(int) repliesLabelBuilder;
+  final Map<String, GlobalKey>? messageKeys;
+  final String? highlightedMessageId;
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +41,15 @@ class ChatRoomMessageList extends StatelessWidget {
           final bool showAvatar = index == 0
               ? true
               : !messages[index - 1].isFromSameSender(messages[index]);
+          final key = messageKeys?[message.id];
 
           return ChatRoomMessageTile(
+            key: key ?? ValueKey('chat-message-${message.id}'),
             message: message,
             showAvatar: showAvatar,
             youLabel: youLabel,
             repliesLabelBuilder: repliesLabelBuilder,
+            isHighlighted: highlightedMessageId == message.id,
           );
         },
       ),

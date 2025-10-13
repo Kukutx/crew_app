@@ -224,6 +224,8 @@
     }
   },
   "chat_search_hint": "搜索聊天",
+  "chat_search_title": "搜索消息",
+  "chat_search_no_results": "没有符合搜索条件的消息。",
   "chat_status_online": "在线",
   "chat_last_seen": "最近活跃 {time}",
   "@chat_last_seen": {

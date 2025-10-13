@@ -764,7 +764,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_saved_toast => 'Settings updated';
 
   @override
-  String get report_issue => 'Report this event';
+  String get report_issue => 'Report';
 
   @override
   String get report_issue_description =>
@@ -811,6 +811,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get report_event_attachment_replace => 'Replace photo';
+
+  @override
+  String get report_event_attachment_empty => 'No file selected';
 
   @override
   String get report_event_attachment_error =>

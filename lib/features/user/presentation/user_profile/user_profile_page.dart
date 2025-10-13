@@ -1,10 +1,10 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
@@ -14,14 +14,7 @@ import 'package:crew_app/features/user/presentation/user_profile/widgets/collaps
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook_page.dart';
-
-import 'dart:typed_data';
-
-typedef ReportSubmission = ({
-  String type,
-  String description,
-  String? imageName,
-});
+import 'package:crew_app/shared/widgets/report_sheet.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key, this.onClose});
@@ -36,7 +29,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     with TickerProviderStateMixin {
   static const double _expandedHeight = 320;
   static const double _tabBarHeight = 48;
-  static const List<String> _reportTypes = ['垃圾信息', '辱骂/仇恨', '违规内容', '其他'];
+  List<String> _reportTypes(AppLocalizations localization) => [
+        localization.report_event_type_misinformation,
+        localization.report_event_type_illegal,
+        localization.report_event_type_fraud,
+        localization.report_event_type_other,
+      ];
 
   late final TabController _tabController;
   late int _currentTabIndex;
@@ -88,6 +86,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   void _showMoreActions(BuildContext context, User profile) {
     final messenger = ScaffoldMessenger.of(context);
     final link = 'https://crew.app/users/${profile.uid}';
+    final localization = AppLocalizations.of(context)!;
 
     showModalBottomSheet<void>(
       context: context,
@@ -107,10 +106,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               ),
               ListTile(
                 leading: const Icon(Icons.flag),
-                title: const Text('举报'),
+                title: Text(localization.report_issue),
                 onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  await _showReportDialog(context, profile, messenger);
+                  await _showReportSheet(context, profile, messenger);
                 },
               ),
               ListTile(
@@ -163,128 +162,30 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     }
   }
 
-  Future<void> _showReportDialog(
+  Future<void> _showReportSheet(
     BuildContext context,
     User profile,
     ScaffoldMessengerState messenger,
   ) async {
-    final descriptionController = TextEditingController();
-    final picker = ImagePicker();
-    String selectedType = _reportTypes.first;
-    Uint8List? selectedImageBytes;
-    String? selectedImageName;
-
-    final ReportSubmission? submission = await showDialog<ReportSubmission>(
+    final localization = AppLocalizations.of(context)!;
+    final ReportSheetSubmission? submission = await ReportSheet.show(
       context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (dialogContext, setState) {
-            Future<void> handlePickImage() async {
-              final file = await picker.pickImage(source: ImageSource.gallery);
-              if (file == null) return;
-              final bytes = await file.readAsBytes();
-              setState(() {
-                selectedImageBytes = bytes;
-                selectedImageName = file.name;
-              });
-            }
-
-            return AlertDialog(
-              title: const Text('举报'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      value: selectedType,
-                      items: _reportTypes
-                          .map(
-                            (type) => DropdownMenuItem<String>(
-                              value: type,
-                              child: Text(type),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() => selectedType = value);
-                      },
-                      decoration: const InputDecoration(
-                        labelText: '举报类型',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: descriptionController,
-                      maxLines: 4,
-                      onChanged: (_) => setState(() {}),
-                      decoration: const InputDecoration(
-                        labelText: '补充说明',
-                        hintText: '请输入举报原因或补充说明',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text('上传证据图片（可选）'),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: handlePickImage,
-                          icon: const Icon(Icons.photo_library_outlined),
-                          label: const Text('选择图片'),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            selectedImageName ?? '未选择文件',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (selectedImageBytes != null) ...[
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.memory(
-                          selectedImageBytes!,
-                          height: 140,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('取消'),
-                ),
-                FilledButton(
-                  onPressed: descriptionController.text.trim().isEmpty
-                      ? null
-                      : () {
-                          Navigator.of(dialogContext).pop((
-                            type: selectedType,
-                            description: descriptionController.text.trim(),
-                            imageName: selectedImageName,
-                          ));
-                        },
-                  child: const Text('提交'),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      title: localization.report_issue,
+      description: localization.report_issue_description,
+      typeLabel: localization.report_event_type_label,
+      typeEmptyHint: localization.report_event_type_required,
+      contentLabel: localization.report_event_content_label,
+      contentHint: localization.report_event_content_hint,
+      attachmentLabel: localization.report_event_attachment_label,
+      attachmentOptional: localization.report_event_attachment_optional,
+      attachmentAddLabel: localization.report_event_attachment_add,
+      attachmentReplaceLabel: localization.report_event_attachment_replace,
+      attachmentEmptyLabel: localization.report_event_attachment_empty,
+      submitLabel: localization.report_event_submit,
+      cancelLabel: localization.action_cancel,
+      reportTypes: _reportTypes(localization),
+      imagePicker: ImagePicker(),
     );
-
-    descriptionController.dispose();
 
     if (submission != null) {
       messenger.showSnackBar(

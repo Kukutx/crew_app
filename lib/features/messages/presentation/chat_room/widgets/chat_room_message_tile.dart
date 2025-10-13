@@ -203,6 +203,7 @@ class ChatRoomMessageTile extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }

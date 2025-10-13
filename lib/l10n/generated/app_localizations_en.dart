@@ -525,14 +525,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_settings_leave_group => 'Leave group';
 
   @override
-  String get chat_settings_leave_group_confirmation_title => 'Leave this group?';
+  String get chat_settings_remove_friend => 'Remove contact';
+
+  @override
+  String get chat_settings_leave_group_confirmation_title =>
+      'Leave this group?';
 
   @override
   String get chat_settings_leave_group_confirmation_message =>
       'You will no longer receive messages from this group.';
-
-  @override
-  String get chat_settings_remove_friend => 'Remove contact';
 
   @override
   String get chat_settings_remove_friend_confirmation_title =>

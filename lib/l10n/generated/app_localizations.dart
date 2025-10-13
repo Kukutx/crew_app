@@ -1052,6 +1052,12 @@ abstract class AppLocalizations {
   /// **'Leave group'**
   String get chat_settings_leave_group;
 
+  /// No description provided for @chat_settings_remove_friend.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove contact'**
+  String get chat_settings_remove_friend;
+
   /// No description provided for @chat_settings_leave_group_confirmation_title.
   ///
   /// In en, this message translates to:
@@ -1063,12 +1069,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You will no longer receive messages from this group.'**
   String get chat_settings_leave_group_confirmation_message;
-
-  /// No description provided for @chat_settings_remove_friend.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove contact'**
-  String get chat_settings_remove_friend;
 
   /// No description provided for @chat_settings_remove_friend_confirmation_title.
   ///

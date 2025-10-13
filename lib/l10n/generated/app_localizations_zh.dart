@@ -213,6 +213,29 @@ class AppLocalizationsZh extends AppLocalizations {
   String get events_tab_moments => '瞬间';
 
   @override
+  String get create_moment_title => '发布瞬间';
+
+  @override
+  String get create_moment_subtitle => '记录此刻的灵感，和身边的小伙伴一起探索城市。';
+
+  @override
+  String get create_moment_description_label => '想分享点什么？';
+
+  @override
+  String get create_moment_add_photo => '添加照片';
+
+  @override
+  String get create_moment_add_location => '添加地点';
+
+  @override
+  String get create_moment_submit_button => '发布';
+
+  @override
+  String createMomentPreviewMessage(String featureName) {
+    return '$featureName 功能即将上线';
+  }
+
+  @override
   String get events_title => '活动';
 
   @override

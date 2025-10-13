@@ -13,6 +13,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/features/events/presentation/shared/create_moment_sheet.dart';
 
 import '../../data/event.dart';
 import '../../data/event_filter.dart';
@@ -228,11 +229,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              onPressed: () {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
-              },
+              onPressed: () => showCreateMomentSheet(context),
               child: const Icon(Icons.add),
             ),
           ),

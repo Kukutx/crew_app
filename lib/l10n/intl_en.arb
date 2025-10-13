@@ -83,6 +83,18 @@
   "messages_tab_groups": "Groups",
   "events_tab_invites": "Invites",
   "events_tab_moments": "Moments",
+  "create_moment_title": "Share a moment",
+  "create_moment_subtitle": "Capture what you're experiencing right now and inspire others nearby.",
+  "create_moment_description_label": "What's happening?",
+  "create_moment_add_photo": "Add photo",
+  "create_moment_add_location": "Add location",
+  "create_moment_submit_button": "Post",
+  "create_moment_preview_message": "{featureName} is coming soon",
+  "@create_moment_preview_message": {
+    "placeholders": {
+      "featureName": {}
+    }
+  },
   "events_title": "Events",
   "create_event_title": "Create Event",
   "feature_not_ready": "This feature is under development.",

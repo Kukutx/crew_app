@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 
-import 'plaza_post_comments_sheet.dart';
+import 'sheets/plaza_post_comments_sheet.dart';
 
 class PlazaPostDetailPage extends StatefulWidget {
   const PlazaPostDetailPage({

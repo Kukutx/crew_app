@@ -185,7 +185,7 @@ class _DirectChatPageState extends State<DirectChatPage> {
         actions: [
           PopupMenuButton<_ChatHeaderAction>(
             tooltip: loc.chat_action_more_options,
-            icon: const Icon(Icons.add_circle_outline),
+            icon: const Icon(Icons.graphic_eq),
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: _ChatHeaderAction.phoneCall,

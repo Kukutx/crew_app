@@ -1,5 +1,5 @@
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/plaza/plaza_post_comments_sheet.dart';
+import 'package:crew_app/features/events/presentation/plaza/sheets/plaza_post_comments_sheet.dart';
 import 'package:crew_app/features/events/presentation/plaza/plaza_post_detail_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';

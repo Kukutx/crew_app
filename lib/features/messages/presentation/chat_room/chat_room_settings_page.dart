@@ -1,4 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/chat_shared_media_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -104,11 +105,43 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                 ),
                 const Divider(height: 0),
                 ListTile(
-                  leading: const Icon(Icons.folder_shared_outlined),
+                  leading: const Icon(Icons.photo_library_outlined),
                   title: Text(loc.chat_settings_shared_files),
                   subtitle: Text(loc.chat_settings_shared_files_subtitle),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ChatSharedMediaPage(
+                          chatTitle: widget.title,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.flag_outlined),
+                  title: Text(loc.chat_settings_report_content),
+                  subtitle: Text(loc.chat_settings_report_content_subtitle),
                   onTap: () =>
-                      _showFeatureComingSoon(loc.chat_settings_shared_files),
+                      _showFeatureComingSoon(loc.chat_settings_report_content),
+                ),
+                const Divider(height: 0),
+                ListTile(
+                  leading: const Icon(Icons.add_photo_alternate_outlined),
+                  title: Text(loc.chat_settings_report_add_photo),
+                  subtitle: Text(loc.chat_settings_report_add_photo_subtitle),
+                  onTap: () => _showFeatureComingSoon(
+                    loc.chat_settings_report_add_photo,
+                  ),
                 ),
               ],
             ),

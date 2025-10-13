@@ -220,8 +220,23 @@
   "chat_settings_remove_friend": "Remove contact",
   "chat_settings_notifications": "Notifications",
   "chat_settings_notifications_subtitle": "Mute or enable alerts",
-  "chat_settings_shared_files": "Shared files",
-  "chat_settings_shared_files_subtitle": "Browse documents, media and links",
+  "chat_settings_shared_files": "Shared photos & videos",
+  "chat_settings_shared_files_subtitle": "Browse images and videos from this chat",
+  "chat_settings_report_content": "Report content",
+  "chat_settings_report_content_subtitle": "Let us know if something in this chat breaks the rules.",
+  "chat_settings_report_add_photo": "Add supporting photo",
+  "chat_settings_report_add_photo_subtitle": "Attach a screenshot to help our review team.",
+  "chat_shared_media_filter_all": "All",
+  "chat_shared_media_filter_photos": "Photos",
+  "chat_shared_media_filter_videos": "Videos",
+  "chat_shared_media_empty": "No photos or videos have been shared yet.",
+  "chat_shared_media_caption": "{sender} · {time}",
+  "@chat_shared_media_caption": {
+    "placeholders": {
+      "sender": {},
+      "time": {}
+    }
+  },
   "chat_settings_members_section": "Members",
   "chat_settings_contact_section": "Contact info",
   "chat_settings_contact_id": "ID: {id}",

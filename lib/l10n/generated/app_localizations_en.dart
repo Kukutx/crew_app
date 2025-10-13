@@ -528,11 +528,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_settings_notifications_subtitle => 'Mute or enable alerts';
 
   @override
-  String get chat_settings_shared_files => 'Shared files';
+  String get chat_settings_shared_files => 'Shared photos & videos';
 
   @override
   String get chat_settings_shared_files_subtitle =>
-      'Browse documents, media and links';
+      'Browse images and videos from this chat';
+
+  @override
+  String get chat_settings_report_content => 'Report content';
+
+  @override
+  String get chat_settings_report_content_subtitle =>
+      'Let us know if something in this chat breaks the rules.';
+
+  @override
+  String get chat_settings_report_add_photo => 'Add supporting photo';
+
+  @override
+  String get chat_settings_report_add_photo_subtitle =>
+      'Attach a screenshot to help our review team.';
+
+  @override
+  String get chat_shared_media_filter_all => 'All';
+
+  @override
+  String get chat_shared_media_filter_photos => 'Photos';
+
+  @override
+  String get chat_shared_media_filter_videos => 'Videos';
+
+  @override
+  String get chat_shared_media_empty =>
+      'No photos or videos have been shared yet.';
+
+  @override
+  String chat_shared_media_caption(Object sender, Object time) {
+    return '$sender · $time';
+  }
 
   @override
   String get chat_settings_members_section => 'Members';

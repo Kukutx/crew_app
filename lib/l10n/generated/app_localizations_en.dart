@@ -794,6 +794,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get report_event_content_required => 'Please describe the issue.';
 
   @override
+  String get report_event_attachment_label => 'Photo evidence';
+
+  @override
+  String get report_event_attachment_optional =>
+      'Optional but helps us review faster.';
+
+  @override
+  String get report_event_attachment_add => 'Add photo';
+
+  @override
+  String get report_event_attachment_replace => 'Replace photo';
+
+  @override
+  String get report_event_attachment_error =>
+      'We couldn\'t load that photo. Please try again.';
+
+  @override
   String get report_event_submit => 'Submit report';
 
   @override

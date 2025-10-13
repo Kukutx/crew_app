@@ -1061,44 +1061,14 @@ abstract class AppLocalizations {
   /// No description provided for @chat_settings_shared_files.
   ///
   /// In en, this message translates to:
-  /// **'Shared photos & videos'**
+  /// **'Shared files'**
   String get chat_settings_shared_files;
 
   /// No description provided for @chat_settings_shared_files_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Browse images and videos from this chat'**
+  /// **'Browse documents, media and links'**
   String get chat_settings_shared_files_subtitle;
-
-  /// No description provided for @chat_shared_media_filter_all.
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get chat_shared_media_filter_all;
-
-  /// No description provided for @chat_shared_media_filter_photos.
-  ///
-  /// In en, this message translates to:
-  /// **'Photos'**
-  String get chat_shared_media_filter_photos;
-
-  /// No description provided for @chat_shared_media_filter_videos.
-  ///
-  /// In en, this message translates to:
-  /// **'Videos'**
-  String get chat_shared_media_filter_videos;
-
-  /// No description provided for @chat_shared_media_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No photos or videos have been shared yet.'**
-  String get chat_shared_media_empty;
-
-  /// No description provided for @chat_shared_media_caption.
-  ///
-  /// In en, this message translates to:
-  /// **'{sender} · {time}'**
-  String chat_shared_media_caption(Object sender, Object time);
 
   /// No description provided for @chat_settings_members_section.
   ///
@@ -1556,6 +1526,36 @@ abstract class AppLocalizations {
   /// **'Please describe the issue.'**
   String get report_event_content_required;
 
+  /// No description provided for @report_event_attachment_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo evidence'**
+  String get report_event_attachment_label;
+
+  /// No description provided for @report_event_attachment_optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional but helps us review faster.'**
+  String get report_event_attachment_optional;
+
+  /// No description provided for @report_event_attachment_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get report_event_attachment_add;
+
+  /// No description provided for @report_event_attachment_replace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace photo'**
+  String get report_event_attachment_replace;
+
+  /// No description provided for @report_event_attachment_error.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn't load that photo. Please try again.'**
+  String get report_event_attachment_error;
+
   /// No description provided for @report_event_submit.
   ///
   /// In en, this message translates to:
@@ -1565,7 +1565,7 @@ abstract class AppLocalizations {
   /// No description provided for @report_event_submit_success.
   ///
   /// In en, this message translates to:
-  /// **'Thank you! We\'ll review this event shortly.'**
+  /// **'Thank you! We'll review this event shortly.'**
   String get report_event_submit_success;
 
   /// No description provided for @feedback_thanks.

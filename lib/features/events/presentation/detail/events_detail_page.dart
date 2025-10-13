@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EventDetailPage extends ConsumerStatefulWidget {
   final Event event;
@@ -214,6 +216,10 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     final detailsController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     String? selectedReason;
+    Uint8List? attachmentPreview;
+    String? attachmentName;
+    bool isPickingAttachment = false;
+    final imagePicker = ImagePicker();
 
     await showModalBottomSheet<void>(
       context: context,
@@ -225,6 +231,45 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         final textTheme = Theme.of(sheetContext).textTheme;
         return StatefulBuilder(
           builder: (context, setModalState) {
+            Future<void> pickAttachment() async {
+              if (isPickingAttachment) return;
+              setModalState(() {
+                isPickingAttachment = true;
+              });
+              try {
+                final picked = await imagePicker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 85,
+                );
+                if (picked == null) {
+                  return;
+                }
+                final bytes = await picked.readAsBytes();
+                if (!sheetContext.mounted) {
+                  return;
+                }
+                setModalState(() {
+                  attachmentPreview = bytes;
+                  attachmentName = picked.name;
+                });
+              } catch (_) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(loc.report_event_attachment_error),
+                    ),
+                  );
+                }
+              } finally {
+                if (!sheetContext.mounted) {
+                  return;
+                }
+                setModalState(() {
+                  isPickingAttachment = false;
+                });
+              }
+            }
+
             return SafeArea(
               child: Padding(
                 padding: EdgeInsets.only(
@@ -306,6 +351,89 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                               (value == null || value.trim().isEmpty)
                                   ? loc.report_event_content_required
                                   : null,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          loc.report_event_attachment_label,
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          loc.report_event_attachment_optional,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        if (attachmentPreview != null) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Stack(
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 4 / 3,
+                                  child: Image.memory(
+                                    attachmentPreview!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: IconButton(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.black.withOpacity(0.6),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.all(8),
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                    onPressed: () {
+                                      setModalState(() {
+                                        attachmentPreview = null;
+                                        attachmentName = null;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.close),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (attachmentName != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              attachmentName!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 12),
+                        ],
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: isPickingAttachment ? null : pickAttachment,
+                            icon: isPickingAttachment
+                                ? SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.photo_library_outlined),
+                            label: Text(
+                              attachmentPreview == null
+                                  ? loc.report_event_attachment_add
+                                  : loc.report_event_attachment_replace,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 24),
                         SizedBox(

@@ -775,6 +775,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get report_event_content_required => '请填写举报内容';
 
   @override
+  String get report_event_attachment_label => '上传图片';
+
+  @override
+  String get report_event_attachment_optional => '选填，但有助于我们更快核查。';
+
+  @override
+  String get report_event_attachment_add => '添加图片';
+
+  @override
+  String get report_event_attachment_replace => '重新选择图片';
+
+  @override
+  String get report_event_attachment_error => '图片加载失败，请重试。';
+
+  @override
   String get report_event_submit => '提交举报';
 
   @override

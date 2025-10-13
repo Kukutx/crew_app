@@ -1,4 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_header_actions.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_participant_avatar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -60,45 +61,11 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: colorScheme.onSurfaceVariant,
       ),
       actions: [
-        IconButton(
-          tooltip: loc.chat_search_hint,
-          icon: const Icon(Icons.search),
-          onPressed: withFallback(onSearchTap, loc.chat_search_hint),
-        ),
-        PopupMenuButton<_ChatHeaderAction>(
-          tooltip: loc.chat_action_more_options,
-          icon: const Icon(Icons.graphic_eq),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: _ChatHeaderAction.phoneCall,
-              child: _HeaderActionRow(
-                icon: Icons.call_outlined,
-                label: loc.chat_action_phone_call,
-              ),
-            ),
-            PopupMenuItem(
-              value: _ChatHeaderAction.videoCall,
-              child: _HeaderActionRow(
-                icon: Icons.videocam_outlined,
-                label: loc.chat_action_video_call,
-              ),
-            ),
-          ],
-          onSelected: (action) {
-            switch (action) {
-              case _ChatHeaderAction.phoneCall:
-                phoneAction();
-                break;
-              case _ChatHeaderAction.videoCall:
-                videoAction();
-                break;
-            }
-          },
-        ),
-        IconButton(
-          tooltip: loc.chat_action_open_settings,
-          icon: const Icon(Icons.settings_outlined),
-          onPressed: onOpenSettings,
+        ChatHeaderActions(
+          onSearchTap: withFallback(onSearchTap, loc.chat_search_hint),
+          onPhoneCallTap: phoneAction,
+          onVideoCallTap: videoAction,
+          onOpenSettings: onOpenSettings,
         ),
       ],
       bottom: PreferredSize(
@@ -117,35 +84,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-enum _ChatHeaderAction { phoneCall, videoCall }
-
-class _HeaderActionRow extends StatelessWidget {
-  const _HeaderActionRow({
-    required this.icon,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: color),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-      ],
     );
   }
 }

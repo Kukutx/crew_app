@@ -3,7 +3,7 @@ import 'package:crew_app/features/events/presentation/plaza/sheets/plaza_post_co
 import 'package:crew_app/features/events/presentation/plaza/plaza_post_detail_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
-import 'package:crew_app/features/events/presentation/shared/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

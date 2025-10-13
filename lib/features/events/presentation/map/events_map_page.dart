@@ -13,7 +13,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
-import 'package:crew_app/features/events/presentation/shared/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 
 import '../../data/event.dart';
 import '../../../../core/error/api_exception.dart';

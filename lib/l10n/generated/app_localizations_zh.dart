@@ -231,7 +231,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get create_moment_submit_button => '发布';
 
   @override
-  String createMomentPreviewMessage(String featureName) {
+  String create_moment_preview_message(Object featureName) {
     return '$featureName 功能即将上线';
   }
 

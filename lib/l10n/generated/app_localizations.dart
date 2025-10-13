@@ -503,13 +503,13 @@ abstract class AppLocalizations {
   /// No description provided for @create_moment_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Capture what you're experiencing right now and inspire others nearby.'**
+  /// **'Capture what you\'re experiencing right now and inspire others nearby.'**
   String get create_moment_subtitle;
 
   /// No description provided for @create_moment_description_label.
   ///
   /// In en, this message translates to:
-  /// **'What's happening?'**
+  /// **'What\'s happening?'**
   String get create_moment_description_label;
 
   /// No description provided for @create_moment_add_photo.
@@ -534,7 +534,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{featureName} is coming soon'**
-  String createMomentPreviewMessage(String featureName);
+  String create_moment_preview_message(Object featureName);
 
   /// No description provided for @events_title.
   ///

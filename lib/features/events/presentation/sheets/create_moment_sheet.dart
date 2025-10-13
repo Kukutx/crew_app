@@ -158,7 +158,7 @@ class _CreateMomentSheetState extends State<_CreateMomentSheet> {
     ScaffoldMessenger.of(widget.parentContext).showSnackBar(
       SnackBar(
         content: Text(
-          loc.createMomentPreviewMessage(featureName),
+          loc.create_moment_preview_message(featureName),
         ),
       ),
     );

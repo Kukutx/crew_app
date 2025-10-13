@@ -220,10 +220,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get create_moment_subtitle =>
-      "Capture what you're experiencing right now and inspire others nearby.";
+      'Capture what you\'re experiencing right now and inspire others nearby.';
 
   @override
-  String get create_moment_description_label => "What's happening?";
+  String get create_moment_description_label => 'What\'s happening?';
 
   @override
   String get create_moment_add_photo => 'Add photo';
@@ -235,7 +235,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get create_moment_submit_button => 'Post';
 
   @override
-  String createMomentPreviewMessage(String featureName) {
+  String create_moment_preview_message(Object featureName) {
     return '$featureName is coming soon';
   }
 

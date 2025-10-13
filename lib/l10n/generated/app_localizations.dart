@@ -1535,7 +1535,7 @@ abstract class AppLocalizations {
   /// No description provided for @report_issue.
   ///
   /// In en, this message translates to:
-  /// **'Report this event'**
+  /// **'Report'**
   String get report_issue;
 
   /// No description provided for @report_issue_description.
@@ -1621,6 +1621,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Replace photo'**
   String get report_event_attachment_replace;
+
+  /// No description provided for @report_event_attachment_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No file selected'**
+  String get report_event_attachment_empty;
 
   /// No description provided for @report_event_attachment_error.
   ///

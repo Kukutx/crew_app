@@ -764,7 +764,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_saved_toast => '设置已更新';
 
   @override
-  String get report_issue => '举报活动';
+  String get report_issue => '举报';
 
   @override
   String get report_issue_description => '请选择举报类型并填写详细说明，我们会尽快核查。';
@@ -807,6 +807,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get report_event_attachment_replace => '重新选择图片';
+
+  @override
+  String get report_event_attachment_empty => '未选择文件';
 
   @override
   String get report_event_attachment_error => '图片加载失败，请重试。';

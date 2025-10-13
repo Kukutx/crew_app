@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_body.dart';
@@ -11,18 +12,19 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
-class EventDetailPage extends StatefulWidget {
+class EventDetailPage extends ConsumerStatefulWidget {
   final Event event;
   const EventDetailPage({super.key, required this.event});
 
   @override
-  State<EventDetailPage> createState() => _EventDetailPageState();
+  ConsumerState<EventDetailPage> createState() => _EventDetailPageState();
 }
 
-class _EventDetailPageState extends State<EventDetailPage> {
+class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   final PageController _pageCtrl = PageController();
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
@@ -202,6 +204,92 @@ class _EventDetailPageState extends State<EventDetailPage> {
     }
   }
 
+  Future<void> _showReportIssueSheet(AppLocalizations loc) async {
+    final theme = Theme.of(context);
+    await showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        final textTheme = Theme.of(sheetContext).textTheme;
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.flag_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        loc.report_issue,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  loc.report_issue_description,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
+                      Navigator.of(sheetContext).pop();
+                      final feedbackService =
+                          ref.read(feedbackServiceProvider);
+                      final submitted =
+                          await feedbackService.collectFeedback(context);
+                      if (!mounted) {
+                        return;
+                      }
+                      if (submitted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(loc.feedback_thanks)),
+                        );
+                      }
+                    },
+                    child: Text(loc.report_issue),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                    child: Text(loc.action_cancel),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showFeatureNotReadyMessage(AppLocalizations loc) {
     ScaffoldMessenger.of(
       context,
@@ -224,7 +312,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 title: Text(loc.report_issue),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
-                  _showFeatureNotReadyMessage(loc);
+                  _showReportIssueSheet(loc);
                 },
               ),
               const Divider(height: 0),

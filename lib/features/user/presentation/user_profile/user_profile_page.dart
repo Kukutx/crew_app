@@ -1,9 +1,11 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
@@ -26,6 +28,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     with TickerProviderStateMixin {
   static const double _expandedHeight = 320;
   static const double _tabBarHeight = 48;
+  static const List<String> _reportTypes = [
+    '垃圾信息',
+    '辱骂/仇恨',
+    '违规内容',
+    '其他',
+  ];
 
   late final TabController _tabController;
   late int _currentTabIndex;
@@ -92,21 +100,17 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               ListTile(
                 leading: const Icon(Icons.block),
                 title: const Text('拉黑'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  messenger.showSnackBar(
-                    const SnackBar(content: Text('已拉黑该用户（示例）')),
-                  );
+                  await _confirmBlockUser(context, profile, messenger);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.flag),
                 title: const Text('举报'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  messenger.showSnackBar(
-                    const SnackBar(content: Text('举报成功（示例）')),
-                  );
+                  await _showReportDialog(context, profile, messenger);
                 },
               ),
               ListTile(
@@ -125,6 +129,184 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         );
       },
     );
+  }
+
+  Future<void> _confirmBlockUser(
+    BuildContext context,
+    User profile,
+    ScaffoldMessengerState messenger,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('确认拉黑'),
+          content: Text('确定要拉黑 ${profile.name} 吗？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('确认'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('已拉黑 ${profile.name}（示例）')),
+      );
+    }
+  }
+
+  Future<void> _showReportDialog(
+    BuildContext context,
+    User profile,
+    ScaffoldMessengerState messenger,
+  ) async {
+    final descriptionController = TextEditingController();
+    final picker = ImagePicker();
+    String selectedType = _reportTypes.first;
+    Uint8List? selectedImageBytes;
+    String? selectedImageName;
+
+    final submission = await showDialog<({
+      String type;
+      String description;
+      String? imageName;
+    })>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setState) {
+            Future<void> handlePickImage() async {
+              final file = await picker.pickImage(source: ImageSource.gallery);
+              if (file == null) {
+                return;
+              }
+
+              final bytes = await file.readAsBytes();
+              setState(() {
+                selectedImageBytes = bytes;
+                selectedImageName = file.name;
+              });
+            }
+
+            return AlertDialog(
+              title: const Text('举报'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      value: selectedType,
+                      items: _reportTypes
+                          .map(
+                            (type) => DropdownMenuItem<String>(
+                              value: type,
+                              child: Text(type),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() {
+                          selectedType = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: '举报类型',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: descriptionController,
+                      maxLines: 4,
+                      onChanged: (_) => setState(() {}),
+                      decoration: const InputDecoration(
+                        labelText: '补充说明',
+                        hintText: '请输入举报原因或补充说明',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '上传证据图片（可选）',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: handlePickImage,
+                          icon: const Icon(Icons.photo_library_outlined),
+                          label: const Text('选择图片'),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            selectedImageName ?? '未选择文件',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (selectedImageBytes != null) ...[
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.memory(
+                          selectedImageBytes!,
+                          height: 140,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('取消'),
+                ),
+                FilledButton(
+                  onPressed: descriptionController.text.trim().isEmpty
+                      ? null
+                      : () {
+                          Navigator.of(dialogContext).pop((
+                            type: selectedType,
+                            description: descriptionController.text.trim(),
+                            imageName: selectedImageName,
+                          ));
+                        },
+                  child: const Text('提交'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    descriptionController.dispose();
+
+    if (submission != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '已收到对 ${profile.name} 的举报：${submission.type}（示例）',
+          ),
+        ),
+      );
+    }
   }
 
   void _startPrivateMessage(BuildContext context, User profile) {

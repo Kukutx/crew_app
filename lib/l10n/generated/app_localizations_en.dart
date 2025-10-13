@@ -519,7 +519,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_settings_leave_group => 'Leave group';
 
   @override
+  String get chat_settings_leave_group_confirmation_title => 'Leave this group?';
+
+  @override
+  String get chat_settings_leave_group_confirmation_message =>
+      'You will no longer receive messages from this group.';
+
+  @override
   String get chat_settings_remove_friend => 'Remove contact';
+
+  @override
+  String get chat_settings_remove_friend_confirmation_title =>
+      'Remove this contact?';
+
+  @override
+  String get chat_settings_remove_friend_confirmation_message =>
+      'This chat will be removed from your list.';
 
   @override
   String get chat_settings_notifications => 'Notifications';
@@ -533,6 +548,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get chat_settings_shared_files_subtitle =>
       'Browse images and videos from this chat';
+
+  @override
+  String get chat_settings_report => 'Report';
 
   @override
   String get chat_shared_media_filter_all => 'All';

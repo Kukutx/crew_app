@@ -1040,11 +1040,35 @@ abstract class AppLocalizations {
   /// **'Leave group'**
   String get chat_settings_leave_group;
 
+  /// No description provided for @chat_settings_leave_group_confirmation_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this group?'**
+  String get chat_settings_leave_group_confirmation_title;
+
+  /// No description provided for @chat_settings_leave_group_confirmation_message.
+  ///
+  /// In en, this message translates to:
+  /// **'You will no longer receive messages from this group.'**
+  String get chat_settings_leave_group_confirmation_message;
+
   /// No description provided for @chat_settings_remove_friend.
   ///
   /// In en, this message translates to:
   /// **'Remove contact'**
   String get chat_settings_remove_friend;
+
+  /// No description provided for @chat_settings_remove_friend_confirmation_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this contact?'**
+  String get chat_settings_remove_friend_confirmation_title;
+
+  /// No description provided for @chat_settings_remove_friend_confirmation_message.
+  ///
+  /// In en, this message translates to:
+  /// **'This chat will be removed from your list.'**
+  String get chat_settings_remove_friend_confirmation_message;
 
   /// No description provided for @chat_settings_notifications.
   ///
@@ -1069,6 +1093,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse images and videos from this chat'**
   String get chat_settings_shared_files_subtitle;
+
+  /// No description provided for @chat_settings_report.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get chat_settings_report;
 
   /// No description provided for @chat_shared_media_filter_all.
   ///

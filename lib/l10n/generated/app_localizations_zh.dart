@@ -509,7 +509,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_settings_leave_group => '退出群组';
 
   @override
+  String get chat_settings_leave_group_confirmation_title => '退出此群组？';
+
+  @override
+  String get chat_settings_leave_group_confirmation_message => '退出后将不再收到此群的消息。';
+
+  @override
   String get chat_settings_remove_friend => '删除好友';
+
+  @override
+  String get chat_settings_remove_friend_confirmation_title => '删除该联系人？';
+
+  @override
+  String get chat_settings_remove_friend_confirmation_message => '此聊天将从你的列表中移除。';
 
   @override
   String get chat_settings_notifications => '通知提醒';
@@ -522,6 +534,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chat_settings_shared_files_subtitle => '查看此聊天中的所有图片与视频';
+
+  @override
+  String get chat_settings_report => '举报';
 
   @override
   String get chat_shared_media_filter_all => '全部';

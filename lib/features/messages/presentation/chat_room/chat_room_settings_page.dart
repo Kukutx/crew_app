@@ -38,6 +38,64 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
       );
   }
 
+  void _showConfirmationSheet({
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required VoidCallback onConfirm,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                        child: Text(AppLocalizations.of(sheetContext)!.action_cancel),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () {
+                          Navigator.of(sheetContext).pop();
+                          onConfirm();
+                        },
+                        child: Text(confirmLabel),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -79,13 +137,31 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                 label: Text(loc.chat_settings_share),
               ),
               OutlinedButton.icon(
-                onPressed: () => _showFeatureComingSoon(exitLabel),
+                onPressed: () {
+                  final title = widget.isGroup
+                      ? loc.chat_settings_leave_group_confirmation_title
+                      : loc.chat_settings_remove_friend_confirmation_title;
+                  final message = widget.isGroup
+                      ? loc.chat_settings_leave_group_confirmation_message
+                      : loc.chat_settings_remove_friend_confirmation_message;
+                  _showConfirmationSheet(
+                    title: title,
+                    message: message,
+                    confirmLabel: exitLabel,
+                    onConfirm: () => _showFeatureComingSoon(exitLabel),
+                  );
+                },
                 icon: Icon(
                   widget.isGroup
                       ? Icons.exit_to_app
                       : Icons.person_remove_alt_1_outlined,
                 ),
                 label: Text(exitLabel),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _showFeatureComingSoon(loc.chat_settings_report),
+                icon: const Icon(Icons.flag_outlined),
+                label: Text(loc.chat_settings_report),
               ),
             ],
           ),

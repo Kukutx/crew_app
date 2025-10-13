@@ -1061,14 +1061,44 @@ abstract class AppLocalizations {
   /// No description provided for @chat_settings_shared_files.
   ///
   /// In en, this message translates to:
-  /// **'Shared files'**
+  /// **'Shared photos & videos'**
   String get chat_settings_shared_files;
 
   /// No description provided for @chat_settings_shared_files_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Browse documents, media and links'**
+  /// **'Browse images and videos from this chat'**
   String get chat_settings_shared_files_subtitle;
+
+  /// No description provided for @chat_shared_media_filter_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get chat_shared_media_filter_all;
+
+  /// No description provided for @chat_shared_media_filter_photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get chat_shared_media_filter_photos;
+
+  /// No description provided for @chat_shared_media_filter_videos.
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get chat_shared_media_filter_videos;
+
+  /// No description provided for @chat_shared_media_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos or videos have been shared yet.'**
+  String get chat_shared_media_empty;
+
+  /// No description provided for @chat_shared_media_caption.
+  ///
+  /// In en, this message translates to:
+  /// **'{sender} · {time}'**
+  String chat_shared_media_caption(Object sender, Object time);
 
   /// No description provided for @chat_settings_members_section.
   ///

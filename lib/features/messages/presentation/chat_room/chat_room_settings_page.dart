@@ -1,4 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/chat_shared_media_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -104,11 +105,18 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                 ),
                 const Divider(height: 0),
                 ListTile(
-                  leading: const Icon(Icons.folder_shared_outlined),
+                  leading: const Icon(Icons.photo_library_outlined),
                   title: Text(loc.chat_settings_shared_files),
                   subtitle: Text(loc.chat_settings_shared_files_subtitle),
-                  onTap: () =>
-                      _showFeatureComingSoon(loc.chat_settings_shared_files),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ChatSharedMediaPage(
+                          chatTitle: widget.title,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

@@ -518,10 +518,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_settings_notifications_subtitle => '静音或开启消息提醒';
 
   @override
-  String get chat_settings_shared_files => '共享文件';
+  String get chat_settings_shared_files => '共享图片与视频';
 
   @override
-  String get chat_settings_shared_files_subtitle => '查看聊天中的文档、媒体与链接';
+  String get chat_settings_shared_files_subtitle => '查看此聊天中的所有图片与视频';
+
+  @override
+  String get chat_shared_media_filter_all => '全部';
+
+  @override
+  String get chat_shared_media_filter_photos => '图片';
+
+  @override
+  String get chat_shared_media_filter_videos => '视频';
+
+  @override
+  String get chat_shared_media_empty => '当前还没有共享的图片或视频。';
+
+  @override
+  String chat_shared_media_caption(Object sender, Object time) {
+    return '$sender · $time';
+  }
 
   @override
   String get chat_settings_members_section => '成员信息';

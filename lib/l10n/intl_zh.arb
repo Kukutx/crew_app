@@ -125,6 +125,18 @@
   "messages_tab_groups": "群聊",
   "events_tab_invites": "召集",
   "events_tab_moments": "瞬间",
+  "create_moment_title": "发布瞬间",
+  "create_moment_subtitle": "记录此刻的灵感，和身边的小伙伴一起探索城市。",
+  "create_moment_description_label": "想分享点什么？",
+  "create_moment_add_photo": "添加照片",
+  "create_moment_add_location": "添加地点",
+  "create_moment_submit_button": "发布",
+  "create_moment_preview_message": "{featureName} 功能即将上线",
+  "@create_moment_preview_message": {
+    "placeholders": {
+      "featureName": {}
+    }
+  },
   "events_title": "活动",
   "create_event_title": "创建活动",
   "feature_not_ready": "该功能正在开发中",

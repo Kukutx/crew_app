@@ -216,6 +216,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events_tab_moments => 'Moments';
 
   @override
+  String get create_moment_title => 'Share a moment';
+
+  @override
+  String get create_moment_subtitle =>
+      "Capture what you're experiencing right now and inspire others nearby.";
+
+  @override
+  String get create_moment_description_label => "What's happening?";
+
+  @override
+  String get create_moment_add_photo => 'Add photo';
+
+  @override
+  String get create_moment_add_location => 'Add location';
+
+  @override
+  String get create_moment_submit_button => 'Post';
+
+  @override
+  String createMomentPreviewMessage(String featureName) {
+    return '$featureName is coming soon';
+  }
+
+  @override
   String get events_title => 'Events';
 
   @override

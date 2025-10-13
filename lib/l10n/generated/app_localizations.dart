@@ -494,6 +494,48 @@ abstract class AppLocalizations {
   /// **'Moments'**
   String get events_tab_moments;
 
+  /// No description provided for @create_moment_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a moment'**
+  String get create_moment_title;
+
+  /// No description provided for @create_moment_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture what you're experiencing right now and inspire others nearby.'**
+  String get create_moment_subtitle;
+
+  /// No description provided for @create_moment_description_label.
+  ///
+  /// In en, this message translates to:
+  /// **'What's happening?'**
+  String get create_moment_description_label;
+
+  /// No description provided for @create_moment_add_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get create_moment_add_photo;
+
+  /// No description provided for @create_moment_add_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Add location'**
+  String get create_moment_add_location;
+
+  /// No description provided for @create_moment_submit_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get create_moment_submit_button;
+
+  /// No description provided for @create_moment_preview_message.
+  ///
+  /// In en, this message translates to:
+  /// **'{featureName} is coming soon'**
+  String createMomentPreviewMessage(String featureName);
+
   /// No description provided for @events_title.
   ///
   /// In en, this message translates to:

@@ -725,10 +725,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_saved_toast => '设置已更新';
 
   @override
-  String get report_issue => '问题反馈';
+  String get report_issue => '举报活动';
 
   @override
-  String get report_issue_description => '提交截图和日志，帮助我们快速定位问题。';
+  String get report_issue_description => '请选择举报类型并填写详细说明，我们会尽快核查。';
+
+  @override
+  String get report_event_type_label => '举报类型';
+
+  @override
+  String get report_event_type_required => '请选择举报类型';
+
+  @override
+  String get report_event_type_misinformation => '信息不实或误导';
+
+  @override
+  String get report_event_type_illegal => '违规违法内容';
+
+  @override
+  String get report_event_type_fraud => '涉嫌欺诈或诈骗';
+
+  @override
+  String get report_event_type_other => '其他';
+
+  @override
+  String get report_event_content_label => '举报内容';
+
+  @override
+  String get report_event_content_hint => '请补充详细情况，方便我们尽快处理。';
+
+  @override
+  String get report_event_content_required => '请填写举报内容';
+
+  @override
+  String get report_event_attachment_label => '上传图片';
+
+  @override
+  String get report_event_attachment_optional => '选填，但有助于我们更快核查。';
+
+  @override
+  String get report_event_attachment_add => '添加图片';
+
+  @override
+  String get report_event_attachment_replace => '重新选择图片';
+
+  @override
+  String get report_event_attachment_error => '图片加载失败，请重试。';
+
+  @override
+  String get report_event_submit => '提交举报';
+
+  @override
+  String get report_event_submit_success => '感谢反馈，我们会尽快核查该活动。';
 
   @override
   String get feedback_thanks => '感谢你的反馈！';

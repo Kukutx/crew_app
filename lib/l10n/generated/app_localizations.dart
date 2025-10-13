@@ -1070,30 +1070,6 @@ abstract class AppLocalizations {
   /// **'Browse images and videos from this chat'**
   String get chat_settings_shared_files_subtitle;
 
-  /// No description provided for @chat_settings_report_content.
-  ///
-  /// In en, this message translates to:
-  /// **'Report content'**
-  String get chat_settings_report_content;
-
-  /// No description provided for @chat_settings_report_content_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Let us know if something in this chat breaks the rules.'**
-  String get chat_settings_report_content_subtitle;
-
-  /// No description provided for @chat_settings_report_add_photo.
-  ///
-  /// In en, this message translates to:
-  /// **'Add supporting photo'**
-  String get chat_settings_report_add_photo;
-
-  /// No description provided for @chat_settings_report_add_photo_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Attach a screenshot to help our review team.'**
-  String get chat_settings_report_add_photo_subtitle;
-
   /// No description provided for @chat_shared_media_filter_all.
   ///
   /// In en, this message translates to:

@@ -524,18 +524,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_settings_shared_files_subtitle => '查看此聊天中的所有图片与视频';
 
   @override
-  String get chat_settings_report_content => '举报内容';
-
-  @override
-  String get chat_settings_report_content_subtitle => '发现违规消息？告诉我们。';
-
-  @override
-  String get chat_settings_report_add_photo => '添加图片';
-
-  @override
-  String get chat_settings_report_add_photo_subtitle => '上传截图，帮助我们了解情况。';
-
-  @override
   String get chat_shared_media_filter_all => '全部';
 
   @override

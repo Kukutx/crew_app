@@ -740,11 +740,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_saved_toast => 'Settings updated';
 
   @override
-  String get report_issue => 'Report a problem';
+  String get report_issue => 'Report this event';
 
   @override
   String get report_issue_description =>
-      'Send feedback and logs to help us fix issues faster.';
+      'Help us review this event by selecting a reason and sharing details.';
+
+  @override
+  String get report_event_type_label => 'Reason';
+
+  @override
+  String get report_event_type_required => 'Please select a reason.';
+
+  @override
+  String get report_event_type_misinformation =>
+      'Incorrect or misleading information';
+
+  @override
+  String get report_event_type_illegal => 'Illegal or prohibited content';
+
+  @override
+  String get report_event_type_fraud => 'Suspected fraud or scam';
+
+  @override
+  String get report_event_type_other => 'Other';
+
+  @override
+  String get report_event_content_label => 'Details';
+
+  @override
+  String get report_event_content_hint =>
+      'Provide more information so our team can review this event.';
+
+  @override
+  String get report_event_content_required => 'Please describe the issue.';
+
+  @override
+  String get report_event_submit => 'Submit report';
+
+  @override
+  String get report_event_submit_success =>
+      'Thank you! We\'ll review this event shortly.';
 
   @override
   String get feedback_thanks => 'Thanks for your feedback!';

@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_body.dart';
@@ -206,88 +205,151 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   Future<void> _showReportIssueSheet(AppLocalizations loc) async {
     final theme = Theme.of(context);
+    final reportOptions = [
+      loc.report_event_type_misinformation,
+      loc.report_event_type_illegal,
+      loc.report_event_type_fraud,
+      loc.report_event_type_other,
+    ];
+    final detailsController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    String? selectedReason;
+
     await showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (sheetContext) {
         final textTheme = Theme.of(sheetContext).textTheme;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.flag_outlined,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        loc.report_issue,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 24,
+                  bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
+                ),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.colorScheme.primary.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.flag_outlined,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                loc.report_issue,
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        Text(
+                          loc.report_issue_description,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        DropdownButtonFormField<String>(
+                          value: selectedReason,
+                          decoration: InputDecoration(
+                            labelText: loc.report_event_type_label,
+                          ),
+                          items: reportOptions
+                              .map(
+                                (option) => DropdownMenuItem<String>(
+                                  value: option,
+                                  child: Text(option),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) =>
+                              setModalState(() => selectedReason = value),
+                          validator: (value) => value == null
+                              ? loc.report_event_type_required
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: detailsController,
+                          minLines: 3,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            labelText: loc.report_event_content_label,
+                            hintText: loc.report_event_content_hint,
+                            alignLabelWithHint: true,
+                          ),
+                          validator: (value) =>
+                              (value == null || value.trim().isEmpty)
+                                  ? loc.report_event_content_required
+                                  : null,
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: () {
+                              if (formKey.currentState?.validate() != true) {
+                                return;
+                              }
+                              Navigator.of(sheetContext).pop();
+                              if (!mounted) {
+                                return;
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    loc.report_event_submit_success,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(loc.report_event_submit),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () =>
+                                Navigator.of(sheetContext).pop(),
+                            child: Text(loc.action_cancel),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  loc.report_issue_description,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () async {
-                      Navigator.of(sheetContext).pop();
-                      final feedbackService =
-                          ref.read(feedbackServiceProvider);
-                      final submitted =
-                          await feedbackService.collectFeedback(context);
-                      if (!mounted) {
-                        return;
-                      }
-                      if (submitted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(loc.feedback_thanks)),
-                        );
-                      }
-                    },
-                    child: Text(loc.report_issue),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(sheetContext).pop(),
-                    child: Text(loc.action_cancel),
-                  ),
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
+    detailsController.dispose();
   }
 
   void _showFeatureNotReadyMessage(AppLocalizations loc) {

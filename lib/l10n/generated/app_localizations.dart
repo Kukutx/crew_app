@@ -1463,14 +1463,80 @@ abstract class AppLocalizations {
   /// No description provided for @report_issue.
   ///
   /// In en, this message translates to:
-  /// **'Report a problem'**
+  /// **'Report this event'**
   String get report_issue;
 
   /// No description provided for @report_issue_description.
   ///
   /// In en, this message translates to:
-  /// **'Send feedback and logs to help us fix issues faster.'**
+  /// **'Help us review this event by selecting a reason and sharing details.'**
   String get report_issue_description;
+
+  /// No description provided for @report_event_type_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get report_event_type_label;
+
+  /// No description provided for @report_event_type_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a reason.'**
+  String get report_event_type_required;
+
+  /// No description provided for @report_event_type_misinformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect or misleading information'**
+  String get report_event_type_misinformation;
+
+  /// No description provided for @report_event_type_illegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Illegal or prohibited content'**
+  String get report_event_type_illegal;
+
+  /// No description provided for @report_event_type_fraud.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspected fraud or scam'**
+  String get report_event_type_fraud;
+
+  /// No description provided for @report_event_type_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get report_event_type_other;
+
+  /// No description provided for @report_event_content_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get report_event_content_label;
+
+  /// No description provided for @report_event_content_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide more information so our team can review this event.'**
+  String get report_event_content_hint;
+
+  /// No description provided for @report_event_content_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please describe the issue.'**
+  String get report_event_content_required;
+
+  /// No description provided for @report_event_submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit report'**
+  String get report_event_submit;
+
+  /// No description provided for @report_event_submit_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! We'll review this event shortly.'**
+  String get report_event_submit_success;
 
   /// No description provided for @feedback_thanks.
   ///

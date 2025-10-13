@@ -15,7 +15,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 
 import '../../data/event.dart';
-import '../../data/event_filter.dart';
 import '../../../../core/error/api_exception.dart';
 import '../../../../core/network/api_service.dart';
 import '../../../../core/state/di/providers.dart';
@@ -27,7 +26,6 @@ import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/map_event_floating_card.dart';
-import 'sheets/map_event_filter_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import 'sheets/map_location_info_sheet.dart';
@@ -49,24 +47,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isEventCardVisible = false;
   List<Event> _carouselEvents = const <Event>[];
   int _activeEventIndex = 0;
-  final _allCategories = const ['派对', '运动', '音乐', '户外', '学习', '展览', '美食'];
-  static const _quickTags = [
-    'today',
-    'nearby',
-    'party',
-    'sports',
-    'music',
-    'free',
-    'trending',
-    'friends',
-  ];
-  final _selectedTags = <String>{};
 
   // 搜索框
   final _searchController = TextEditingController();
   late final FocusNode _searchFocusNode;
   late final ApiService _api;
-  EventFilter _filter = const EventFilter();
   List<Event> _searchResults = const <Event>[];
   bool _isSearching = false;
   bool _showSearchResults = false;
@@ -162,27 +147,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onClear: _onSearchClear,
         onCreateRoadTripTap: _onCreateRoadTripTap,
         onAvatarTap: _onAvatarTap,
-        tags: _quickTags,
-        selected: _selectedTags,
-        onTagToggle: (t, v) => setState(() {
-          v ? _selectedTags.add(t) : _selectedTags.remove(t);
-          // TODO: 将标签映射到 _filter 并刷新 Provider
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
-        }),
-        onOpenFilter: () async {
-          final res = await showEventFilterSheet(
-            context: context,
-            initial: _filter,
-            allCategories: _allCategories,
-          );
-          if (res != null) setState(() => _filter = res);
-          // TODO: 根据 _filter 刷新数据
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
-        },
         onResultTap: _onSearchResultTap,
         showResults: _showSearchResults,
         isLoading: _isSearching,

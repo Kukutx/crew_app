@@ -14,10 +14,6 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onClear,
     required this.onCreateRoadTripTap,
     required this.onAvatarTap,
-    required this.tags,
-    required this.selected,
-    required this.onTagToggle,
-    required this.onOpenFilter,
     required this.onResultTap,
     required this.showResults,
     required this.isLoading,
@@ -32,10 +28,6 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onClear;
   final VoidCallback onCreateRoadTripTap;
   final void Function(bool authed) onAvatarTap;
-  final List<String> tags;
-  final Set<String> selected;
-  final void Function(String tag, bool value) onTagToggle;
-  final VoidCallback onOpenFilter;
   final void Function(Event event) onResultTap;
   final bool showResults;
   final bool isLoading;
@@ -59,9 +51,9 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     return visibleCount * itemHeight + padding;
   }
 
-  // 搜索框 ~56 + 间距8 + 标签条44 + 结果列表高度
+  // 搜索框 ~56 + 余量12 + 结果列表高度
   @override
-  Size get preferredSize => Size.fromHeight(112 + _resultsHeight);
+  Size get preferredSize => Size.fromHeight(68 + _resultsHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -133,37 +125,9 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            // 标签 + 筛选按钮（一行，水平滚动）
-            SizedBox(
-              height: 44,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                children: [
-                  ...tags.map(
-                    (t) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        visualDensity: VisualDensity.compact,
-                        label: Text(_tagLabel(loc, t)),
-                        selected: selected.contains(t),
-                        onSelected: (v) => onTagToggle(t, v),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.tune),
-                    label: Text(loc.filter),
-                    onPressed: onOpenFilter,
-                  ),
-                ],
-              ),
-            ),
             if (showResults)
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
                 child: Material(
                   elevation: 4,
                   borderRadius: BorderRadius.circular(16),
@@ -233,26 +197,4 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  String _tagLabel(AppLocalizations loc, String key) {
-    switch (key) {
-      case 'today':
-        return loc.tag_today;
-      case 'nearby':
-        return loc.tag_nearby;
-      case 'party':
-        return loc.tag_party;
-      case 'sports':
-        return loc.tag_sports;
-      case 'music':
-        return loc.tag_music;
-      case 'free':
-        return loc.tag_free;
-      case 'trending':
-        return loc.tag_trending;
-      case 'friends':
-        return loc.tag_friends;
-      default:
-        return key;
-    }
-  }
 }

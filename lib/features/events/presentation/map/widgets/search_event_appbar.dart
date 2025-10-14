@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'avatar_icon.dart';
 
 const double _resultItemHeight = 72.0;
+const double _resultsVerticalPadding = 16.0;
+const double _maxResultsHeight = 240.0;
+const int _maxVisibleItems = 4;
 
 class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchEventAppBar({
@@ -36,22 +39,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Event> results;
   final String? errorText;
 
-  double get _resultsHeight {
-    if (!showResults) return 0;
-
-    // 结果列表容器外部有 Padding(top: 4, bottom: 12)，需要将这 16 像素计入
-    // preferredSize，否则在部分屏幕上会出现底部溢出。
-    const padding = 16.0;
-
-    if (isLoading) return 72 + padding;
-    if (errorText != null || results.isEmpty) return 64 + padding;
-
-    const itemHeight = _resultItemHeight;
-    const maxVisible = 4;
-    final visibleCount =
-        results.length > maxVisible ? maxVisible : results.length;
-    return visibleCount * itemHeight + padding;
-  }
+  double get _resultsHeight =>
+      showResults ? _maxResultsHeight + _resultsVerticalPadding : 0;
 
   // 搜索框 ~56 + 余量12 + 结果列表高度
   @override
@@ -134,8 +123,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                   elevation: 4,
                   borderRadius: BorderRadius.circular(16),
                   clipBehavior: Clip.antiAlias,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 240),
+                  child: SizedBox(
+                    height: _maxResultsHeight,
                     child: _buildResults(context),
                   ),
                 ),
@@ -149,39 +138,32 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildResults(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     if (isLoading) {
-      return const SizedBox(
-        height: 72,
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (errorText != null) {
-      return SizedBox(
-        height: 64,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              errorText!,
-              style: const TextStyle(color: Colors.redAccent),
-              textAlign: TextAlign.center,
-            ),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            errorText!,
+            style: const TextStyle(color: Colors.redAccent),
+            textAlign: TextAlign.center,
           ),
         ),
       );
     }
 
     if (results.isEmpty) {
-      return SizedBox(
-        height: 64,
-        child: Center(child: Text(loc.no_events_found)),
-      );
+      return Center(child: Text(loc.no_events_found));
     }
 
     return ListView.separated(
-      shrinkWrap: true,
       padding: EdgeInsets.zero,
       itemCount: results.length,
+      physics: results.length > _maxVisibleItems
+          ? const BouncingScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
       separatorBuilder: (_, __) => const Divider(height: 1, thickness: 1),
       itemBuilder: (context, index) {
         final event = results[index];

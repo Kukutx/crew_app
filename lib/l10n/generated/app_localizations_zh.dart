@@ -821,6 +821,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get report_event_submit_success => '感谢反馈，我们会尽快核查该活动。';
 
   @override
+  String get report_user_type_harassment => '骚扰或辱骂他人';
+
+  @override
+  String get report_user_type_impersonation => '冒充他人或虚假身份';
+
+  @override
+  String get report_user_type_inappropriate => '发布不当内容';
+
+  @override
+  String get report_user_type_spam => '垃圾信息或广告';
+
+  @override
+  String get report_user_type_other => '其他与用户相关的问题';
+
+  @override
+  String get report_group_type_illegal => '群组含违规或违法内容';
+
+  @override
+  String get report_group_type_hate => '仇恨言论或辱骂行为';
+
+  @override
+  String get report_group_type_spam => '垃圾广告或推广';
+
+  @override
+  String get report_group_type_fraud => '涉嫌欺诈或诈骗';
+
+  @override
+  String get report_group_type_other => '其他与群组相关的问题';
+
+  @override
   String get feedback_thanks => '感谢你的反馈！';
 
   @override

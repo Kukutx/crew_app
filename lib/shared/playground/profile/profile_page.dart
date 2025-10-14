@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
@@ -181,9 +182,11 @@ class _ProfileHeader extends ConsumerWidget {
     if (user == null) return;
     final loc = AppLocalizations.of(context)!;
     final customPath = ref.read(avatarProvider);
-    final imageProvider = customPath != null
-        ? FileImage(File(customPath)) as ImageProvider
-        : (user.photoURL != null ? NetworkImage(user.photoURL!) : null);
+      final imageProvider = customPath != null
+          ? FileImage(File(customPath)) as ImageProvider
+          : (user.photoURL != null
+              ? CachedNetworkImageProvider(user.photoURL!)
+              : null);
 
     final action = await showGeneralDialog<String>(
       context: context,
@@ -387,12 +390,12 @@ ImageProvider? _resolveAvatarImage(
 
   final backendPhoto = backendUser?.photoUrl?.trim();
   if (backendPhoto != null && backendPhoto.isNotEmpty) {
-    return NetworkImage(backendPhoto);
+    return CachedNetworkImageProvider(backendPhoto);
   }
 
   final firebasePhoto = user.photoURL?.trim();
   if (firebasePhoto != null && firebasePhoto.isNotEmpty) {
-    return NetworkImage(firebasePhoto);
+    return CachedNetworkImageProvider(firebasePhoto);
   }
 
   return null;

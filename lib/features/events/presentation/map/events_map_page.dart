@@ -116,7 +116,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
     final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
@@ -439,8 +438,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted || _selectedLatLng == null || _isSelectionSheetOpen) {
       return;
     }
-
-    final controller = _map;
+    
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
 
@@ -915,7 +913,7 @@ class _LocationSelectionSheet extends StatelessWidget {
             Text(
               loc.map_select_location_tip,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: .7),
               ),
             ),
             const SizedBox(height: 20),

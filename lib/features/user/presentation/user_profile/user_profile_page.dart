@@ -30,10 +30,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   static const double _expandedHeight = 320;
   static const double _tabBarHeight = 48;
   List<String> _reportTypes(AppLocalizations localization) => [
-        localization.report_event_type_misinformation,
-        localization.report_event_type_illegal,
-        localization.report_event_type_fraud,
-        localization.report_event_type_other,
+        localization.report_user_type_harassment,
+        localization.report_user_type_impersonation,
+        localization.report_user_type_inappropriate,
+        localization.report_user_type_spam,
+        localization.report_user_type_other,
       ];
 
   late final TabController _tabController;

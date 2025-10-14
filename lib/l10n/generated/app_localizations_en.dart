@@ -787,7 +787,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get report_issue_description =>
-      'Help us review this event by selecting a reason and sharing details.';
+      'Help us review by selecting a reason and sharing details.';
 
   @override
   String get report_event_type_label => 'Reason';
@@ -813,7 +813,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get report_event_content_hint =>
-      'Provide more information so our team can review this event.';
+      'Provide more information so our team can review this.';
 
   @override
   String get report_event_content_required => 'Please describe the issue.';
@@ -844,6 +844,48 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get report_event_submit_success =>
       'Thank you! We\'ll review this event shortly.';
+
+  @override
+  String get report_direct_submit_success =>
+      'Thank you! We\'ll review this conversation shortly.';
+
+  @override
+  String get report_group_submit_success =>
+      'Thank you! We\'ll review this group shortly.';
+
+  @override
+  String get report_user_type_harassment => 'Harassment or bullying';
+
+  @override
+  String get report_user_type_impersonation =>
+      'Impersonation or fake identity';
+
+  @override
+  String get report_user_type_inappropriate =>
+      'Sharing inappropriate content';
+
+  @override
+  String get report_user_type_spam => 'Spam or advertising';
+
+  @override
+  String get report_user_type_other => 'Other issues';
+
+  @override
+  String get report_group_type_illegal =>
+      'Illegal or prohibited group content';
+
+  @override
+  String get report_group_type_hate =>
+      'Hate speech or abusive behaviour';
+
+  @override
+  String get report_group_type_spam => 'Spam or unwanted promotion';
+
+  @override
+  String get report_group_type_fraud => 'Fraud or scam activity';
+
+  @override
+  String get report_group_type_other => 'Other group issues';
 
   @override
   String get feedback_thanks => 'Thanks for your feedback!';

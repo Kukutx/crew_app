@@ -1,7 +1,9 @@
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/chat_shared_media_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/report_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatRoomSettingsPage extends StatefulWidget {
   const ChatRoomSettingsPage({
@@ -25,6 +27,62 @@ class ChatRoomSettingsPage extends StatefulWidget {
 
 class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
   bool _notificationsEnabled = true;
+
+  List<String> _reportTypes(AppLocalizations localization) {
+    if (widget.isGroup) {
+      return [
+        localization.report_group_type_illegal,
+        localization.report_group_type_hate,
+        localization.report_group_type_spam,
+        localization.report_group_type_fraud,
+        localization.report_group_type_other,
+      ];
+    }
+
+    return [
+      localization.report_user_type_harassment,
+      localization.report_user_type_impersonation,
+      localization.report_user_type_inappropriate,
+      localization.report_user_type_spam,
+      localization.report_user_type_other,
+    ];
+  }
+
+  Future<void> _showReportSheet(AppLocalizations localization) async {
+    final submission = await ReportSheet.show(
+      context: context,
+      title: localization.report_issue,
+      description: localization.report_issue_description,
+      typeLabel: localization.report_event_type_label,
+      typeEmptyHint: localization.report_event_type_required,
+      contentLabel: localization.report_event_content_label,
+      contentHint: localization.report_event_content_hint,
+      attachmentLabel: localization.report_event_attachment_label,
+      attachmentOptional: localization.report_event_attachment_optional,
+      attachmentAddLabel: localization.report_event_attachment_add,
+      attachmentReplaceLabel: localization.report_event_attachment_replace,
+      attachmentEmptyLabel: localization.report_event_attachment_empty,
+      submitLabel: localization.report_event_submit,
+      cancelLabel: localization.action_cancel,
+      reportTypes: _reportTypes(localization),
+      imagePicker: ImagePicker(),
+    );
+
+    if (!mounted || submission == null) {
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          widget.isGroup
+              ? localization.report_group_submit_success
+              : localization.report_direct_submit_success,
+        ),
+      ),
+    );
+  }
 
   void _showFeatureComingSoon(String label) {
     final loc = AppLocalizations.of(context)!;
@@ -159,7 +217,7 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                 label: Text(exitLabel),
               ),
               OutlinedButton.icon(
-                onPressed: () => _showFeatureComingSoon(loc.chat_settings_report),
+                onPressed: () => _showReportSheet(loc),
                 icon: const Icon(Icons.flag_outlined),
                 label: Text(loc.chat_settings_report),
               ),

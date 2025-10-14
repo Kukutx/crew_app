@@ -9,6 +9,7 @@ import 'package:crew_app/features/events/presentation/detail/widgets/event_share
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/report_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -206,278 +207,39 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   }
 
   Future<void> _showReportIssueSheet(AppLocalizations loc) async {
-    final theme = Theme.of(context);
-    final reportOptions = [
-      loc.report_event_type_misinformation,
-      loc.report_event_type_illegal,
-      loc.report_event_type_fraud,
-      loc.report_event_type_other,
-    ];
-    final detailsController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    String? selectedReason;
-    Uint8List? attachmentPreview;
-    String? attachmentName;
-    bool isPickingAttachment = false;
-    final imagePicker = ImagePicker();
-
-    await showModalBottomSheet<void>(
+    final submission = await ReportSheet.show(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) {
-        final textTheme = Theme.of(sheetContext).textTheme;
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            Future<void> pickAttachment() async {
-              if (isPickingAttachment) return;
-              setModalState(() {
-                isPickingAttachment = true;
-              });
-              try {
-                final picked = await imagePicker.pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 85,
-                );
-                if (picked == null) {
-                  return;
-                }
-                final bytes = await picked.readAsBytes();
-                if (!sheetContext.mounted) {
-                  return;
-                }
-                setModalState(() {
-                  attachmentPreview = bytes;
-                  attachmentName = picked.name;
-                });
-              } catch (_) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(loc.report_event_attachment_error),
-                    ),
-                  );
-                }
-              } finally {
-                if (!sheetContext.mounted) {
-                  return;
-                }
-                setModalState(() {
-                  isPickingAttachment = false;
-                });
-              }
-            }
-
-            return SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  top: 24,
-                  bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
-                ),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.colorScheme.primary.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.flag_outlined,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                loc.report_issue,
-                                style: textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          loc.report_issue_description,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        DropdownButtonFormField<String>(
-                          value: selectedReason,
-                          decoration: InputDecoration(
-                            labelText: loc.report_event_type_label,
-                          ),
-                          items: reportOptions
-                              .map(
-                                (option) => DropdownMenuItem<String>(
-                                  value: option,
-                                  child: Text(option),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) =>
-                              setModalState(() => selectedReason = value),
-                          validator: (value) => value == null
-                              ? loc.report_event_type_required
-                              : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: detailsController,
-                          minLines: 3,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            labelText: loc.report_event_content_label,
-                            hintText: loc.report_event_content_hint,
-                            alignLabelWithHint: true,
-                          ),
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                                  ? loc.report_event_content_required
-                                  : null,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          loc.report_event_attachment_label,
-                          style: textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          loc.report_event_attachment_optional,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (attachmentPreview != null) ...[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Stack(
-                              children: [
-                                AspectRatio(
-                                  aspectRatio: 4 / 3,
-                                  child: Image.memory(
-                                    attachmentPreview!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: IconButton(
-                                    style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          Colors.black.withOpacity(0.6),
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.all(8),
-                                      visualDensity: VisualDensity.compact,
-                                    ),
-                                    onPressed: () {
-                                      setModalState(() {
-                                        attachmentPreview = null;
-                                        attachmentName = null;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.close),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (attachmentName != null) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              attachmentName!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                          const SizedBox(height: 12),
-                        ],
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: isPickingAttachment ? null : pickAttachment,
-                            icon: isPickingAttachment
-                                ? SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.photo_library_outlined),
-                            label: Text(
-                              attachmentPreview == null
-                                  ? loc.report_event_attachment_add
-                                  : loc.report_event_attachment_replace,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          child: FilledButton(
-                            onPressed: () {
-                              if (formKey.currentState?.validate() != true) {
-                                return;
-                              }
-                              Navigator.of(sheetContext).pop();
-                              if (!mounted) {
-                                return;
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    loc.report_event_submit_success,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(loc.report_event_submit),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () =>
-                                Navigator.of(sheetContext).pop(),
-                            child: Text(loc.action_cancel),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+      title: loc.report_issue,
+      description: loc.report_issue_description,
+      typeLabel: loc.report_event_type_label,
+      typeEmptyHint: loc.report_event_type_required,
+      contentLabel: loc.report_event_content_label,
+      contentHint: loc.report_event_content_hint,
+      attachmentLabel: loc.report_event_attachment_label,
+      attachmentOptional: loc.report_event_attachment_optional,
+      attachmentAddLabel: loc.report_event_attachment_add,
+      attachmentReplaceLabel: loc.report_event_attachment_replace,
+      attachmentEmptyLabel: loc.report_event_attachment_empty,
+      submitLabel: loc.report_event_submit,
+      cancelLabel: loc.action_cancel,
+      reportTypes: [
+        loc.report_event_type_misinformation,
+        loc.report_event_type_illegal,
+        loc.report_event_type_fraud,
+        loc.report_event_type_other,
+      ],
+      imagePicker: ImagePicker(),
     );
-    detailsController.dispose();
+
+    if (!mounted || submission == null) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(loc.report_event_submit_success),
+      ),
+    );
   }
 
   void _showFeatureNotReadyMessage(AppLocalizations loc) {

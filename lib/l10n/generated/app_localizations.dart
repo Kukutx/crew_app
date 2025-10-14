@@ -1541,7 +1541,7 @@ abstract class AppLocalizations {
   /// No description provided for @report_issue_description.
   ///
   /// In en, this message translates to:
-  /// **'Help us review this event by selecting a reason and sharing details.'**
+  /// **'Help us review by selecting a reason and sharing details.'**
   String get report_issue_description;
 
   /// No description provided for @report_event_type_label.
@@ -1589,7 +1589,7 @@ abstract class AppLocalizations {
   /// No description provided for @report_event_content_hint.
   ///
   /// In en, this message translates to:
-  /// **'Provide more information so our team can review this event.'**
+  /// **'Provide more information so our team can review this.'**
   String get report_event_content_hint;
 
   /// No description provided for @report_event_content_required.
@@ -1645,6 +1645,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thank you! We\'ll review this event shortly.'**
   String get report_event_submit_success;
+
+  /// No description provided for @report_direct_submit_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! We\'ll review this conversation shortly.'**
+  String get report_direct_submit_success;
+
+  /// No description provided for @report_group_submit_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! We\'ll review this group shortly.'**
+  String get report_group_submit_success;
+
+  /// No description provided for @report_user_type_harassment.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment or bullying'**
+  String get report_user_type_harassment;
+
+  /// No description provided for @report_user_type_impersonation.
+  ///
+  /// In en, this message translates to:
+  /// **'Impersonation or fake identity'**
+  String get report_user_type_impersonation;
+
+  /// No description provided for @report_user_type_inappropriate.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing inappropriate content'**
+  String get report_user_type_inappropriate;
+
+  /// No description provided for @report_user_type_spam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or advertising'**
+  String get report_user_type_spam;
+
+  /// No description provided for @report_user_type_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other issues'**
+  String get report_user_type_other;
+
+  /// No description provided for @report_group_type_illegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Illegal or prohibited group content'**
+  String get report_group_type_illegal;
+
+  /// No description provided for @report_group_type_hate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hate speech or abusive behaviour'**
+  String get report_group_type_hate;
+
+  /// No description provided for @report_group_type_spam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or unwanted promotion'**
+  String get report_group_type_spam;
+
+  /// No description provided for @report_group_type_fraud.
+  ///
+  /// In en, this message translates to:
+  /// **'Fraud or scam activity'**
+  String get report_group_type_fraud;
+
+  /// No description provided for @report_group_type_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other group issues'**
+  String get report_group_type_other;
 
   /// No description provided for @feedback_thanks.
   ///

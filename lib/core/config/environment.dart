@@ -1,12 +1,16 @@
 class Env {
   static const String dev = 'https://crew-api-u8vu.onrender.com/api';
+  static const String stage = dev;
   static const String prod = 'https://your-prod-api.com/api';
-  
+
   static String current = dev;
-  
+
   static void setProduction() => current = prod;
   static void setDevelopment() => current = dev;
+  static void setStage() => current = stage;
   static bool get isProduction => current == prod;
+  static bool get isDevelopment => current == dev;
+  static bool get isStage => current == stage;
 }
 
   // 目前仍使用测试 API，尚无主服务器

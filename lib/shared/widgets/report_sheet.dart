@@ -173,7 +173,7 @@ class _ReportSheetState extends State<ReportSheet> {
                   Text(
                     widget.description,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8),
+                      color: theme.colorScheme.onPrimaryContainer.withValues(alpha:0.8),
                     ),
                   ),
                 ],
@@ -181,7 +181,7 @@ class _ReportSheetState extends State<ReportSheet> {
             ),
             const SizedBox(height: 24),
             DropdownButtonFormField<String>(
-              value: _selectedType,
+              initialValue: _selectedType,
               items: widget.reportTypes
                   .map(
                     (type) => DropdownMenuItem<String>(
@@ -232,7 +232,7 @@ class _ReportSheetState extends State<ReportSheet> {
                   child: Text(
                     widget.attachmentOptional,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.right,
                   ),

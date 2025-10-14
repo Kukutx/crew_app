@@ -716,6 +716,12 @@ abstract class AppLocalizations {
   /// **'Map'**
   String get map;
 
+  /// No description provided for @map_clear_selected_point.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selected point'**
+  String get map_clear_selected_point;
+
   /// No description provided for @map_location_info_title.
   ///
   /// In en, this message translates to:
@@ -835,6 +841,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Price level: unknown'**
   String get map_place_details_price_unknown;
+
+  /// No description provided for @map_select_location_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an event here?'**
+  String get map_select_location_title;
+
+  /// No description provided for @map_select_location_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the pin to fine-tune the meeting point before creating your event.'**
+  String get map_select_location_tip;
 
   /// No description provided for @messages.
   ///

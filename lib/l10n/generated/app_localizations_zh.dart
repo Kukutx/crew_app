@@ -328,6 +328,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map => '地图';
 
   @override
+  String get map_clear_selected_point => '清除选点';
+
+  @override
   String get map_location_info_title => '位置信息';
 
   @override
@@ -397,6 +400,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_place_details_price_unknown => '价格等级：未知';
+
+  @override
+  String get map_select_location_title => '要在这里创建活动吗？';
+
+  @override
+  String get map_select_location_tip => '拖动标记微调位置，确认后即可创建活动。';
 
   @override
   String get messages => '消息';

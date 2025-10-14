@@ -8,6 +8,7 @@ import 'package:crew_app/shared/widgets/sheets/legal_sheet/presentation/widgets/
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,7 +30,6 @@ import 'widgets/markers_layer.dart';
 import 'widgets/map_event_floating_card.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
-import 'sheets/map_location_info_sheet.dart';
 import '../detail/events_detail_page.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
@@ -48,6 +48,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isEventCardVisible = false;
   List<Event> _carouselEvents = const <Event>[];
   int _activeEventIndex = 0;
+  LatLng? _selectedLatLng;
+  late final ValueNotifier<LatLng?> _selectedLatLngNotifier;
+  bool _isHandlingLongPress = false;
+  final DraggableScrollableController _selectionSheetController =
+      DraggableScrollableController();
+  EdgeInsets _mapPadding = EdgeInsets.zero;
+  double _currentSheetExtent = 0;
+  double _layoutHeight = 0;
+  bool _isCreatingEvent = false;
+
+  static const double _selectionSheetMinExtent = 0.18;
+  static const double _selectionSheetInitialExtent = 0.26;
+  static const double _selectionSheetMaxExtent = 0.72;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -68,6 +81,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _eventCardController = PageController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
+    _selectedLatLngNotifier = ValueNotifier<LatLng?>(null);
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -95,6 +109,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchController.dispose();
     _mapFocusSubscription?.close();
     _eventCardController.dispose();
+    _selectedLatLngNotifier.dispose();
+    _selectionSheetController.dispose();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
       if (controller.state) {
@@ -133,6 +149,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       ),
     );
 
+    final markers = <Marker>{...markersLayer.markers};
+    final selected = _selectedLatLng;
+    if (selected != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId('selected_location'),
+          position: selected,
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
+          onTap: () => unawaited(_revealSelectionSheet()),
+          onDrag: _onSelectedLocationDrag,
+          onDragEnd: _onSelectedLocationDragEnd,
+        ),
+      );
+    }
+
     // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.selectedEvent != null && !_movedToSelected) {
@@ -155,31 +189,64 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         isLoading: _isSearching,
         results: _searchResults,
         errorText: _searchError,
+        showClearSelectionAction: _selectedLatLng != null,
+        onClearSelection:
+            _selectedLatLng != null ? () => unawaited(_cancelSelection()) : null,
       ),
-      body: Stack(
-        children: [
-          Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: (_) {
-              if (_searchFocusNode.hasFocus) {
-                _searchFocusNode.unfocus();
-              } else if (_showSearchResults) {
-                setState(() => _showSearchResults = false);
-              }
-            },
-            child: MapCanvas(
-              initialCenter: startCenter,
-              onMapCreated: _onMapCreated,
-              onMapReady: _onMapReady,
-              onTap: (pos) => unawaited(_onMapTap(pos)),
-              onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
-              markers: markersLayer.markers,
-              showUserLocation: true,
-              showMyLocationButton: true,
-            ),
-          ),
-          _buildEventCardOverlay(safeBottom),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          _layoutHeight = constraints.maxHeight;
+          if (_selectedLatLng != null && _currentSheetExtent > 0) {
+            final desiredPadding = _currentSheetExtent * _layoutHeight;
+            if ((desiredPadding - _mapPadding.bottom).abs() > 2) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) {
+                  return;
+                }
+                _handleSelectionSheetExtentChange(_currentSheetExtent);
+              });
+            }
+          }
+          return Stack(
+            children: [
+              Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: (_) {
+                  if (_searchFocusNode.hasFocus) {
+                    _searchFocusNode.unfocus();
+                  } else if (_showSearchResults) {
+                    setState(() => _showSearchResults = false);
+                  }
+                },
+                child: MapCanvas(
+                  initialCenter: startCenter,
+                  onMapCreated: _onMapCreated,
+                  onMapReady: _onMapReady,
+                  onTap: (pos) => unawaited(_onMapTap(pos)),
+                  onLongPress: (pos) => unawaited(_onMapLongPress(pos)),
+                  markers: markers,
+                  showUserLocation: true,
+                  showMyLocationButton: true,
+                  mapPadding: _mapPadding,
+                ),
+              ),
+              _buildEventCardOverlay(safeBottom),
+              if (_selectedLatLng != null)
+                _LocationSelectionSheet(
+                  controller: _selectionSheetController,
+                  positionListenable: _selectedLatLngNotifier,
+                  reverseGeocode: _reverseGeocode,
+                  onConfirm: _onSelectionConfirm,
+                  onCancel: _cancelSelection,
+                  onExtentChanged: _handleSelectionSheetExtentChange,
+                  isProcessing: _isCreatingEvent,
+                  minExtent: _selectionSheetMinExtent,
+                  initialExtent: _selectionSheetInitialExtent,
+                  maxExtent: _selectionSheetMaxExtent,
+                ),
+            ],
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Column(
@@ -348,35 +415,144 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _onMapLongPress(LatLng latlng) async {
-    if (!mounted) {
+    if (!mounted || _isHandlingLongPress) {
       return;
     }
     _hideEventCard();
-
-    final addressFuture = _reverseGeocode(latlng);
-    final placesService = ref.read(placesServiceProvider);
-    Future<List<NearbyPlace>>? nearbyPlacesFuture;
+    _isHandlingLongPress = true;
     try {
-      nearbyPlacesFuture = placesService.searchNearbyPlaces(
-        latlng,
-        radius: 100,
-        maxResults: 8,
-      );
-    } on PlacesApiException catch (error) {
-      nearbyPlacesFuture = Future<List<NearbyPlace>>.error(error);
-    } catch (error) {
-      nearbyPlacesFuture = Future<List<NearbyPlace>>.error(error);
+      await _clearSelectedLocation(resetPadding: false);
+      _setSelectedLatLng(latlng);
+      await _moveCamera(latlng, zoom: 17);
+      await _revealSelectionSheet();
+    } finally {
+      _isHandlingLongPress = false;
+    }
+  }
+
+  void _setSelectedLatLng(LatLng? position) {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _selectedLatLng = position;
+    });
+    _selectedLatLngNotifier.value = position;
+  }
+
+  void _onSelectedLocationDrag(LatLng position) {
+    _setSelectedLatLng(position);
+  }
+
+  void _onSelectedLocationDragEnd(LatLng position) {
+    _setSelectedLatLng(position);
+    HapticFeedback.lightImpact();
+  }
+
+  Future<void> _clearSelectedLocation({bool resetPadding = true}) async {
+    if (mounted) {
+      setState(() {
+        _selectedLatLng = null;
+        if (resetPadding) {
+          _mapPadding = EdgeInsets.zero;
+        }
+      });
+    } else {
+      _selectedLatLng = null;
+      if (resetPadding) {
+        _mapPadding = EdgeInsets.zero;
+      }
     }
 
-    await showMapLocationInfoSheet(
-      context: context,
-      position: latlng,
-      addressFuture: addressFuture,
-      nearbyPlacesFuture: nearbyPlacesFuture,
-      onCreateEvent: () async {
-        Navigator.of(context).pop();
-        await _createEventAt(latlng);
-      },
+    _selectedLatLngNotifier.value = null;
+    _currentSheetExtent = 0;
+
+    if (resetPadding) {
+      final controller = _map;
+      if (controller != null) {
+        unawaited(controller.setPadding(0, 0, 0, 0));
+      }
+    }
+  }
+
+  Future<void> _cancelSelection() => _clearSelectedLocation();
+
+  Future<void> _onSelectionConfirm() async {
+    final target = _selectedLatLng;
+    if (target == null || _isCreatingEvent) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() => _isCreatingEvent = true);
+    } else {
+      _isCreatingEvent = true;
+    }
+
+    try {
+      await _createEventAt(target);
+      await _clearSelectedLocation();
+    } finally {
+      if (mounted) {
+        setState(() => _isCreatingEvent = false);
+      } else {
+        _isCreatingEvent = false;
+      }
+    }
+  }
+
+  void _handleSelectionSheetExtentChange(double extent) {
+    _currentSheetExtent = extent;
+    if (_layoutHeight <= 0) {
+      return;
+    }
+
+    final sheetHeight = extent * _layoutHeight;
+    final newPadding = EdgeInsets.only(bottom: sheetHeight);
+    if ((sheetHeight - _mapPadding.bottom).abs() < 2) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _mapPadding = newPadding;
+      });
+    } else {
+      _mapPadding = newPadding;
+    }
+
+    final controller = _map;
+    if (controller != null) {
+      unawaited(controller.setPadding(0, 0, 0, sheetHeight.round()));
+    }
+  }
+
+  Future<void> _revealSelectionSheet({double? extent}) async {
+    if (_selectedLatLng == null) {
+      return;
+    }
+
+    final targetExtent = (extent ?? _selectionSheetInitialExtent)
+        .clamp(_selectionSheetMinExtent, _selectionSheetMaxExtent);
+
+    if (!_selectionSheetController.isAttached) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _selectedLatLng == null) {
+          return;
+        }
+        unawaited(_revealSelectionSheet(extent: targetExtent));
+      });
+      return;
+    }
+
+    if ((_selectionSheetController.size - targetExtent).abs() < 0.01) {
+      return;
+    }
+
+    await _selectionSheetController.animateTo(
+      targetExtent,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
     );
   }
 
@@ -750,5 +926,264 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _isSearching = false;
       _currentSearchQuery = '';
     });
+  }
+}
+
+class _LocationSelectionSheet extends StatefulWidget {
+  const _LocationSelectionSheet({
+    required this.controller,
+    required this.positionListenable,
+    required this.onConfirm,
+    required this.onCancel,
+    required this.reverseGeocode,
+    required this.onExtentChanged,
+    required this.isProcessing,
+    required this.minExtent,
+    required this.initialExtent,
+    required this.maxExtent,
+  });
+
+  final DraggableScrollableController controller;
+  final ValueListenable<LatLng?> positionListenable;
+  final Future<void> Function() onConfirm;
+  final Future<void> Function() onCancel;
+  final Future<String?> Function(LatLng) reverseGeocode;
+  final void Function(double extent) onExtentChanged;
+  final bool isProcessing;
+  final double minExtent;
+  final double initialExtent;
+  final double maxExtent;
+
+  @override
+  State<_LocationSelectionSheet> createState() => _LocationSelectionSheetState();
+}
+
+class _LocationSelectionSheetState extends State<_LocationSelectionSheet> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_handleExtentChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !widget.controller.isAttached) {
+        return;
+      }
+      widget.onExtentChanged(widget.controller.size);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _LocationSelectionSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_handleExtentChanged);
+      widget.controller.addListener(_handleExtentChanged);
+    }
+    if (widget.controller.isAttached) {
+      widget.onExtentChanged(widget.controller.size);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleExtentChanged);
+    super.dispose();
+  }
+
+  void _handleExtentChanged() {
+    if (!widget.controller.isAttached) {
+      return;
+    }
+    widget.onExtentChanged(widget.controller.size);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final safeBottom = MediaQuery.of(context).viewPadding.bottom;
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: DraggableScrollableSheet(
+        controller: widget.controller,
+        initialChildSize: widget.initialExtent,
+        minChildSize: widget.minExtent,
+        maxChildSize: widget.maxExtent,
+        snap: true,
+        snapSizes: <double>[
+          widget.minExtent,
+          widget.initialExtent,
+          widget.maxExtent,
+        ]
+          ..sort(),
+        builder: (context, scrollController) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, -8),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + safeBottom),
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.dividerColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    loc.map_select_location_title,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    loc.map_select_location_tip,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ValueListenableBuilder<LatLng?>(
+                    valueListenable: widget.positionListenable,
+                    builder: (context, position, _) {
+                      if (position == null) {
+                        return const SizedBox.shrink();
+                      }
+
+                      final coords = loc.location_coordinates(
+                        position.latitude.toStringAsFixed(6),
+                        position.longitude.toStringAsFixed(6),
+                      );
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.place_outlined,
+                                  color: Colors.redAccent),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  coords,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          FutureBuilder<String?>(
+                            key: ValueKey('${position.latitude}_${position.longitude}'),
+                            future: widget.reverseGeocode(position),
+                            builder: (context, snapshot) {
+                              final icon = Icon(
+                                Icons.home_outlined,
+                                color: Colors.blueGrey.shade600,
+                              );
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return _LocationSheetRow(
+                                  icon: icon,
+                                  child: Text(loc.map_location_info_address_loading),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return _LocationSheetRow(
+                                  icon: icon,
+                                  child:
+                                      Text(loc.map_location_info_address_unavailable),
+                                );
+                              }
+                              final address = snapshot.data;
+                              final display =
+                                  (address == null || address.trim().isEmpty)
+                                      ? loc.map_location_info_address_unavailable
+                                      : address;
+                              return _LocationSheetRow(
+                                icon: icon,
+                                child: Text(display),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: widget.isProcessing
+                              ? null
+                              : () async {
+                                  await widget.onCancel();
+                                },
+                          child: Text(loc.action_cancel),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: widget.isProcessing
+                              ? null
+                              : () async {
+                                  await widget.onConfirm();
+                                },
+                          child: widget.isProcessing
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation(
+                                      theme.colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                )
+                              : Text(loc.map_location_info_create_event),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LocationSheetRow extends StatelessWidget {
+  const _LocationSheetRow({required this.icon, required this.child});
+
+  final Icon icon;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        icon,
+        const SizedBox(width: 8),
+        Expanded(child: child),
+      ],
+    );
   }
 }

@@ -336,6 +336,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'Map';
 
   @override
+  String get map_clear_selected_point => 'Clear selected point';
+
+  @override
   String get map_location_info_title => 'Location info';
 
   @override
@@ -406,6 +409,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_place_details_price_unknown => 'Price level: unknown';
+
+  @override
+  String get map_select_location_title => 'Create an event here?';
+
+  @override
+  String get map_select_location_tip =>
+      'Drag the pin to fine-tune the meeting point before creating your event.';
 
   @override
   String get messages => 'Messages';

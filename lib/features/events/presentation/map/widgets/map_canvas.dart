@@ -10,9 +10,12 @@ class MapCanvas extends StatelessWidget {
   final VoidCallback? onMapReady;
   final ValueChanged<LatLng>? onTap;
   final ValueChanged<LatLng>? onLongPress;
+  final ValueChanged<CameraPosition>? onCameraMove;
+  final VoidCallback? onCameraIdle;
   final Set<Marker> markers;
   final bool showUserLocation;
   final bool showMyLocationButton;
+  final EdgeInsets mapPadding;
 
   const MapCanvas({
     super.key,
@@ -22,9 +25,12 @@ class MapCanvas extends StatelessWidget {
     this.onMapReady,
     this.onTap,
     this.onLongPress,
+    this.onCameraMove,
+    this.onCameraIdle,
     this.markers = const <Marker>{},
     this.showUserLocation = false,
     this.showMyLocationButton = false,
+    this.mapPadding = EdgeInsets.zero,
   });
 
   @override
@@ -40,6 +46,8 @@ class MapCanvas extends StatelessWidget {
       },
       onTap: onTap,
       onLongPress: onLongPress,
+      onCameraMove: onCameraMove,
+      onCameraIdle: onCameraIdle,
       markers: markers,
       myLocationButtonEnabled: showMyLocationButton,
       myLocationEnabled: showUserLocation,
@@ -50,6 +58,7 @@ class MapCanvas extends StatelessWidget {
       tiltGesturesEnabled: true,
       scrollGesturesEnabled: true,
       zoomGesturesEnabled: true,
+      padding: mapPadding,
     );
   }
 }

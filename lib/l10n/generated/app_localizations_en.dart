@@ -849,12 +849,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get report_user_type_harassment => 'Harassment or bullying';
 
   @override
-  String get report_user_type_impersonation =>
-      'Impersonation or fake identity';
+  String get report_user_type_impersonation => 'Impersonation or fake identity';
 
   @override
-  String get report_user_type_inappropriate =>
-      'Sharing inappropriate content';
+  String get report_user_type_inappropriate => 'Sharing inappropriate content';
 
   @override
   String get report_user_type_spam => 'Spam or advertising';
@@ -863,12 +861,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get report_user_type_other => 'Other issues';
 
   @override
-  String get report_group_type_illegal =>
-      'Illegal or prohibited group content';
+  String get report_group_type_illegal => 'Illegal or prohibited group content';
 
   @override
-  String get report_group_type_hate =>
-      'Hate speech or abusive behaviour';
+  String get report_group_type_hate => 'Hate speech or abusive behaviour';
 
   @override
   String get report_group_type_spam => 'Spam or unwanted promotion';

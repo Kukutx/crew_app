@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import '../../data/event.dart';
-import '../detail/events_detail_page.dart';
+import '../pages/detail/events_detail_page.dart';
 import 'event_image_placeholder.dart';
 
 /// A reusable grid card for displaying [Event] items inside masonry layouts.

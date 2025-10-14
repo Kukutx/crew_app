@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:crew_app/features/events/presentation/map/sheets/map_events_explore_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/map/sheets/map_events_explore_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -9,8 +9,8 @@ import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../features/events/presentation/map/events_map_page.dart';
-import '../features/events/presentation/trips/create_road_trip_page.dart';
+import '../features/events/presentation/pages/map/events_map_page.dart';
+import '../features/events/presentation/pages/trips/create_road_trip_page.dart';
 import 'state/app_overlay_provider.dart';
 import 'state/bottom_navigation_visibility_provider.dart';
 

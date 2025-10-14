@@ -17,11 +17,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 
-import '../../data/event.dart';
-import '../../../../core/error/api_exception.dart';
-import '../../../../core/network/api_service.dart';
-import '../../../../core/state/di/providers.dart';
-import '../../../../core/network/places/places_service.dart';
+import '../../../data/event.dart';
+import '../../../../../core/error/api_exception.dart';
+import '../../../../../core/network/api_service.dart';
+import '../../../../../core/state/di/providers.dart';
+import '../../../../../core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';

@@ -1,14 +1,14 @@
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_host_card.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_media_carousel.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_info_card.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_plaza_card.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_summary_card.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_cost_calculator_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_cost_calculator_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'dart:math' as math;
 
-import 'package:crew_app/features/events/presentation/detail/widgets/event_media_fullscreen_page.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

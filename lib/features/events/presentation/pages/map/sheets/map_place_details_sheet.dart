@@ -1,7 +1,7 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../core/network/places/places_service.dart';
+import '../../../../../../core/network/places/places_service.dart';
 
 Future<void> showMapPlaceDetailsSheet({
   required BuildContext context,

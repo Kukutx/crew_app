@@ -1,10 +1,10 @@
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_app_bar.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_body.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_detail_bottom_bar.dart';
-import 'package:crew_app/features/events/presentation/detail/widgets/event_share_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_share_sheet.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

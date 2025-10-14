@@ -1,6 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/plaza/sheets/plaza_post_comments_sheet.dart';
-import 'package:crew_app/features/events/presentation/plaza/plaza_post_detail_page.dart';
+import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/plaza/plaza_post_detail_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
@@ -10,8 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
-import '../../../../../app/state/app_overlay_provider.dart';
-import '../../../../../core/error/api_exception.dart';
+import '../../../../../../app/state/app_overlay_provider.dart';
+import '../../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
 class MapEventsExploreSheet extends ConsumerStatefulWidget {

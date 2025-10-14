@@ -7,6 +7,7 @@ import 'package:crew_app/core/config/environment.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/presentation/widgets/disclaimer_sheet.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -450,8 +451,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       });
     }
 
-    await controller?.setPadding(0, 0, 0, paddingValue);
-
     try {
       final result = await showModalBottomSheet<bool>(
         context: context,
@@ -490,7 +489,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         _mapPadding = EdgeInsets.zero;
         _isSelectionSheetOpen = false;
       }
-      await controller?.setPadding(0, 0, 0, 0);
     }
   }
 

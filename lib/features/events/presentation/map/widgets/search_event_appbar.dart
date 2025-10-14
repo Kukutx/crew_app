@@ -181,13 +181,14 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       return Center(child: Text(loc.no_events_found));
     }
 
-    return ListView.separated(
+    final listView = ListView.separated(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       itemCount: results.length,
       physics: results.length > _maxVisibleItems
-          ? const BouncingScrollPhysics()
+          ? const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics())
           : const NeverScrollableScrollPhysics(),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       separatorBuilder: (_, __) => const Divider(height: 1, thickness: 1),
       itemBuilder: (context, index) {
         final event = results[index];
@@ -205,6 +206,15 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         );
       },
+    );
+
+    if (results.length <= _maxVisibleItems) {
+      return listView;
+    }
+
+    return Scrollbar(
+      thumbVisibility: true,
+      child: listView,
     );
   }
 

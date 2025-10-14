@@ -10,6 +10,7 @@ class EventHostCard extends StatelessWidget {
   final VoidCallback onTapProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
+  final bool isFollowBusy;
 
   const EventHostCard({
     super.key,
@@ -20,6 +21,7 @@ class EventHostCard extends StatelessWidget {
     required this.onTapProfile,
     required this.onToggleFollow,
     required this.isFollowing,
+    this.isFollowBusy = false,
   });
 
   @override
@@ -76,7 +78,7 @@ class EventHostCard extends StatelessWidget {
                 height: 36,
                 child: isFollowing
                     ? OutlinedButton.icon(
-                        onPressed: onToggleFollow,
+                        onPressed: isFollowBusy ? null : onToggleFollow,
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.orange,
                           side: BorderSide(color: Colors.orange.shade300),
@@ -88,7 +90,7 @@ class EventHostCard extends StatelessWidget {
                         label: Text(loc.action_following),
                       )
                     : ElevatedButton.icon(
-                        onPressed: onToggleFollow,
+                        onPressed: isFollowBusy ? null : onToggleFollow,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,

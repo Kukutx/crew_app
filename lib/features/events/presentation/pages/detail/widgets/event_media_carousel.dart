@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
@@ -45,15 +46,33 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
   }
 
   List<_EventMediaItem> _parseMediaItems(Event event) {
-    final images = event.imageUrls
-        .map((url) => url.trim())
-        .where((url) => url.isNotEmpty)
-        .map(_EventMediaItem.image);
-    final videos = event.videoUrls
-        .map((url) => url.trim())
-        .where((url) => url.isNotEmpty)
-        .map(_EventMediaItem.video);
-    return [...images, ...videos];
+    final seen = LinkedHashSet<String>();
+    final items = <_EventMediaItem>[];
+
+    void addItem(_EventMediaType type, String url) {
+      final normalized = url.trim();
+      if (normalized.isEmpty) {
+        return;
+      }
+      if (seen.add(normalized)) {
+        switch (type) {
+          case _EventMediaType.image:
+            items.add(_EventMediaItem.image(normalized));
+            break;
+          case _EventMediaType.video:
+            items.add(_EventMediaItem.video(normalized));
+            break;
+        }
+      }
+    }
+
+    for (final url in event.imageUrls) {
+      addItem(_EventMediaType.image, url);
+    }
+    for (final url in event.videoUrls) {
+      addItem(_EventMediaType.video, url);
+    }
+    return items;
   }
 
   @override
@@ -71,19 +90,30 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
             onPageChanged: widget.onPageChanged,
             itemBuilder: (_, index) {
               final item = mediaItems[index];
-              switch (item.type) {
-                case _EventMediaType.image:
-                  return _NetworkImageSlide(url: item.url);
-                case _EventMediaType.video:
-                  return _EventVideoPlayer(
-                    key: ValueKey(item.url),
-                    url: item.url,
-                    isActive: widget.currentPage == index,
-                  );
-              }
+                switch (item.type) {
+                  case _EventMediaType.image:
+                    return Semantics(
+                      label: '${index + 1} of ${mediaItems.length}',
+                      image: true,
+                      child: _NetworkImageSlide(url: item.url),
+                    );
+                  case _EventMediaType.video:
+                    return Semantics(
+                      label: 'Video ${index + 1} of ${mediaItems.length}',
+                      child: _EventVideoPlayer(
+                        key: ValueKey(item.url),
+                        url: item.url,
+                        isActive: widget.currentPage == index,
+                      ),
+                    );
+                }
             },
           )
         : _buildFallback(fallbackUrl);
+
+    final theme = Theme.of(context);
+    final indicatorActiveColor = theme.colorScheme.onSurface;
+    final indicatorInactiveColor = indicatorActiveColor.withOpacity(0.5);
 
     return Stack(
       children: [
@@ -109,8 +139,8 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: index == widget.currentPage
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: .5),
+                        ? indicatorActiveColor
+                        : indicatorInactiveColor,
                   ),
                 ),
               ),

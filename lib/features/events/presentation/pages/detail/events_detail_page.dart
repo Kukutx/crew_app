@@ -38,6 +38,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   );
 
   bool _following = false;
+  bool _followInFlight = false;
 
   @override
   void initState() {
@@ -50,6 +51,44 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         statusBarBrightness: Brightness.dark,
       ),
     );
+  }
+
+  Future<bool> _performFollowRequest(bool follow) async {
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    return true;
+  }
+
+  Future<void> _handleToggleFollow(AppLocalizations loc) async {
+    if (_followInFlight) {
+      return;
+    }
+    final next = !_following;
+    setState(() {
+      _following = next;
+      _followInFlight = true;
+    });
+
+    final success = await _performFollowRequest(next);
+    if (!mounted) {
+      return;
+    }
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(next ? loc.followed : loc.unfollowed)),
+      );
+    } else {
+      setState(() {
+        _following = !next;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.feature_not_ready)),
+      );
+    }
+
+    setState(() {
+      _followInFlight = false;
+    });
   }
 
   void _captureCurrentOverlayStyle() {
@@ -294,6 +333,8 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     final event = widget.event;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
+    final theme = Theme.of(context);
+    final backgroundColor = theme.colorScheme.surface;
     final hostName = (organizer?.name.isNotEmpty ?? false)
         ? organizer!.name
         : _fallbackHost.name;
@@ -304,7 +345,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         ? organizer!.avatarUrl!
         : _fallbackHost.avatar;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7E9),
+      backgroundColor: backgroundColor,
       extendBodyBehindAppBar: true,
       appBar: EventDetailAppBar(
         onBack: () => Navigator.pop(context),
@@ -341,14 +382,11 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
             MaterialPageRoute(builder: (_) => UserProfilePage()),
           );
         },
-        onToggleFollow: () async {
-          // TODO: integrate backend follow logic
-          setState(() => _following = !_following);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_following ? loc.followed : loc.unfollowed)),
-          );
+        onToggleFollow: () {
+          _handleToggleFollow(loc);
         },
         isFollowing: _following,
+        isFollowBusy: _followInFlight,
         onTapLocation: () => Navigator.pop(context, widget.event),
         heroTag: 'event-media-${event.id}',
       ),

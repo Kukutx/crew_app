@@ -1,13 +1,15 @@
+import 'dart:async';
+
 import 'package:crew_app/features/events/data/event.dart';
+
+import 'package:crew_app/features/events/presentation/pages/detail/controllers/event_detail_interaction_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_cost_calculator_sheet.dart';
+import 'package:crew_app/features/events/presentation/sheets/event_cost_calculator_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/event_media_header.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'dart:math' as math;
-
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +26,7 @@ class EventDetailBody extends StatefulWidget {
   final VoidCallback onTapHostProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
+  final bool isFollowBusy;
   final VoidCallback onTapLocation;
   final String heroTag;
 
@@ -40,6 +43,7 @@ class EventDetailBody extends StatefulWidget {
     required this.onTapHostProfile,
     required this.onToggleFollow,
     required this.isFollowing,
+    required this.isFollowBusy,
     required this.onTapLocation,
     required this.heroTag,
   });
@@ -57,20 +61,25 @@ class _EventDetailBodyState extends State<EventDetailBody>
 
   late final ScrollController _scrollController;
   late final AnimationController _headerStretchController;
-  bool _navigatingToFullScreen = false;
+  late EventDetailInteractionController _interactionController;
   int _lastReportedPage = 0;
+  late int _mediaCount;
+  bool _hasMedia = false;
 
-  int get _mediaCount {
-    final imageCount = widget.event.imageUrls
-        .where((url) => url.trim().isNotEmpty)
-        .length;
-    final videoCount = widget.event.videoUrls
-        .where((url) => url.trim().isNotEmpty)
-        .length;
-    return imageCount + videoCount;
+  int _computeMediaCount(Event event) {
+    final urls = <String>{};
+    urls.addAll(
+      event.imageUrls
+          .map((url) => url.trim())
+          .where((url) => url.isNotEmpty),
+    );
+    urls.addAll(
+      event.videoUrls
+          .map((url) => url.trim())
+          .where((url) => url.isNotEmpty),
+    );
+    return urls.length;
   }
-
-  bool get _hasMedia => _mediaCount > 0;
 
   @override
   void initState() {
@@ -85,6 +94,13 @@ class _EventDetailBodyState extends State<EventDetailBody>
     );
     _scrollController.addListener(_handleScroll);
     _lastReportedPage = widget.currentPage;
+    _mediaCount = _computeMediaCount(widget.event);
+    _hasMedia = _mediaCount > 0;
+    _interactionController = EventDetailInteractionController(
+      eventId: widget.event.id,
+      openFullScreen: _openFullScreen,
+      onFullScreenClosed: _handleFullScreenClosed,
+    );
   }
 
   @override
@@ -92,6 +108,17 @@ class _EventDetailBodyState extends State<EventDetailBody>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentPage != widget.currentPage) {
       _lastReportedPage = widget.currentPage;
+    }
+    if (oldWidget.event != widget.event) {
+      _mediaCount = _computeMediaCount(widget.event);
+      _hasMedia = _mediaCount > 0;
+      if (oldWidget.event.id != widget.event.id) {
+        _interactionController = EventDetailInteractionController(
+          eventId: widget.event.id,
+          openFullScreen: _openFullScreen,
+          onFullScreenClosed: _handleFullScreenClosed,
+        );
+      }
     }
   }
 
@@ -110,36 +137,36 @@ class _EventDetailBodyState extends State<EventDetailBody>
     final offset = _scrollController.offset;
     if (!_hasMedia) {
       if (_headerStretchController.value != 0) {
-        _headerStretchController.animateTo(0,
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut);
+        _headerStretchController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+        );
       }
       return;
     }
     if (offset < 0) {
-      final progress = math.min(1.0, -offset / _fullScreenTriggerOffset);
+      final progress = (-offset / _fullScreenTriggerOffset).clamp(0.0, 1.0);
       if (_headerStretchController.value != progress) {
         _headerStretchController.value = progress;
       }
-      if (!_navigatingToFullScreen && progress >= 1.0) {
-        debugPrint('Analytics: event_fullscreen_threshold_${widget.event.id}');
-        _navigatingToFullScreen = true;
-        HapticFeedback.mediumImpact();
-        _openFullScreen();
+      if (progress >= 1.0) {
+        unawaited(_interactionController.handleStretchProgress(progress));
       }
     } else {
       if (_headerStretchController.value != 0) {
-        _headerStretchController.animateTo(0,
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut);
+        _headerStretchController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+        );
       }
     }
   }
 
-  Future<void> _openFullScreen() async {
-    if (!_hasMedia) {
-      _navigatingToFullScreen = false;
-      return;
+  Future<int?> _openFullScreen() async {
+    if (!_hasMedia || !mounted) {
+      return null;
     }
     debugPrint('Analytics: event_fullscreen_enter_${widget.event.id}');
     final result = await Navigator.of(context).push<int>(
@@ -160,7 +187,11 @@ class _EventDetailBodyState extends State<EventDetailBody>
     );
     if (!mounted) return;
     debugPrint('Analytics: event_fullscreen_exit_${widget.event.id}');
-    _navigatingToFullScreen = false;
+    return result;
+  }
+
+  void _handleFullScreenClosed(int? result) {
+    if (!mounted) return;
     if (result != null && _hasMedia) {
       final targetIndex = result.clamp(0, _mediaCount - 1);
       if (widget.pageController.hasClients) {
@@ -168,8 +199,11 @@ class _EventDetailBodyState extends State<EventDetailBody>
       }
       _handlePageChanged(targetIndex);
     }
-    _headerStretchController.animateTo(0,
-        duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    _headerStretchController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+    );
   }
 
   void _handlePageChanged(int index) {
@@ -188,125 +222,48 @@ class _EventDetailBodyState extends State<EventDetailBody>
     );
   }
 
-  double get _currentHeaderHeight =>
-      _baseHeaderHeight + _extraStretchHeight * _headerStretchController.value;
-
-  double get _currentCornerRadius =>
-      _maxCornerRadius * (.6 - _headerStretchController.value);
-
-  double get _currentGradientOpacity =>
-      0.25 + 0.55 * _headerStretchController.value;
-
   void _handleHeaderTap() {
-    if (_navigatingToFullScreen || !_hasMedia) {
+    if (!_hasMedia) {
       return;
     }
-    HapticFeedback.mediumImpact();
-    _navigatingToFullScreen = true;
-    _openFullScreen();
+    unawaited(_interactionController.handleTap());
+  }
+
+  void _handleKeyboardNavigation(int delta) {
+    if (!_hasMedia || !widget.pageController.hasClients) {
+      return;
+    }
+    final target = (widget.currentPage + delta).clamp(0, _mediaCount - 1);
+    if (target == widget.currentPage) {
+      return;
+    }
+    widget.pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOut,
+    );
+    _handlePageChanged(target);
   }
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final topInset = mediaQuery.padding.top;
-    return NotificationListener<OverscrollIndicatorNotification>(
-      onNotification: (notification) {
-        notification.disallowIndicator();
-        return false;
-      },
-      child: CustomScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
-        slivers: [
-          SliverToBoxAdapter(
-            child: AnimatedBuilder(
-              animation: _headerStretchController,
-              builder: (context, child) {
-                final height = topInset + _currentHeaderHeight;
-                final radius = _currentCornerRadius;
-                final gradientOpacity = _currentGradientOpacity;
-                return Semantics(
-                  label: widget.event.title,
-                  button: true,
-                  child: GestureDetector(
-                    onTap: _handleHeaderTap,
-                    onVerticalDragEnd: (details) {
-                      final velocity = details.primaryVelocity ?? 0;
-                      if (velocity < -650 && !_navigatingToFullScreen) {
-                        if (!_hasMedia) {
-                          return;
-                        }
-                        _navigatingToFullScreen = true;
-                        HapticFeedback.mediumImpact();
-                        _openFullScreen();
-                      }
-                    },
-                    child: Hero(
-                      tag: widget.heroTag,
-                      flightShuttleBuilder: (_, animation, _, _, toHero) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: toHero.widget,
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(radius),
-                          bottomRight: Radius.circular(radius),
-                        ),
-                        child: Stack(
-                          children: [
-                            SizedBox(
-                              height: height,
-                              width: double.infinity,
-                              child: EventMediaCarousel(
-                                event: widget.event,
-                                controller: widget.pageController,
-                                currentPage: widget.currentPage,
-                                onPageChanged: _handlePageChanged,
-                                height: height,
-                              ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                ignoring: true,
-                                child: Container(
-                                  height: topInset + 72,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.black.withValues(alpha: 
-                                          math.min(1.0, gradientOpacity * 0.9),
-                                        ),
-                                        Colors.transparent,
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                const SizedBox(height: 12),
-                EventHostCard(
+    final shortcutBindings = <ShortcutActivator, VoidCallback>{
+      const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+          _handleKeyboardNavigation(-1),
+      const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+          _handleKeyboardNavigation(1),
+    };
+
+    final contentSliver = SliverPadding(
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 120),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            switch (index) {
+              case 0:
+                return EventHostCard(
                   loc: widget.loc,
                   name: widget.hostName,
                   bio: widget.hostBio,
@@ -314,26 +271,79 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   onTapProfile: widget.onTapHostProfile,
                   onToggleFollow: widget.onToggleFollow,
                   isFollowing: widget.isFollowing,
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: EventSummaryCard(event: widget.event, loc: widget.loc),
-                ),
-                const SizedBox(height: 10),
-                EventInfoCard(
-                  event: widget.event,
-                  loc: widget.loc,
-                  onTapLocation: widget.onTapLocation,
-                  onTapCostCalculator: _showCostCalculator,
-                ),
-                const SizedBox(height: 10),
-                EventPlazaCard(loc: widget.loc),
-                const SizedBox(height: 120),
-              ],
+                  isFollowBusy: widget.isFollowBusy,
+                );
+              case 1:
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: EventSummaryCard(
+                    event: widget.event,
+                    loc: widget.loc,
+                  ),
+                );
+              case 2:
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: EventInfoCard(
+                    event: widget.event,
+                    loc: widget.loc,
+                    onTapLocation: widget.onTapLocation,
+                    onTapCostCalculator: _showCostCalculator,
+                  ),
+                );
+              case 3:
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: EventPlazaCard(loc: widget.loc),
+                );
+              default:
+                return const SizedBox.shrink();
+            }
+          },
+          childCount: 4,
+        ),
+      ),
+    );
+
+    return CallbackShortcuts(
+      bindings: shortcutBindings,
+      child: Focus(
+        autofocus: true,
+        child: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (notification) {
+            notification.disallowIndicator();
+            return false;
+          },
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
             ),
+            slivers: [
+              SliverToBoxAdapter(
+                child: EventMediaHeader(
+                  event: widget.event,
+                  pageController: widget.pageController,
+                  currentPage: widget.currentPage,
+                  onPageChanged: _handlePageChanged,
+                  heroTag: widget.heroTag,
+                  stretchAnimation: _headerStretchController,
+                  topPadding: topInset,
+                  baseHeight: _baseHeaderHeight,
+                  extraStretchHeight: _extraStretchHeight,
+                  maxCornerRadius: _maxCornerRadius,
+                  hasMedia: _hasMedia,
+                  mediaCount: _mediaCount,
+                  onTap: _handleHeaderTap,
+                  onDragEnd: (velocity) => unawaited(
+                    _interactionController.handleDragEndVelocity(velocity),
+                  ),
+                ),
+              ),
+              contentSliver,
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1448,17 +1448,35 @@ abstract class AppLocalizations {
   /// **'Upgrade subscription'**
   String get settings_subscription_upgrade;
 
+  /// No description provided for @settings_subscription_upgrade_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrades are not available yet.'**
+  String get settings_subscription_upgrade_unavailable;
+
   /// No description provided for @settings_subscription_cancel.
   ///
   /// In en, this message translates to:
   /// **'Cancel subscription'**
   String get settings_subscription_cancel;
 
+  /// No description provided for @settings_subscription_cancel_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation can be managed once billing launches.'**
+  String get settings_subscription_cancel_unavailable;
+
   /// No description provided for @settings_subscription_payment_methods.
   ///
   /// In en, this message translates to:
   /// **'Manage payment methods'**
   String get settings_subscription_payment_methods;
+
+  /// No description provided for @settings_subscription_payment_methods_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment management will be added soon.'**
+  String get settings_subscription_payment_methods_unavailable;
 
   /// No description provided for @settings_location_permission.
   ///
@@ -1490,11 +1508,23 @@ abstract class AppLocalizations {
   /// **'Blocked & muted users'**
   String get settings_manage_blocklist;
 
+  /// No description provided for @settings_privacy_blocklist_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocklist controls are coming soon.'**
+  String get settings_privacy_blocklist_unavailable;
+
   /// No description provided for @settings_privacy_documents.
   ///
   /// In en, this message translates to:
   /// **'Privacy policy & user agreement'**
   String get settings_privacy_documents;
+
+  /// No description provided for @settings_privacy_documents_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal documents will be published shortly.'**
+  String get settings_privacy_documents_unavailable;
 
   /// No description provided for @settings_account_info.
   ///
@@ -1520,17 +1550,41 @@ abstract class AppLocalizations {
   /// **'Delete account'**
   String get settings_account_delete;
 
+  /// No description provided for @settings_account_delete_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion will be self-serve soon.'**
+  String get settings_account_delete_unavailable;
+
+  /// No description provided for @settings_dark_mode_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Match the interface to a dark appearance.'**
+  String get settings_dark_mode_subtitle;
+
   /// No description provided for @settings_notifications_activity.
   ///
   /// In en, this message translates to:
   /// **'Activity reminders'**
   String get settings_notifications_activity;
 
+  /// No description provided for @settings_notifications_activity_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive reminders about upcoming activities.'**
+  String get settings_notifications_activity_subtitle;
+
   /// No description provided for @settings_notifications_following.
   ///
   /// In en, this message translates to:
   /// **'Followed users updates'**
   String get settings_notifications_following;
+
+  /// No description provided for @settings_notifications_following_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get alerts when people you follow share updates.'**
+  String get settings_notifications_following_subtitle;
 
   /// No description provided for @settings_notifications_push.
   ///

@@ -722,10 +722,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_subscription_upgrade => '升级订阅';
 
   @override
+  String get settings_subscription_upgrade_unavailable => '升级功能即将上线。';
+
+  @override
   String get settings_subscription_cancel => '取消订阅';
 
   @override
+  String get settings_subscription_cancel_unavailable => '计费上线后即可管理取消。';
+
+  @override
   String get settings_subscription_payment_methods => '支付方式管理';
+
+  @override
+  String get settings_subscription_payment_methods_unavailable =>
+      '支付方式管理功能即将开放。';
 
   @override
   String get settings_location_permission => '位置权限';
@@ -743,7 +753,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_blocklist => '屏蔽 / 拉黑管理';
 
   @override
+  String get settings_privacy_blocklist_unavailable => '屏蔽名单管理即将开放。';
+
+  @override
   String get settings_privacy_documents => '隐私政策 / 用户协议';
+
+  @override
+  String get settings_privacy_documents_unavailable => '相关法律文件将稍后公布。';
 
   @override
   String get settings_account_info => '账号信息';
@@ -758,10 +774,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_account_delete => '删除账号';
 
   @override
+  String get settings_account_delete_unavailable => '账号自助注销功能即将上线。';
+
+  @override
+  String get settings_dark_mode_subtitle => '使用深色主题以匹配夜间环境。';
+
+  @override
   String get settings_notifications_activity => '活动提醒';
 
   @override
+  String get settings_notifications_activity_subtitle => '接收即将开始活动的提醒。';
+
+  @override
   String get settings_notifications_following => '关注用户动态';
+
+  @override
+  String get settings_notifications_following_subtitle => '关注的人发布动态时向你通知。';
 
   @override
   String get settings_notifications_push => '推送开关';

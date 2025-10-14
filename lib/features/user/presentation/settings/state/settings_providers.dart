@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:crew_app/core/config/remote_config_keys.dart';
+import 'package:crew_app/core/config/remote_config_providers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ---------- Settings ----------
@@ -67,4 +69,12 @@ final settingsProvider =
     StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   return SettingsNotifier(prefs);
+});
+
+final settingsDeveloperToolsEnabledProvider = Provider<bool>((ref) {
+  final remoteConfig = ref.watch(remoteConfigProvider);
+  if (remoteConfig == null) {
+    return kDebugMode;
+  }
+  return remoteConfig.getBool(RemoteConfigKeys.settingsDeveloperToolsEnabled);
 });

@@ -740,10 +740,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_subscription_upgrade => 'Upgrade subscription';
 
   @override
+  String get settings_subscription_upgrade_unavailable =>
+      'Upgrades are not available yet.';
+
+  @override
   String get settings_subscription_cancel => 'Cancel subscription';
 
   @override
+  String get settings_subscription_cancel_unavailable =>
+      'Cancellation can be managed once billing launches.';
+
+  @override
   String get settings_subscription_payment_methods => 'Manage payment methods';
+
+  @override
+  String get settings_subscription_payment_methods_unavailable =>
+      'Payment management will be added soon.';
 
   @override
   String get settings_location_permission => 'Location permission';
@@ -762,7 +774,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_manage_blocklist => 'Blocked & muted users';
 
   @override
+  String get settings_privacy_blocklist_unavailable =>
+      'Blocklist controls are coming soon.';
+
+  @override
   String get settings_privacy_documents => 'Privacy policy & user agreement';
+
+  @override
+  String get settings_privacy_documents_unavailable =>
+      'Legal documents will be published shortly.';
 
   @override
   String get settings_account_info => 'Account details';
@@ -777,10 +797,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_account_delete => 'Delete account';
 
   @override
+  String get settings_account_delete_unavailable =>
+      'Account deletion will be self-serve soon.';
+
+  @override
+  String get settings_dark_mode_subtitle =>
+      'Match the interface to a dark appearance.';
+
+  @override
   String get settings_notifications_activity => 'Activity reminders';
 
   @override
+  String get settings_notifications_activity_subtitle =>
+      'Receive reminders about upcoming activities.';
+
+  @override
   String get settings_notifications_following => 'Followed users updates';
+
+  @override
+  String get settings_notifications_following_subtitle =>
+      'Get alerts when people you follow share updates.';
 
   @override
   String get settings_notifications_push => 'Push notifications';

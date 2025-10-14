@@ -16,7 +16,7 @@ class MarkersLayer {
           markerId: MarkerId('event_${ev.id}'),
           position: LatLng(ev.latitude, ev.longitude),
           infoWindow: InfoWindow(title: ev.title, snippet: ev.location),
-          consumeTapEvents: true,
+          consumeTapEvents: true,           // 先暂时不显示 InfoWindow，因为点击老是会切换地图信息
           onTap: () => onEventTap(ev),
         ),
     };

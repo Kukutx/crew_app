@@ -23,6 +23,7 @@
   "about_update_status_unknown": "Unable to determine the latest version right now.",
   "action_apply": "Apply",
   "action_cancel": "Cancel",
+  "action_confirm": "Confirm",
   "action_create": "Create",
   "action_follow": "Follow",
   "action_following": "Following",
@@ -108,6 +109,48 @@
   "filter_distance": "Distance",
   "filter_only_free": "Only show free events",
   "followed": "Followed",
+  "profile_tab_activities": "Activities",
+  "profile_tab_favorites": "Favorites",
+  "profile_action_block": "Block",
+  "profile_action_block_tooltip": "Block this user",
+  "profile_action_copy_link": "Copy profile link",
+  "profile_action_copy_link_tooltip": "Copy profile link",
+  "profile_action_link_copied": "Profile link copied: {link}",
+  "@profile_action_link_copied": {
+    "placeholders": {
+      "link": {}
+    }
+  },
+  "profile_action_message": "Message",
+  "profile_action_message_tooltip": "Send a private message",
+  "profile_action_message_unavailable": "Direct messaging isn't available yet—stay tuned!",
+  "profile_action_more_tooltip": "More actions",
+  "profile_action_settings_tooltip": "Open settings",
+  "profile_action_close_tooltip": "Close",
+  "profile_action_view_guestbook": "View guestbook",
+  "profile_block_confirm_title": "Block user",
+  "profile_block_confirm_message": "Block {name}?",
+  "@profile_block_confirm_message": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "profile_block_success": "{name} has been blocked (demo).",
+  "@profile_block_success": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "profile_report_success": "Reported {name} for {type} (demo).",
+  "@profile_report_success": {
+    "placeholders": {
+      "name": {},
+      "type": {}
+    }
+  },
+  "profile_stat_followers": "Followers",
+  "profile_stat_following": "Following",
+  "profile_stat_events": "Events",
   "favorites_empty": "No favorites yet~",
   "favorites_title": "Favorites",
   "history_empty": "No history yet~",

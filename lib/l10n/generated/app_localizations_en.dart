@@ -53,6 +53,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_cancel => 'Cancel';
 
   @override
+  String get action_confirm => 'Confirm';
+
+  @override
   String get action_create => 'Create';
 
   @override
@@ -277,6 +280,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get followed => 'Followed';
+
+  @override
+  String get profile_tab_activities => 'Activities';
+
+  @override
+  String get profile_tab_favorites => 'Favorites';
+
+  @override
+  String get profile_action_block => 'Block';
+
+  @override
+  String get profile_action_block_tooltip => 'Block this user';
+
+  @override
+  String get profile_action_copy_link => 'Copy profile link';
+
+  @override
+  String get profile_action_copy_link_tooltip => 'Copy profile link';
+
+  @override
+  String profile_action_link_copied(Object link) {
+    return 'Profile link copied: $link';
+  }
+
+  @override
+  String get profile_action_message => 'Message';
+
+  @override
+  String get profile_action_message_tooltip => 'Send a private message';
+
+  @override
+  String get profile_action_message_unavailable =>
+      'Direct messaging isn\'t available yet—stay tuned!';
+
+  @override
+  String get profile_action_more_tooltip => 'More actions';
+
+  @override
+  String get profile_action_settings_tooltip => 'Open settings';
+
+  @override
+  String get profile_action_close_tooltip => 'Close';
+
+  @override
+  String get profile_action_view_guestbook => 'View guestbook';
+
+  @override
+  String get profile_block_confirm_title => 'Block user';
+
+  @override
+  String profile_block_confirm_message(Object name) {
+    return 'Block $name?';
+  }
+
+  @override
+  String profile_block_success(Object name) {
+    return '$name has been blocked (demo).';
+  }
+
+  @override
+  String profile_report_success(Object name, Object type) {
+    return 'Reported $name for $type (demo).';
+  }
+
+  @override
+  String get profile_stat_followers => 'Followers';
+
+  @override
+  String get profile_stat_following => 'Following';
+
+  @override
+  String get profile_stat_events => 'Events';
 
   @override
   String get favorites_empty => 'No favorites yet~';

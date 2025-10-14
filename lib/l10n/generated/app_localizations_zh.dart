@@ -52,6 +52,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_cancel => '取消';
 
   @override
+  String get action_confirm => '确认';
+
+  @override
   String get action_create => '创建';
 
   @override
@@ -273,6 +276,77 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get followed => '已关注';
+
+  @override
+  String get profile_tab_activities => '活动';
+
+  @override
+  String get profile_tab_favorites => '收藏';
+
+  @override
+  String get profile_action_block => '拉黑';
+
+  @override
+  String get profile_action_block_tooltip => '拉黑该用户';
+
+  @override
+  String get profile_action_copy_link => '复制链接';
+
+  @override
+  String get profile_action_copy_link_tooltip => '复制个人资料链接';
+
+  @override
+  String profile_action_link_copied(Object link) {
+    return '已复制链接：$link';
+  }
+
+  @override
+  String get profile_action_message => '私信';
+
+  @override
+  String get profile_action_message_tooltip => '发送私信';
+
+  @override
+  String get profile_action_message_unavailable => '私信功能尚未开放，敬请期待！';
+
+  @override
+  String get profile_action_more_tooltip => '更多操作';
+
+  @override
+  String get profile_action_settings_tooltip => '打开设置';
+
+  @override
+  String get profile_action_close_tooltip => '关闭';
+
+  @override
+  String get profile_action_view_guestbook => '查看留言簿';
+
+  @override
+  String get profile_block_confirm_title => '确认拉黑';
+
+  @override
+  String profile_block_confirm_message(Object name) {
+    return '确定要拉黑 $name 吗？';
+  }
+
+  @override
+  String profile_block_success(Object name) {
+    return '已拉黑 $name（示例）';
+  }
+
+  @override
+  String profile_report_success(Object name, Object type) {
+    return '已收到对 $name 的举报：$type（示例）';
+  }
+
+  @override
+  String get profile_stat_followers => '粉丝';
+
+  @override
+  String get profile_stat_following => '关注';
+
+  @override
+  String get profile_stat_events => '活动';
 
   @override
   String get favorites_empty => '暂无收藏~';

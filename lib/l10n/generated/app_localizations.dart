@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get action_cancel;
 
+  /// No description provided for @action_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get action_confirm;
+
   /// No description provided for @action_create.
   ///
   /// In en, this message translates to:
@@ -613,6 +619,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Followed'**
   String get followed;
+
+  /// No description provided for @profile_tab_activities.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get profile_tab_activities;
+
+  /// No description provided for @profile_tab_favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get profile_tab_favorites;
+
+  /// No description provided for @profile_action_block.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get profile_action_block;
+
+  /// No description provided for @profile_action_block_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Block this user'**
+  String get profile_action_block_tooltip;
+
+  /// No description provided for @profile_action_copy_link.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy profile link'**
+  String get profile_action_copy_link;
+
+  /// No description provided for @profile_action_copy_link_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy profile link'**
+  String get profile_action_copy_link_tooltip;
+
+  /// No description provided for @profile_action_link_copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile link copied: {link}'**
+  String profile_action_link_copied(Object link);
+
+  /// No description provided for @profile_action_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get profile_action_message;
+
+  /// No description provided for @profile_action_message_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a private message'**
+  String get profile_action_message_tooltip;
+
+  /// No description provided for @profile_action_message_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct messaging isn't available yet—stay tuned!'**
+  String get profile_action_message_unavailable;
+
+  /// No description provided for @profile_action_more_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get profile_action_more_tooltip;
+
+  /// No description provided for @profile_action_settings_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get profile_action_settings_tooltip;
+
+  /// No description provided for @profile_action_close_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get profile_action_close_tooltip;
+
+  /// No description provided for @profile_action_view_guestbook.
+  ///
+  /// In en, this message translates to:
+  /// **'View guestbook'**
+  String get profile_action_view_guestbook;
+
+  /// No description provided for @profile_block_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Block user'**
+  String get profile_block_confirm_title;
+
+  /// No description provided for @profile_block_confirm_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Block {name}?'**
+  String profile_block_confirm_message(Object name);
+
+  /// No description provided for @profile_block_success.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has been blocked (demo).'**
+  String profile_block_success(Object name);
+
+  /// No description provided for @profile_report_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported {name} for {type} (demo).'**
+  String profile_report_success(Object name, Object type);
+
+  /// No description provided for @profile_stat_followers.
+  ///
+  /// In en, this message translates to:
+  /// **'Followers'**
+  String get profile_stat_followers;
+
+  /// No description provided for @profile_stat_following.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get profile_stat_following;
+
+  /// No description provided for @profile_stat_events.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get profile_stat_events;
 
   /// No description provided for @favorites_empty.
   ///

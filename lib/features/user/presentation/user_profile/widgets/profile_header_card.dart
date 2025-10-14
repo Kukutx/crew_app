@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
@@ -11,12 +13,14 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.onFollowToggle,
     required this.onMessagePressed,
     required this.onGuestbookPressed,
+    required this.localization,
   });
 
   final User userProfile;
   final VoidCallback onFollowToggle;
   final VoidCallback onMessagePressed;
   final VoidCallback onGuestbookPressed;
+  final AppLocalizations localization;
 
   @override
   Widget build(BuildContext context) {
@@ -62,17 +66,17 @@ class ProfileHeaderCard extends StatelessWidget {
                         Row(
                           children: [
                             _ProfileStat(
-                              label: '粉丝',
+                              label: localization.profile_stat_followers,
                               value: userProfile.followers,
                             ),
                             const _ProfileStatDot(),
                             _ProfileStat(
-                              label: '关注',
+                              label: localization.profile_stat_following,
                               value: userProfile.following,
                             ),
                             const _ProfileStatDot(),
                             _ProfileStat(
-                              label: '活动',
+                              label: localization.profile_stat_events,
                               value: userProfile.events,
                             ),
                           ],
@@ -92,27 +96,34 @@ class ProfileHeaderCard extends StatelessWidget {
                         runSpacing: 8,
                         alignment: WrapAlignment.center,
                         children: [
-                          _MessageButton(onPressed: onMessagePressed),
+                          _MessageButton(
+                            onPressed: onMessagePressed,
+                            localization: localization,
+                          ),
                           _FollowButton(
                             followed: userProfile.followed,
                             onPressed: onFollowToggle,
+                            localization: localization,
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      TextButton(
-                        onPressed: onGuestbookPressed,
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: const Text(
-                          '查看留言簿',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.w500,
+                      Tooltip(
+                        message: localization.profile_action_view_guestbook,
+                        child: TextButton(
+                          onPressed: onGuestbookPressed,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            localization.profile_action_view_guestbook,
+                            style: const TextStyle(
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
@@ -124,6 +135,8 @@ class ProfileHeaderCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(48),
                   child: CachedNetworkImage(
                     imageUrl: userProfile.avatar,
+                    cacheKey:
+                        'profile_avatar_${userProfile.uid}_${userProfile.avatar.hashCode}',
                     width: 64,
                     height: 64,
                     fit: BoxFit.cover,
@@ -283,41 +296,62 @@ class _ProfileTag extends StatelessWidget {
 }
 
 class _FollowButton extends StatelessWidget {
-  const _FollowButton({required this.followed, required this.onPressed});
+  const _FollowButton({
+    required this.followed,
+    required this.onPressed,
+    required this.localization,
+  });
 
   final bool followed;
   final VoidCallback onPressed;
+  final AppLocalizations localization;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: followed ? Colors.white10 : Colors.white,
-        foregroundColor: followed ? Colors.white : Colors.black,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    final label = followed
+        ? localization.action_following
+        : localization.action_follow;
+
+    return Tooltip(
+      message: label,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: followed ? Colors.white10 : Colors.white,
+          foregroundColor: followed ? Colors.white : Colors.black,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        onPressed: onPressed,
+        child: Text(label),
       ),
-      onPressed: onPressed,
-      child: Text(followed ? '已关注' : '关注'),
     );
   }
 }
 
 class _MessageButton extends StatelessWidget {
-  const _MessageButton({required this.onPressed});
+  const _MessageButton({
+    required this.onPressed,
+    required this.localization,
+  });
 
   final VoidCallback onPressed;
+  final AppLocalizations localization;
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: Colors.white,
-        side: const BorderSide(color: Colors.white70),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Tooltip(
+      message: localization.profile_action_message_tooltip,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: const BorderSide(color: Colors.white70),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        icon: const Icon(Icons.mail_outline, size: 18),
+        label: Text(localization.profile_action_message),
       ),
-      icon: const Icon(Icons.mail_outline, size: 18),
-      label: const Text('私信'),
     );
   }
 }

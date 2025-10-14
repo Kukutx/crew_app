@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 final eventsProvider =
@@ -58,4 +57,6 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
     final api = ref.read(apiServiceProvider);
     state = await AsyncValue.guard(() => api.getEvents());
   }
+
+  Future<void> refresh() => _refreshEvents();
 }

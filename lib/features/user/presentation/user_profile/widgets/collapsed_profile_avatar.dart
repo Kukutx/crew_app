@@ -10,23 +10,31 @@ class CollapsedProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+    return Semantics(
+      label: user.name,
+      image: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.85),
+          shape: BoxShape.circle,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundImage: CachedNetworkImageProvider(
+              user.avatar,
+              cacheKey:
+                  'profile_avatar_${user.uid}_${user.avatar.hashCode}',
+            ),
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: CircleAvatar(
-          radius: 20,
-          backgroundImage: CachedNetworkImageProvider(user.avatar),
         ),
       ),
     );

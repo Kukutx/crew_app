@@ -1,14 +1,14 @@
 import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:crew_app/features/user/data/user.dart';
 
-final userProfileProvider = AutoDisposeAsyncNotifierProvider<
-    UserProfileController, User>(UserProfileController.new);
+final userProfileProvider =
+    AsyncNotifierProvider.autoDispose<UserProfileController, User>(
+  UserProfileController.new,
+);
 
-class UserProfileController extends AutoDisposeAsyncNotifier<User> {
-  static const _initialUser = User(
+class UserProfileController extends AsyncNotifier<User> {
+  static final _initialUser = User(
     uid: 'u_001',
     name: 'Luna',
     bio: '爱户外、爱分享 | Crew 资深爱好者',
@@ -28,21 +28,18 @@ class UserProfileController extends AutoDisposeAsyncNotifier<User> {
 
   Future<void> toggleFollow() async {
     final current = state.value;
-    if (current == null) {
-      return;
-    }
+    if (current == null) return;
 
     final optimistic = current.copyWith(
       followed: !current.followed,
       followers:
           current.followed ? current.followers - 1 : current.followers + 1,
     );
-
-    state = AsyncValue.data(optimistic);
+    state = AsyncData(optimistic);
   }
 
   Future<void> refresh() async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
     state = await AsyncValue.guard(_loadProfile);
   }
 

@@ -161,7 +161,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                 ),
               );
             },
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const Divider(height: 1),
             itemCount: actions.length,
           ),
         );
@@ -242,7 +242,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         onRefresh: _onRefresh,
         child: profileAsync.when(
           data: (profile) => NestedScrollView(
-            headerSliverBuilder: (_, __) => [
+            headerSliverBuilder: (_, _) => [
               _buildSliverAppBar(
                 context,
                 profile,
@@ -253,8 +253,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             ],
             body: ProfileTabView(controller: _tabController),
           ),
-          loading: const _ProfileLoadingView(),
-          error: (_, __) => _ProfileErrorView(
+          loading: () => const _ProfileLoadingView(),
+          error: (_, _) => _ProfileErrorView(
             message: localization.load_failed,
             onRetry: () =>
                 ref.read(userProfileProvider.notifier).refresh(),

@@ -677,7 +677,7 @@ abstract class AppLocalizations {
   /// No description provided for @profile_action_message_unavailable.
   ///
   /// In en, this message translates to:
-  /// **'Direct messaging isn't available yet—stay tuned!'**
+  /// **'Direct messaging isn\'t available yet—stay tuned!'**
   String get profile_action_message_unavailable;
 
   /// No description provided for @profile_action_more_tooltip.

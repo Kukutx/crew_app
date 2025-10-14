@@ -339,6 +339,8 @@
   "report_event_attachment_error": "We couldn't load that photo. Please try again.",
   "report_event_submit": "Submit report",
   "report_event_submit_success": "Thank you! We'll review this event shortly.",
+  "report_direct_submit_success": "Thank you! We'll review this conversation shortly.",
+  "report_group_submit_success": "Thank you! We'll review this group shortly.",
   "report_user_type_harassment": "Harassment or bullying",
   "report_user_type_impersonation": "Impersonation or fake identity",
   "report_user_type_inappropriate": "Sharing inappropriate content",

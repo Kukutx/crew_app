@@ -1646,6 +1646,18 @@ abstract class AppLocalizations {
   /// **'Thank you! We\'ll review this event shortly.'**
   String get report_event_submit_success;
 
+  /// No description provided for @report_direct_submit_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! We\'ll review this conversation shortly.'**
+  String get report_direct_submit_success;
+
+  /// No description provided for @report_group_submit_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! We\'ll review this group shortly.'**
+  String get report_group_submit_success;
+
   /// No description provided for @report_user_type_harassment.
   ///
   /// In en, this message translates to:

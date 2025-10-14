@@ -821,6 +821,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get report_event_submit_success => '感谢反馈，我们会尽快核查该活动。';
 
   @override
+  String get report_direct_submit_success => '感谢反馈，我们会尽快审核此对话。';
+
+  @override
+  String get report_group_submit_success => '感谢反馈，我们会尽快审核此群聊。';
+
+  @override
   String get report_user_type_harassment => '骚扰或辱骂他人';
 
   @override

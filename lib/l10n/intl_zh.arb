@@ -342,6 +342,8 @@
   "report_event_attachment_error": "图片加载失败，请重试。",
   "report_event_submit": "提交举报",
   "report_event_submit_success": "感谢反馈，我们会尽快核查该活动。",
+  "report_direct_submit_success": "感谢反馈，我们会尽快审核此对话。",
+  "report_group_submit_success": "感谢反馈，我们会尽快审核此群聊。",
   "report_user_type_harassment": "骚扰或辱骂他人",
   "report_user_type_impersonation": "冒充他人或虚假身份",
   "report_user_type_inappropriate": "发布不当内容",

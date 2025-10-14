@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 
 import 'avatar_icon.dart';
 
+const double _searchBarHeight = 68.0;
+const double _searchHorizontalPadding = 12.0;
+const double _searchTopPadding = 12.0;
+const double _dropdownGap = 8.0;
 const double _resultItemHeight = 72.0;
-const double _resultsVerticalPadding = 16.0;
-const double _maxResultsHeight = 240.0;
 const int _maxVisibleItems = 4;
+const double _maxResultsHeight = _resultItemHeight * _maxVisibleItems;
 
 class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchEventAppBar({
@@ -39,12 +42,21 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Event> results;
   final String? errorText;
 
-  double get _resultsHeight =>
-      showResults ? _maxResultsHeight + _resultsVerticalPadding : 0;
+  double get _resultsHeight {
+    if (!showResults) return 0;
+    if (isLoading) return _resultItemHeight;
+    if (errorText != null || results.isEmpty) return 64.0;
 
-  // 搜索框 ~56 + 余量12 + 结果列表高度
+    final visibleCount =
+        results.length > _maxVisibleItems ? _maxVisibleItems : results.length;
+    return (visibleCount * _resultItemHeight)
+        .clamp(0, _maxResultsHeight)
+        .toDouble();
+  }
+
+  // 搜索框 ~56 + 余量12
   @override
-  Size get preferredSize => Size.fromHeight(68 + _resultsHeight);
+  Size get preferredSize => const Size.fromHeight(_searchBarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -55,81 +67,92 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: 0,
       bottom: PreferredSize(
         preferredSize: preferredSize,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 搜索框
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-              child: Material(
-                elevation: 4, // 若仍显压，可改为 3
-                borderRadius: BorderRadius.circular(24),
-                clipBehavior: Clip.antiAlias,
-                surfaceTintColor: Colors.transparent,
-                child: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: controller,
-                  builder: (context, value, _) {
-                    final hasQuery = value.text.isNotEmpty;
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        hintText: loc.search_hint,
-                        filled: true,
-                        fillColor: Colors.white,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
-                        ),
-                        prefixIcon: IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: onCreateRoadTripTap,
-                        ),
-                        suffixIconConstraints:
-                            const BoxConstraints(minWidth: 96, minHeight: 44),
-                        suffixIcon: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (hasQuery)
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: onClear,
-                              )
-                            else
-                              const SizedBox(
-                                  width: 48), // 占位，宽度和 IconButton 差不多,
-                            Padding(
-                              padding: const EdgeInsets.only(right: 6),
-                              child: AvatarIcon(onTap: onAvatarTap),
+        child: SizedBox(
+          height: preferredSize.height,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    _searchHorizontalPadding,
+                    _searchTopPadding,
+                    _searchHorizontalPadding,
+                    0,
+                  ),
+                  child: Material(
+                    elevation: 4, // 若仍显压，可改为 3
+                    borderRadius: BorderRadius.circular(24),
+                    clipBehavior: Clip.antiAlias,
+                    surfaceTintColor: Colors.transparent,
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: controller,
+                      builder: (context, value, _) {
+                        final hasQuery = value.text.isNotEmpty;
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          textInputAction: TextInputAction.search,
+                          decoration: InputDecoration(
+                            hintText: loc.search_hint,
+                            filled: true,
+                            fillColor: Colors.white,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
                             ),
-                          ],
-                        ),
-                      ),
-                      onSubmitted: onSearch,
-                      onChanged: onChanged,
-                    );
-                  },
-                ),
-              ),
-            ),
-            if (showResults)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                child: Material(
-                  elevation: 4,
-                  borderRadius: BorderRadius.circular(16),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    height: _maxResultsHeight,
-                    child: _buildResults(context),
+                            prefixIcon: IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: onCreateRoadTripTap,
+                            ),
+                            suffixIconConstraints: const BoxConstraints(
+                                minWidth: 96, minHeight: 44),
+                            suffixIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (hasQuery)
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: onClear,
+                                  )
+                                else
+                                  const SizedBox(
+                                      width: 48), // 占位，宽度和 IconButton 差不多,
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: AvatarIcon(onTap: onAvatarTap),
+                                ),
+                              ],
+                            ),
+                          ),
+                          onSubmitted: onSearch,
+                          onChanged: onChanged,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-          ],
+              if (showResults)
+                Positioned(
+                  left: _searchHorizontalPadding,
+                  right: _searchHorizontalPadding,
+                  top: _searchBarHeight + _dropdownGap,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(16),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      height: _resultsHeight,
+                      child: _buildResults(context),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -159,6 +182,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return ListView.separated(
+      shrinkWrap: true,
       padding: EdgeInsets.zero,
       itemCount: results.length,
       physics: results.length > _maxVisibleItems

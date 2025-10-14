@@ -127,8 +127,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
-      data: (list) =>
-          MarkersLayer.fromEvents(events: list, onEventTap: _focusOnEvent),
+      data: (list) => MarkersLayer.fromEvents(
+        events: list,
+        onEventTap: (event) => _focusOnEvent(event, showEventCard: false),
+      ),
     );
 
     // 页面首帧跳转至选中事件,如果有选中事件，页面初始化时直接跳过去
@@ -387,43 +389,49 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       data: (events) => events,
       orElse: () => const <Event>[],
     );
-    List<Event> updatedList;
-    int targetIndex;
-    if (list.isEmpty) {
-      updatedList = <Event>[ev];
-      targetIndex = 0;
-    } else {
-      final index = list.indexWhere((event) => event.id == ev.id);
-      if (index == -1) {
-        updatedList = <Event>[ev, ...list];
-        targetIndex = 0;
-      } else {
-        updatedList = list;
-        targetIndex = index;
-      }
+    final selectedIndex = list.indexWhere((event) => event.id == ev.id);
+    if (selectedIndex == -1) {
+      setState(() {
+        _carouselEvents = <Event>[ev];
+        _isEventCardVisible = true;
+        _activeEventIndex = 0;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_eventCardController.hasClients) {
+          return;
+        }
+        _eventCardController.jumpToPage(0);
+      });
+      _updateBottomNavigation(false);
+      return;
     }
 
     setState(() {
-      _carouselEvents = updatedList;
+      _carouselEvents = list;
       _isEventCardVisible = true;
-      _activeEventIndex = targetIndex;
+      _activeEventIndex = selectedIndex;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_eventCardController.hasClients) {
         return;
       }
-      _eventCardController.jumpToPage(targetIndex);
+      _eventCardController.jumpToPage(selectedIndex);
     });
     _updateBottomNavigation(false);
   }
 
-  void _focusOnEvent(Event event) {
+  void _focusOnEvent(
+    Event event, {
+    bool showEventCard = true,
+  }) {
     if (!mounted) {
       return;
     }
     _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
     _movedToSelected = true;
-    _showEventCard(event);
+    if (showEventCard) {
+      _showEventCard(event);
+    }
   }
 
   Future<void> _onMapTap(LatLng position) async {

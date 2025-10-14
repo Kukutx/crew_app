@@ -19,6 +19,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.isLoading,
     required this.results,
     this.errorText,
+    this.showClearSelectionAction = false,
+    this.onClearSelection,
   });
 
   final TextEditingController controller;
@@ -33,6 +35,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isLoading;
   final List<Event> results;
   final String? errorText;
+  final bool showClearSelectionAction;
+  final VoidCallback? onClearSelection;
 
   double get _resultsHeight {
     if (!showResults) return 0;
@@ -53,7 +57,9 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   // 搜索框 ~56 + 余量12 + 结果列表高度
   @override
-  Size get preferredSize => Size.fromHeight(68 + _resultsHeight);
+  Size get preferredSize => Size.fromHeight(
+        (showClearSelectionAction ? 112 : 68) + _resultsHeight,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -69,60 +75,86 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             // 搜索框
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-              child: Material(
-                elevation: 4, // 若仍显压，可改为 3
-                borderRadius: BorderRadius.circular(24),
-                clipBehavior: Clip.antiAlias,
-                surfaceTintColor: Colors.transparent,
-                child: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: controller,
-                  builder: (context, value, _) {
-                    final hasQuery = value.text.isNotEmpty;
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        hintText: loc.search_hint,
-                        filled: true,
-                        fillColor: Colors.white,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
-                        ),
-                        prefixIcon: IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: onCreateRoadTripTap,
-                        ),
-                        suffixIconConstraints:
-                            const BoxConstraints(minWidth: 96, minHeight: 44),
-                        suffixIcon: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (hasQuery)
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: onClear,
-                              )
-                            else
-                              const SizedBox(
-                                  width: 48), // 占位，宽度和 IconButton 差不多,
-                            Padding(
-                              padding: const EdgeInsets.only(right: 6),
-                              child: AvatarIcon(onTap: onAvatarTap),
-                            ),
-                          ],
-                        ),
+              padding: EdgeInsets.fromLTRB(
+                12,
+                showClearSelectionAction ? 8 : 12,
+                12,
+                0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (showClearSelectionAction && onClearSelection != null)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: onClearSelection,
+                        icon: const Icon(Icons.close),
+                        label: Text(loc.map_clear_selected_point),
                       ),
-                      onSubmitted: onSearch,
-                      onChanged: onChanged,
-                    );
-                  },
-                ),
+                    ),
+                  if (showClearSelectionAction && onClearSelection != null)
+                    const SizedBox(height: 8),
+                  Material(
+                    elevation: 4, // 若仍显压，可改为 3
+                    borderRadius: BorderRadius.circular(24),
+                    clipBehavior: Clip.antiAlias,
+                    surfaceTintColor: Colors.transparent,
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: controller,
+                      builder: (context, value, _) {
+                        final hasQuery = value.text.isNotEmpty;
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          textInputAction: TextInputAction.search,
+                          decoration: InputDecoration(
+                            hintText: loc.search_hint,
+                            filled: true,
+                            fillColor: Colors.white,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: onCreateRoadTripTap,
+                            ),
+                            suffixIconConstraints: const BoxConstraints(
+                              minWidth: 96,
+                              minHeight: 44,
+                            ),
+                            suffixIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (hasQuery)
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: onClear,
+                                  )
+                                else
+                                  const SizedBox(
+                                    width: 48,
+                                  ), // 占位，宽度和 IconButton 差不多,
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: AvatarIcon(onTap: onAvatarTap),
+                                ),
+                              ],
+                            ),
+                          ),
+                          onSubmitted: onSearch,
+                          onChanged: onChanged,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             if (showResults)

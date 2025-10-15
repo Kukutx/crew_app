@@ -334,10 +334,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_location_info_title => '位置信息';
 
   @override
-  String get map_location_info_address_loading => '正在解析地址…';
+  String get map_location_info_address_loading => '正在获取地址…';
 
   @override
-  String get map_location_info_address_unavailable => '暂无地址信息';
+  String get map_location_info_address_unavailable => '暂无法获取地址';
 
   @override
   String get map_location_info_create_event => '在此创建活动';
@@ -355,13 +355,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_place_details_title => '地点信息';
 
   @override
-  String get map_place_details_not_found => '附近没有找到可用地点。';
+  String get map_place_details_not_found => '未找到该地点的详细信息。';
 
   @override
-  String get map_place_details_error => '暂时无法获取地点信息。';
+  String get map_place_details_error => '暂时无法加载地点详情。';
 
   @override
-  String get map_place_details_missing_api_key => 'Google Places API Key 未配置。';
+  String get map_place_details_missing_api_key => '地点搜索不可用：未配置 API 密钥。';
 
   @override
   String map_place_details_rating_value(Object rating) {
@@ -402,10 +402,54 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_place_details_price_unknown => '价格等级：未知';
 
   @override
-  String get map_select_location_title => '要在这里创建活动吗？';
+  String get map_select_location_title => '选择起点位置';
 
   @override
-  String get map_select_location_tip => '拖动标记微调位置，确认后即可创建活动。';
+  String get map_select_location_tip => '在地图长按可精确调整位置。';
+
+  @override
+  String get map_selection_sheet_tap_to_expand => '点击展开';
+
+  @override
+  String get map_select_location_destination_tip => '点击地图选择终点。';
+
+  @override
+  String get map_select_location_destination_missing => '请选择终点后继续。';
+
+  @override
+  String get map_select_location_trip_title_label => '行程名称';
+
+  @override
+  String get map_select_location_trip_title_hint => '为此次行程起个名字';
+
+  @override
+  String get map_select_location_title_required => '请输入行程名称。';
+
+  @override
+  String get map_select_location_start_label => '起点';
+
+  @override
+  String get map_select_location_destination_label => '终点';
+
+  @override
+  String get map_select_location_open_detailed => '打开详细规划';
+
+  @override
+  String get map_select_location_create_trip => '创建快速行程';
+
+  @override
+  String get map_quick_trip_default_title => '自驾游';
+
+  @override
+  String map_quick_trip_description(Object start, Object destination) {
+    return '从 $start 出发前往 $destination。';
+  }
+
+  @override
+  String get map_quick_trip_created => '快速行程已创建。';
+
+  @override
+  String get map_quick_trip_create_failed => '创建行程失败。';
 
   @override
   String get messages => '消息';

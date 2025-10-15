@@ -33,6 +33,14 @@ import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import '../detail/events_detail_page.dart';
 
+enum _SelectionSheetState { hidden, collapsed, expanded }
+
+const double _kSheetHiddenExtent = 0.0;
+const double _kSheetCollapsedExtent = 0.15;
+const double _kSheetExpandedExtent = 0.85;
+const double _kSheetSnapVelocityThreshold = 800;
+const double _kSheetSnapDistanceThreshold = 0.1;
+
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
   const EventsMapPage({super.key, this.selectedEvent});
@@ -52,11 +60,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   LatLng? _selectedLatLng;
   late final ValueNotifier<LatLng?> _selectedLatLngNotifier;
   bool _isHandlingLongPress = false;
-  bool _isSelectionSheetOpen = false;
   EdgeInsets _mapPadding = EdgeInsets.zero;
-  Completer<bool>? _selectionSheetCompleter;
-  double? _pendingSelectionSheetPadding;
-  bool _selectionSheetPaddingScheduled = false;
+  late final DraggableScrollableController _selectionSheetController;
+  _SelectionSheetState _selectionSheetState = _SelectionSheetState.hidden;
+  bool _isHidingSelectionSheet = false;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -78,6 +85,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _selectedLatLngNotifier = ValueNotifier<LatLng?>(null);
+    _selectionSheetController = DraggableScrollableController();
+    _selectionSheetController.addListener(_handleSelectionSheetExtentChanged);
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -106,6 +115,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _mapFocusSubscription?.close();
     _eventCardController.dispose();
     _selectedLatLngNotifier.dispose();
+    _selectionSheetController.removeListener(
+      _handleSelectionSheetExtentChanged,
+    );
+    _selectionSheetController.dispose();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
       if (controller.state) {
@@ -154,7 +167,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueAzure,
           ),
-          onTap: () => unawaited(_showLocationSelectionSheet()),
+          onTap: () => unawaited(_showLocationSelectionSheet(expand: true)),
           onDrag: _onSelectedLocationDrag,
           onDragEnd: _onSelectedLocationDragEnd,
         ),
@@ -303,29 +316,43 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Widget _buildLocationSelectionSheetOverlay() {
-    if (!_isSelectionSheetOpen) {
+    final hasSelection = _selectedLatLng != null;
+    final shouldRenderSheet = hasSelection ||
+        _selectionSheetState != _SelectionSheetState.hidden ||
+        _isHidingSelectionSheet;
+
+    if (!shouldRenderSheet) {
       return const SizedBox.shrink();
     }
 
-    final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     final placesService = ref.read(placesServiceProvider);
+    final isCollapsed = _selectionSheetState == _SelectionSheetState.collapsed;
+    final isExpanded = _selectionSheetState == _SelectionSheetState.expanded;
 
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SizedBox.expand(
-        child: NotificationListener<DraggableScrollableNotification>(
-          onNotification: (notification) {
-            _updateMapPaddingForExtent(notification.extent);
-            return false;
-          },
+    return Stack(
+      children: [
+        if (isExpanded)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => unawaited(_collapseSelectionSheet()),
+              child: Container(color: Colors.black26),
+            ),
+          ),
+        Align(
+          alignment: Alignment.bottomCenter,
           child: DraggableScrollableSheet(
+            controller: _selectionSheetController,
             expand: false,
-            initialChildSize: 0.32,
-            minChildSize: 0.18,
-            maxChildSize: 0.75,
+            initialChildSize: _kSheetHiddenExtent,
+            minChildSize: _kSheetHiddenExtent,
+            maxChildSize: _kSheetExpandedExtent,
             snap: true,
-            snapSizes: const [0.18, 0.32, 0.75],
+            snapSizes: const [
+              _kSheetHiddenExtent,
+              _kSheetCollapsedExtent,
+              _kSheetExpandedExtent,
+            ],
             builder: (context, scrollController) {
               return Align(
                 alignment: Alignment.bottomCenter,
@@ -337,28 +364,85 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                     ),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: _LocationSelectionSheet(
-                    positionListenable: _selectedLatLngNotifier,
-                    onConfirm: () => _completeSelectionSheet(true),
-                    onCancel: () => _completeSelectionSheet(false),
-                    reverseGeocode: _reverseGeocode,
-                    fetchNearbyPlaces: (position) =>
-                        placesService.searchNearbyPlaces(
-                      position,
-                      radius: 200,
-                      maxResults: 3,
-                    ),
-                    onPlaceSelected: (place) =>
-                        unawaited(_onNearbyPlaceSelected(place)),
-                    scrollController: scrollController,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _SelectionSheetGrabHandle(
+                        onTap: () {
+                          if (_selectionSheetState ==
+                              _SelectionSheetState.collapsed) {
+                            unawaited(_expandSelectionSheet());
+                          } else if (_selectionSheetState ==
+                              _SelectionSheetState.expanded) {
+                            unawaited(_collapseSelectionSheet());
+                          }
+                        },
+                        onVerticalDragUpdate: (details) {
+                          final delta = details.primaryDelta;
+                          if (delta != null) {
+                            _dragSelectionSheetByDelta(delta);
+                          }
+                        },
+                        onVerticalDragEnd: (details) {
+                          _snapSelectionSheetByVelocity(
+                            details.primaryVelocity ?? 0,
+                          );
+                        },
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _selectionSheetState ==
+                                  _SelectionSheetState.collapsed
+                              ? () => unawaited(_expandSelectionSheet())
+                              : null,
+                          child: IgnorePointer(
+                            ignoring: isCollapsed,
+                            child: _LocationSelectionSheet(
+                              positionListenable: _selectedLatLngNotifier,
+                              onConfirm: _onSelectionSheetConfirm,
+                              onCancel: _onSelectionSheetCancel,
+                              reverseGeocode: _reverseGeocode,
+                              fetchNearbyPlaces: (position) =>
+                                  placesService.searchNearbyPlaces(
+                                position,
+                                radius: 200,
+                                maxResults: 3,
+                              ),
+                              onPlaceSelected: (place) =>
+                                  unawaited(_onNearbyPlaceSelected(place)),
+                              scrollController: scrollController,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
             },
           ),
         ),
-      ),
+      ],
     );
+  }
+
+  void _handleSelectionSheetExtentChanged() {
+    if (!mounted) {
+      return;
+    }
+
+    final extent = _selectionSheetController.size;
+    _updateMapPaddingForExtent(extent);
+
+    if (_isHidingSelectionSheet) {
+      return;
+    }
+
+    final nextState = _stateForExtent(extent);
+    if (nextState != _selectionSheetState) {
+      setState(() => _selectionSheetState = nextState);
+    }
   }
 
   void _updateMapPaddingForExtent(double extent) {
@@ -367,35 +451,191 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
 
     final mediaQuery = MediaQuery.of(context);
-    final targetBottom =
-        extent * mediaQuery.size.height + mediaQuery.viewPadding.bottom + 24;
+    final hiddenThreshold = (_kSheetCollapsedExtent + _kSheetHiddenExtent) / 2;
+    final targetBottom = extent <= hiddenThreshold
+        ? 0.0
+        : extent * mediaQuery.size.height +
+            mediaQuery.viewPadding.bottom +
+            24;
 
     if ((_mapPadding.bottom - targetBottom).abs() < 2) {
       return;
     }
 
-    _pendingSelectionSheetPadding = targetBottom;
-    if (_selectionSheetPaddingScheduled) {
+    setState(() {
+      _mapPadding = EdgeInsets.only(bottom: targetBottom);
+    });
+  }
+
+  _SelectionSheetState _stateForExtent(double extent) {
+    if (extent <= (_kSheetCollapsedExtent + _kSheetHiddenExtent) / 2) {
+      return _SelectionSheetState.hidden;
+    }
+    if (extent <= (_kSheetCollapsedExtent + _kSheetExpandedExtent) / 2) {
+      return _SelectionSheetState.collapsed;
+    }
+    return _SelectionSheetState.expanded;
+  }
+
+  Future<void> _animateSheetTo(
+    double extent, {
+    Duration duration = const Duration(milliseconds: 250),
+  }) async {
+    Future<void> runAnimation() async {
+      try {
+        await _selectionSheetController.animateTo(
+          extent,
+          duration: duration,
+          curve: Curves.easeOutCubic,
+        );
+      } catch (_) {
+        try {
+          if ((_selectionSheetController.size - extent).abs() <= 0.001) {
+            return;
+          }
+        } catch (_) {}
+        rethrow;
+      }
+    }
+
+    try {
+      await runAnimation();
+    } on FlutterError catch (_) {
+      _scheduleSheetAnimation(runAnimation);
+    } on StateError catch (_) {
+      _scheduleSheetAnimation(runAnimation);
+    }
+  }
+
+  void _scheduleSheetAnimation(Future<void> Function() runAnimation) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      unawaited(runAnimation().catchError((_) {}));
+    });
+  }
+
+  Future<void> _expandSelectionSheet() async {
+    if (!mounted || _selectedLatLng == null) {
       return;
     }
-    _selectionSheetPaddingScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _selectionSheetPaddingScheduled = false;
-      if (!mounted || !_isSelectionSheetOpen) {
-        return;
+    if (_selectionSheetState != _SelectionSheetState.expanded) {
+      setState(() => _selectionSheetState = _SelectionSheetState.expanded);
+    }
+    _updateMapPaddingForExtent(_kSheetExpandedExtent);
+    await _animateSheetTo(
+      _kSheetExpandedExtent,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  Future<void> _collapseSelectionSheet() async {
+    if (!mounted) {
+      return;
+    }
+    if (_selectionSheetState == _SelectionSheetState.hidden) {
+      return;
+    }
+    if (_selectionSheetState != _SelectionSheetState.collapsed) {
+      setState(() => _selectionSheetState = _SelectionSheetState.collapsed);
+    }
+    _updateMapPaddingForExtent(_kSheetCollapsedExtent);
+    await _animateSheetTo(
+      _kSheetCollapsedExtent,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
+
+  Future<void> _hideSelectionSheet() async {
+    if (!mounted) {
+      return;
+    }
+    double? currentExtent;
+    try {
+      currentExtent = _selectionSheetController.size;
+    } catch (_) {
+      currentExtent = null;
+    }
+    final isAlreadyHidden = _selectionSheetState == _SelectionSheetState.hidden &&
+        (currentExtent == null ||
+            currentExtent <= _kSheetHiddenExtent + 0.001);
+    if (isAlreadyHidden) {
+      return;
+    }
+    _isHidingSelectionSheet = true;
+    try {
+      await _animateSheetTo(
+        _kSheetHiddenExtent,
+        duration: const Duration(milliseconds: 200),
+      );
+    } finally {
+      _isHidingSelectionSheet = false;
+    }
+    if (!mounted) {
+      return;
+    }
+    if (_selectionSheetState != _SelectionSheetState.hidden) {
+      setState(() => _selectionSheetState = _SelectionSheetState.hidden);
+    }
+    _updateMapPaddingForExtent(_kSheetHiddenExtent);
+  }
+
+  void _dragSelectionSheetByDelta(double delta) {
+    final height = MediaQuery.of(context).size.height;
+    if (height <= 0) {
+      return;
+    }
+    double current;
+    try {
+      current = _selectionSheetController.size;
+    } catch (_) {
+      return;
+    }
+    final next = (current - delta / height)
+        .clamp(_kSheetHiddenExtent, _kSheetExpandedExtent);
+    _selectionSheetController.jumpTo(next);
+  }
+
+  void _snapSelectionSheetByVelocity(double velocity) {
+    double current;
+    try {
+      current = _selectionSheetController.size;
+    } catch (_) {
+      return;
+    }
+    double target;
+
+    if (velocity.abs() > _kSheetSnapVelocityThreshold) {
+      if (velocity > 0) {
+        target = current > (_kSheetCollapsedExtent + _kSheetExpandedExtent) / 2
+            ? _kSheetCollapsedExtent
+            : _kSheetHiddenExtent;
+      } else {
+        target = _kSheetExpandedExtent;
       }
-      final pending = _pendingSelectionSheetPadding;
-      _pendingSelectionSheetPadding = null;
-      if (pending == null) {
-        return;
+    } else {
+      if (current <= _kSheetCollapsedExtent - _kSheetSnapDistanceThreshold) {
+        target = _kSheetHiddenExtent;
+      } else if ((current - _kSheetCollapsedExtent).abs() <=
+          _kSheetSnapDistanceThreshold) {
+        target = _kSheetCollapsedExtent;
+      } else {
+        target = _kSheetExpandedExtent;
       }
-      if ((_mapPadding.bottom - pending).abs() < 2) {
-        return;
-      }
-      setState(() {
-        _mapPadding = EdgeInsets.only(bottom: pending);
-      });
-    });
+    }
+
+    if (_selectedLatLng == null) {
+      target = _kSheetHiddenExtent;
+    }
+
+    if (target == _kSheetHiddenExtent) {
+      unawaited(_hideSelectionSheet());
+    } else if (target == _kSheetCollapsedExtent) {
+      unawaited(_showLocationSelectionSheet(expand: false));
+    } else {
+      unawaited(_expandSelectionSheet());
+    }
   }
 
   void _onEventCardPageChanged(int index) {
@@ -511,69 +751,62 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     HapticFeedback.lightImpact();
   }
 
-  Future<void> _waitForSelectionSheetToClose() async {
-    var attempts = 0;
-    while (_isSelectionSheetOpen && attempts < 50) {
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-      attempts++;
-    }
-  }
-
-  Future<void> _clearSelectedLocation({bool dismissSheet = true}) async {
-    if (dismissSheet && _isSelectionSheetOpen) {
-      _completeSelectionSheet(false);
-      await _waitForSelectionSheetToClose();
-    }
-
+  Future<void> _clearSelectedLocation() async {
     if (_selectedLatLng == null) {
+      if (_selectionSheetState != _SelectionSheetState.hidden) {
+        await _hideSelectionSheet();
+      }
       _selectedLatLngNotifier.value = null;
       return;
     }
 
+    await _hideSelectionSheet();
     _setSelectedLatLng(null);
   }
 
-  Future<void> _showLocationSelectionSheet() async {
-    if (!mounted || _selectedLatLng == null || _isSelectionSheetOpen) {
+  Future<void> _showLocationSelectionSheet({bool expand = false}) async {
+    if (!mounted || _selectedLatLng == null) {
       return;
     }
 
-    final bottomInset = MediaQuery.of(context).viewPadding.bottom;
-    final paddingValue = 320.0 + bottomInset;
-    final completer = Completer<bool>();
+    if (expand) {
+      await _expandSelectionSheet();
+      return;
+    }
 
-    setState(() {
-      _isSelectionSheetOpen = true;
-      _mapPadding = EdgeInsets.only(bottom: paddingValue);
-      _selectionSheetCompleter = completer;
-    });
+    if (_selectionSheetState != _SelectionSheetState.collapsed) {
+      setState(() => _selectionSheetState = _SelectionSheetState.collapsed);
+    }
 
-    final result = await completer.future;
+    _updateMapPaddingForExtent(_kSheetCollapsedExtent);
 
+    await _animateSheetTo(
+      _kSheetCollapsedExtent,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
+
+  Future<void> _onSelectionSheetConfirm() async {
+    final target = _selectedLatLngNotifier.value;
+    if (target == null) {
+      await _hideSelectionSheet();
+      return;
+    }
+
+    await _hideSelectionSheet();
     if (!mounted) {
       return;
     }
 
-    setState(() {
-      _isSelectionSheetOpen = false;
-      _mapPadding = EdgeInsets.zero;
-      _selectionSheetCompleter = null;
-    });
-
-    if (result) {
-      final target = _selectedLatLngNotifier.value;
-      if (target != null) {
-        await _createEventAt(target);
-        await _clearSelectedLocation(dismissSheet: false);
-      }
+    await _createEventAt(target);
+    if (!mounted) {
+      return;
     }
+    _setSelectedLatLng(null);
   }
 
-  void _completeSelectionSheet(bool confirmed) {
-    final completer = _selectionSheetCompleter;
-    if (completer != null && !completer.isCompleted) {
-      completer.complete(confirmed);
-    }
+  Future<void> _onSelectionSheetCancel() async {
+    await _clearSelectedLocation();
   }
 
   Future<void> _onNearbyPlaceSelected(NearbyPlace place) async {
@@ -584,6 +817,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _setSelectedLatLng(location);
     await _moveCamera(location, zoom: 17);
     await HapticFeedback.selectionClick();
+    await _expandSelectionSheet();
   }
 
   void _showEventCard(Event ev) {
@@ -645,6 +879,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     _hideEventCard();
+
+    if (_selectionSheetState == _SelectionSheetState.expanded) {
+      await _collapseSelectionSheet();
+      return;
+    }
+
+    if (_selectionSheetState == _SelectionSheetState.collapsed) {
+      await _clearSelectedLocation();
+      return;
+    }
+
     final loc = AppLocalizations.of(context)!;
     final places = ref.read(placesServiceProvider);
 
@@ -963,6 +1208,41 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 }
 
+class _SelectionSheetGrabHandle extends StatelessWidget {
+  const _SelectionSheetGrabHandle({
+    this.onTap,
+    required this.onVerticalDragUpdate,
+    required this.onVerticalDragEnd,
+  });
+
+  final VoidCallback? onTap;
+  final ValueChanged<DragUpdateDetails> onVerticalDragUpdate;
+  final ValueChanged<DragEndDetails> onVerticalDragEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      onVerticalDragUpdate: onVerticalDragUpdate,
+      onVerticalDragEnd: onVerticalDragEnd,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Center(
+          child: Container(
+            width: 44,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade400,
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LocationSelectionSheet extends StatelessWidget {
   const _LocationSelectionSheet({
     required this.positionListenable,
@@ -992,19 +1272,9 @@ class _LocationSelectionSheet extends StatelessWidget {
       top: false,
       child: ListView(
         controller: scrollController,
-        padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomInset),
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(24, 12, 24, 24 + bottomInset),
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
           Text(
             loc.map_select_location_title,
             style: theme.textTheme.titleMedium,

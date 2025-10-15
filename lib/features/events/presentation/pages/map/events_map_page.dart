@@ -59,6 +59,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isSelectionSheetOpen = false;
   EdgeInsets _mapPadding = EdgeInsets.zero;
   BuildContext? _selectionSheetContext;
+  final Map<String, Future<List<NearbyPlace>>> _nearbyPlacesCache = {};
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -401,6 +402,38 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
+  Future<List<NearbyPlace>> _getNearbyPlaces(LatLng position) {
+    final key = _nearbyPlacesCacheKey(position);
+    final cached = _nearbyPlacesCache[key];
+    if (cached != null) {
+      return cached;
+    }
+
+    final future = _loadNearbyPlaces(position).then(
+      (value) => value,
+      onError: (Object error, StackTrace stackTrace) {
+        _nearbyPlacesCache.remove(key);
+        throw error;
+      },
+    );
+    _nearbyPlacesCache[key] = future;
+    return future;
+  }
+
+  String _nearbyPlacesCacheKey(LatLng position) {
+    return '${position.latitude.toStringAsFixed(5)}_${position.longitude.toStringAsFixed(5)}';
+  }
+
+  Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng position) async {
+    final service = ref.read(placesServiceProvider);
+    final results = await service.searchNearbyPlaces(
+      position,
+      radius: 150,
+      maxResults: 6,
+    );
+    return results.take(3).toList(growable: false);
+  }
+
   Future<void> _onMapLongPress(LatLng latlng) async {
     if (!mounted) {
       return;
@@ -587,6 +620,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onConfirm: () => Navigator.of(sheetContext).pop(true),
           onCancel: () => Navigator.of(sheetContext).pop(false),
           reverseGeocode: _reverseGeocode,
+          fetchNearbyPlaces: _getNearbyPlaces,
           collapsedListenable: collapsedNotifier,
           onExpand: () => collapsedNotifier.value = false,
         );
@@ -642,6 +676,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           startPositionListenable: _selectedLatLngNotifier,
           destinationListenable: _destinationLatLngNotifier,
           reverseGeocode: _reverseGeocode,
+          fetchNearbyPlaces: _getNearbyPlaces,
           collapsedListenable: collapsedNotifier,
           onExpand: () => collapsedNotifier.value = false,
           onCancel: () => Navigator.of(sheetContext).pop(null),
@@ -980,6 +1015,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       final result = await InternetAddress.lookup(lookupHost);
       final hasConnection =
           result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+      final hasConnection =
+          result.isNotEmpty && result.first.rawAddress.isNotEmpty;
 
       if (!hasConnection && mounted) {
         ScaffoldMessenger.of(
@@ -1221,6 +1258,7 @@ class _StartLocationSheet extends StatelessWidget {
     required this.onConfirm,
     required this.onCancel,
     required this.reverseGeocode,
+    required this.fetchNearbyPlaces,
     required this.collapsedListenable,
     required this.onExpand,
   });
@@ -1229,6 +1267,7 @@ class _StartLocationSheet extends StatelessWidget {
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
   final Future<String?> Function(LatLng) reverseGeocode;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
   final ValueListenable<bool> collapsedListenable;
   final VoidCallback onExpand;
 
@@ -1262,6 +1301,7 @@ class _StartLocationSheet extends StatelessWidget {
                       onConfirm: onConfirm,
                       onCancel: onCancel,
                       reverseGeocode: reverseGeocode,
+                      fetchNearbyPlaces: fetchNearbyPlaces,
                     ),
             );
           },
@@ -1278,12 +1318,14 @@ class _StartExpandedView extends StatelessWidget {
     required this.onConfirm,
     required this.onCancel,
     required this.reverseGeocode,
+    required this.fetchNearbyPlaces,
   });
 
   final ValueListenable<LatLng?> positionListenable;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
   final Future<String?> Function(LatLng) reverseGeocode;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
 
   @override
   Widget build(BuildContext context) {
@@ -1395,6 +1437,13 @@ class _StartExpandedView extends StatelessWidget {
                           child: Text(display),
                         );
                       },
+                    ),
+                    const SizedBox(height: 16),
+                    _NearbyPlacesPreview(
+                      key: ValueKey(
+                        '${position.latitude}_${position.longitude}_start_nearby',
+                      ),
+                      future: fetchNearbyPlaces(position),
                     ),
                   ],
                 );
@@ -1521,6 +1570,7 @@ class _DestinationSelectionSheet extends StatefulWidget {
     required this.startPositionListenable,
     required this.destinationListenable,
     required this.reverseGeocode,
+    required this.fetchNearbyPlaces,
     required this.collapsedListenable,
     required this.onExpand,
     required this.onCancel,
@@ -1529,6 +1579,7 @@ class _DestinationSelectionSheet extends StatefulWidget {
   final ValueListenable<LatLng?> startPositionListenable;
   final ValueListenable<LatLng?> destinationListenable;
   final Future<String?> Function(LatLng) reverseGeocode;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
   final ValueListenable<bool> collapsedListenable;
   final VoidCallback onExpand;
   final VoidCallback onCancel;
@@ -1707,6 +1758,7 @@ class _DestinationSelectionSheetState
                       startListenable: widget.startPositionListenable,
                       destinationListenable: widget.destinationListenable,
                       reverseGeocode: widget.reverseGeocode,
+                      fetchNearbyPlaces: widget.fetchNearbyPlaces,
                     ),
             );
           },
@@ -1729,6 +1781,7 @@ class _DestinationExpandedView extends StatelessWidget {
     required this.startListenable,
     required this.destinationListenable,
     required this.reverseGeocode,
+    required this.fetchNearbyPlaces,
   });
 
   final GlobalKey<FormState> formKey;
@@ -1741,6 +1794,7 @@ class _DestinationExpandedView extends StatelessWidget {
   final ValueListenable<LatLng?> startListenable;
   final ValueListenable<LatLng?> destinationListenable;
   final Future<String?> Function(LatLng) reverseGeocode;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
 
   @override
   Widget build(BuildContext context) {
@@ -1872,6 +1926,13 @@ class _DestinationExpandedView extends StatelessWidget {
                           );
                         },
                       ),
+                      const SizedBox(height: 16),
+                      _NearbyPlacesPreview(
+                        key: ValueKey(
+                          '${position.latitude}_${position.longitude}_start_nearby_trip',
+                        ),
+                        future: fetchNearbyPlaces(position),
+                      ),
                     ],
                   );
                 },
@@ -1953,6 +2014,13 @@ class _DestinationExpandedView extends StatelessWidget {
                             child: Text(display),
                           );
                         },
+                      ),
+                      const SizedBox(height: 16),
+                      _NearbyPlacesPreview(
+                        key: ValueKey(
+                          '${position.latitude}_${position.longitude}_destination_nearby_trip',
+                        ),
+                        future: fetchNearbyPlaces(position),
                       ),
                     ],
                   );
@@ -2120,6 +2188,119 @@ class _DestinationCollapsedView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _NearbyPlacesPreview extends StatelessWidget {
+  const _NearbyPlacesPreview({super.key, required this.future});
+
+  final Future<List<NearbyPlace>> future;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.map_location_info_nearby_title,
+          style: theme.textTheme.labelLarge,
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<NearbyPlace>>(
+          future: future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 56,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasError) {
+              final error = snapshot.error;
+              var message = loc.map_location_info_nearby_error;
+              if (error is PlacesApiException &&
+                  error.message.contains('not configured')) {
+                message = loc.map_place_details_missing_api_key;
+              }
+              return Text(
+                message,
+                style: theme.textTheme.bodySmall,
+              );
+            }
+            final places = snapshot.data;
+            if (places == null || places.isEmpty) {
+              return Text(
+                loc.map_location_info_nearby_empty,
+                style: theme.textTheme.bodySmall,
+              );
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < places.length; i++) ...[
+                  _NearbyPlaceTile(place: places[i]),
+                  if (i < places.length - 1) const SizedBox(height: 8),
+                ],
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _NearbyPlaceTile extends StatelessWidget {
+  const _NearbyPlaceTile({required this.place});
+
+  final NearbyPlace place;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleStyle = theme.textTheme.bodyMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
+    final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurface.withValues(alpha: .7),
+    );
+    final address = place.formattedAddress?.trim();
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.place_outlined,
+          color: theme.colorScheme.primary,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                place.displayName,
+                style: titleStyle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (address != null && address.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  address,
+                  style: subtitleStyle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

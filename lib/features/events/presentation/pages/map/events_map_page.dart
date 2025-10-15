@@ -20,7 +20,6 @@ import 'package:crew_app/features/events/presentation/pages/trips/create_road_tr
 
 import '../../../data/event.dart';
 import '../../../../../core/error/api_exception.dart';
-import '../../../../../core/state/di/providers.dart';
 import '../../../../../core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';

@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:crew_app/app/state/app_overlay_provider.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }
 
@@ -281,7 +282,7 @@ class SettingsPage extends ConsumerWidget {
                           Text('${loc.settings_account_uid_label}: $uid'),
                         ],
                       )
-                    : Text(loc.login_prompt)
+                    : Text(loc.login_prompt),
               ),
               ListTile(
                 leading: const Icon(Icons.history),
@@ -321,6 +322,10 @@ class SettingsPage extends ConsumerWidget {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(loc.logout_success)));
+    ref.read(appOverlayIndexProvider.notifier).state = 1;
+    Navigator.of(
+      context,
+    ).popUntil((route) => route.settings.name == '/' || route.isFirst);
   }
 
   void _showSubscriptionPlanSheet(

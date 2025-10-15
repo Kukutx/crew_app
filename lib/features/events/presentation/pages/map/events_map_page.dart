@@ -579,7 +579,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
 
-    final proceed = await (_presentSelectionSheet<bool>(
+ final proceed = await _presentSelectionSheet<bool>(
               expandedPadding: paddingValue,
               builder: (sheetContext, collapsedNotifier) {
                 return _StartLocationSheet(
@@ -589,12 +589,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                   reverseGeocode: _reverseGeocode,
                   collapsedListenable: collapsedNotifier,
                   onExpand: () => collapsedNotifier.value = false,
-                );
+                );    
               },
-            ) ??
-            false);
+            );
 
-    if (proceed) {
+    if (proceed != null && proceed) {
       await _beginDestinationSelection();
     } else {
       await _clearSelectedLocation(dismissSheet: false);

@@ -731,7 +731,7 @@ abstract class AppLocalizations {
   /// No description provided for @map_location_info_address_loading.
   ///
   /// In en, this message translates to:
-  /// **'Resolving address…'**
+  /// **'Looking up address…'**
   String get map_location_info_address_loading;
 
   /// No description provided for @map_location_info_address_unavailable.
@@ -773,19 +773,19 @@ abstract class AppLocalizations {
   /// No description provided for @map_place_details_not_found.
   ///
   /// In en, this message translates to:
-  /// **'No places found nearby.'**
+  /// **"We couldn't find details for this place."**
   String get map_place_details_not_found;
 
   /// No description provided for @map_place_details_error.
   ///
   /// In en, this message translates to:
-  /// **'Unable to load place information.'**
+  /// **'Unable to load place details right now.'**
   String get map_place_details_error;
 
   /// No description provided for @map_place_details_missing_api_key.
   ///
   /// In en, this message translates to:
-  /// **'Google Places API key is not configured.'**
+  /// **'Places search is unavailable: API key is not configured.'**
   String get map_place_details_missing_api_key;
 
   /// No description provided for @map_place_details_rating_value.
@@ -845,14 +845,98 @@ abstract class AppLocalizations {
   /// No description provided for @map_select_location_title.
   ///
   /// In en, this message translates to:
-  /// **'Create an event here?'**
+  /// **'Choose a start location'**
   String get map_select_location_title;
 
   /// No description provided for @map_select_location_tip.
   ///
   /// In en, this message translates to:
-  /// **'Drag the pin to fine-tune the meeting point before creating your event.'**
+  /// **'Long press on the map to fine-tune the position.'**
   String get map_select_location_tip;
+
+  /// No description provided for @map_selection_sheet_tap_to_expand.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to expand'**
+  String get map_selection_sheet_tap_to_expand;
+
+  /// No description provided for @map_select_location_destination_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to choose a destination.'**
+  String get map_select_location_destination_tip;
+
+  /// No description provided for @map_select_location_destination_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a destination to continue.'**
+  String get map_select_location_destination_missing;
+
+  /// No description provided for @map_select_location_trip_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip title'**
+  String get map_select_location_trip_title_label;
+
+  /// No description provided for @map_select_location_trip_title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Give this trip a name'**
+  String get map_select_location_trip_title_hint;
+
+  /// No description provided for @map_select_location_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a trip title.'**
+  String get map_select_location_title_required;
+
+  /// No description provided for @map_select_location_start_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get map_select_location_start_label;
+
+  /// No description provided for @map_select_location_destination_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get map_select_location_destination_label;
+
+  /// No description provided for @map_select_location_open_detailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Open detailed planner'**
+  String get map_select_location_open_detailed;
+
+  /// No description provided for @map_select_location_create_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create quick trip'**
+  String get map_select_location_create_trip;
+
+  /// No description provided for @map_quick_trip_default_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Road trip'**
+  String get map_quick_trip_default_title;
+
+  /// No description provided for @map_quick_trip_description.
+  ///
+  /// In en, this message translates to:
+  /// **'From {start} to {destination}.'**
+  String map_quick_trip_description(Object start, Object destination);
+
+  /// No description provided for @map_quick_trip_created.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick trip created.'**
+  String get map_quick_trip_created;
+
+  /// No description provided for @map_quick_trip_create_failed.
+  ///
+  /// In en, this message translates to:
+  /// **"We couldn't create this trip."**
+  String get map_quick_trip_create_failed;
 
   /// No description provided for @messages.
   ///

@@ -133,16 +133,16 @@
   "map": "Map",
   "map_clear_selected_point": "Clear selected point",
   "map_location_info_title": "Location info",
-  "map_location_info_address_loading": "Resolving address…",
+  "map_location_info_address_loading": "Looking up address…",
   "map_location_info_address_unavailable": "Address unavailable",
   "map_location_info_create_event": "Create event here",
   "map_location_info_nearby_title": "Nearby places",
   "map_location_info_nearby_empty": "No places found within 100 m.",
   "map_location_info_nearby_error": "Unable to load nearby places.",
   "map_place_details_title": "Place details",
-  "map_place_details_not_found": "No places found nearby.",
-  "map_place_details_error": "Unable to load place information.",
-  "map_place_details_missing_api_key": "Google Places API key is not configured.",
+  "map_place_details_not_found": "We couldn't find details for this place.",
+  "map_place_details_error": "Unable to load place details right now.",
+  "map_place_details_missing_api_key": "Places search is unavailable: API key is not configured.",
   "map_place_details_rating_value": "Rating {rating}",
   "@map_place_details_rating_value": {
     "placeholders": {
@@ -164,8 +164,8 @@
   "map_place_details_price_expensive": "Price level: $$$",
   "map_place_details_price_very_expensive": "Price level: $$$$",
   "map_place_details_price_unknown": "Price level: unknown",
-  "map_select_location_title": "Create an event here?",
-  "map_select_location_tip": "Drag the pin to fine-tune the meeting point before creating your event.",
+  "map_select_location_title": "Choose a start location",
+  "map_select_location_tip": "Long press on the map to fine-tune the position.",
   "messages": "Messages",
   "max_interest_selection": "You can select up to 5 interest tags.",
   "my_events": "My events",
@@ -379,5 +379,25 @@
   },
   "disclaimer_acknowledge": "I have read and agree to the terms above.",
   "disclaimer_exit": "Exit",
-  "disclaimer_accept": "Agree"
+  "disclaimer_accept": "Agree",
+  "map_quick_trip_default_title": "Road trip",
+  "map_quick_trip_description": "From {start} to {destination}.",
+  "map_quick_trip_created": "Quick trip created.",
+  "map_quick_trip_create_failed": "We couldn't create this trip.",
+  "map_selection_sheet_tap_to_expand": "Tap to expand",
+  "map_select_location_destination_tip": "Tap the map to choose a destination.",
+  "map_select_location_destination_missing": "Pick a destination to continue.",
+  "map_select_location_trip_title_label": "Trip title",
+  "map_select_location_trip_title_hint": "Give this trip a name",
+  "map_select_location_title_required": "Please enter a trip title.",
+  "map_select_location_start_label": "Start",
+  "map_select_location_destination_label": "Destination",
+  "map_select_location_open_detailed": "Open detailed planner",
+  "map_select_location_create_trip": "Create quick trip",
+  "@map_quick_trip_description": {
+    "placeholders": {
+      "start": {},
+      "destination": {}
+    }
+  }
 }

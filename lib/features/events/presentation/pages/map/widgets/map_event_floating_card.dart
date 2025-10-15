@@ -30,12 +30,14 @@ class MapEventFloatingCard extends StatelessWidget {
     final timeLabel = startTime != null
         ? DateFormat('MM.dd HH:mm').format(startTime.toLocal())
         : loc.to_be_announced;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Material(
       elevation: 12,
       borderRadius: BorderRadius.circular(20),
       clipBehavior: Clip.antiAlias,
-      color: Theme.of(context).colorScheme.surface,
+      color: cs.surface,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -88,24 +90,23 @@ class MapEventFloatingCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: Text(
-                                event.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: onFavorite,
-                              visualDensity: VisualDensity.compact,
-                              icon: Icon(
-                                event.isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                              ),
+                          child: Text(
+                            event.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: onFavorite,
+                          visualDensity: VisualDensity.compact,
+                          tooltip: loc.favorites_title,
+                          icon: Icon(
+                            event.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                          ),
                             ),
                             IconButton(
                               onPressed: onClose,
@@ -116,7 +117,7 @@ class MapEventFloatingCard extends StatelessWidget {
                         ),
                         Text(
                           timeLabel,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          style: theme.textTheme.titleSmall?.copyWith(
                                 color: Colors.black87,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -130,9 +131,7 @@ class MapEventFloatingCard extends StatelessWidget {
                                 event.location,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
+                                style: theme.textTheme.bodyMedium
                                     ?.copyWith(color: Colors.black54),
                               ),
                             ),
@@ -148,9 +147,7 @@ class MapEventFloatingCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 participantSummary,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
+                                style: theme.textTheme.bodyMedium
                                     ?.copyWith(color: Colors.black54),
                               ),
                             ),
@@ -172,9 +169,7 @@ class MapEventFloatingCard extends StatelessWidget {
                               onPressed: onRegister,
                               child: Text(
                                 loc.action_register_now,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
+                                style: theme.textTheme.labelLarge
                                     ?.copyWith(color: Colors.white),
                               ),
                             ),
@@ -194,16 +189,17 @@ class MapEventFloatingCard extends StatelessWidget {
 
   Widget _smallChip(BuildContext context, String text) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary.withValues(alpha: 0.12),
+        color: cs.secondaryContainer.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         text,
         style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.secondary,
+          color: cs.onSecondaryContainer,
           fontWeight: FontWeight.w600,
         ),
       ),

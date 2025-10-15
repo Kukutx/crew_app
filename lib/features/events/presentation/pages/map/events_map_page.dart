@@ -29,7 +29,7 @@ import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
-import 'widgets/map_event_floating_card.dart';
+import 'widgets/map_event_sheet.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import '../detail/events_detail_page.dart';
@@ -43,13 +43,17 @@ class EventsMapPage extends ConsumerStatefulWidget {
 }
 
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
+  static const double _sheetCollapsedSize = 0.15;
+  static const double _sheetExpandedSize = 0.85;
+  static const double _sheetCollapseThreshold = 0.2;
+
   GoogleMapController? _map;
   bool _mapReady = false;
   bool _movedToSelected = false;
-  late final PageController _eventCardController;
-  bool _isEventCardVisible = false;
-  List<Event> _carouselEvents = const <Event>[];
-  int _activeEventIndex = 0;
+  late final DraggableScrollableController _eventSheetController;
+  Event? _focusedEvent;
+  bool _isSheetCollapsed = true;
+  double _sheetExtent = 0;
   LatLng? _selectedLatLng;
   LatLng? _destinationLatLng;
   late final ValueNotifier<LatLng?> _selectedLatLngNotifier;
@@ -76,7 +80,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   void initState() {
     super.initState();
     _api = ref.read(apiServiceProvider);
-    _eventCardController = PageController();
+    _eventSheetController = DraggableScrollableController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _selectedLatLngNotifier = ValueNotifier<LatLng?>(null);
@@ -107,7 +111,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     _mapFocusSubscription?.close();
-    _eventCardController.dispose();
+    _eventSheetController.dispose();
     _selectedLatLngNotifier.dispose();
     _destinationLatLngNotifier.dispose();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -123,9 +127,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safeBottom = MediaQuery.of(context).viewPadding.bottom;
-    final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
-    final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
+    final mediaQuery = MediaQuery.of(context);
+    final safeBottom = mediaQuery.viewPadding.bottom;
+    final screenHeight = mediaQuery.size.height;
+    final sheetVisible = _focusedEvent != null;
+    final effectiveExtent = !sheetVisible
+        ? 0.0
+        : (_sheetExtent > 0 ? _sheetExtent : _sheetCollapsedSize);
+    final bottomPadding = (sheetVisible
+            ? (effectiveExtent * screenHeight) + 32
+            : 120) +
+        safeBottom;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
@@ -143,7 +155,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
       data: (list) => MarkersLayer.fromEvents(
         events: list,
-        onEventTap: (event) => _focusOnEvent(event, showEventCard: false),
+        onEventTap: _focusOnEvent,
       ),
     );
 
@@ -232,7 +244,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               mapPadding: _mapPadding,
             ),
           ),
-          _buildEventCardOverlay(safeBottom),
+          _buildEventSheetOverlay(),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -273,63 +285,74 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  Widget _buildEventCardOverlay(double safeBottom) {
-    final loc = AppLocalizations.of(context)!;
-    final visible = _isEventCardVisible && _carouselEvents.isNotEmpty;
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: IgnorePointer(
-        ignoring: !visible,
-        child: AnimatedSlide(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeInOut,
-          offset: Offset(0, visible ? 0 : 1.2),
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            opacity: visible ? 1 : 0,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + safeBottom),
-              child: SizedBox(
-                height: 158,
-                child: PageView.builder(
-                  controller: _eventCardController,
-                  physics: _carouselEvents.length > 1
-                      ? const PageScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  onPageChanged: _onEventCardPageChanged,
-                  itemCount: _carouselEvents.length,
-                  itemBuilder: (_, index) {
-                    final event = _carouselEvents[index];
-                    return MapEventFloatingCard(
-                      key: ValueKey(event.id),
-                      event: event,
-                      onTap: () => _openEventDetails(event),
-                      onClose: _hideEventCard,
-                      onRegister: () {
-                        _showSnackBar(loc.registration_not_implemented);
-                      },
-                      onFavorite: () {
-                        _showSnackBar(loc.feature_not_ready);
-                      },
+  Widget _buildEventSheetOverlay() {
+    final event = _focusedEvent;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: event == null
+          ? const SizedBox.shrink()
+          : Align(
+              alignment: Alignment.bottomCenter,
+              child: NotificationListener<DraggableScrollableNotification>(
+                onNotification: (notification) {
+                  final extent = notification.extent;
+                  final collapsed = extent <= _sheetCollapseThreshold;
+                  if (_sheetExtent != extent ||
+                      _isSheetCollapsed != collapsed) {
+                    setState(() {
+                      _sheetExtent = extent;
+                      _isSheetCollapsed = collapsed;
+                    });
+                  }
+                  return false;
+                },
+                child: DraggableScrollableSheet(
+                  key: ValueKey(event.id),
+                  controller: _eventSheetController,
+                  initialChildSize: _sheetCollapsedSize,
+                  minChildSize: _sheetCollapsedSize,
+                  maxChildSize: _sheetExpandedSize,
+                  snap: true,
+                  snapSizes:
+                      const [_sheetCollapsedSize, _sheetExpandedSize],
+                  expand: false,
+                  builder: (context, _) {
+                    final loc = AppLocalizations.of(context)!;
+                    final safeBottom =
+                        MediaQuery.of(context).viewPadding.bottom;
+                    return Padding(
+                      padding:
+                          EdgeInsets.fromLTRB(16, 0, 16, 16 + safeBottom),
+                      child: MapEventSheet(
+                        event: event,
+                        collapsed: _isSheetCollapsed,
+                        onClose: () => unawaited(_hideEventSheet()),
+                        onTapBody: _handleSheetBodyTap,
+                        onRegister: () {
+                          _showSnackBar(loc.registration_not_implemented);
+                        },
+                        onFavorite: () {
+                          _showSnackBar(loc.feature_not_ready);
+                        },
+                        onHandleDragUpdate: (details) {
+                          final delta = details.primaryDelta;
+                          if (delta == null) {
+                            return;
+                          }
+                          _dragSheetByDelta(context, delta);
+                        },
+                        onHandleDragEnd: (details) {
+                          _snapSheetByVelocity(
+                            details.primaryVelocity ?? 0,
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
               ),
             ),
-          ),
-        ),
-      ),
     );
-  }
-
-  void _onEventCardPageChanged(int index) {
-    if (index < 0 || index >= _carouselEvents.length) {
-      return;
-    }
-    setState(() => _activeEventIndex = index);
-    final event = _carouselEvents[index];
-    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
   }
 
   Future<void> _openEventDetails(Event event) async {
@@ -345,14 +368,18 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
-  void _hideEventCard() {
-    if (!_isEventCardVisible) {
+  Future<void> _hideEventSheet() async {
+    if (_focusedEvent == null) {
+      return;
+    }
+    await _collapseEventSheet();
+    if (!mounted) {
       return;
     }
     setState(() {
-      _isEventCardVisible = false;
-      _carouselEvents = const <Event>[];
-      _activeEventIndex = 0;
+      _focusedEvent = null;
+      _isSheetCollapsed = true;
+      _sheetExtent = 0;
     });
     _updateBottomNavigation(true);
   }
@@ -362,6 +389,116 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (controller.state != visible) {
       controller.state = visible;
     }
+  }
+
+  void _showEventSheet(Event event) {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _focusedEvent = event;
+      _isSheetCollapsed = true;
+      _sheetExtent = _sheetCollapsedSize;
+    });
+    _updateBottomNavigation(false);
+  }
+
+  void _focusOnEvent(
+    Event event, {
+    bool showEventCard = true,
+  }) {
+    if (!mounted) {
+      return;
+    }
+    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
+    _movedToSelected = true;
+    if (showEventCard) {
+      _showEventSheet(event);
+    }
+  }
+
+  void _handleSheetBodyTap() {
+    final event = _focusedEvent;
+    if (event == null) {
+      return;
+    }
+    if (_isSheetCollapsed) {
+      unawaited(_expandEventSheet());
+    } else {
+      _openEventDetails(event);
+    }
+  }
+
+  Future<void> _expandEventSheet() async {
+    final size = _currentSheetSizeOrNull();
+    if (size == null) {
+      return;
+    }
+    await _eventSheetController.animateTo(
+      _sheetExpandedSize,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  Future<void> _collapseEventSheet() async {
+    final size = _currentSheetSizeOrNull();
+    if (size == null) {
+      return;
+    }
+    await _eventSheetController.animateTo(
+      _sheetCollapsedSize,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  double? _currentSheetSizeOrNull() {
+    try {
+      return _eventSheetController.size;
+    } on StateError {
+      return null;
+    }
+  }
+
+  void _dragSheetByDelta(BuildContext context, double delta) {
+    final size = _currentSheetSizeOrNull();
+    if (size == null) {
+      return;
+    }
+    final height = MediaQuery.of(context).size.height;
+    if (height <= 0) {
+      return;
+    }
+    final target =
+        (size - delta / height).clamp(_sheetCollapsedSize, _sheetExpandedSize)
+            as double;
+    _eventSheetController.animateTo(
+      target,
+      duration: Duration.zero,
+      curve: Curves.linear,
+    );
+  }
+
+  void _snapSheetByVelocity(double velocity) {
+    final size = _currentSheetSizeOrNull();
+    if (size == null) {
+      return;
+    }
+    final target = _chooseSnapTarget(size, velocity);
+    _eventSheetController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  double _chooseSnapTarget(double current, double velocity) {
+    if (velocity.abs() > 600) {
+      return velocity < 0 ? _sheetExpandedSize : _sheetCollapsedSize;
+    }
+    final midpoint = (_sheetCollapsedSize + _sheetExpandedSize) / 2;
+    return current >= midpoint ? _sheetExpandedSize : _sheetCollapsedSize;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -412,7 +549,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (_isHandlingLongPress) {
       return;
     }
-    _hideEventCard();
+    await _hideEventSheet();
     _isHandlingLongPress = true;
     try {
       await _clearSelectedLocation();
@@ -678,60 +815,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     await _clearSelectedLocation(dismissSheet: false);
   }
 
-  void _showEventCard(Event ev) {
-    if (!mounted) {
-      return;
-    }
-    final asyncEvents = ref.read(eventsProvider);
-    final list = asyncEvents.maybeWhen(
-      data: (events) => events,
-      orElse: () => const <Event>[],
-    );
-    final selectedIndex = list.indexWhere((event) => event.id == ev.id);
-    if (selectedIndex == -1) {
-      setState(() {
-        _carouselEvents = <Event>[ev];
-        _isEventCardVisible = true;
-        _activeEventIndex = 0;
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || !_eventCardController.hasClients) {
-          return;
-        }
-        _eventCardController.jumpToPage(0);
-      });
-      _updateBottomNavigation(false);
-      return;
-    }
-
-    setState(() {
-      _carouselEvents = list;
-      _isEventCardVisible = true;
-      _activeEventIndex = selectedIndex;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_eventCardController.hasClients) {
-        return;
-      }
-      _eventCardController.jumpToPage(selectedIndex);
-    });
-    _updateBottomNavigation(false);
-  }
-
-  void _focusOnEvent(
-    Event event, {
-    bool showEventCard = true,
-  }) {
-    if (!mounted) {
-      return;
-    }
-    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
-    _movedToSelected = true;
-    if (showEventCard) {
-      _showEventCard(event);
-    }
-  }
-
   Future<void> _onMapTap(LatLng position) async {
     if (!mounted) {
       return;
@@ -740,7 +823,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       await _handleDestinationSelection(position);
       return;
     }
-    _hideEventCard();
+    await _collapseEventSheet();
     final loc = AppLocalizations.of(context)!;
     final places = ref.read(placesServiceProvider);
 

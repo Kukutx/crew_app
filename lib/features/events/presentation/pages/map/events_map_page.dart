@@ -54,7 +54,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isHandlingLongPress = false;
   bool _isSelectionSheetOpen = false;
   EdgeInsets _mapPadding = EdgeInsets.zero;
-  BuildContext? _selectionSheetContext;
+  Completer<bool?>? _selectionSheetCompleter;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -104,6 +104,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _mapFocusSubscription?.close();
     _eventCardController.dispose();
     _selectedLatLngNotifier.dispose();
+    final completer = _selectionSheetCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(null);
+    }
+    _selectionSheetCompleter = null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
       if (controller.state) {
@@ -209,6 +214,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             ),
           ),
           _buildEventCardOverlay(safeBottom),
+          _buildLocationSelectionSheetOverlay(safeBottom),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -421,8 +427,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _clearSelectedLocation({bool dismissSheet = true}) async {
-    if (dismissSheet && _isSelectionSheetOpen && _selectionSheetContext != null) {
-      Navigator.of(_selectionSheetContext!).pop(false);
+    if (dismissSheet && _isSelectionSheetOpen) {
+      _completeSelectionSheet(false);
       await _waitForSelectionSheetToClose();
     }
 
@@ -439,7 +445,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
 
-    final placesService = ref.read(placesServiceProvider);
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
 
@@ -447,55 +452,97 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       setState(() {
         _isSelectionSheetOpen = true;
         _mapPadding = EdgeInsets.only(bottom: paddingValue);
+        _selectionSheetCompleter = Completer<bool?>();
       });
+    } else {
+      _isSelectionSheetOpen = true;
+      _mapPadding = EdgeInsets.only(bottom: paddingValue);
+      _selectionSheetCompleter = Completer<bool?>();
     }
 
-    try {
-      final result = await showModalBottomSheet<bool>(
-        context: context,
-        useSafeArea: true,
-        isScrollControlled: true,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        builder: (sheetContext) {
-          _selectionSheetContext = sheetContext;
-          return _LocationSelectionSheet(
-            positionListenable: _selectedLatLngNotifier,
-            onConfirm: () => Navigator.of(sheetContext).pop(true),
-            onCancel: () => Navigator.of(sheetContext).pop(false),
-            reverseGeocode: _reverseGeocode,
-            fetchNearbyPlaces: (position) => placesService.searchNearbyPlaces(
-              position,
-              radius: 200,
-              maxResults: 3,
-            ),
-            onPlaceSelected: (place) =>
-                unawaited(_onNearbyPlaceSelected(place)),
-          );
-        },
-      );
+    final result = await _selectionSheetCompleter!.future;
 
-      if (result == true) {
-        final target = _selectedLatLngNotifier.value;
-        if (target != null) {
-          await _createEventAt(target);
-          await _clearSelectedLocation(dismissSheet: false);
-        }
+    if (result == true) {
+      final target = _selectedLatLngNotifier.value;
+      if (target != null) {
+        await _createEventAt(target);
+        await _clearSelectedLocation(dismissSheet: false);
       }
-    } finally {
-      _selectionSheetContext = null;
-      if (mounted) {
-        setState(() {
-          _mapPadding = EdgeInsets.zero;
-          _isSelectionSheetOpen = false;
-        });
-      } else {
+    }
+
+    if (mounted) {
+      setState(() {
         _mapPadding = EdgeInsets.zero;
         _isSelectionSheetOpen = false;
-      }
+      });
+    } else {
+      _mapPadding = EdgeInsets.zero;
+      _isSelectionSheetOpen = false;
     }
+    _selectionSheetCompleter = null;
+  }
+
+  void _onSelectionSheetConfirm() {
+    _completeSelectionSheet(true);
+  }
+
+  void _onSelectionSheetCancel() {
+    _completeSelectionSheet(false);
+  }
+
+  void _completeSelectionSheet([bool? result]) {
+    final completer = _selectionSheetCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(result);
+    }
+  }
+
+  Widget _buildLocationSelectionSheetOverlay(double safeBottom) {
+    final theme = Theme.of(context);
+    final visible = _isSelectionSheetOpen;
+    final bottomPadding = safeBottom + 16;
+    final placesService = ref.read(placesServiceProvider);
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeInOut,
+        offset: Offset(0, visible ? 0 : 1.2),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          opacity: visible ? 1 : 0,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding),
+            child: IgnorePointer(
+              ignoring: !visible,
+              child: Material(
+                color: theme.colorScheme.surface,
+                elevation: 12,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                clipBehavior: Clip.antiAlias,
+                child: _LocationSelectionSheet(
+                  positionListenable: _selectedLatLngNotifier,
+                  onConfirm: _onSelectionSheetConfirm,
+                  onCancel: _onSelectionSheetCancel,
+                  reverseGeocode: _reverseGeocode,
+                  fetchNearbyPlaces: (position) =>
+                      placesService.searchNearbyPlaces(
+                    position,
+                    radius: 200,
+                    maxResults: 3,
+                  ),
+                  onPlaceSelected: (place) =>
+                      unawaited(_onNearbyPlaceSelected(place)),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _onNearbyPlaceSelected(NearbyPlace place) async {
@@ -563,7 +610,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _onMapTap(LatLng position) async {
-    if (!mounted) {
+    if (!mounted || _isSelectionSheetOpen) {
       return;
     }
     _hideEventCard();

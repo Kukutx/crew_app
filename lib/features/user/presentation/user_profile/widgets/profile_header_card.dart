@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/domain/user_profile.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
@@ -13,7 +13,7 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.onGuestbookPressed,
   });
 
-  final User userProfile;
+  final UserProfile userProfile;
   final VoidCallback onFollowToggle;
   final VoidCallback onMessagePressed;
   final VoidCallback onGuestbookPressed;
@@ -42,7 +42,7 @@ class ProfileHeaderCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          userProfile.name,
+                          userProfile.displayName,
                           style: t.titleMedium!.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -73,7 +73,7 @@ class ProfileHeaderCard extends StatelessWidget {
                             const _ProfileStatDot(),
                             _ProfileStat(
                               label: '活动',
-                              value: userProfile.events,
+                              value: userProfile.eventsHosted,
                             ),
                           ],
                         ),
@@ -94,7 +94,7 @@ class ProfileHeaderCard extends StatelessWidget {
                         children: [
                           _MessageButton(onPressed: onMessagePressed),
                           _FollowButton(
-                            followed: userProfile.followed,
+                            followed: userProfile.isFollowed,
                             onPressed: onFollowToggle,
                           ),
                         ],
@@ -123,7 +123,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 final avatar = ClipRRect(
                   borderRadius: BorderRadius.circular(48),
                   child: CachedNetworkImage(
-                    imageUrl: userProfile.avatar,
+                    imageUrl: userProfile.avatarUrl,
                     width: 64,
                     height: 64,
                     fit: BoxFit.cover,

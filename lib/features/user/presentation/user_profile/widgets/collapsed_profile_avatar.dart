@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/domain/user_profile.dart';
 
 class CollapsedProfileAvatar extends StatelessWidget {
   const CollapsedProfileAvatar({super.key, required this.user});
 
-  final User user;
+  final UserProfile user;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class CollapsedProfileAvatar extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         child: CircleAvatar(
           radius: 20,
-          backgroundImage: CachedNetworkImageProvider(user.avatar),
+          backgroundImage: CachedNetworkImageProvider(user.avatarUrl),
         ),
       ),
     );

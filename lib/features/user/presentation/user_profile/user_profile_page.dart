@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
-import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/domain/user_profile.dart';
 import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
 import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_header_card.dart';
@@ -64,8 +64,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   void _toggleFollow() {
     final current = ref.read(userProfileProvider);
     ref.read(userProfileProvider.notifier).state = current.copyWith(
-      followed: !current.followed,
-      followers: current.followed
+      isFollowed: !current.isFollowed,
+      followers: current.isFollowed
           ? current.followers - 1
           : current.followers + 1,
     );
@@ -84,9 +84,9 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     }
   }
 
-  void _showMoreActions(BuildContext context, User profile) {
+  void _showMoreActions(BuildContext context, UserProfile profile) {
     final messenger = ScaffoldMessenger.of(context);
-    final link = 'https://crew.app/users/${profile.uid}';
+    final link = 'https://crew.app/users/${profile.id}';
     final localization = AppLocalizations.of(context)!;
 
     showModalBottomSheet<void>(
@@ -133,7 +133,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
   Future<void> _confirmBlockUser(
     BuildContext context,
-    User profile,
+    UserProfile profile,
     ScaffoldMessengerState messenger,
   ) async {
     final confirmed = await showModalBottomSheet<bool>(
@@ -143,20 +143,20 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
-        return _BlockUserConfirmationSheet(name: profile.name);
+        return _BlockUserConfirmationSheet(name: profile.displayName);
       },
     );
 
     if (confirmed == true) {
       messenger.showSnackBar(
-        SnackBar(content: Text('已拉黑 ${profile.name}（示例）')),
+        SnackBar(content: Text('已拉黑 ${profile.displayName}（示例）')),
       );
     }
   }
 
   Future<void> _showReportSheet(
     BuildContext context,
-    User profile,
+    UserProfile profile,
     ScaffoldMessengerState messenger,
   ) async {
     final localization = AppLocalizations.of(context)!;
@@ -182,13 +182,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     if (submission != null) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('已收到对 ${profile.name} 的举报：${submission.type}（示例）'),
+          content: Text('已收到对 ${profile.displayName} 的举报：${submission.type}（示例）'),
         ),
       );
     }
   }
 
-  void _startPrivateMessage(BuildContext context, User profile) {
+  void _startPrivateMessage(BuildContext context, UserProfile profile) {
     // Navigator.of(context).push(
     //   MaterialPageRoute(
     //     builder: (_) => const DirectMessagesPage(),
@@ -231,7 +231,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
   Widget _buildSliverAppBar(
     BuildContext context,
-    User profile,
+    UserProfile profile,
     double topPadding,
     ThemeData theme,
   ) {

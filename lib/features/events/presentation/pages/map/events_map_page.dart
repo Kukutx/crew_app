@@ -144,7 +144,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
       data: (list) => MarkersLayer.fromEvents(
         events: list,
-        onEventTap: (event) => _focusOnEvent(event, showEventCard: false),
+        onEventTap: _focusOnEvent,
       ),
     );
 
@@ -717,38 +717,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    final asyncEvents = ref.read(eventsProvider);
-    final list = asyncEvents.maybeWhen(
-      data: (events) => events,
-      orElse: () => const <Event>[],
-    );
-    final selectedIndex = list.indexWhere((event) => event.id == ev.id);
-    if (selectedIndex == -1) {
-      setState(() {
-        _carouselEvents = <Event>[ev];
-        _isEventCardVisible = true;
-        _activeEventIndex = 0;
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || !_eventCardController.hasClients) {
-          return;
-        }
-        _eventCardController.jumpToPage(0);
-      });
-      _updateBottomNavigation(false);
-      return;
-    }
-
     setState(() {
-      _carouselEvents = list;
+      _carouselEvents = <Event>[ev];
       _isEventCardVisible = true;
-      _activeEventIndex = selectedIndex;
+      _activeEventIndex = 0;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_eventCardController.hasClients) {
         return;
       }
-      _eventCardController.jumpToPage(selectedIndex);
+      _eventCardController.jumpToPage(0);
     });
     _updateBottomNavigation(false);
   }

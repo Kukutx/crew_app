@@ -166,6 +166,25 @@
   "map_place_details_price_unknown": "Price level: unknown",
   "map_select_location_title": "Create an event here?",
   "map_select_location_tip": "Drag the pin to fine-tune the meeting point before creating your event.",
+  "map_select_location_trip_title_label": "Road trip title",
+  "map_select_location_trip_title_hint": "e.g. Coastal highway adventure",
+  "map_select_location_title_required": "Please enter a title",
+  "map_select_location_start_label": "Start point",
+  "map_select_location_destination_label": "Destination",
+  "map_select_location_destination_tip": "Tap the map to drop a green pin for your destination.",
+  "map_select_location_destination_missing": "Please select a destination pin on the map.",
+  "map_select_location_create_trip": "Create road trip",
+  "map_select_location_open_detailed": "Plan full details",
+  "map_quick_trip_default_title": "Road trip",
+  "map_quick_trip_description": "Route from {start} to {destination}.",
+  "@map_quick_trip_description": {
+    "placeholders": {
+      "start": {},
+      "destination": {}
+    }
+  },
+  "map_quick_trip_created": "Road trip created. Add more details anytime.",
+  "map_quick_trip_create_failed": "Unable to create road trip right now.",
   "messages": "Messages",
   "max_interest_selection": "You can select up to 5 interest tags.",
   "my_events": "My events",

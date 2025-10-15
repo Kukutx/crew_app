@@ -408,6 +408,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_tip => '拖动标记微调位置，确认后即可创建活动。';
 
   @override
+  String get map_select_location_trip_title_label => '自驾游活动标题';
+
+  @override
+  String get map_select_location_trip_title_hint => '例如：沿海公路一日游';
+
+  @override
+  String get map_select_location_title_required => '请输入活动标题';
+
+  @override
+  String get map_select_location_start_label => '起点';
+
+  @override
+  String get map_select_location_destination_label => '终点';
+
+  @override
+  String get map_select_location_destination_tip => '在地图上点一下放置绿色终点标记。';
+
+  @override
+  String get map_select_location_destination_missing => '请先在地图上选择终点。';
+
+  @override
+  String get map_select_location_create_trip => '创建自驾游活动';
+
+  @override
+  String get map_select_location_open_detailed => '完善详细活动';
+
+  @override
+  String get map_quick_trip_default_title => '自驾游活动';
+
+  @override
+  String map_quick_trip_description(Object start, Object destination) {
+    return '线路：从$start前往$destination。';
+  }
+
+  @override
+  String get map_quick_trip_created => '已创建自驾游活动，可随时补充详情。';
+
+  @override
+  String get map_quick_trip_create_failed => '暂时无法创建自驾游活动，请稍后再试。';
+
+  @override
   String get messages => '消息';
 
   @override

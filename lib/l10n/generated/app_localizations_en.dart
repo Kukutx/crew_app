@@ -418,6 +418,52 @@ class AppLocalizationsEn extends AppLocalizations {
       'Drag the pin to fine-tune the meeting point before creating your event.';
 
   @override
+  String get map_select_location_trip_title_label => 'Road trip title';
+
+  @override
+  String get map_select_location_trip_title_hint =>
+      'e.g. Coastal highway adventure';
+
+  @override
+  String get map_select_location_title_required => 'Please enter a title';
+
+  @override
+  String get map_select_location_start_label => 'Start point';
+
+  @override
+  String get map_select_location_destination_label => 'Destination';
+
+  @override
+  String get map_select_location_destination_tip =>
+      'Tap the map to drop a green pin for your destination.';
+
+  @override
+  String get map_select_location_destination_missing =>
+      'Please select a destination pin on the map.';
+
+  @override
+  String get map_select_location_create_trip => 'Create road trip';
+
+  @override
+  String get map_select_location_open_detailed => 'Plan full details';
+
+  @override
+  String get map_quick_trip_default_title => 'Road trip';
+
+  @override
+  String map_quick_trip_description(Object start, Object destination) {
+    return 'Route from $start to $destination.';
+  }
+
+  @override
+  String get map_quick_trip_created =>
+      'Road trip created. Add more details anytime.';
+
+  @override
+  String get map_quick_trip_create_failed =>
+      'Unable to create road trip right now.';
+
+  @override
   String get messages => 'Messages';
 
   @override

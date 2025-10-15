@@ -854,6 +854,84 @@ abstract class AppLocalizations {
   /// **'Drag the pin to fine-tune the meeting point before creating your event.'**
   String get map_select_location_tip;
 
+  /// No description provided for @map_select_location_trip_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Road trip title'**
+  String get map_select_location_trip_title_label;
+
+  /// No description provided for @map_select_location_trip_title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Coastal highway adventure'**
+  String get map_select_location_trip_title_hint;
+
+  /// No description provided for @map_select_location_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a title'**
+  String get map_select_location_title_required;
+
+  /// No description provided for @map_select_location_start_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start point'**
+  String get map_select_location_start_label;
+
+  /// No description provided for @map_select_location_destination_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get map_select_location_destination_label;
+
+  /// No description provided for @map_select_location_destination_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to drop a green pin for your destination.'**
+  String get map_select_location_destination_tip;
+
+  /// No description provided for @map_select_location_destination_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a destination pin on the map.'**
+  String get map_select_location_destination_missing;
+
+  /// No description provided for @map_select_location_create_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create road trip'**
+  String get map_select_location_create_trip;
+
+  /// No description provided for @map_select_location_open_detailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan full details'**
+  String get map_select_location_open_detailed;
+
+  /// No description provided for @map_quick_trip_default_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Road trip'**
+  String get map_quick_trip_default_title;
+
+  /// No description provided for @map_quick_trip_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Route from {start} to {destination}.'**
+  String map_quick_trip_description(Object start, Object destination);
+
+  /// No description provided for @map_quick_trip_created.
+  ///
+  /// In en, this message translates to:
+  /// **'Road trip created. Add more details anytime.'**
+  String get map_quick_trip_created;
+
+  /// No description provided for @map_quick_trip_create_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create road trip right now.'**
+  String get map_quick_trip_create_failed;
+
   /// No description provided for @messages.
   ///
   /// In en, this message translates to:

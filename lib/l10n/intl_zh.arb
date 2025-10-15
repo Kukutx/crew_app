@@ -208,6 +208,25 @@
   "map_place_details_price_unknown": "价格等级：未知",
   "map_select_location_title": "要在这里创建活动吗？",
   "map_select_location_tip": "拖动标记微调位置，确认后即可创建活动。",
+  "map_select_location_trip_title_label": "自驾游活动标题",
+  "map_select_location_trip_title_hint": "例如：沿海公路一日游",
+  "map_select_location_title_required": "请输入活动标题",
+  "map_select_location_start_label": "起点",
+  "map_select_location_destination_label": "终点",
+  "map_select_location_destination_tip": "在地图上点一下放置绿色终点标记。",
+  "map_select_location_destination_missing": "请先在地图上选择终点。",
+  "map_select_location_create_trip": "创建自驾游活动",
+  "map_select_location_open_detailed": "完善详细活动",
+  "map_quick_trip_default_title": "自驾游活动",
+  "map_quick_trip_description": "线路：从{start}前往{destination}。",
+  "@map_quick_trip_description": {
+    "placeholders": {
+      "start": {},
+      "destination": {}
+    }
+  },
+  "map_quick_trip_created": "已创建自驾游活动，可随时补充详情。",
+  "map_quick_trip_create_failed": "暂时无法创建自驾游活动，请稍后再试。",
   "messages": "消息",
   "max_interest_selection": "最多只能选择 5 个兴趣标签喵~",
   "my_events": "我的活动",

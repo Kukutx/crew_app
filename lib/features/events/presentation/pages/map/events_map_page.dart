@@ -20,8 +20,6 @@ import 'package:crew_app/features/events/presentation/pages/trips/create_road_tr
 
 import '../../../data/event.dart';
 import '../../../../../core/error/api_exception.dart';
-import '../../../../../core/network/api_service.dart';
-import '../../../../../core/state/di/providers.dart';
 import '../../../../../core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
@@ -29,10 +27,11 @@ import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
-import 'widgets/map_event_floating_card.dart';
+import 'widgets/events_map_event_carousel.dart';
 import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import '../detail/events_detail_page.dart';
+import 'state/events_map_search_controller.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -64,19 +63,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   // 搜索框
   final _searchController = TextEditingController();
   late final FocusNode _searchFocusNode;
-  late final ApiService _api;
-  List<Event> _searchResults = const <Event>[];
-  bool _isSearching = false;
-  bool _showSearchResults = false;
-  String? _searchError;
-  String _currentSearchQuery = '';
-  Timer? _searchDebounce;
   ProviderSubscription<Event?>? _mapFocusSubscription;
 
   @override
   void initState() {
     super.initState();
-    _api = ref.read(apiServiceProvider);
     _eventCardController = PageController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
@@ -103,7 +94,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   @override
   void dispose() {
-    _searchDebounce?.cancel();
     _searchFocusNode.removeListener(_onSearchFocusChanged);
     _searchFocusNode.dispose();
     _searchController.dispose();
@@ -127,6 +117,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
     final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
     final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
+    final searchState = ref.watch(eventsMapSearchControllerProvider);
+    final loc = AppLocalizations.of(context)!;
     // 跟随定位（只在无选中事件时）
     ref.listen<AsyncValue<LatLng?>>(userLocationProvider, (prev, next) {
       final loc = next.value;
@@ -202,10 +194,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onCreateRoadTripTap: _onCreateRoadTripTap,
         onAvatarTap: _onAvatarTap,
         onResultTap: _onSearchResultTap,
-        showResults: _showSearchResults,
-        isLoading: _isSearching,
-        results: _searchResults,
-        errorText: _searchError,
+        showResults: searchState.showResults,
+        isLoading: searchState.isLoading,
+        results: searchState.results,
+        errorText: searchState.errorText,
         showClearSelectionAction: _selectedLatLng != null,
         onClearSelection:
             _selectedLatLng != null ? () => unawaited(_clearSelectedLocation()) : null,
@@ -217,8 +209,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             onPointerDown: (_) {
               if (_searchFocusNode.hasFocus) {
                 _searchFocusNode.unfocus();
-              } else if (_showSearchResults) {
-                setState(() => _showSearchResults = false);
+              } else {
+                final state = ref.read(eventsMapSearchControllerProvider);
+                if (state.showResults) {
+                  ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
+                }
               }
             },
             child: MapCanvas(
@@ -233,7 +228,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               mapPadding: _mapPadding,
             ),
           ),
-          _buildEventCardOverlay(safeBottom),
+          EventsMapEventCarousel(
+            events: _carouselEvents,
+            visible: _isEventCardVisible && _carouselEvents.isNotEmpty,
+            controller: _eventCardController,
+            safeBottom: safeBottom,
+            onPageChanged: _onEventCardPageChanged,
+            onOpenDetails: _openEventDetails,
+            onClose: _hideEventCard,
+            onRegister: () => _showSnackBar(loc.registration_not_implemented),
+            onFavorite: () => _showSnackBar(loc.feature_not_ready),
+          ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -270,56 +275,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             child: const Icon(Icons.my_location),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEventCardOverlay(double safeBottom) {
-    final loc = AppLocalizations.of(context)!;
-    final visible = _isEventCardVisible && _carouselEvents.isNotEmpty;
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: IgnorePointer(
-        ignoring: !visible,
-        child: AnimatedSlide(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeInOut,
-          offset: Offset(0, visible ? 0 : 1.2),
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            opacity: visible ? 1 : 0,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + safeBottom),
-              child: SizedBox(
-                height: 158,
-                child: PageView.builder(
-                  controller: _eventCardController,
-                  physics: _carouselEvents.length > 1
-                      ? const PageScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  onPageChanged: _onEventCardPageChanged,
-                  itemCount: _carouselEvents.length,
-                  itemBuilder: (_, index) {
-                    final event = _carouselEvents[index];
-                    return MapEventFloatingCard(
-                      key: ValueKey(event.id),
-                      event: event,
-                      onTap: () => _openEventDetails(event),
-                      onClose: _hideEventCard,
-                      onRegister: () {
-                        _showSnackBar(loc.registration_not_implemented);
-                      },
-                      onFavorite: () {
-                        _showSnackBar(loc.feature_not_ready);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -951,9 +906,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (_searchFocusNode.hasFocus) {
       _searchFocusNode.unfocus();
     }
-    if (_showSearchResults) {
-      setState(() => _showSearchResults = false);
-    }
+    ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
     ref.read(appOverlayIndexProvider.notifier).state = 0;
   }
 
@@ -961,9 +914,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (_searchFocusNode.hasFocus) {
       _searchFocusNode.unfocus();
     }
-    if (_showSearchResults) {
-      setState(() => _showSearchResults = false);
-    }
+    ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
     if (!authed) {
       Navigator.of(context).pushNamed('/login');
       return;
@@ -1036,116 +987,47 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   /// 搜索框事件
   void _onSearchFocusChanged() {
-    if (!_searchFocusNode.hasFocus) {
-      _searchDebounce?.cancel();
-      if (_showSearchResults) {
-        setState(() => _showSearchResults = false);
+    final hasFocus = _searchFocusNode.hasFocus;
+    final notifier = ref.read(eventsMapSearchControllerProvider.notifier);
+    if (hasFocus) {
+      notifier.onFocusChanged(true);
+      final text = _searchController.text.trim();
+      if (text.isEmpty) {
+        return;
+      }
+      final state = ref.read(eventsMapSearchControllerProvider);
+      if (state.query != text && !state.isLoading) {
+        notifier.onQueryChanged(text);
       }
       return;
     }
 
-    final text = _searchController.text.trim();
-    if (text.isEmpty) {
-      if (_showSearchResults) {
-        setState(() => _showSearchResults = false);
-      }
+    if (_isSelectingDestination) {
       return;
     }
 
-    if (_searchResults.isNotEmpty || _isSearching || _searchError != null) {
-      setState(() => _showSearchResults = true);
-    } else {
-      _triggerSearch(text);
-    }
+    notifier.onFocusChanged(false);
   }
 
   void _onQueryChanged(String raw) {
-    _triggerSearch(raw);
-  }
-
-  void _triggerSearch(String raw, {bool immediate = false}) {
-    final query = raw.trim();
-    _searchDebounce?.cancel();
-
-    if (query.isEmpty) {
-      _clearSearchResults();
-      return;
-    }
-
-    setState(() {
-      _currentSearchQuery = query;
-      _showSearchResults = true;
-      _isSearching = true;
-      _searchError = null;
-    });
-
-    if (immediate) {
-      _performSearch(query);
-    } else {
-      _searchDebounce = Timer(const Duration(milliseconds: 350), () {
-        _performSearch(query);
-      });
-    }
+    ref.read(eventsMapSearchControllerProvider.notifier).onQueryChanged(raw);
   }
 
   void _onSearchSubmitted(String keyword) {
-    _triggerSearch(keyword, immediate: true);
-  }
-
-  Future<void> _performSearch(String keyword) async {
-    final query = keyword.trim();
-    if (query.isEmpty) {
-      _clearSearchResults();
-      return;
-    }
-
-    try {
-      final data = await _api.searchEvents(query);
-      if (!mounted || _currentSearchQuery != query) return;
-      setState(() {
-        _searchResults = data;
-      });
-    } on ApiException catch (e) {
-      if (!mounted || _currentSearchQuery != query) return;
-      setState(() {
-        _searchResults = const <Event>[];
-        _searchError = e.message;
-      });
-    } finally {
-      if (mounted && _currentSearchQuery == query) {
-        setState(() {
-          _isSearching = false;
-        });
-      }
-    }
+    ref.read(eventsMapSearchControllerProvider.notifier).onSubmitted(keyword);
   }
 
   void _onSearchClear() {
-    _searchDebounce?.cancel();
     _searchController.clear();
-    _clearSearchResults();
+    ref.read(eventsMapSearchControllerProvider.notifier).clear();
   }
 
   void _onSearchResultTap(Event event) {
     FocusScope.of(context).unfocus();
-    setState(() {
-      _showSearchResults = false;
-      _searchResults = const <Event>[];
-      _searchError = null;
-      _currentSearchQuery = '';
-      _searchController.text = event.title;
-    });
+    final notifier = ref.read(eventsMapSearchControllerProvider.notifier);
+    notifier.selectResult(event);
+    _searchController.text = event.title;
     _focusOnEvent(event);
-  }
-
-  void _clearSearchResults() {
-    setState(() {
-      _searchResults = const <Event>[];
-      _searchError = null;
-      _showSearchResults = false;
-      _isSearching = false;
-      _currentSearchQuery = '';
-    });
   }
 }
 

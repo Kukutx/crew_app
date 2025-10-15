@@ -147,7 +147,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       ),
     );
 
-    final markers = <Marker>{...markersLayer.markers};
+    final shouldHideEventMarkers = _selectedLatLng != null || _isSelectingDestination;
+    final markers = <Marker>{
+      if (!shouldHideEventMarkers) ...markersLayer.markers,
+    };
     final selected = _selectedLatLng;
     if (selected != null) {
       markers.add(
@@ -403,9 +406,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     if (_isSelectingDestination) {
-      _setDestinationLatLng(latlng);
-      await _moveCamera(latlng, zoom: 12);
-      HapticFeedback.lightImpact();
+      await _handleDestinationSelection(latlng);
       return;
     }
     if (_isHandlingLongPress) {
@@ -441,6 +442,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _destinationLatLng = position;
     });
     _destinationLatLngNotifier.value = position;
+  }
+
+  Future<void> _handleDestinationSelection(LatLng position) async {
+    if (!_isSelectingDestination || _isSelectionSheetOpen) {
+      return;
+    }
+    _setDestinationLatLng(position);
+    await _moveCamera(position, zoom: 12);
+    HapticFeedback.lightImpact();
+    await _showDestinationSelectionSheet();
   }
 
   void _onSelectedLocationDrag(LatLng position) {
@@ -561,11 +572,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     _setDestinationLatLng(null);
     await _moveCamera(start, zoom: 6);
-    await _showDestinationSelectionSheet();
+    final loc = AppLocalizations.of(context)!;
+    _showSnackBar(loc.map_select_location_destination_tip);
   }
 
   Future<void> _showDestinationSelectionSheet() async {
     if (!mounted || !_isSelectingDestination || _selectedLatLng == null) {
+      return;
+    }
+    if (_destinationLatLng == null) {
       return;
     }
 
@@ -696,6 +711,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   Future<void> _onMapTap(LatLng position) async {
     if (!mounted) {
+      return;
+    }
+    if (_isSelectingDestination) {
+      await _handleDestinationSelection(position);
       return;
     }
     _hideEventCard();

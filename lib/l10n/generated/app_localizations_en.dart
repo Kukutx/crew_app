@@ -435,7 +435,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_select_location_destination_tip =>
-      'Long press the map to drop a green pin for your destination.';
+      'Tap the map to drop a green pin for your destination.';
 
   @override
   String get map_select_location_destination_missing =>

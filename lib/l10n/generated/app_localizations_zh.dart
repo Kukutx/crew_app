@@ -423,7 +423,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_destination_label => '终点';
 
   @override
-  String get map_select_location_destination_tip => '长按地图放置绿色终点标记。';
+  String get map_select_location_destination_tip => '点击地图放置绿色终点标记。';
 
   @override
   String get map_select_location_destination_missing => '请先在地图上选择终点。';

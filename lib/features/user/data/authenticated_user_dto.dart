@@ -1,33 +1,19 @@
 class AuthenticatedUserDto {
   AuthenticatedUserDto({
-    required this.id,
+    required this.uid,
+    required this.aspNetIdentityId,
     required this.email,
-    this.displayName,
-    this.photoUrl,
-    this.roles = const [],
-    this.hasActiveSubscription = false,
   });
 
-  final String id;
+  final String uid;
+  final String aspNetIdentityId;
   final String email;
-  final String? displayName;
-  final String? photoUrl;
-  final List<String> roles;
-  final bool hasActiveSubscription;
 
   factory AuthenticatedUserDto.fromJson(Map<String, dynamic> json) {
-    final subscription = json['subscription'];
-
     return AuthenticatedUserDto(
-      id: json['id'] as String,
+      uid: json['uid'] as String,
+      aspNetIdentityId: json['aspNetIdentityId'] as String,
       email: json['email'] as String,
-      displayName: json['displayName'] as String?,
-      photoUrl: json['photoUrl'] as String?,
-      roles: (json['roles'] as List<dynamic>? ?? const [])
-          .map((role) => role.toString())
-          .toList(),
-      hasActiveSubscription:
-          subscription is Map<String, dynamic> && subscription['isActive'] == true,
     );
   }
 }

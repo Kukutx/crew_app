@@ -42,7 +42,8 @@ class EventsMapPage extends ConsumerStatefulWidget {
   ConsumerState<EventsMapPage> createState() => _EventsMapPageState();
 }
 
-class _EventsMapPageState extends ConsumerState<EventsMapPage> {
+class _EventsMapPageState extends ConsumerState<EventsMapPage>
+    with SingleTickerProviderStateMixin {
   GoogleMapController? _map;
   bool _mapReady = false;
   bool _movedToSelected = false;
@@ -58,7 +59,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isSelectingDestination = false;
   bool _isSelectionSheetOpen = false;
   EdgeInsets _mapPadding = EdgeInsets.zero;
-  BuildContext? _selectionSheetContext;
+  void Function(dynamic result)? _selectionSheetCloser;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -472,8 +473,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _clearSelectedLocation({bool dismissSheet = true}) async {
-    if (dismissSheet && _isSelectionSheetOpen && _selectionSheetContext != null) {
-      Navigator.of(_selectionSheetContext!).pop(false);
+    if (dismissSheet && _isSelectionSheetOpen && _selectionSheetCloser != null) {
+      _selectionSheetCloser!.call(null);
       await _waitForSelectionSheetToClose();
     }
 
@@ -501,10 +502,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     required Widget Function(
       BuildContext sheetContext,
       ValueNotifier<bool> collapsedNotifier,
+      void Function(T? result) close,
     )
         builder,
   }) async {
     if (!mounted) {
+      return null;
+    }
+
+    final overlay = Overlay.of(context);
+    if (overlay == null) {
       return null;
     }
 
@@ -513,6 +520,18 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final collapsedPadding = EdgeInsets.only(bottom: collapsedHeight);
     final expandedEdgeInsets = EdgeInsets.only(bottom: expandedPadding);
     final collapsedNotifier = ValueNotifier<bool>(false);
+    final controller = AnimationController(
+      duration: const Duration(milliseconds: 280),
+      reverseDuration: const Duration(milliseconds: 220),
+      vsync: this,
+    );
+    final curved = CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    final completer = Completer<T?>();
+    late OverlayEntry entry;
 
     void updatePadding() {
       if (!mounted) {
@@ -524,39 +543,70 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       });
     }
 
-    setState(() {
+    if (mounted) {
+      setState(() {
+        _isSelectionSheetOpen = true;
+        _mapPadding = expandedEdgeInsets;
+      });
+    } else {
       _isSelectionSheetOpen = true;
       _mapPadding = expandedEdgeInsets;
-    });
+    }
 
     collapsedNotifier.addListener(updatePadding);
 
+    void completeWith(T? value) {
+      if (!completer.isCompleted) {
+        completer.complete(value);
+      }
+    }
+
+    entry = OverlayEntry(
+      builder: (overlayContext) {
+        return MediaQuery(
+          data: media,
+          child: _CollapsibleSheetRouteContent<T>(
+            animation: curved,
+            collapsedNotifier: collapsedNotifier,
+            onBackgroundTap: () {
+              collapsedNotifier.value = true;
+            },
+            builder: (sheetContext) {
+              return builder(sheetContext, collapsedNotifier, completeWith);
+            },
+          ),
+        );
+      },
+    );
+
+    overlay.insert(entry);
+
+    _selectionSheetCloser = (dynamic value) {
+      if (value == null) {
+        completeWith(null);
+        return;
+      }
+      completeWith(value as T);
+    };
+
+    await controller.forward();
+
     T? result;
     try {
-      result = await Navigator.of(context).push<T>(
-        PageRouteBuilder<T>(
-          opaque: false,
-          barrierDismissible: false,
-          barrierColor: Colors.transparent,
-          pageBuilder: (routeContext, animation, secondaryAnimation) {
-            return _CollapsibleSheetRouteContent<T>(
-              animation: animation,
-              collapsedNotifier: collapsedNotifier,
-              onBackgroundTap: () {
-                collapsedNotifier.value = true;
-              },
-              builder: (sheetContext) {
-                _selectionSheetContext = sheetContext;
-                return builder(sheetContext, collapsedNotifier);
-              },
-            );
-          },
-        ),
-      );
+      result = await completer.future;
     } finally {
       collapsedNotifier.removeListener(updatePadding);
+      try {
+        if (controller.status != AnimationStatus.dismissed) {
+          await controller.reverse();
+        }
+      } catch (_) {}
+      if (entry.mounted) {
+        entry.remove();
+      }
+      controller.dispose();
       collapsedNotifier.dispose();
-      _selectionSheetContext = null;
+      _selectionSheetCloser = null;
       if (mounted) {
         setState(() {
           _mapPadding = EdgeInsets.zero;
@@ -579,19 +629,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
 
- final proceed = await _presentSelectionSheet<bool>(
-              expandedPadding: paddingValue,
-              builder: (sheetContext, collapsedNotifier) {
-                return _StartLocationSheet(
-                  positionListenable: _selectedLatLngNotifier,
-                  onConfirm: () => Navigator.of(sheetContext).pop(true),
-                  onCancel: () => Navigator.of(sheetContext).pop(false),
-                  reverseGeocode: _reverseGeocode,
-                  collapsedListenable: collapsedNotifier,
-                  onExpand: () => collapsedNotifier.value = false,
-                );    
-              },
-            );
+    final proceed = await _presentSelectionSheet<bool>(
+      expandedPadding: paddingValue,
+      builder: (sheetContext, collapsedNotifier, close) {
+        return _StartLocationSheet(
+          positionListenable: _selectedLatLngNotifier,
+          onConfirm: () => close(true),
+          onCancel: () => close(null),
+          reverseGeocode: _reverseGeocode,
+          collapsedListenable: collapsedNotifier,
+          onExpand: () => collapsedNotifier.value = false,
+        );
+      },
+    );
 
     if (proceed != null && proceed) {
       await _beginDestinationSelection();
@@ -637,14 +687,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     final result = await _presentSelectionSheet<_QuickRoadTripResult>(
       expandedPadding: paddingValue,
-      builder: (sheetContext, collapsedNotifier) {
+      builder: (sheetContext, collapsedNotifier, close) {
         return _DestinationSelectionSheet(
           startPositionListenable: _selectedLatLngNotifier,
           destinationListenable: _destinationLatLngNotifier,
           reverseGeocode: _reverseGeocode,
           collapsedListenable: collapsedNotifier,
           onExpand: () => collapsedNotifier.value = false,
-          onCancel: () => Navigator.of(sheetContext).pop(null),
+          onCancel: () => close(null),
+          onComplete: close,
         );
       },
     );
@@ -1520,6 +1571,7 @@ class _DestinationSelectionSheet extends StatefulWidget {
     required this.collapsedListenable,
     required this.onExpand,
     required this.onCancel,
+    required this.onComplete,
   });
 
   final ValueListenable<LatLng?> startPositionListenable;
@@ -1528,6 +1580,7 @@ class _DestinationSelectionSheet extends StatefulWidget {
   final ValueListenable<bool> collapsedListenable;
   final VoidCallback onExpand;
   final VoidCallback onCancel;
+  final ValueChanged<_QuickRoadTripResult?> onComplete;
 
   @override
   State<_DestinationSelectionSheet> createState() =>
@@ -1610,7 +1663,7 @@ class _DestinationSelectionSheetState
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop(
+      widget.onComplete(
         _QuickRoadTripResult(
           title: _titleController.text.trim(),
           start: start,
@@ -1630,7 +1683,7 @@ class _DestinationSelectionSheetState
   Future<void> _handleOpenDetailed() async {
     final start = widget.startPositionListenable.value;
     if (start == null) {
-      Navigator.of(context).pop();
+      widget.onComplete(null);
       return;
     }
     setState(() => _isSubmitting = true);
@@ -1650,7 +1703,7 @@ class _DestinationSelectionSheetState
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop(
+      widget.onComplete(
         _QuickRoadTripResult(
           title: _titleController.text.trim(),
           start: start,

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -38,32 +40,40 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showClearSelectionAction;
   final VoidCallback? onClearSelection;
 
+  static const _resultsPadding = 16.0;
+  static const _maxVisibleResults = 4;
+  static const _itemHeight = 60.0;
+  static const _loadingHeight = 72.0;
+  static const _emptyOrErrorHeight = 64.0;
+  static const _baseHeight = 68.0;
+  static const _baseHeightWithClearSelection = 112.0;
+
+  bool get _canClearSelection => showClearSelectionAction && onClearSelection != null;
+
   double get _resultsHeight {
     if (!showResults) return 0;
 
-    // 结果列表容器外部有 Padding(top: 4, bottom: 12)，需要将这 16 像素计入
-    // preferredSize，否则在部分屏幕上会出现底部溢出。
-    const padding = 16.0;
+    if (isLoading) return _loadingHeight + _resultsPadding;
+    if (errorText != null || results.isEmpty) {
+      return _emptyOrErrorHeight + _resultsPadding;
+    }
 
-    if (isLoading) return 72 + padding;
-    if (errorText != null || results.isEmpty) return 64 + padding;
-
-    const itemHeight = 60.0;
-    const maxVisible = 4;
-    final visibleCount =
-        results.length > maxVisible ? maxVisible : results.length;
-    return visibleCount * itemHeight + padding;
+    final visibleCount = math.min(results.length, _maxVisibleResults);
+    return visibleCount * _itemHeight + _resultsPadding;
   }
 
-  // 搜索框 ~56 + 余量12 + 结果列表高度
   @override
   Size get preferredSize => Size.fromHeight(
-        (showClearSelectionAction ? 112 : 68) + _resultsHeight,
+        (_canClearSelection ? _baseHeightWithClearSelection : _baseHeight) +
+            _resultsHeight,
       );
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final surfaceColor = colorScheme.surface;
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -77,14 +87,14 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(
                 12,
-                showClearSelectionAction ? 8 : 12,
+                _canClearSelection ? 8 : 12,
                 12,
                 0,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (showClearSelectionAction && onClearSelection != null)
+                  if (_canClearSelection) ...[
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
@@ -93,8 +103,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                         label: Text(loc.map_clear_selected_point),
                       ),
                     ),
-                  if (showClearSelectionAction && onClearSelection != null)
                     const SizedBox(height: 8),
+                  ],
                   Material(
                     elevation: 4, // 若仍显压，可改为 3
                     borderRadius: BorderRadius.circular(24),
@@ -111,7 +121,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                           decoration: InputDecoration(
                             hintText: loc.search_hint,
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: surfaceColor,
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -164,6 +174,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                   elevation: 4,
                   borderRadius: BorderRadius.circular(16),
                   clipBehavior: Clip.antiAlias,
+                  color: surfaceColor,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 240),
                     child: _buildResults(context),
@@ -178,6 +189,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildResults(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     if (isLoading) {
       return const SizedBox(
         height: 72,
@@ -193,7 +206,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               errorText!,
-              style: const TextStyle(color: Colors.redAccent),
+              style: TextStyle(color: colorScheme.error),
               textAlign: TextAlign.center,
             ),
           ),
@@ -223,7 +236,10 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          leading: const Icon(Icons.location_on_outlined),
+          leading: Icon(
+            Icons.location_on_outlined,
+            color: colorScheme.primary,
+          ),
         );
       },
     );

@@ -166,6 +166,7 @@
   "map_place_details_price_unknown": "Price level: unknown",
   "map_select_location_title": "Create an event here?",
   "map_select_location_tip": "Drag the pin to fine-tune the meeting point before creating your event.",
+  "map_selection_sheet_tap_to_expand": "Tap to expand for more options.",
   "map_select_location_trip_title_label": "Road trip title",
   "map_select_location_trip_title_hint": "e.g. Coastal highway adventure",
   "map_select_location_title_required": "Please enter a title",

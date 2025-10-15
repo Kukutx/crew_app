@@ -208,6 +208,7 @@
   "map_place_details_price_unknown": "价格等级：未知",
   "map_select_location_title": "要在这里创建活动吗？",
   "map_select_location_tip": "拖动标记微调位置，确认后即可创建活动。",
+  "map_selection_sheet_tap_to_expand": "轻触展开查看更多选项。",
   "map_select_location_trip_title_label": "自驾游活动标题",
   "map_select_location_trip_title_hint": "例如：沿海公路一日游",
   "map_select_location_title_required": "请输入活动标题",

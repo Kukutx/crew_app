@@ -854,6 +854,12 @@ abstract class AppLocalizations {
   /// **'Drag the pin to fine-tune the meeting point before creating your event.'**
   String get map_select_location_tip;
 
+  /// No description provided for @map_selection_sheet_tap_to_expand.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to expand for more options.'**
+  String get map_selection_sheet_tap_to_expand;
+
   /// No description provided for @map_select_location_trip_title_label.
   ///
   /// In en, this message translates to:

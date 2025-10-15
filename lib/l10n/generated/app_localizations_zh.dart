@@ -408,6 +408,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_tip => '拖动标记微调位置，确认后即可创建活动。';
 
   @override
+  String get map_selection_sheet_tap_to_expand => '轻触展开查看更多选项。';
+
+  @override
   String get map_select_location_trip_title_label => '自驾游活动标题';
 
   @override

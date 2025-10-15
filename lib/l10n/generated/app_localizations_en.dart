@@ -418,6 +418,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Drag the pin to fine-tune the meeting point before creating your event.';
 
   @override
+  String get map_selection_sheet_tap_to_expand =>
+      'Tap to expand for more options.';
+
+  @override
   String get map_select_location_trip_title_label => 'Road trip title';
 
   @override

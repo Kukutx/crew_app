@@ -54,7 +54,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isHandlingLongPress = false;
   bool _isSelectionSheetOpen = false;
   EdgeInsets _mapPadding = EdgeInsets.zero;
-  BuildContext? _selectionSheetContext;
+  Completer<bool>? _selectionSheetCompleter;
+  double? _pendingSelectionSheetPadding;
+  bool _selectionSheetPaddingScheduled = false;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -209,6 +211,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             ),
           ),
           _buildEventCardOverlay(safeBottom),
+          _buildLocationSelectionSheetOverlay(),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -297,6 +300,102 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildLocationSelectionSheetOverlay() {
+    if (!_isSelectionSheetOpen) {
+      return const SizedBox.shrink();
+    }
+
+    final mediaQuery = MediaQuery.of(context);
+    final theme = Theme.of(context);
+    final placesService = ref.read(placesServiceProvider);
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox.expand(
+        child: NotificationListener<DraggableScrollableNotification>(
+          onNotification: (notification) {
+            _updateMapPaddingForExtent(notification.extent);
+            return false;
+          },
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.32,
+            minChildSize: 0.18,
+            maxChildSize: 0.75,
+            snap: true,
+            snapSizes: const [0.18, 0.32, 0.75],
+            builder: (context, scrollController) {
+              return Align(
+                alignment: Alignment.bottomCenter,
+                child: Material(
+                  color: theme.colorScheme.surface,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: _LocationSelectionSheet(
+                    positionListenable: _selectedLatLngNotifier,
+                    onConfirm: () => _completeSelectionSheet(true),
+                    onCancel: () => _completeSelectionSheet(false),
+                    reverseGeocode: _reverseGeocode,
+                    fetchNearbyPlaces: (position) =>
+                        placesService.searchNearbyPlaces(
+                      position,
+                      radius: 200,
+                      maxResults: 3,
+                    ),
+                    onPlaceSelected: (place) =>
+                        unawaited(_onNearbyPlaceSelected(place)),
+                    scrollController: scrollController,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _updateMapPaddingForExtent(double extent) {
+    if (!mounted) {
+      return;
+    }
+
+    final mediaQuery = MediaQuery.of(context);
+    final targetBottom =
+        extent * mediaQuery.size.height + mediaQuery.viewPadding.bottom + 24;
+
+    if ((_mapPadding.bottom - targetBottom).abs() < 2) {
+      return;
+    }
+
+    _pendingSelectionSheetPadding = targetBottom;
+    if (_selectionSheetPaddingScheduled) {
+      return;
+    }
+    _selectionSheetPaddingScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _selectionSheetPaddingScheduled = false;
+      if (!mounted || !_isSelectionSheetOpen) {
+        return;
+      }
+      final pending = _pendingSelectionSheetPadding;
+      _pendingSelectionSheetPadding = null;
+      if (pending == null) {
+        return;
+      }
+      if ((_mapPadding.bottom - pending).abs() < 2) {
+        return;
+      }
+      setState(() {
+        _mapPadding = EdgeInsets.only(bottom: pending);
+      });
+    });
   }
 
   void _onEventCardPageChanged(int index) {
@@ -421,8 +520,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _clearSelectedLocation({bool dismissSheet = true}) async {
-    if (dismissSheet && _isSelectionSheetOpen && _selectionSheetContext != null) {
-      Navigator.of(_selectionSheetContext!).pop(false);
+    if (dismissSheet && _isSelectionSheetOpen) {
+      _completeSelectionSheet(false);
       await _waitForSelectionSheetToClose();
     }
 
@@ -439,62 +538,41 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
 
-    final placesService = ref.read(placesServiceProvider);
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
+    final completer = Completer<bool>();
 
-    if (mounted) {
-      setState(() {
-        _isSelectionSheetOpen = true;
-        _mapPadding = EdgeInsets.only(bottom: paddingValue);
-      });
+    setState(() {
+      _isSelectionSheetOpen = true;
+      _mapPadding = EdgeInsets.only(bottom: paddingValue);
+      _selectionSheetCompleter = completer;
+    });
+
+    final result = await completer.future;
+
+    if (!mounted) {
+      return;
     }
 
-    try {
-      final result = await showModalBottomSheet<bool>(
-        context: context,
-        useSafeArea: true,
-        isScrollControlled: true,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        builder: (sheetContext) {
-          _selectionSheetContext = sheetContext;
-          return _LocationSelectionSheet(
-            positionListenable: _selectedLatLngNotifier,
-            onConfirm: () => Navigator.of(sheetContext).pop(true),
-            onCancel: () => Navigator.of(sheetContext).pop(false),
-            reverseGeocode: _reverseGeocode,
-            fetchNearbyPlaces: (position) => placesService.searchNearbyPlaces(
-              position,
-              radius: 200,
-              maxResults: 3,
-            ),
-            onPlaceSelected: (place) =>
-                unawaited(_onNearbyPlaceSelected(place)),
-          );
-        },
-      );
+    setState(() {
+      _isSelectionSheetOpen = false;
+      _mapPadding = EdgeInsets.zero;
+      _selectionSheetCompleter = null;
+    });
 
-      if (result == true) {
-        final target = _selectedLatLngNotifier.value;
-        if (target != null) {
-          await _createEventAt(target);
-          await _clearSelectedLocation(dismissSheet: false);
-        }
+    if (result) {
+      final target = _selectedLatLngNotifier.value;
+      if (target != null) {
+        await _createEventAt(target);
+        await _clearSelectedLocation(dismissSheet: false);
       }
-    } finally {
-      _selectionSheetContext = null;
-      if (mounted) {
-        setState(() {
-          _mapPadding = EdgeInsets.zero;
-          _isSelectionSheetOpen = false;
-        });
-      } else {
-        _mapPadding = EdgeInsets.zero;
-        _isSelectionSheetOpen = false;
-      }
+    }
+  }
+
+  void _completeSelectionSheet(bool confirmed) {
+    final completer = _selectionSheetCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(confirmed);
     }
   }
 
@@ -893,6 +971,7 @@ class _LocationSelectionSheet extends StatelessWidget {
     required this.reverseGeocode,
     required this.fetchNearbyPlaces,
     required this.onPlaceSelected,
+    required this.scrollController,
   });
 
   final ValueListenable<LatLng?> positionListenable;
@@ -901,135 +980,129 @@ class _LocationSelectionSheet extends StatelessWidget {
   final Future<String?> Function(LatLng) reverseGeocode;
   final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
   final ValueChanged<NearbyPlace> onPlaceSelected;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+    return SafeArea(
+      top: false,
+      child: ListView(
+        controller: scrollController,
+        padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomInset),
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              loc.map_select_location_title,
-              style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            loc.map_select_location_title,
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            loc.map_select_location_tip,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: .7),
             ),
-            const SizedBox(height: 8),
-            Text(
-              loc.map_select_location_tip,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: .7),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ValueListenableBuilder<LatLng?>(
-              valueListenable: positionListenable,
-              builder: (context, position, _) {
-                if (position == null) {
-                  return const SizedBox.shrink();
-                }
+          ),
+          const SizedBox(height: 20),
+          ValueListenableBuilder<LatLng?>(
+            valueListenable: positionListenable,
+            builder: (context, position, _) {
+              if (position == null) {
+                return const SizedBox.shrink();
+              }
 
-                final coords = loc.location_coordinates(
-                  position.latitude.toStringAsFixed(6),
-                  position.longitude.toStringAsFixed(6),
-                );
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.place_outlined, color: Colors.redAccent),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            coords,
-                            style: theme.textTheme.bodyMedium,
-                          ),
+              final coords = loc.location_coordinates(
+                position.latitude.toStringAsFixed(6),
+                position.longitude.toStringAsFixed(6),
+              );
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.place_outlined, color: Colors.redAccent),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          coords,
+                          style: theme.textTheme.bodyMedium,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    FutureBuilder<String?>(
-                      key: ValueKey('${position.latitude}_${position.longitude}'),
-                      future: reverseGeocode(position),
-                      builder: (context, snapshot) {
-                        final icon = Icon(
-                          Icons.home_outlined,
-                          color: Colors.blueGrey.shade600,
-                        );
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return _LocationSheetRow(
-                            icon: icon,
-                            child: Text(loc.map_location_info_address_loading),
-                          );
-                        }
-                        if (snapshot.hasError) {
-                          return _LocationSheetRow(
-                            icon: icon,
-                            child: Text(loc.map_location_info_address_unavailable),
-                          );
-                        }
-                        final address = snapshot.data;
-                        final display = (address == null || address.trim().isEmpty)
-                            ? loc.map_location_info_address_unavailable
-                            : address;
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  FutureBuilder<String?>(
+                    key: ValueKey('${position.latitude}_${position.longitude}'),
+                    future: reverseGeocode(position),
+                    builder: (context, snapshot) {
+                      final icon = Icon(
+                        Icons.home_outlined,
+                        color: Colors.blueGrey.shade600,
+                      );
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return _LocationSheetRow(
                           icon: icon,
-                          child: Text(display),
+                          child: Text(loc.map_location_info_address_loading),
                         );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    _NearbyPlacesList(
-                      selectedPosition: position,
-                      fetchNearbyPlaces: fetchNearbyPlaces,
-                      onPlaceSelected: onPlaceSelected,
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: onCancel,
-                    child: Text(loc.action_cancel),
+                      }
+                      if (snapshot.hasError) {
+                        return _LocationSheetRow(
+                          icon: icon,
+                          child: Text(loc.map_location_info_address_unavailable),
+                        );
+                      }
+                      final address = snapshot.data;
+                      final display = (address == null || address.trim().isEmpty)
+                          ? loc.map_location_info_address_unavailable
+                          : address;
+                      return _LocationSheetRow(
+                        icon: icon,
+                        child: Text(display),
+                      );
+                    },
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: onConfirm,
-                    child: Text(loc.map_location_info_create_event),
+                  const SizedBox(height: 20),
+                  _NearbyPlacesList(
+                    selectedPosition: position,
+                    fetchNearbyPlaces: fetchNearbyPlaces,
+                    onPlaceSelected: onPlaceSelected,
                   ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onCancel,
+                  child: Text(loc.action_cancel),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  onPressed: onConfirm,
+                  child: Text(loc.map_location_info_create_event),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -28,7 +28,6 @@ import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
-import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import '../detail/events_detail_page.dart';
 import 'state/events_map_search_controller.dart';
@@ -49,7 +48,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   late final PageController _eventCardController;
   bool _isEventCardVisible = false;
   List<Event> _carouselEvents = const <Event>[];
-  int _activeEventIndex = 0;
   bool _isHandlingLongPress = false;
   BuildContext? _selectionSheetContext;
 
@@ -275,7 +273,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (index < 0 || index >= _carouselEvents.length) {
       return;
     }
-    setState(() => _activeEventIndex = index);
     final event = _carouselEvents[index];
     _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
   }
@@ -300,7 +297,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     setState(() {
       _isEventCardVisible = false;
       _carouselEvents = const <Event>[];
-      _activeEventIndex = 0;
     });
     _updateBottomNavigation(true);
   }
@@ -610,7 +606,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       setState(() {
         _carouselEvents = <Event>[ev];
         _isEventCardVisible = true;
-        _activeEventIndex = 0;
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !_eventCardController.hasClients) {
@@ -625,7 +620,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     setState(() {
       _carouselEvents = list;
       _isEventCardVisible = true;
-      _activeEventIndex = selectedIndex;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_eventCardController.hasClients) {
@@ -695,32 +689,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       }
       _showSnackBar(loc.map_place_details_error);
     }
-  }
-
-  Future<void> _createEventAt(LatLng latlng) async {
-    if (!await _ensureNetworkAvailable()) {
-      return;
-    }
-
-    if (!await _ensureDisclaimerAccepted()) {
-      return;
-    }
-    if (!mounted) {
-      return;
-    }
-    final data = await showCreateEventBottomSheet(context, latlng);
-    if (data == null || data.title.trim().isEmpty) {
-      return;
-    }
-
-    await ref
-        .read(eventsProvider.notifier)
-        .createEvent(
-          title: data.title.trim(),
-          description: data.description.trim(),
-          pos: latlng,
-          locationName: data.locationName,
-        );
   }
 
   Future<void> _createQuickRoadTrip(_QuickRoadTripResult result) async {
@@ -1006,7 +974,7 @@ class _CollapsibleSheetRouteContent<T> extends StatelessWidget {
                       child: Container(
                         color: collapsed
                             ? Colors.transparent
-                            : Colors.black.withOpacity(0.45),
+                            : Colors.black.withValues(alpha: .45),
                       ),
                     ),
                   ),

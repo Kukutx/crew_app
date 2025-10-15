@@ -119,7 +119,7 @@ class _ChatMessageSearchSheetState extends State<ChatMessageSearchSheet> {
                     ? _EmptySearchState(message: loc.chat_search_no_results)
                     : ListView.separated(
                         itemCount: results.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final message = results[index];
                           final senderLabel = message.sender.isCurrentUser

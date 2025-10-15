@@ -214,13 +214,11 @@ class PlazaPostCard extends StatelessWidget {
 class _PlazaPostAction extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool dense;
   final VoidCallback? onTap;
 
   const _PlazaPostAction({
     required this.icon,
     required this.label,
-    this.dense = false,
     this.onTap,
   });
 
@@ -249,7 +247,7 @@ class _PlazaPostAction extends StatelessWidget {
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  fontWeight: dense ? FontWeight.w500 : FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

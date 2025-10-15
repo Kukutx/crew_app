@@ -675,12 +675,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ref.read(appOverlayIndexProvider.notifier).state = 0;
   }
 
-  void _onAvatarTap(bool _) {
+  void _onAvatarTap(bool authed) {
     if (_searchFocusNode.hasFocus) {
       _searchFocusNode.unfocus();
     }
     if (_showSearchResults) {
       setState(() => _showSearchResults = false);
+    }
+    if (!authed) {
+      Navigator.of(context).pushNamed('/login');
+      return;
     }
     ref.read(appOverlayIndexProvider.notifier).state = 2;
   }

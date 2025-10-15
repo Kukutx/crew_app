@@ -498,8 +498,23 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       }
     }
 
+    var isAttached = true;
+    try {
+      // Accessing the size throws when the controller is not yet attached.
+      _selectionSheetController.size;
+    } catch (_) {
+      isAttached = false;
+    }
+
+    if (!isAttached) {
+      _scheduleSheetAnimation(runAnimation);
+      return;
+    }
+
     try {
       await runAnimation();
+    } on AssertionError catch (_) {
+      _scheduleSheetAnimation(runAnimation);
     } on FlutterError catch (_) {
       _scheduleSheetAnimation(runAnimation);
     } on StateError catch (_) {
@@ -512,7 +527,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       if (!mounted) {
         return;
       }
-      unawaited(runAnimation().catchError((_) {}));
+      unawaited(
+        runAnimation().catchError((error, __) {
+          if (error is AssertionError ||
+              error is FlutterError ||
+              error is StateError) {
+            _scheduleSheetAnimation(runAnimation);
+          }
+        }),
+      );
     });
   }
 

@@ -1015,8 +1015,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       final result = await InternetAddress.lookup(lookupHost);
       final hasConnection =
           result.isNotEmpty && result.first.rawAddress.isNotEmpty;
-      final hasConnection =
-          result.isNotEmpty && result.first.rawAddress.isNotEmpty;
 
       if (!hasConnection && mounted) {
         ScaffoldMessenger.of(

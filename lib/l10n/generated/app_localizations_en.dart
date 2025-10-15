@@ -364,10 +364,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_place_details_not_found =>
-      "We couldn't find details for this place.";
+      'We couldn\'t find details for this place.';
 
   @override
-  String get map_place_details_error => 'Unable to load place details right now.';
+  String get map_place_details_error =>
+      'Unable to load place details right now.';
 
   @override
   String get map_place_details_missing_api_key =>
@@ -417,54 +418,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get map_select_location_tip =>
       'Long press on the map to fine-tune the position.';
-
-  @override
-  String get map_selection_sheet_tap_to_expand => 'Tap to expand';
-
-  @override
-  String get map_select_location_destination_tip =>
-      'Tap the map to choose a destination.';
-
-  @override
-  String get map_select_location_destination_missing =>
-      'Pick a destination to continue.';
-
-  @override
-  String get map_select_location_trip_title_label => 'Trip title';
-
-  @override
-  String get map_select_location_trip_title_hint => 'Give this trip a name';
-
-  @override
-  String get map_select_location_title_required =>
-      'Please enter a trip title.';
-
-  @override
-  String get map_select_location_start_label => 'Start';
-
-  @override
-  String get map_select_location_destination_label => 'Destination';
-
-  @override
-  String get map_select_location_open_detailed => 'Open detailed planner';
-
-  @override
-  String get map_select_location_create_trip => 'Create quick trip';
-
-  @override
-  String get map_quick_trip_default_title => 'Road trip';
-
-  @override
-  String map_quick_trip_description(Object start, Object destination) {
-    return 'From $start to $destination.';
-  }
-
-  @override
-  String get map_quick_trip_created => 'Quick trip created.';
-
-  @override
-  String get map_quick_trip_create_failed =>
-      "We couldn't create this trip.";
 
   @override
   String get messages => 'Messages';

@@ -32,6 +32,7 @@ import 'sheets/map_create_event_sheet.dart';
 import 'sheets/map_place_details_sheet.dart';
 import '../detail/events_detail_page.dart';
 import 'state/events_map_search_controller.dart';
+import 'state/map_selection_controller.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -49,16 +50,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   bool _isEventCardVisible = false;
   List<Event> _carouselEvents = const <Event>[];
   int _activeEventIndex = 0;
-  LatLng? _selectedLatLng;
-  LatLng? _destinationLatLng;
-  late final ValueNotifier<LatLng?> _selectedLatLngNotifier;
-  late final ValueNotifier<LatLng?> _destinationLatLngNotifier;
   bool _isHandlingLongPress = false;
-  bool _isSelectingDestination = false;
-  bool _isSelectionSheetOpen = false;
-  EdgeInsets _mapPadding = EdgeInsets.zero;
   BuildContext? _selectionSheetContext;
-  final Map<String, Future<List<NearbyPlace>>> _nearbyPlacesCache = {};
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -71,8 +64,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _eventCardController = PageController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(_onSearchFocusChanged);
-    _selectedLatLngNotifier = ValueNotifier<LatLng?>(null);
-    _destinationLatLngNotifier = ValueNotifier<LatLng?>(null);
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -99,8 +90,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchController.dispose();
     _mapFocusSubscription?.close();
     _eventCardController.dispose();
-    _selectedLatLngNotifier.dispose();
-    _destinationLatLngNotifier.dispose();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
       if (controller.state) {
@@ -130,6 +119,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final events = ref.watch(eventsProvider);
     final userLoc = ref.watch(userLocationProvider).value;
     final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
+    final selectionState = ref.watch(mapSelectionControllerProvider);
 
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
@@ -140,11 +130,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       ),
     );
 
-    final shouldHideEventMarkers = _selectedLatLng != null || _isSelectingDestination;
+    final shouldHideEventMarkers =
+        selectionState.selectedLatLng != null || selectionState.isSelectingDestination;
     final markers = <Marker>{
       if (!shouldHideEventMarkers) ...markersLayer.markers,
     };
-    final selected = _selectedLatLng;
+    final selected = selectionState.selectedLatLng;
     if (selected != null) {
       markers.add(
         Marker(
@@ -161,7 +152,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       );
     }
 
-    final destination = _destinationLatLng;
+    final destination = selectionState.destinationLatLng;
     if (destination != null) {
       markers.add(
         Marker(
@@ -198,9 +189,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         isLoading: searchState.isLoading,
         results: searchState.results,
         errorText: searchState.errorText,
-        showClearSelectionAction: _selectedLatLng != null,
-        onClearSelection:
-            _selectedLatLng != null ? () => unawaited(_clearSelectedLocation()) : null,
+        showClearSelectionAction: selectionState.selectedLatLng != null,
+        onClearSelection: selectionState.selectedLatLng != null
+            ? () => unawaited(_clearSelectedLocation())
+            : null,
       ),
       body: Stack(
         children: [
@@ -225,7 +217,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               markers: markers,
               showUserLocation: true,
               showMyLocationButton: true,
-              mapPadding: _mapPadding,
+              mapPadding: selectionState.mapPadding,
             ),
           ),
           EventsMapEventCarousel(
@@ -357,43 +349,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
-  Future<List<NearbyPlace>> _getNearbyPlaces(LatLng position) {
-    final key = _nearbyPlacesCacheKey(position);
-    final cached = _nearbyPlacesCache[key];
-    if (cached != null) {
-      return cached;
-    }
-
-    final future = _loadNearbyPlaces(position).then(
-      (value) => value,
-      onError: (Object error, StackTrace stackTrace) {
-        _nearbyPlacesCache.remove(key);
-        throw error;
-      },
-    );
-    _nearbyPlacesCache[key] = future;
-    return future;
-  }
-
-  String _nearbyPlacesCacheKey(LatLng position) {
-    return '${position.latitude.toStringAsFixed(5)}_${position.longitude.toStringAsFixed(5)}';
-  }
-
-  Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng position) async {
-    final service = ref.read(placesServiceProvider);
-    final results = await service.searchNearbyPlaces(
-      position,
-      radius: 150,
-      maxResults: 6,
-    );
-    return results.take(3).toList(growable: false);
-  }
-
   Future<void> _onMapLongPress(LatLng latlng) async {
     if (!mounted) {
       return;
     }
-    if (_isSelectingDestination) {
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    if (selectionState.isSelectingDestination) {
       await _handleDestinationSelection(latlng);
       return;
     }
@@ -404,7 +365,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _isHandlingLongPress = true;
     try {
       await _clearSelectedLocation();
-      _setSelectedLatLng(latlng);
+      ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(latlng);
       await _moveCamera(latlng, zoom: 17);
       await _showLocationSelectionSheet();
     } finally {
@@ -412,76 +373,49 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
-  void _setSelectedLatLng(LatLng? position) {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _selectedLatLng = position;
-    });
-    _selectedLatLngNotifier.value = position;
-  }
-
-  void _setDestinationLatLng(LatLng? position) {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _destinationLatLng = position;
-    });
-    _destinationLatLngNotifier.value = position;
-  }
-
   Future<void> _handleDestinationSelection(LatLng position) async {
-    if (!_isSelectingDestination || _isSelectionSheetOpen) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    if (!selectionState.isSelectingDestination ||
+        selectionState.isSelectionSheetOpen) {
       return;
     }
-    _setDestinationLatLng(position);
+    selectionController.setDestinationLatLng(position);
     await _moveCamera(position, zoom: 12);
     HapticFeedback.lightImpact();
     await _showDestinationSelectionSheet();
   }
 
   void _onSelectedLocationDrag(LatLng position) {
-    _setSelectedLatLng(position);
+    ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(position);
   }
 
   void _onSelectedLocationDragEnd(LatLng position) {
-    _setSelectedLatLng(position);
+    _onSelectedLocationDrag(position);
     HapticFeedback.lightImpact();
   }
 
   Future<void> _waitForSelectionSheetToClose() async {
     var attempts = 0;
-    while (_isSelectionSheetOpen && attempts < 50) {
+    while (ref.read(mapSelectionControllerProvider).isSelectionSheetOpen &&
+        attempts < 50) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
       attempts++;
     }
   }
 
   Future<void> _clearSelectedLocation({bool dismissSheet = true}) async {
-    if (dismissSheet && _isSelectionSheetOpen && _selectionSheetContext != null) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final selectionState = ref.read(mapSelectionControllerProvider);
+
+    if (dismissSheet &&
+        selectionState.isSelectionSheetOpen &&
+        _selectionSheetContext != null) {
       Navigator.of(_selectionSheetContext!).pop(false);
       await _waitForSelectionSheetToClose();
     }
 
-    if (mounted) {
-      setState(() {
-        _isSelectingDestination = false;
-      });
-    } else {
-      _isSelectingDestination = false;
-    }
-
-    if (_selectedLatLng == null) {
-      _selectedLatLngNotifier.value = null;
-      _destinationLatLngNotifier.value = null;
-      _destinationLatLng = null;
-      return;
-    }
-
-    _setSelectedLatLng(null);
-    _setDestinationLatLng(null);
+    selectionController.resetSelection();
   }
 
   Future<T?> _presentSelectionSheet<T>({
@@ -496,6 +430,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return null;
     }
 
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final media = MediaQuery.of(context);
     final collapsedHeight = media.size.height * 0.15;
     final collapsedPadding = EdgeInsets.only(bottom: collapsedHeight);
@@ -507,15 +442,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         return;
       }
       final isCollapsed = collapsedNotifier.value;
-      setState(() {
-        _mapPadding = isCollapsed ? collapsedPadding : expandedEdgeInsets;
-      });
+      selectionController
+          .setMapPadding(isCollapsed ? collapsedPadding : expandedEdgeInsets);
     }
 
-    setState(() {
-      _isSelectionSheetOpen = true;
-      _mapPadding = expandedEdgeInsets;
-    });
+    selectionController.setSelectionSheetOpen(true);
+    selectionController.setMapPadding(expandedEdgeInsets);
 
     collapsedNotifier.addListener(updatePadding);
 
@@ -545,22 +477,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       collapsedNotifier.removeListener(updatePadding);
       collapsedNotifier.dispose();
       _selectionSheetContext = null;
-      if (mounted) {
-        setState(() {
-          _mapPadding = EdgeInsets.zero;
-          _isSelectionSheetOpen = false;
-        });
-      } else {
-        _mapPadding = EdgeInsets.zero;
-        _isSelectionSheetOpen = false;
-      }
+      selectionController.resetMapPadding();
+      selectionController.setSelectionSheetOpen(false);
     }
 
     return result;
   }
 
   Future<void> _showLocationSelectionSheet() async {
-    if (!mounted || _selectedLatLng == null || _isSelectionSheetOpen) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    if (!mounted ||
+        selectionState.selectedLatLng == null ||
+        selectionState.isSelectionSheetOpen) {
       return;
     }
 
@@ -571,11 +500,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       expandedPadding: paddingValue,
       builder: (sheetContext, collapsedNotifier) {
         return _StartLocationSheet(
-          positionListenable: _selectedLatLngNotifier,
+          positionListenable: selectionController.selectedLatLngListenable,
           onConfirm: () => Navigator.of(sheetContext).pop(true),
           onCancel: () => Navigator.of(sheetContext).pop(false),
           reverseGeocode: _reverseGeocode,
-          fetchNearbyPlaces: _getNearbyPlaces,
+          fetchNearbyPlaces: selectionController.getNearbyPlaces,
           collapsedListenable: collapsedNotifier,
           onExpand: () => collapsedNotifier.value = false,
         );
@@ -593,31 +522,30 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    final start = _selectedLatLng;
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    final start = selectionState.selectedLatLng;
     if (start == null) {
       await _clearSelectedLocation(dismissSheet: false);
       return;
     }
 
-    if (mounted) {
-      setState(() {
-        _isSelectingDestination = true;
-      });
-    } else {
-      _isSelectingDestination = true;
-    }
-
-    _setDestinationLatLng(null);
+    selectionController.setSelectingDestination(true);
+    selectionController.setDestinationLatLng(null);
     await _moveCamera(start, zoom: 6);
     final loc = AppLocalizations.of(context)!;
     _showSnackBar(loc.map_select_location_destination_tip);
   }
 
   Future<void> _showDestinationSelectionSheet() async {
-    if (!mounted || !_isSelectingDestination || _selectedLatLng == null) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    if (!mounted ||
+        !selectionState.isSelectingDestination ||
+        selectionState.selectedLatLng == null) {
       return;
     }
-    if (_destinationLatLng == null) {
+    if (selectionState.destinationLatLng == null) {
       return;
     }
 
@@ -628,10 +556,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       expandedPadding: paddingValue,
       builder: (sheetContext, collapsedNotifier) {
         return _DestinationSelectionSheet(
-          startPositionListenable: _selectedLatLngNotifier,
-          destinationListenable: _destinationLatLngNotifier,
+          startPositionListenable: selectionController.selectedLatLngListenable,
+          destinationListenable: selectionController.destinationLatLngListenable,
           reverseGeocode: _reverseGeocode,
-          fetchNearbyPlaces: _getNearbyPlaces,
+          fetchNearbyPlaces: selectionController.getNearbyPlaces,
           collapsedListenable: collapsedNotifier,
           onExpand: () => collapsedNotifier.value = false,
           onCancel: () => Navigator.of(sheetContext).pop(null),
@@ -726,7 +654,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    if (_isSelectingDestination) {
+    if (ref.read(mapSelectionControllerProvider).isSelectingDestination) {
       await _handleDestinationSelection(position);
       return;
     }
@@ -1002,7 +930,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
 
-    if (_isSelectingDestination) {
+    if (ref.read(mapSelectionControllerProvider).isSelectingDestination) {
       return;
     }
 

@@ -281,21 +281,7 @@ class SettingsPage extends ConsumerWidget {
                           Text('${loc.settings_account_uid_label}: $uid'),
                         ],
                       )
-                    : Text(loc.login_prompt),
-                isThreeLine: true,
-                trailing: firebaseUser == null
-                    ? TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/login');
-                        },
-                        child: Text(loc.action_login),
-                      )
-                    : null,
-                onTap: firebaseUser == null
-                    ? () {
-                        Navigator.pushNamed(context, '/login');
-                      }
-                    : null,
+                    : Text(loc.login_prompt)
               ),
               ListTile(
                 leading: const Icon(Icons.history),

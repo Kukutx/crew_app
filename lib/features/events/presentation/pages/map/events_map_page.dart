@@ -438,7 +438,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted || _selectedLatLng == null || _isSelectionSheetOpen) {
       return;
     }
-    
+
+    final placesService = ref.read(placesServiceProvider);
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
 
@@ -465,6 +466,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             onConfirm: () => Navigator.of(sheetContext).pop(true),
             onCancel: () => Navigator.of(sheetContext).pop(false),
             reverseGeocode: _reverseGeocode,
+            fetchNearbyPlaces: (position) => placesService.searchNearbyPlaces(
+              position,
+              radius: 200,
+              maxResults: 3,
+            ),
+            onPlaceSelected: (place) =>
+                unawaited(_onNearbyPlaceSelected(place)),
           );
         },
       );
@@ -488,6 +496,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         _isSelectionSheetOpen = false;
       }
     }
+  }
+
+  Future<void> _onNearbyPlaceSelected(NearbyPlace place) async {
+    final location = place.location;
+    if (location == null) {
+      return;
+    }
+    _setSelectedLatLng(location);
+    await _moveCamera(location, zoom: 17);
+    await HapticFeedback.selectionClick();
   }
 
   void _showEventCard(Event ev) {
@@ -873,12 +891,16 @@ class _LocationSelectionSheet extends StatelessWidget {
     required this.onConfirm,
     required this.onCancel,
     required this.reverseGeocode,
+    required this.fetchNearbyPlaces,
+    required this.onPlaceSelected,
   });
 
   final ValueListenable<LatLng?> positionListenable;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
   final Future<String?> Function(LatLng) reverseGeocode;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
+  final ValueChanged<NearbyPlace> onPlaceSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -978,6 +1000,12 @@ class _LocationSelectionSheet extends StatelessWidget {
                         );
                       },
                     ),
+                    const SizedBox(height: 20),
+                    _NearbyPlacesList(
+                      selectedPosition: position,
+                      fetchNearbyPlaces: fetchNearbyPlaces,
+                      onPlaceSelected: onPlaceSelected,
+                    ),
                   ],
                 );
               },
@@ -1022,6 +1050,156 @@ class _LocationSheetRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(child: child),
       ],
+    );
+  }
+}
+
+class _NearbyPlacesList extends StatelessWidget {
+  const _NearbyPlacesList({
+    required this.selectedPosition,
+    required this.fetchNearbyPlaces,
+    required this.onPlaceSelected,
+  });
+
+  final LatLng selectedPosition;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
+  final ValueChanged<NearbyPlace> onPlaceSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.map_location_info_nearby_title,
+          style: theme.textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        FutureBuilder<List<NearbyPlace>>(
+          key: ValueKey(
+            'nearby_${selectedPosition.latitude}_${selectedPosition.longitude}',
+          ),
+          future: fetchNearbyPlaces(selectedPosition),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (snapshot.hasError) {
+              final error = snapshot.error;
+              String message = loc.map_location_info_nearby_error;
+              if (error is PlacesApiException) {
+                if (error.message.contains('not configured')) {
+                  message = loc.map_place_details_missing_api_key;
+                } else if (error.message.trim().isNotEmpty) {
+                  message = error.message;
+                }
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  message,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              );
+            }
+
+            final places = (snapshot.data ?? const <NearbyPlace>[])
+                .where((place) => place.location != null)
+                .take(3)
+                .toList(growable: false);
+            if (places.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  loc.map_location_info_nearby_empty,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              );
+            }
+
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                final place = places[index];
+                return _NearbyPlaceTile(
+                  place: place,
+                  selected: _isSameLocation(
+                    place.location!,
+                    selectedPosition,
+                  ),
+                  onTap: () => onPlaceSelected(place),
+                );
+              },
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemCount: places.length,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  bool _isSameLocation(LatLng a, LatLng b) {
+    const tolerance = 1e-5;
+    return (a.latitude - b.latitude).abs() < tolerance &&
+        (a.longitude - b.longitude).abs() < tolerance;
+  }
+}
+
+class _NearbyPlaceTile extends StatelessWidget {
+  const _NearbyPlaceTile({
+    required this.place,
+    required this.onTap,
+    required this.selected,
+  });
+
+  final NearbyPlace place;
+  final VoidCallback onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasAddress = place.formattedAddress != null &&
+        place.formattedAddress!.trim().isNotEmpty;
+
+    final colorScheme = theme.colorScheme;
+    final selectedColor = colorScheme.primary.withOpacity(0.12);
+    final defaultIconColor = theme.colorScheme.onSurfaceVariant;
+
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: EdgeInsets.zero,
+      color: selected ? selectedColor : null,
+      child: ListTile(
+        onTap: onTap,
+        leading: Icon(
+          Icons.place_outlined,
+          color: selected ? colorScheme.primary : defaultIconColor,
+        ),
+        title: Text(
+          place.displayName,
+          style: theme.textTheme.titleSmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: hasAddress
+            ? Text(
+                place.formattedAddress!,
+                style: theme.textTheme.bodySmall,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              )
+            : null,
+      ),
     );
   }
 }

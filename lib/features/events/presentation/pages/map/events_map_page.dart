@@ -503,6 +503,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       ValueNotifier<bool> collapsedNotifier,
     )
         builder,
+    bool initiallyCollapsed = false,
   }) async {
     if (!mounted) {
       return null;
@@ -512,7 +513,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final collapsedHeight = media.size.height * 0.15;
     final collapsedPadding = EdgeInsets.only(bottom: collapsedHeight);
     final expandedEdgeInsets = EdgeInsets.only(bottom: expandedPadding);
-    final collapsedNotifier = ValueNotifier<bool>(false);
+    final collapsedNotifier = ValueNotifier<bool>(initiallyCollapsed);
 
     void updatePadding() {
       if (!mounted) {
@@ -526,7 +527,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     setState(() {
       _isSelectionSheetOpen = true;
-      _mapPadding = expandedEdgeInsets;
+      _mapPadding = initiallyCollapsed ? collapsedPadding : expandedEdgeInsets;
     });
 
     collapsedNotifier.addListener(updatePadding);
@@ -579,19 +580,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final paddingValue = 320.0 + bottomInset;
 
- final proceed = await _presentSelectionSheet<bool>(
-              expandedPadding: paddingValue,
-              builder: (sheetContext, collapsedNotifier) {
-                return _StartLocationSheet(
-                  positionListenable: _selectedLatLngNotifier,
-                  onConfirm: () => Navigator.of(sheetContext).pop(true),
-                  onCancel: () => Navigator.of(sheetContext).pop(false),
-                  reverseGeocode: _reverseGeocode,
-                  collapsedListenable: collapsedNotifier,
-                  onExpand: () => collapsedNotifier.value = false,
-                );    
-              },
-            );
+    final proceed = await _presentSelectionSheet<bool>(
+      expandedPadding: paddingValue,
+      builder: (sheetContext, collapsedNotifier) {
+        return _StartLocationSheet(
+          positionListenable: _selectedLatLngNotifier,
+          onConfirm: () => Navigator.of(sheetContext).pop(true),
+          onCancel: () => Navigator.of(sheetContext).pop(false),
+          reverseGeocode: _reverseGeocode,
+          collapsedListenable: collapsedNotifier,
+          onExpand: () => collapsedNotifier.value = false,
+        );
+      },
+      initiallyCollapsed: true,
+    );
 
     if (proceed != null && proceed) {
       await _beginDestinationSelection();

@@ -449,13 +449,12 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                 ? SizedBox(
                     key: const ValueKey('emoji_picker'),
                     height: 320,
-                    child: EmojiPicker(
-                      onEmojiSelected: _handleEmojiSelected,
-                      onBackspacePressed: _handleBackspacePressed,
-                      config: const Config(),
-                      textEditingController: _composerController,
-                    ),
-                  )
+                  child: EmojiPicker(
+                    onEmojiSelected: _handleEmojiSelected,
+                    onBackspacePressed: _handleBackspacePressed,
+                    config: const Config(),
+                  ),
+                )
                 : const SizedBox.shrink(),
           ),
         ],

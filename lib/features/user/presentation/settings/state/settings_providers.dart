@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crew_app/core/storage/shared_preferences_provider.dart';
 
 // ---------- Settings ----------
 class SettingsState {
@@ -57,12 +58,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     );
   }
 }
-
-
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('SharedPreferences not initialized');
-});
-
 final settingsProvider =
     StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);

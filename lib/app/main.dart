@@ -1,4 +1,4 @@
-import 'package:crew_app/app/view/my_app.dart';
+import 'package:crew_app/app/view/crew_app.dart';
 import 'package:crew_app/bootstrap/bootstrapper.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +8,7 @@ Future<void> main() async {
     return ProviderScope(
       overrides: result.overrides,
       child: BetterFeedback(
-        child: const MyApp(),
+        child: const CrewApp(),
       ),
     );
   });

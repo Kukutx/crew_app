@@ -11,8 +11,8 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+class CrewApp extends ConsumerWidget {
+  const CrewApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

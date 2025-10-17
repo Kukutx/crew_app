@@ -12,6 +12,9 @@ class ChatRoomMessageComposer extends StatelessWidget {
     this.onVoiceRecordStart,
     this.onVoiceRecordCancel,
     this.onVoiceRecordSend,
+    this.focusNode,
+    this.onTextFieldTap,
+    this.isEmojiPickerVisible = false,
   });
 
   final TextEditingController controller;
@@ -22,6 +25,9 @@ class ChatRoomMessageComposer extends StatelessWidget {
   final VoidCallback? onVoiceRecordStart;
   final VoidCallback? onVoiceRecordCancel;
   final VoidCallback? onVoiceRecordSend;
+  final FocusNode? focusNode;
+  final VoidCallback? onTextFieldTap;
+  final bool isEmojiPickerVisible;
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +107,12 @@ class ChatRoomMessageComposer extends StatelessWidget {
             children: [
               IconButton(
                 tooltip: loc.chat_composer_emoji_tooltip,
-                icon: Icon(Icons.emoji_emotions_outlined, color: colorScheme.primary),
+                icon: Icon(
+                  isEmojiPickerVisible
+                      ? Icons.keyboard_alt_rounded
+                      : Icons.emoji_emotions_outlined,
+                  color: colorScheme.primary,
+                ),
                 onPressed:
                     withFallback(onEmojiTap, loc.chat_composer_emoji_tooltip),
               ),
@@ -116,11 +127,13 @@ class ChatRoomMessageComposer extends StatelessWidget {
                   controller: controller,
                   minLines: 1,
                   maxLines: 4,
+                  focusNode: focusNode,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: hintText,
                   ),
+                  onTap: onTextFieldTap,
                   onSubmitted: (_) => onSend(),
                 ),
               ),

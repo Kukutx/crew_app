@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:characters/characters.dart';
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
@@ -11,6 +12,7 @@ import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_r
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 
 enum ChatConversationType { group, direct }
@@ -55,10 +57,12 @@ class ChatConversationPage extends StatefulWidget {
 class _ChatConversationPageState extends State<ChatConversationPage> {
   late final TextEditingController _composerController;
   late final ScrollController _scrollController;
+  late final FocusNode _composerFocusNode;
   late final List<ChatMessage> _messages;
   final Map<String, GlobalKey> _messageKeys = <String, GlobalKey>{};
   String? _highlightedMessageId;
   Timer? _highlightTimer;
+  bool _isEmojiPickerVisible = false;
 
   bool get _isGroup => widget.type == ChatConversationType.group;
 
@@ -67,8 +71,14 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     super.initState();
     _composerController = TextEditingController();
     _scrollController = ScrollController();
+    _composerFocusNode = FocusNode();
     _messages = List<ChatMessage>.of(widget.initialMessages);
     _ensureMessageKeys();
+    _composerFocusNode.addListener(() {
+      if (_composerFocusNode.hasFocus && _isEmojiPickerVisible) {
+        setState(() => _isEmojiPickerVisible = false);
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
@@ -77,6 +87,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     _highlightTimer?.cancel();
     _composerController.dispose();
     _scrollController.dispose();
+    _composerFocusNode.dispose();
     super.dispose();
   }
 
@@ -99,9 +110,71 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     setState(() {
       _messages.add(newMessage);
       _messageKeys[newMessage.id] = GlobalKey();
+      _isEmojiPickerVisible = false;
     });
     _composerController.clear();
     _scrollToBottom();
+  }
+
+  void _toggleEmojiPicker() {
+    setState(() {
+      _isEmojiPickerVisible = !_isEmojiPickerVisible;
+    });
+
+    if (_isEmojiPickerVisible) {
+      FocusScope.of(context).unfocus();
+    } else {
+      _composerFocusNode.requestFocus();
+    }
+  }
+
+  void _hideEmojiPicker() {
+    if (!_isEmojiPickerVisible) return;
+    setState(() => _isEmojiPickerVisible = false);
+  }
+
+  void _handleEmojiSelected(Category? category, Emoji emoji) {
+    final text = _composerController.text;
+    final selection = _composerController.selection;
+    final start = selection.start >= 0 ? selection.start : text.length;
+    final end = selection.end >= 0 ? selection.end : start;
+
+    final newText = text.replaceRange(start, end, emoji.emoji);
+    final newSelectionIndex = start + emoji.emoji.length;
+
+    _composerController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newSelectionIndex),
+    );
+  }
+
+  void _handleBackspacePressed() {
+    final text = _composerController.text;
+    final selection = _composerController.selection;
+    final start = selection.start >= 0 ? selection.start : text.length;
+    final end = selection.end >= 0 ? selection.end : start;
+
+    if (start != end) {
+      final newText = text.replaceRange(start, end, '');
+      _composerController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: start),
+      );
+      return;
+    }
+
+    if (start <= 0) {
+      return;
+    }
+
+    final prefix = text.substring(0, start);
+    final trimmedPrefix = prefix.characters.skipLast(1).toString();
+    final suffix = text.substring(start);
+    final newText = trimmedPrefix + suffix;
+    _composerController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: trimmedPrefix.length),
+    );
   }
 
   void _scrollToBottom() {
@@ -363,6 +436,26 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
             hintText: loc.chat_message_input_hint,
             onSend: _handleSend,
             onMoreOptionsTap: _showAttachmentSheet,
+            onEmojiTap: _toggleEmojiPicker,
+            focusNode: _composerFocusNode,
+            onTextFieldTap: _hideEmojiPicker,
+            isEmojiPickerVisible: _isEmojiPickerVisible,
+          ),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: _isEmojiPickerVisible
+                ? SizedBox(
+                    key: const ValueKey('emoji_picker'),
+                    height: 320,
+                  child: EmojiPicker(
+                    onEmojiSelected: _handleEmojiSelected,
+                    onBackspacePressed: _handleBackspacePressed,
+                    config: const Config(),
+                  ),
+                )
+                : const SizedBox.shrink(),
           ),
         ],
       ),

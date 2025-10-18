@@ -46,7 +46,9 @@ class AuthenticatedUserNotifier
     }
 
     state = const AsyncValue<AuthenticatedUserDto?>.loading();
-    state = await AsyncValue.guard(_loadProfile);
+    final nextState = await AsyncValue.guard(_loadProfile);
+    if (!mounted) return;
+    state = nextState;
   }
 
   Future<AuthenticatedUserDto?> refreshProfile() async {
@@ -57,7 +59,9 @@ class AuthenticatedUserNotifier
     }
 
     state = const AsyncValue<AuthenticatedUserDto?>.loading();
-    state = await AsyncValue.guard(_loadProfile);
+   final nextState = await AsyncValue.guard(_loadProfile);
+    if (!mounted) return null;
+    state = nextState;
     return state.asData?.value;
   }
 

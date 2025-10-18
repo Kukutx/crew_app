@@ -1,9 +1,9 @@
 class Env {
-  static const String dev = 'https://crew-api-dev.onrender.com/api';
+  static const String dev = 'https://crew-api-dev.onrender.com/api/v1/';
   static const String stage = dev;
   static const String prod = 'https://crew-api-u8vu.onrender.com/api';
 
-  static String current = prod;
+  static String current = dev;
 
   static void setProduction() => current = prod;
   static void setDevelopment() => current = dev;

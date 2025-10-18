@@ -1,4 +1,5 @@
 import 'event_segment_dto.dart';
+import 'json_helpers.dart';
 import 'moment_summary_dto.dart';
 
 class EventDetailDto {
@@ -31,31 +32,43 @@ class EventDetailDto {
     this.routePolyline,
     required this.maxParticipants,
     required this.visibility,
-    required this.segments,
+    required List<EventSegmentDto> segments,
     required this.memberCount,
     required this.isRegistered,
     this.tags,
-    required this.moments,
-  });
+    required List<MomentSummaryDto> moments,
+  })  : segments = List.unmodifiable(segments),
+        moments = List.unmodifiable(moments);
 
-  factory EventDetailDto.fromJson(Map<String, dynamic> json) => EventDetailDto(
-        id: json['id'],
-        ownerId: json['ownerId'],
-        title: json['title'],
-        description: json['description'],
-        startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
-        endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
-        startPoint: (json['startPoint'] as List?)?.map((e) => (e as num).toDouble()).toList(),
-        endPoint: (json['endPoint'] as List?)?.map((e) => (e as num).toDouble()).toList(),
-        routePolyline: json['routePolyline'],
-        maxParticipants: json['maxParticipants'],
-        visibility: json['visibility'],
-        segments: (json['segments'] as List).map((e) => EventSegmentDto.fromJson(e)).toList(),
-        memberCount: json['memberCount'],
-        isRegistered: json['isRegistered'],
-        tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
-        moments: (json['moments'] as List).map((e) => MomentSummaryDto.fromJson(e)).toList(),
-      );
+  factory EventDetailDto.fromJson(Map<String, dynamic> json) {
+    final start = parseDoubleList(json['startPoint']);
+    final end = parseDoubleList(json['endPoint']);
+    final tags = parseStringList(json['tags']);
+    final segments = parseMapList(json['segments'])
+        .map(EventSegmentDto.fromJson)
+        .toList(growable: false);
+    final moments = parseMapList(json['moments'])
+        .map(MomentSummaryDto.fromJson)
+        .toList(growable: false);
+    return EventDetailDto(
+      id: json['id']?.toString() ?? '',
+      ownerId: json['ownerId']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      description: json['description'] as String?,
+      startTime: parseDateTime(json['startTime']),
+      endTime: parseDateTime(json['endTime']),
+      startPoint: start.isEmpty ? null : List.unmodifiable(start),
+      endPoint: end.isEmpty ? null : List.unmodifiable(end),
+      routePolyline: json['routePolyline'] as String?,
+      maxParticipants: parseInt(json['maxParticipants']) ?? 0,
+      visibility: json['visibility']?.toString() ?? 'Public',
+      segments: segments,
+      memberCount: parseInt(json['memberCount']) ?? 0,
+      isRegistered: parseBool(json['isRegistered']),
+      tags: tags.isEmpty ? null : List.unmodifiable(tags),
+      moments: moments,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

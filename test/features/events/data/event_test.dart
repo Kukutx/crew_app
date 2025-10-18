@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/models/event/event_card_dto.dart';
 import 'package:crew_app/features/models/event/event_detail_dto.dart';
+import 'package:crew_app/features/models/event/event_feed_response_dto.dart';
 import 'package:crew_app/features/models/event/event_segment_dto.dart';
 import 'package:crew_app/features/models/event/event_summary_dto.dart';
 import 'package:crew_app/features/models/event/moment_summary_dto.dart';
@@ -117,5 +118,40 @@ void main() {
     expect(enriched.waypoints, contains('Lat 24.0000'));
     expect(enriched.firstAvailableImageUrl,
         'https://example.com/sunrise.jpg');
+  });
+
+  test('Event DTOs gracefully handle missing optional fields', () {
+    final feed = EventFeedResponseDto.fromJson({
+      'events': [
+        {
+          'id': 'event-lite',
+          'ownerId': 'owner-lite',
+          'title': 'Lite Ride',
+          'createdAt': '2024-01-01T00:00:00Z',
+          'coordinates': [121.0, 24.0],
+        },
+      ],
+      'nextCursor': '',
+    });
+
+    expect(feed.events, hasLength(1));
+    expect(feed.nextCursor, isNull);
+    expect(feed.events.first.registrations, 0);
+    expect(feed.events.first.tags, isNull);
+
+    final detail = EventDetailDto.fromJson({
+      'id': 'event-lite',
+      'ownerId': 'owner-lite',
+      'title': 'Lite Ride',
+      'visibility': 'Public',
+      'maxParticipants': 0,
+      'memberCount': 0,
+      'isRegistered': false,
+    });
+
+    expect(detail.segments, isEmpty);
+    expect(detail.moments, isEmpty);
+    expect(detail.startPoint, isNull);
+    expect(detail.tags, isNull);
   });
 }

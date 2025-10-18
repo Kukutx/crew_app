@@ -1,3 +1,5 @@
+import 'json_helpers.dart';
+
 class MomentSummaryDto {
   final String id;
   final String userId;
@@ -20,14 +22,14 @@ class MomentSummaryDto {
   });
 
   factory MomentSummaryDto.fromJson(Map<String, dynamic> json) => MomentSummaryDto(
-        id: json['id'],
-        userId: json['userId'],
-        userDisplayName: json['userDisplayName'],
-        title: json['title'],
-        coverImageUrl: json['coverImageUrl'],
-        country: json['country'],
-        city: json['city'],
-        createdAt: DateTime.parse(json['createdAt']),
+        id: json['id']?.toString() ?? '',
+        userId: json['userId']?.toString() ?? '',
+        userDisplayName: json['userDisplayName']?.toString() ?? '',
+        title: json['title']?.toString() ?? '',
+        coverImageUrl: json['coverImageUrl'] as String?,
+        country: json['country'] as String?,
+        city: json['city'] as String?,
+        createdAt: parseDateTime(json['createdAt']) ?? DateTime.now().toUtc(),
       );
 
   Map<String, dynamic> toJson() => {

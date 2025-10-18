@@ -1,3 +1,5 @@
+import 'json_helpers.dart';
+
 class EventCardDto {
   final String id;
   final String ownerId;
@@ -27,20 +29,25 @@ class EventCardDto {
     this.tags,
   });
 
-  factory EventCardDto.fromJson(Map<String, dynamic> json) => EventCardDto(
-        id: json['id'],
-        ownerId: json['ownerId'],
-        title: json['title'],
-        description: json['description'],
-        startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
-        createdAt: DateTime.parse(json['createdAt']),
-        coordinates: (json['coordinates'] as List).map((e) => (e as num).toDouble()).toList(),
-        distanceKm: (json['distanceKm'] as num?)?.toDouble(),
-        registrations: json['registrations'],
-        likes: json['likes'],
-        engagement: (json['engagement'] as num?)?.toDouble(),
-        tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
-      );
+  factory EventCardDto.fromJson(Map<String, dynamic> json) {
+    final coordinates = parseDoubleList(json['coordinates']);
+    final tags = parseStringList(json['tags']);
+    return EventCardDto(
+      id: json['id']?.toString() ?? '',
+      ownerId: json['ownerId']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      description: json['description'] as String?,
+      startTime: parseDateTime(json['startTime']),
+      createdAt: parseDateTime(json['createdAt']) ?? DateTime.now().toUtc(),
+      coordinates:
+          coordinates.isEmpty ? const <double>[] : List.unmodifiable(coordinates),
+      distanceKm: parseDouble(json['distanceKm']),
+      registrations: parseInt(json['registrations']) ?? 0,
+      likes: parseInt(json['likes']) ?? 0,
+      engagement: parseDouble(json['engagement']),
+      tags: tags.isEmpty ? null : List.unmodifiable(tags),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

@@ -2,7 +2,9 @@ import 'package:crew_app/core/config/environment.dart';
 import 'package:dio/dio.dart';
 
 import '../../features/events/data/event.dart';
-import '../../features/user/data/authenticated_user_dto.dart';
+import '../../features/models/events/event_models.dart';
+import '../../features/models/user/ensure_user_request.dart';
+import '../../features/models/user/user_profile_dto.dart';
 import '../error/api_exception.dart';
 import 'auth/auth_service.dart';
 
@@ -10,19 +12,23 @@ class ApiService {
   ApiService({
     Dio? dio,
     required AuthService authService,
-  })  : _dio = dio ?? Dio(BaseOptions(baseUrl: Env.current)),
-        _auth = authService {
-    _dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        responseBody: true,
-        error: true,
-      ),
-    );
-  }
+  })  : _dio = dio ??
+            Dio(
+              BaseOptions(
+                baseUrl: Env.current,
+                headers: const {'Accept': 'application/json'},
+                connectTimeout: const Duration(seconds: 10),
+                receiveTimeout: const Duration(seconds: 20),
+                sendTimeout: const Duration(seconds: 20),
+                responseType: ResponseType.json,
+              ),
+            ),
+        _auth = authService;
 
   final Dio _dio;
   final AuthService _auth;
+
+  Map<String, String> get _versionHeaders => const {'x-api-version': '1.0'};
 
   Future<Map<String, String>> _buildAuthHeaders({bool required = false}) async {
     final user = _auth.currentUser;
@@ -30,7 +36,7 @@ class ApiService {
       if (required) {
         throw ApiException('User not authenticated');
       }
-      return const {};
+      return const <String, String>{};
     }
 
     try {
@@ -39,28 +45,36 @@ class ApiService {
         if (required) {
           throw ApiException('Unable to obtain authentication token');
         }
-        return const {};
+        return const <String, String>{};
       }
       return {'Authorization': 'Bearer $token'};
     } catch (error) {
       if (required) {
         throw ApiException('Failed to acquire authentication token');
       }
-      return const {};
+      return const <String, String>{};
     }
   }
 
-  Future<AuthenticatedUserDto> getAuthenticatedUserDetail() async {
+  Future<UserProfileDto> ensureAuthenticatedUser(
+    EnsureUserRequest request,
+  ) async {
     try {
-      final headers = await _buildAuthHeaders(required: true);
-      final response = await _dio.get(
-        '/User/GetAuthenticatedUserDetail',
+      final headers = {
+        ..._versionHeaders,
+        ...await _buildAuthHeaders(required: true),
+        'Content-Type': 'application/json',
+      };
+
+      final response = await _dio.post(
+        '/users/ensure',
+        data: request.toJson(),
         options: Options(headers: headers),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
         if (data is Map<String, dynamic>) {
-          return AuthenticatedUserDto.fromJson(data);
+          return UserProfileDto.fromJson(data);
         }
         throw ApiException('Unexpected user payload type');
       }
@@ -79,12 +93,28 @@ class ApiService {
     }
   }
 
-  Future<List<Event>> getEvents() async {
+  Future<List<Event>> getEvents({Map<String, dynamic>? queryParameters}) async {
     try {
-      final response = await _dio.get('/events');
+      final headers = {
+        ..._versionHeaders,
+        ...await _buildAuthHeaders(),
+      };
+
+      final response = await _dio.get(
+        '/events',
+        queryParameters: queryParameters ??
+            <String, dynamic>{
+              'minLat': -90,
+              'maxLat': 90,
+              'minLng': -180,
+              'maxLng': 180,
+            },
+        options: Options(headers: headers),
+      );
       if (response.statusCode == 200) {
         final events = _unwrapEventList(response.data)
-            .map(Event.fromJson)
+            .map(EventSummaryDto.fromJson)
+            .map((dto) => dto.toEvent())
             .toList(growable: false);
         if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
           return events;
@@ -112,7 +142,11 @@ class ApiService {
     double lng,
   ) async {
     try {
-      final headers = await _buildAuthHeaders(required: true);
+      final headers = {
+        ..._versionHeaders,
+        ...await _buildAuthHeaders(required: true),
+        'Content-Type': 'application/json',
+      };
       final response = await _dio.post(
         '/events',
         data: {
@@ -144,14 +178,27 @@ class ApiService {
 
   Future<List<Event>> searchEvents(String query) async {
     try {
+      final headers = {
+        ..._versionHeaders,
+        ...await _buildAuthHeaders(),
+      };
+
       final response = await _dio.get(
-        '/events/search',
-        queryParameters: {'query': query},
+        '/events',
+        queryParameters: {
+          'q': query,
+          'minLat': -90,
+          'maxLat': 90,
+          'minLng': -180,
+          'maxLng': 180,
+        },
+        options: Options(headers: headers),
       );
 
       if (response.statusCode == 200) {
         final events = _unwrapEventList(response.data)
-            .map(Event.fromJson)
+            .map(EventSummaryDto.fromJson)
+            .map((dto) => dto.toEvent())
             .toList(growable: false);
         if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
           return events;

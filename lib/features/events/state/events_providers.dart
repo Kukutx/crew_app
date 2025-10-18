@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'user_location_provider.dart';
+
 final eventsProvider =
     AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);
 
@@ -17,7 +19,26 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
   @override
   Future<List<Event>> build() async {
     final api = ref.read(apiServiceProvider);
-    final events = await api.getEvents();
+    Map<String, dynamic>? query;
+    final location = await ref.read(userLocationProvider.future);
+    if (location != null) {
+      const delta = 0.75;
+      double clamp(double value, double min, double max) =>
+          value < min ? min : (value > max ? max : value);
+      final minLat = clamp(location.latitude - delta, -90, 90);
+      final maxLat = clamp(location.latitude + delta, -90, 90);
+      final minLng = clamp(location.longitude - delta, -180, 180);
+      final maxLng = clamp(location.longitude + delta, -180, 180);
+      query = {
+        'minLat': minLat,
+        'maxLat': maxLat,
+        'minLng': minLng,
+        'maxLng': maxLng,
+        'from': DateTime.now().toUtc().toIso8601String(),
+      };
+    }
+
+    final events = await api.getEvents(queryParameters: query);
     state = AsyncData(events);
     _startPolling();
     return events;
@@ -56,6 +77,25 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
 
   Future<void> _refreshEvents() async {
     final api = ref.read(apiServiceProvider);
-    state = await AsyncValue.guard(() => api.getEvents());
+    Map<String, dynamic>? query;
+    final location = await ref.read(userLocationProvider.future);
+    if (location != null) {
+      const delta = 0.75;
+      double clamp(double value, double min, double max) =>
+          value < min ? min : (value > max ? max : value);
+      final minLat = clamp(location.latitude - delta, -90, 90);
+      final maxLat = clamp(location.latitude + delta, -90, 90);
+      final minLng = clamp(location.longitude - delta, -180, 180);
+      final maxLng = clamp(location.longitude + delta, -180, 180);
+      query = {
+        'minLat': minLat,
+        'maxLat': maxLat,
+        'minLng': minLng,
+        'maxLng': maxLng,
+        'from': DateTime.now().toUtc().toIso8601String(),
+      };
+    }
+
+    state = await AsyncValue.guard(() => api.getEvents(queryParameters: query));
   }
 }

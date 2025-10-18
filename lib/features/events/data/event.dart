@@ -112,7 +112,12 @@ class Event {
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
-    final locationJson = _asMap(json['location']) ?? _asMap(json['meetingPoint']);
+    final locationJson =
+        _asMap(json['location']) ?? _asMap(json['meetingPoint']) ?? _asMap(json['place']);
+    final centerJson = _asMap(locationJson?['center']) ??
+        _asMap(locationJson?['point']) ??
+        _asMap(locationJson?['location']) ??
+        _asMap(locationJson?['coordinates']);
     final mediaJson =
         _asMap(json['media']) ?? _asMap(json['images']) ?? _asMap(json['gallery']);
     final statsJson = _asMap(json['stats']) ??
@@ -179,9 +184,11 @@ class Event {
     String locationName = parseString(
           locationJson?['name'] ??
               locationJson?['title'] ??
+              centerJson?['name'] ??
               json['location'] ??
               json['locationName'] ??
-              locationJson?['address'],
+              locationJson?['address'] ??
+              centerJson?['address'],
         ) ??
         '';
     if (locationName.isEmpty) {
@@ -189,14 +196,19 @@ class Event {
     }
 
     final latitude = parseDouble(
-          locationJson?['latitude'] ??
+          centerJson?['latitude'] ??
+              centerJson?['lat'] ??
+              locationJson?['latitude'] ??
               locationJson?['lat'] ??
               json['latitude'] ??
               json['lat'],
         ) ??
         0;
     final longitude = parseDouble(
-          locationJson?['longitude'] ??
+          centerJson?['longitude'] ??
+              centerJson?['lng'] ??
+              centerJson?['lon'] ??
+              locationJson?['longitude'] ??
               locationJson?['lng'] ??
               locationJson?['lon'] ??
               json['longitude'] ??

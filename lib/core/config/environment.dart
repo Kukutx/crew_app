@@ -1,7 +1,9 @@
 class Env {
-  static const String dev = 'https://crew-api-dev.onrender.com/api';
+  static const String apiVersion = 'v1.0';
+
+  static const String dev = 'https://crew-api-dev.onrender.com/api/$apiVersion';
   static const String stage = dev;
-  static const String prod = 'https://crew-api-u8vu.onrender.com/api';
+  static const String prod = 'https://crew-api-u8vu.onrender.com/api/$apiVersion';
 
   static String current = prod;
 
@@ -13,5 +15,5 @@ class Env {
   static bool get isStage => current == stage;
 }
 
-  // 目前仍使用测试 API，尚无主服务器
+// 目前仍使用测试 API，尚无主服务器
 

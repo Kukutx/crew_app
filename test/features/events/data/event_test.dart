@@ -26,6 +26,7 @@ void main() {
     final event = Event.fromFeedCard(card);
 
     expect(event.id, 'event-1');
+    expect(event.ownerId, 'owner-7');
     expect(event.title, 'Crew Morning Ride');
     expect(event.latitude, closeTo(25.0330, 1e-6));
     expect(event.longitude, closeTo(121.5654, 1e-6));
@@ -51,6 +52,7 @@ void main() {
     final event = Event.fromSummary(summary);
 
     expect(event.id, 'event-2');
+    expect(event.ownerId, 'owner-1');
     expect(event.maxParticipants, 12);
     expect(event.currentParticipants, 9);
     expect(event.isRegistered, isTrue);
@@ -108,6 +110,7 @@ void main() {
     final enriched = base.mergeDetail(detail);
 
     expect(enriched.isRegistered, isTrue);
+    expect(enriched.ownerId, 'owner-9');
     expect(enriched.maxParticipants, 20);
     expect(enriched.moments, hasLength(1));
     expect(enriched.segments, hasLength(2));

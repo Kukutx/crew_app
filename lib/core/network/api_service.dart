@@ -190,6 +190,29 @@ class ApiService {
     );
   }
 
+  Future<UserProfileDto> getUserProfile(String id) async {
+    try {
+      final response = await _dio.get('/users/$id');
+      if (response.statusCode == 200) {
+        final data = _asJsonObject(response.data);
+        return UserProfileDto.fromJson(data);
+      }
+      if (response.statusCode == 404) {
+        throw ApiException('User not found', statusCode: 404);
+      }
+      throw ApiException(
+        'Failed to load user profile',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
   Future<void> registerForEvent(String id) async {
     final headers = await _buildAuthHeaders(required: true);
     try {
@@ -229,6 +252,52 @@ class ApiService {
 
       throw ApiException(
         'Failed to cancel registration',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> followUser(String id) async {
+    final headers = await _buildAuthHeaders(required: true);
+    try {
+      final response = await _dio.post(
+        '/users/$id/follow',
+        options: _optionsWithHeaders(headers),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
+      }
+      throw ApiException(
+        'Failed to follow user',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> unfollowUser(String id) async {
+    final headers = await _buildAuthHeaders(required: true);
+    try {
+      final response = await _dio.delete(
+        '/users/$id/follow',
+        options: _optionsWithHeaders(headers),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
+      }
+      throw ApiException(
+        'Failed to unfollow user',
         statusCode: response.statusCode,
       );
     } on DioException catch (error) {

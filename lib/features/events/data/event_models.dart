@@ -22,6 +22,7 @@ class EventOrganizer {
 
 class Event {
   final String id;
+  final String ownerId;
   final String title;
   final String location;
   final String description;
@@ -53,6 +54,7 @@ class Event {
 
   const Event({
     required this.id,
+    required this.ownerId,
     required this.title,
     required this.location,
     required this.description,
@@ -88,6 +90,7 @@ class Event {
     final lng = _coordinateAt(dto.coordinates, 0) ?? 0;
     return Event(
       id: dto.id,
+      ownerId: dto.ownerId,
       title: dto.title,
       description: dto.description ?? '',
       location: _formatCoordinateLocation(lat, lng),
@@ -108,6 +111,7 @@ class Event {
     final lng = _coordinateAt(dto.center, 0) ?? 0;
     return Event(
       id: dto.id,
+      ownerId: dto.ownerId,
       title: dto.title,
       description: '',
       location: _formatCoordinateLocation(lat, lng),
@@ -141,6 +145,7 @@ class Event {
 
     return Event(
       id: dto.id,
+      ownerId: dto.ownerId,
       title: dto.title,
       description: dto.description ?? '',
       location: _formatCoordinateLocation(lat, lng),
@@ -180,6 +185,7 @@ class Event {
 
     return Event(
       id: detail.id,
+      ownerId: detail.ownerId,
       title: detail.title,
       description: detail.description ?? description,
       location: _formatCoordinateLocation(lat, lng),
@@ -211,6 +217,72 @@ class Event {
       memberCount: detail.memberCount,
       segments: List.unmodifiable(detail.segments),
       moments: List.unmodifiable(detail.moments),
+    );
+  }
+
+  Event copyWith({
+    String? id,
+    String? ownerId,
+    String? title,
+    String? location,
+    String? description,
+    double? latitude,
+    double? longitude,
+    List<String>? imageUrls,
+    List<String>? videoUrls,
+    String? coverImageUrl,
+    String? address,
+    DateTime? startTime,
+    DateTime? endTime,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? maxParticipants,
+    int? currentParticipants,
+    bool? isFavorite,
+    bool? isRegistered,
+    bool? isFree,
+    double? price,
+    List<String>? tags,
+    List<String>? waypoints,
+    bool? isRoundTrip,
+    double? distanceKm,
+    EventOrganizer? organizer,
+    String? visibility,
+    int? memberCount,
+    List<EventSegmentDto>? segments,
+    List<MomentSummaryDto>? moments,
+  }) {
+    return Event(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
+      title: title ?? this.title,
+      location: location ?? this.location,
+      description: description ?? this.description,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      imageUrls: imageUrls ?? this.imageUrls,
+      videoUrls: videoUrls ?? this.videoUrls,
+      coverImageUrl: coverImageUrl ?? this.coverImageUrl,
+      address: address ?? this.address,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      maxParticipants: maxParticipants ?? this.maxParticipants,
+      currentParticipants: currentParticipants ?? this.currentParticipants,
+      isFavorite: isFavorite ?? this.isFavorite,
+      isRegistered: isRegistered ?? this.isRegistered,
+      isFree: isFree ?? this.isFree,
+      price: price ?? this.price,
+      tags: tags ?? this.tags,
+      waypoints: waypoints ?? this.waypoints,
+      isRoundTrip: isRoundTrip ?? this.isRoundTrip,
+      distanceKm: distanceKm ?? this.distanceKm,
+      organizer: organizer ?? this.organizer,
+      visibility: visibility ?? this.visibility,
+      memberCount: memberCount ?? this.memberCount,
+      segments: segments ?? this.segments,
+      moments: moments ?? this.moments,
     );
   }
 

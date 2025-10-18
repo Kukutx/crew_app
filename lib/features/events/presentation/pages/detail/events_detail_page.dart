@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
@@ -34,6 +35,8 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   SystemUiOverlayStyle? _previousOverlayStyle;
   late Event _event;
   bool _loadingDetail = false;
+  bool _registering = false;
+  bool _followProcessing = false;
 
   static const _fallbackHost = (
     name: 'Crew Host',
@@ -101,7 +104,23 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     });
     final api = ref.read(apiServiceProvider);
     try {
-      final result = await api.getEventDetail(_event.id, current: _event);
+      var result = await api.getEventDetail(_event.id, current: _event);
+      EventOrganizer? organizer = result.organizer;
+      if (organizer == null && result.ownerId.isNotEmpty) {
+        try {
+          final profile = await api.getUserProfile(result.ownerId);
+          organizer = EventOrganizer(
+            id: profile.id,
+            name: profile.displayName,
+            avatarUrl: profile.avatarUrl,
+            bio: profile.bio,
+            username: profile.email,
+          );
+          result = result.copyWith(organizer: organizer);
+        } on ApiException {
+          // ignore host fetch failures but continue rendering detail
+        }
+      }
       if (!mounted) return;
       setState(() {
         _event = result;
@@ -124,6 +143,132 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       setState(() {
         _loadingDetail = false;
       });
+    }
+  }
+  Future<void> _toggleRegistration() async {
+    if (_registering) {
+      return;
+    }
+    final loc = AppLocalizations.of(context)!;
+    final firebaseUser = ref.read(currentUserProvider);
+    if (firebaseUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.not_logged_in)),
+      );
+      return;
+    }
+
+    setState(() {
+      _registering = true;
+    });
+
+    final shouldRegister = !_event.isRegistered;
+    final api = ref.read(apiServiceProvider);
+    try {
+      if (shouldRegister) {
+        await api.registerForEvent(_event.id);
+      } else {
+        await api.unregisterFromEvent(_event.id);
+      }
+
+      if (!mounted) return;
+      setState(() {
+        final currentCount = _event.currentParticipants;
+        int? nextCount = currentCount;
+        if (currentCount != null) {
+          if (shouldRegister) {
+            nextCount = currentCount + 1;
+          } else {
+            nextCount = currentCount > 0 ? currentCount - 1 : 0;
+          }
+        }
+        final nextMemberCount = nextCount ?? _event.memberCount;
+        _event = _event.copyWith(
+          isRegistered: shouldRegister,
+          currentParticipants: nextCount,
+          memberCount: nextMemberCount,
+        );
+        _registering = false;
+      });
+      final message = shouldRegister ? loc.registration_open : loc.action_cancel;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } on ApiException catch (error) {
+      final message = error.message.isNotEmpty ? error.message : loc.registration_not_implemented;
+      if (!mounted) return;
+      setState(() {
+        _registering = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _registering = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.registration_not_implemented)),
+      );
+    }
+  }
+
+  Future<void> _toggleFollow(AppLocalizations loc) async {
+    if (_followProcessing) {
+      return;
+    }
+    final ownerId = _event.ownerId;
+    if (ownerId.isEmpty) {
+      return;
+    }
+
+    final firebaseUser = ref.read(currentUserProvider);
+    if (firebaseUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.not_logged_in)),
+      );
+      return;
+    }
+
+    setState(() {
+      _followProcessing = true;
+    });
+
+    final shouldFollow = !_following;
+    final api = ref.read(apiServiceProvider);
+    try {
+      if (shouldFollow) {
+        await api.followUser(ownerId);
+      } else {
+        await api.unfollowUser(ownerId);
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _following = shouldFollow;
+        _followProcessing = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(shouldFollow ? loc.followed : loc.unfollowed)),
+      );
+    } on ApiException catch (error) {
+      final message = error.message.isNotEmpty ? error.message : loc.action_follow;
+      if (!mounted) return;
+      setState(() {
+        _followProcessing = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _followProcessing = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.action_follow)),
+      );
     }
   }
 
@@ -362,11 +507,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         loc: loc,
         isFavorite: event.isFavorite,
         onFavorite: () => _showFeatureNotReadyMessage(loc),
-        onRegister: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(loc.registration_not_implemented)),
-          );
-        },
+        isRegistered: event.isRegistered,
+        isProcessing: _registering,
+        onRegister: _toggleRegistration,
       ),
       floatingActionButton: _PlazaPostFab(
         label: loc.event_detail_publish_plaza,
@@ -390,16 +533,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                 MaterialPageRoute(builder: (_) => UserProfilePage()),
               );
             },
-            onToggleFollow: () async {
-              // TODO: integrate backend follow logic
-              setState(() => _following = !_following);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(_following ? loc.followed : loc.unfollowed),
-                ),
-              );
-            },
+            onToggleFollow: () => _toggleFollow(loc),
             isFollowing: _following,
+            isFollowProcessing: _followProcessing,
             onTapLocation: () => Navigator.pop(context, _event),
             heroTag: 'event-media-${event.id}',
           ),

@@ -24,6 +24,7 @@ class EventDetailBody extends StatefulWidget {
   final VoidCallback onTapHostProfile;
   final VoidCallback onToggleFollow;
   final bool isFollowing;
+  final bool isFollowProcessing;
   final VoidCallback onTapLocation;
   final String heroTag;
 
@@ -40,6 +41,7 @@ class EventDetailBody extends StatefulWidget {
     required this.onTapHostProfile,
     required this.onToggleFollow,
     required this.isFollowing,
+    required this.isFollowProcessing,
     required this.onTapLocation,
     required this.heroTag,
   });
@@ -314,6 +316,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   onTapProfile: widget.onTapHostProfile,
                   onToggleFollow: widget.onToggleFollow,
                   isFollowing: widget.isFollowing,
+                  isProcessing: widget.isFollowProcessing,
                 ),
                 const SizedBox(height: 10),
                 SizedBox(

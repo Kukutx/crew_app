@@ -6,6 +6,8 @@ class EventDetailBottomBar extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onFavorite;
   final VoidCallback onRegister;
+  final bool isRegistered;
+  final bool isProcessing;
 
   const EventDetailBottomBar({
     super.key,
@@ -13,10 +15,13 @@ class EventDetailBottomBar extends StatelessWidget {
     required this.isFavorite,
     required this.onFavorite,
     required this.onRegister,
+    required this.isRegistered,
+    required this.isProcessing,
   });
 
   @override
   Widget build(BuildContext context) {
+    final buttonText = isRegistered ? loc.action_cancel : loc.action_register;
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -32,7 +37,7 @@ class EventDetailBottomBar extends StatelessWidget {
               child: SizedBox(
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: onRegister,
+                  onPressed: isProcessing ? null : onRegister,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     foregroundColor: Colors.white,
@@ -40,7 +45,16 @@ class EventDetailBottomBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(loc.action_register),
+                  child: isProcessing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(buttonText),
                 ),
               ),
             ),

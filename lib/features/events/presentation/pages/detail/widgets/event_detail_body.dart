@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';

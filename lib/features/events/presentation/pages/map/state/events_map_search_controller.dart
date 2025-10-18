@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/network/api_service.dart';
 import 'package:crew_app/core/state/di/providers.dart';

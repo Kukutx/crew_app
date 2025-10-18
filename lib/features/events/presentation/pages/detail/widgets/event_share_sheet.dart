@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/sheets/share_sheet/app_share_sheet.dart';

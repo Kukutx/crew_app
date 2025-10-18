@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/map_event_floating_card.dart';
 import 'package:flutter/material.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:crew_app/core/state/di/providers.dart';
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

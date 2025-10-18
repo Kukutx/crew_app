@@ -1,5 +1,5 @@
 // widgets/markers_layer.dart
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MarkersLayer {

@@ -1,6 +1,8 @@
 import 'dart:ui' as ui;
 
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/di/providers.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
@@ -30,6 +32,8 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
   SystemUiOverlayStyle? _previousOverlayStyle;
+  late Event _event;
+  bool _loadingDetail = false;
 
   static const _fallbackHost = (
     name: 'Crew Host',
@@ -42,6 +46,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   @override
   void initState() {
     super.initState();
+    _event = widget.event;
     _captureCurrentOverlayStyle();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -50,6 +55,11 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         statusBarBrightness: Brightness.dark,
       ),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _prefetchHeroImage(_event);
+      _fetchDetail();
+    });
   }
 
   void _captureCurrentOverlayStyle() {
@@ -68,22 +78,59 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final url = widget.event.firstAvailableImageUrl;
-    if (url != null && url.isNotEmpty) {
-      precacheImage(
-        Image.network(url).image,
-        context,
-        onError: (error, stackTrace) {
-          debugPrint('Failed to precache event image: $error');
-        },
-      );
+    _prefetchHeroImage(_event);
+  }
+
+  void _prefetchHeroImage(Event event) {
+    final url = event.firstAvailableImageUrl;
+    if (url == null || url.isEmpty) {
+      return;
+    }
+    precacheImage(
+      Image.network(url).image,
+      context,
+      onError: (error, stackTrace) {
+        debugPrint('Failed to precache event image: $error');
+      },
+    );
+  }
+
+  Future<void> _fetchDetail() async {
+    setState(() {
+      _loadingDetail = true;
+    });
+    final api = ref.read(apiServiceProvider);
+    try {
+      final result = await api.getEventDetail(_event.id, current: _event);
+      if (!mounted) return;
+      setState(() {
+        _event = result;
+        _loadingDetail = false;
+      });
+      _prefetchHeroImage(result);
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loadingDetail = false;
+      });
+      final message = error.message.isNotEmpty ? error.message : null;
+      if (message != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loadingDetail = false;
+      });
     }
   }
 
-  String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
+  String get _eventShareLink => 'https://crewapp.events/${_event.id}';
 
   String _buildShareMessage() {
-    final event = widget.event;
+    final event = _event;
     return '${event.title} · ${event.location}\n$_eventShareLink';
   }
 
@@ -94,7 +141,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => EventShareSheet(
-        event: widget.event,
+        event: _event,
         loc: loc,
         previewKey: _sharePreviewKey,
         shareLink: _eventShareLink,
@@ -177,7 +224,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       final Uint8List pngBytes = byteData.buffer.asUint8List();
       final result = await ImageGallerySaverPlus.saveImage(
         pngBytes,
-        name: 'crew_event_${widget.event.id}',
+        name: 'crew_event_${_event.id}',
         quality: 100,
         isReturnImagePathOfIOS: true,
       );
@@ -291,7 +338,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final event = widget.event;
+    final event = _event;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
     final hostName = (organizer?.name.isNotEmpty ?? false)
@@ -326,31 +373,43 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         onPressed: () => showCreateMomentSheet(context),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: EventDetailBody(
-        event: event,
-        loc: loc,
-        pageController: _pageCtrl,
-        currentPage: _page,
-        onPageChanged: (index) => setState(() => _page = index),
-        hostName: hostName,
-        hostBio: hostBio,
-        hostAvatarUrl: hostAvatar,
-        onTapHostProfile: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => UserProfilePage()),
-          );
-        },
-        onToggleFollow: () async {
-          // TODO: integrate backend follow logic
-          setState(() => _following = !_following);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_following ? loc.followed : loc.unfollowed)),
-          );
-        },
-        isFollowing: _following,
-        onTapLocation: () => Navigator.pop(context, widget.event),
-        heroTag: 'event-media-${event.id}',
+      body: Stack(
+        children: [
+          EventDetailBody(
+            event: event,
+            loc: loc,
+            pageController: _pageCtrl,
+            currentPage: _page,
+            onPageChanged: (index) => setState(() => _page = index),
+            hostName: hostName,
+            hostBio: hostBio,
+            hostAvatarUrl: hostAvatar,
+            onTapHostProfile: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => UserProfilePage()),
+              );
+            },
+            onToggleFollow: () async {
+              // TODO: integrate backend follow logic
+              setState(() => _following = !_following);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(_following ? loc.followed : loc.unfollowed),
+                ),
+              );
+            },
+            isFollowing: _following,
+            onTapLocation: () => Navigator.pop(context, _event),
+            heroTag: 'event-media-${event.id}',
+          ),
+          if (_loadingDetail)
+            const Positioned(
+              right: 16,
+              top: 72,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+        ],
       ),
     );
   }

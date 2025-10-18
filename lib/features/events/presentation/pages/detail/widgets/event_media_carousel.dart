@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
-import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';

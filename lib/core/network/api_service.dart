@@ -1,7 +1,7 @@
 import 'package:crew_app/core/config/environment.dart';
 import 'package:dio/dio.dart';
 
-import '../../features/events/data/event.dart';
+import '../../features/events/data/event_models.dart';
 import '../../features/models/event/event_card_dto.dart';
 import '../../features/models/event/event_detail_dto.dart';
 import '../../features/models/event/event_feed_response_dto.dart';
@@ -127,7 +127,7 @@ class ApiService {
         final data = _asJsonObject(response.data);
         final feed = EventFeedResponseDto.fromJson(data);
         return feed.events
-            .map(Event.fromEventCardDto)
+            .map(Event.fromFeedCard)
             .toList(growable: false);
       }
 
@@ -144,7 +144,10 @@ class ApiService {
     }
   }
 
-  Future<Event> getEventDetail(String id) async {
+  Future<Event> getEventDetail(
+    String id, {
+    Event? current,
+  }) async {
     final headers = await _buildAuthHeaders();
     try {
       final response = await _dio.get(
@@ -155,7 +158,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = _asJsonObject(response.data);
         final dto = EventDetailDto.fromJson(data);
-        return Event.fromEventDetailDto(dto);
+        return current?.mergeDetail(dto) ?? Event.fromDetail(dto);
       }
 
       if (response.statusCode == 404) {
@@ -284,7 +287,7 @@ class ApiService {
         final list = _asJsonList(response.data);
         return list
             .map(EventSummaryDto.fromJson)
-            .map(Event.fromEventSummaryDto)
+            .map(Event.fromSummary)
             .toList(growable: false);
       }
 

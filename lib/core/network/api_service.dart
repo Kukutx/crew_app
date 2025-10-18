@@ -2,7 +2,12 @@ import 'package:crew_app/core/config/environment.dart';
 import 'package:dio/dio.dart';
 
 import '../../features/events/data/event.dart';
-import '../../features/user/data/authenticated_user_dto.dart';
+import '../../features/models/event/event_card_dto.dart';
+import '../../features/models/event/event_detail_dto.dart';
+import '../../features/models/event/event_feed_response_dto.dart';
+import '../../features/models/event/event_summary_dto.dart';
+import '../../features/models/user/ensure_user_request.dart';
+import '../../features/models/user/user_profile_dto.dart';
 import '../error/api_exception.dart';
 import 'auth/auth_service.dart';
 
@@ -24,6 +29,9 @@ class ApiService {
   final Dio _dio;
   final AuthService _auth;
 
+  static const double _fallbackLatitude = 25.0330; // Taipei 101
+  static const double _fallbackLongitude = 121.5654;
+
   Future<Map<String, String>> _buildAuthHeaders({bool required = false}) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -42,7 +50,9 @@ class ApiService {
         return const {};
       }
       return {'Authorization': 'Bearer $token'};
-    } catch (error) {
+    } on ApiException {
+      rethrow;
+    } catch (_) {
       if (required) {
         throw ApiException('Failed to acquire authentication token');
       }
@@ -50,56 +60,117 @@ class ApiService {
     }
   }
 
-  Future<AuthenticatedUserDto> getAuthenticatedUserDetail() async {
+  Options _optionsWithHeaders(Map<String, String> headers) {
+    if (headers.isEmpty) {
+      return const Options();
+    }
+    return Options(headers: headers);
+  }
+
+  Future<UserProfileDto> ensureUserProfile(EnsureUserRequest request) async {
+    final headers = await _buildAuthHeaders(required: true);
     try {
-      final headers = await _buildAuthHeaders(required: true);
-      final response = await _dio.get(
-        '/User/GetAuthenticatedUserDetail',
-        options: Options(headers: headers),
+      final response = await _dio.post(
+        '/users/ensure',
+        data: request.toJson(),
+        options: _optionsWithHeaders(headers),
       );
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is Map<String, dynamic>) {
-          return AuthenticatedUserDto.fromJson(data);
-        }
-        throw ApiException('Unexpected user payload type');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = _asJsonObject(response.data);
+        return UserProfileDto.fromJson(data);
       }
+
       throw ApiException(
-        'Failed to load user detail',
+        'Failed to synchronize user profile',
         statusCode: response.statusCode,
       );
-    } on ApiException {
-      rethrow;
-    } on DioException catch (e) {
-      final message = _extractErrorMessage(e) ?? 'Request error';
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
       throw ApiException(
         message,
-        statusCode: e.response?.statusCode,
+        statusCode: error.response?.statusCode,
       );
     }
   }
 
-  Future<List<Event>> getEvents() async {
+  Future<List<Event>> getEvents({
+    double? latitude,
+    double? longitude,
+    double radiusKm = 50,
+    int? limit,
+    String? cursor,
+    List<String>? tags,
+  }) async {
+    final queryParameters = <String, dynamic>{
+      'lat': (latitude ?? _fallbackLatitude).toStringAsFixed(6),
+      'lng': (longitude ?? _fallbackLongitude).toStringAsFixed(6),
+      'radius': radiusKm,
+      if (limit != null) 'limit': limit,
+      if (cursor != null) 'cursor': cursor,
+    };
+
+    if (tags != null && tags.isNotEmpty) {
+      queryParameters['tags'] = tags;
+    }
+
+    final headers = await _buildAuthHeaders();
+
     try {
-      final response = await _dio.get('/events');
+      final response = await _dio.get(
+        '/events/feed',
+        queryParameters: queryParameters,
+        options: _optionsWithHeaders(headers),
+      );
+
       if (response.statusCode == 200) {
-        final events = _unwrapEventList(response.data)
-            .map(Event.fromJson)
+        final data = _asJsonObject(response.data);
+        final feed = EventFeedResponseDto.fromJson(data);
+        return feed.events
+            .map(Event.fromEventCardDto)
             .toList(growable: false);
-        if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
-          return events;
-        }
-        throw ApiException('Unexpected events payload type');
       }
+
       throw ApiException(
         'Failed to load events',
         statusCode: response.statusCode,
       );
-    } on DioException catch (e) {
-      final message = _extractErrorMessage(e) ?? 'Request error';
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
       throw ApiException(
         message,
-        statusCode: e.response?.statusCode,
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<Event> getEventDetail(String id) async {
+    final headers = await _buildAuthHeaders();
+    try {
+      final response = await _dio.get(
+        '/events/$id',
+        options: _optionsWithHeaders(headers),
+      );
+
+      if (response.statusCode == 200) {
+        final data = _asJsonObject(response.data);
+        final dto = EventDetailDto.fromJson(data);
+        return Event.fromEventDetailDto(dto);
+      }
+
+      if (response.statusCode == 404) {
+        throw ApiException('Event not found', statusCode: 404);
+      }
+
+      throw ApiException(
+        'Failed to load event detail',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: error.response?.statusCode,
       );
     }
   }
@@ -111,62 +182,121 @@ class ApiService {
     double lat,
     double lng,
   ) async {
+    throw ApiException(
+      'Event creation is not supported in this API version.',
+    );
+  }
+
+  Future<void> registerForEvent(String id) async {
+    final headers = await _buildAuthHeaders(required: true);
     try {
-      final headers = await _buildAuthHeaders(required: true);
       final response = await _dio.post(
-        '/events',
-        data: {
-          'title': title,
-          'location': location,
-          'description': description,
-          'latitude': lat,
-          'longitude': lng,
-        },
-        options: Options(headers: headers),
+        '/events/$id/registrations',
+        options: _optionsWithHeaders(headers),
       );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return Event.fromJson(_unwrapEventObject(response.data));
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
       }
+
       throw ApiException(
-        'Failed to create event',
+        'Failed to register for event',
         statusCode: response.statusCode,
       );
-    } on ApiException {
-      rethrow;
-    } on DioException catch (e) {
-      final message = _extractErrorMessage(e) ?? 'Request error';
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
       throw ApiException(
         message,
-        statusCode: e.response?.statusCode,
+        statusCode: error.response?.statusCode,
       );
     }
   }
 
-  Future<List<Event>> searchEvents(String query) async {
+  Future<void> unregisterFromEvent(String id) async {
+    final headers = await _buildAuthHeaders(required: true);
+    try {
+      final response = await _dio.delete(
+        '/events/$id/registrations/me',
+        options: _optionsWithHeaders(headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
+      }
+
+      throw ApiException(
+        'Failed to cancel registration',
+        statusCode: response.statusCode,
+      );
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
+      throw ApiException(
+        message,
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<List<Event>> searchEvents(
+    String query, {
+    double? minLng,
+    double? minLat,
+    double? maxLng,
+    double? maxLat,
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      return const <Event>[];
+    }
+
+    final queryParameters = <String, dynamic>{'q': trimmed};
+
+    void addParam(String key, double? value) {
+      if (value != null) {
+        queryParameters[key] = value;
+      }
+    }
+
+    addParam('minLng', minLng);
+    addParam('minLat', minLat);
+    addParam('maxLng', maxLng);
+    addParam('maxLat', maxLat);
+
+    if (from != null) {
+      queryParameters['from'] = from.toIso8601String();
+    }
+    if (to != null) {
+      queryParameters['to'] = to.toIso8601String();
+    }
+
+    final headers = await _buildAuthHeaders();
+
     try {
       final response = await _dio.get(
-        '/events/search',
-        queryParameters: {'query': query},
+        '/events',
+        queryParameters: queryParameters,
+        options: _optionsWithHeaders(headers),
       );
 
       if (response.statusCode == 200) {
-        final events = _unwrapEventList(response.data)
-            .map(Event.fromJson)
+        final list = _asJsonList(response.data);
+        return list
+            .map(EventSummaryDto.fromJson)
+            .map(Event.fromEventSummaryDto)
             .toList(growable: false);
-        if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
-          return events;
-        }
-        throw ApiException('Unexpected events payload type');
       }
+
       throw ApiException(
-        'Failed to load events',
+        'Failed to search events',
         statusCode: response.statusCode,
       );
-    } on DioException catch (e) {
-      final message = _extractErrorMessage(e) ?? 'Request error';
+    } on DioException catch (error) {
+      final message = _extractErrorMessage(error) ?? 'Request error';
       throw ApiException(
         message,
-        statusCode: e.response?.statusCode,
+        statusCode: error.response?.statusCode,
       );
     }
   }
@@ -174,10 +304,21 @@ class ApiService {
   String? _extractErrorMessage(DioException exception) {
     final data = exception.response?.data;
     if (data is Map<String, dynamic>) {
+      final title = data['title'];
+      if (title is String && title.isNotEmpty) {
+        return title;
+      }
+
+      final detail = data['detail'];
+      if (detail is String && detail.isNotEmpty) {
+        return detail;
+      }
+
       final message = data['message'];
       if (message is String && message.isNotEmpty) {
         return message;
       }
+
       final error = data['error'];
       if (error is String && error.isNotEmpty) {
         return error;
@@ -185,70 +326,33 @@ class ApiService {
     }
     return exception.message;
   }
-}
 
-bool _isKnownEmptyCollection(dynamic data) {
-  if (data is List && data.isEmpty) {
-    return true;
-  }
-  if (data is Map<String, dynamic>) {
-    for (final key in const ['items', 'data', 'events', 'results', 'value']) {
-      final value = data[key];
-      if (value == null) {
-        continue;
-      }
-      if (value is List && value.isEmpty) {
-        return true;
-      }
-      if (value is Map<String, dynamic> && _isKnownEmptyCollection(value)) {
-        return true;
-      }
+  Map<String, dynamic> _asJsonObject(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      return data;
     }
+    throw ApiException('Unexpected response format');
   }
-  return false;
-}
 
-List<Map<String, dynamic>> _unwrapEventList(dynamic data) {
-  final rawList = _extractEventList(data);
-  return rawList
-      .whereType<Map>()
-      .map((item) => Map<String, dynamic>.from(item))
-      .toList(growable: false);
-}
-
-Map<String, dynamic> _unwrapEventObject(dynamic data) {
-  if (data is Map<String, dynamic>) {
-    for (final key in const ['data', 'event', 'result', 'value']) {
-      final value = data[key];
-      if (value is Map<String, dynamic>) {
-        return value;
-      }
+  List<Map<String, dynamic>> _asJsonList(dynamic data) {
+    if (data is List) {
+      return data
+          .whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList(growable: false);
     }
-    return data;
-  }
-  throw ApiException('Unexpected event payload type');
-}
-
-List<dynamic> _extractEventList(dynamic data) {
-  if (data is List<dynamic>) {
-    return data;
-  }
-  if (data is Map<String, dynamic>) {
-    for (final key in const ['items', 'data', 'events', 'results', 'value']) {
-      final value = data[key];
-      if (value is List<dynamic>) {
-        return value;
-      }
-      if (value is Map<String, dynamic>) {
-        final nested = _extractEventList(value);
-        if (nested.isNotEmpty || _isKnownEmptyCollection(value)) {
-          return nested;
+    if (data is Map<String, dynamic>) {
+      final possibleKeys = ['items', 'data', 'events', 'results', 'value'];
+      for (final key in possibleKeys) {
+        final value = data[key];
+        if (value is List) {
+          return value
+              .whereType<Map>()
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList(growable: false);
         }
       }
     }
+    throw ApiException('Unexpected response format');
   }
-  if (data == null) {
-    return const <dynamic>[];
-  }
-  throw ApiException('Unexpected events payload type');
 }

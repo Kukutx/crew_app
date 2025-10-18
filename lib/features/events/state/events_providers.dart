@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'user_location_provider.dart';
+
 final eventsProvider =
     AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);
 
@@ -17,7 +19,11 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
   @override
   Future<List<Event>> build() async {
     final api = ref.read(apiServiceProvider);
-    final events = await api.getEvents();
+    final location = await ref.watch(userLocationProvider.future);
+    final events = await api.getEvents(
+      latitude: location?.latitude,
+      longitude: location?.longitude,
+    );
     state = AsyncData(events);
     _startPolling();
     return events;
@@ -56,6 +62,12 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
 
   Future<void> _refreshEvents() async {
     final api = ref.read(apiServiceProvider);
-    state = await AsyncValue.guard(() => api.getEvents());
+    final location = ref.read(userLocationProvider).value;
+    state = await AsyncValue.guard(
+      () => api.getEvents(
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+      ),
+    );
   }
 }

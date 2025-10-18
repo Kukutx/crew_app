@@ -472,7 +472,7 @@ String _resolveEmail(
 }
 
 String _resolveUid(fa.User user, AuthenticatedUserDto? backendUser) {
-  final backendId = backendUser?.uid.trim();
+  final backendId = backendUser?.id.trim();
   if (backendId != null && backendId.isNotEmpty) {
     return backendId;
   }

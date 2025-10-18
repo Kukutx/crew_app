@@ -1,3 +1,9 @@
+import 'package:crew_app/features/models/event/event_card_dto.dart';
+import 'package:crew_app/features/models/event/event_detail_dto.dart';
+import 'package:crew_app/features/models/event/event_segment_dto.dart';
+import 'package:crew_app/features/models/event/event_summary_dto.dart';
+import 'package:crew_app/features/models/event/moment_summary_dto.dart';
+
 class EventOrganizer {
   final String id;
   final String name;
@@ -47,6 +53,93 @@ class EventOrganizer {
     );
   }
 
+  factory Event.fromEventSummaryDto(EventSummaryDto dto) {
+    final lat = _coordinateAt(dto.center, 1) ?? 0;
+    final lng = _coordinateAt(dto.center, 0) ?? 0;
+    return Event(
+      id: dto.id,
+      title: dto.title,
+      location: _formatCoordinateLocation(lat, lng),
+      description: '',
+      latitude: lat,
+      longitude: lng,
+      imageUrls: const <String>[],
+      startTime: dto.startTime,
+      maxParticipants: dto.maxParticipants,
+      currentParticipants: dto.memberCount,
+      isRegistered: dto.isRegistered,
+      isFavorite: false,
+      isFree: true,
+      tags: dto.tags ?? const <String>[],
+      waypoints: const <String>[],
+      memberCount: dto.memberCount,
+    );
+  }
+
+  factory Event.fromEventCardDto(EventCardDto dto) {
+    final lat = _coordinateAt(dto.coordinates, 1) ?? 0;
+    final lng = _coordinateAt(dto.coordinates, 0) ?? 0;
+    return Event(
+      id: dto.id,
+      title: dto.title,
+      location: _formatCoordinateLocation(lat, lng),
+      description: dto.description ?? '',
+      latitude: lat,
+      longitude: lng,
+      imageUrls: const <String>[],
+      startTime: dto.startTime,
+      createdAt: dto.createdAt,
+      currentParticipants: dto.registrations,
+      isRegistered: false,
+      isFavorite: false,
+      isFree: true,
+      tags: dto.tags ?? const <String>[],
+      distanceKm: dto.distanceKm,
+      memberCount: dto.registrations,
+    );
+  }
+
+  factory Event.fromEventDetailDto(EventDetailDto dto) {
+    final startLat = _coordinateAt(dto.startPoint, 1) ?? 0;
+    final startLng = _coordinateAt(dto.startPoint, 0) ?? 0;
+    final waypointStrings = dto.segments
+        .map((segment) => _formatCoordinateLocation(
+              _coordinateAt(segment.waypoint, 1) ?? startLat,
+              _coordinateAt(segment.waypoint, 0) ?? startLng,
+            ))
+        .toList(growable: false);
+    final coverImages = dto.moments
+        .map((moment) => moment.coverImageUrl)
+        .whereType<String>()
+        .map((url) => url.trim())
+        .where((url) => url.isNotEmpty)
+        .toList(growable: false);
+
+    return Event(
+      id: dto.id,
+      title: dto.title,
+      description: dto.description ?? '',
+      location: _formatCoordinateLocation(startLat, startLng),
+      latitude: startLat,
+      longitude: startLng,
+      imageUrls: List.unmodifiable(coverImages),
+      coverImageUrl: coverImages.isNotEmpty ? coverImages.first : null,
+      startTime: dto.startTime,
+      endTime: dto.endTime,
+      maxParticipants: dto.maxParticipants,
+      currentParticipants: dto.memberCount,
+      isRegistered: dto.isRegistered,
+      isFavorite: false,
+      isFree: true,
+      tags: dto.tags ?? const <String>[],
+      waypoints: List.unmodifiable(waypointStrings),
+      visibility: dto.visibility,
+      memberCount: dto.memberCount,
+      segments: List.unmodifiable(dto.segments),
+      moments: List.unmodifiable(dto.moments),
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
@@ -82,6 +175,10 @@ class Event {
   final bool? isRoundTrip;
   final double? distanceKm;
   final EventOrganizer? organizer;
+  final String? visibility;
+  final int? memberCount;
+  final List<EventSegmentDto>? segments;
+  final List<MomentSummaryDto>? moments;
 
   const Event({
     required this.id,
@@ -109,6 +206,10 @@ class Event {
     this.isRoundTrip,
     this.distanceKm,
     this.organizer,
+    this.visibility,
+    this.memberCount,
+    this.segments,
+    this.moments,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -288,6 +389,20 @@ class Event {
           json['routeLength'],
     );
 
+    final parsedSegments = (json['segments'] as List?)
+        ?.map((item) => item is Map<String, dynamic>
+            ? EventSegmentDto.fromJson(Map<String, dynamic>.from(item))
+            : null)
+        .whereType<EventSegmentDto>()
+        .toList(growable: false);
+
+    final parsedMoments = (json['moments'] as List?)
+        ?.map((item) => item is Map<String, dynamic>
+            ? MomentSummaryDto.fromJson(Map<String, dynamic>.from(item))
+            : null)
+        .whereType<MomentSummaryDto>()
+        .toList(growable: false);
+
     return Event(
       id: parseString(json['id'] ?? json['eventId']) ?? '',
       title: parseString(json['title'] ?? json['name']) ?? '',
@@ -334,6 +449,14 @@ class Event {
                   avatarUrl: parseString(json['organizerAvatar']),
                 )
               : null,
+      visibility: parseString(json['visibility'] ?? statsJson?['visibility']),
+      memberCount: currentParticipants,
+      segments: (parsedSegments == null || parsedSegments.isEmpty)
+          ? null
+          : List.unmodifiable(parsedSegments),
+      moments: (parsedMoments == null || parsedMoments.isEmpty)
+          ? null
+          : List.unmodifiable(parsedMoments),
     );
   }
 
@@ -363,6 +486,12 @@ class Event {
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
         if (distanceKm != null) 'distanceKm': distanceKm,
         if (organizer != null) 'organizer': organizer!.toJson(),
+        if (visibility != null) 'visibility': visibility,
+        if (memberCount != null) 'memberCount': memberCount,
+        if (segments != null)
+          'segments': segments!.map((e) => e.toJson()).toList(),
+        if (moments != null)
+          'moments': moments!.map((e) => e.toJson()).toList(),
       };
 
   /// Returns the first non-empty image URL among [imageUrls] and
@@ -393,6 +522,19 @@ class Event {
     }
     return (current ?? max).toString();
   }
+}
+
+double? _coordinateAt(List<double>? coordinates, int index) {
+  if (coordinates == null || coordinates.length <= index) {
+    return null;
+  }
+  return coordinates[index];
+}
+
+String _formatCoordinateLocation(double? lat, double? lng) {
+  final safeLat = lat ?? 0;
+  final safeLng = lng ?? 0;
+  return 'Lat ${safeLat.toStringAsFixed(4)}, Lng ${safeLng.toStringAsFixed(4)}';
 }
 
 Map<String, dynamic>? _asMap(dynamic value) {

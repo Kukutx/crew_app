@@ -1,21 +1,22 @@
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/core/state/di/providers.dart';
-import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
+import 'package:crew_app/features/models/user/ensure_user_request.dart';
+import 'package:crew_app/features/models/user/user_profile_dto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 final authenticatedUserProvider =
     StateNotifierProvider.autoDispose<AuthenticatedUserNotifier,
-        AsyncValue<AuthenticatedUserDto?>>((ref) {
+        AsyncValue<UserProfileDto?>>((ref) {
   return AuthenticatedUserNotifier(ref);
 });
 
 class AuthenticatedUserNotifier
-    extends StateNotifier<AsyncValue<AuthenticatedUserDto?>> {
+    extends StateNotifier<AsyncValue<UserProfileDto?>> {
   AuthenticatedUserNotifier(this._ref)
-      : super(const AsyncValue<AuthenticatedUserDto?>.data(null)) {
+      : super(const AsyncValue<UserProfileDto?>.data(null)) {
     _listenToAuthChanges();
     _initialize();
   }
@@ -28,7 +29,7 @@ class AuthenticatedUserNotifier
       final currentUser = next;
 
       if (currentUser == null) {
-        state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+        state = const AsyncValue<UserProfileDto?>.data(null);
         return;
       }
 
@@ -41,35 +42,41 @@ class AuthenticatedUserNotifier
   Future<void> _initialize() async {
     final user = _ref.read(currentUserProvider);
     if (user == null) {
-      state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+      state = const AsyncValue<UserProfileDto?>.data(null);
       return;
     }
 
-    state = const AsyncValue<AuthenticatedUserDto?>.loading();
+    state = const AsyncValue<UserProfileDto?>.loading();
     final nextState = await AsyncValue.guard(_loadProfile);
     if (!mounted) return;
     state = nextState;
   }
 
-  Future<AuthenticatedUserDto?> refreshProfile() async {
+  Future<UserProfileDto?> refreshProfile() async {
     final user = _ref.read(currentUserProvider);
     if (user == null) {
-      state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+      state = const AsyncValue<UserProfileDto?>.data(null);
       return null;
     }
 
-    state = const AsyncValue<AuthenticatedUserDto?>.loading();
-   final nextState = await AsyncValue.guard(_loadProfile);
+    state = const AsyncValue<UserProfileDto?>.loading();
+    final nextState = await AsyncValue.guard(_loadProfile);
     if (!mounted) return null;
     state = nextState;
     return state.asData?.value;
   }
 
-  Future<AuthenticatedUserDto?> _loadProfile() async {
+  Future<UserProfileDto?> _loadProfile() async {
+    final firebaseUser = _ref.read(currentUserProvider);
+    if (firebaseUser == null) {
+      return null;
+    }
+
     final api = _ref.read(apiServiceProvider);
 
     try {
-      return await api.getAuthenticatedUserDetail();
+      final ensureRequest = _buildEnsureRequest(firebaseUser);
+      return await api.ensureUserProfile(ensureRequest);
     } on ApiException catch (error) {
       final status = error.statusCode;
       if (status == null) {
@@ -82,5 +89,22 @@ class AuthenticatedUserNotifier
 
       rethrow;
     }
+  }
+
+  EnsureUserRequest _buildEnsureRequest(User firebaseUser) {
+    final displayName = firebaseUser.displayName?.trim();
+    final email = firebaseUser.email?.trim();
+    final avatarUrl = firebaseUser.photoURL?.trim();
+
+    return EnsureUserRequest(
+      firebaseUid: firebaseUser.uid,
+      displayName:
+          (displayName != null && displayName.isNotEmpty) ? displayName : 'Crew User',
+      email: (email != null && email.isNotEmpty) ? email : '${firebaseUser.uid}@crew.app',
+      role: 'User',
+      avatarUrl: (avatarUrl != null && avatarUrl.isNotEmpty) ? avatarUrl : null,
+      bio: null,
+      tags: null,
+    );
   }
 }

@@ -1943,7 +1943,7 @@ abstract class AppLocalizations {
   /// No description provided for @map_quick_actions_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Pick what you'd like to do next.'**
+  /// **'Pick what you\'d like to do next.'**
   String get map_quick_actions_subtitle;
 
   /// No description provided for @map_quick_actions_quick_trip.

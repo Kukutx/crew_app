@@ -1024,4 +1024,90 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_select_location_create_trip => '创建快速行程';
+
+  @override
+  String get wallet_title => '我的钱包';
+
+  @override
+  String get wallet_overview_subtitle => '查看余额、积分与账单';
+
+  @override
+  String get wallet_balance_label => '可用余额';
+
+  @override
+  String wallet_last_updated(Object timeAgo) {
+    return '$timeAgo前更新';
+  }
+
+  @override
+  String get wallet_reserved_funds => '预留中';
+
+  @override
+  String get wallet_reward_points => '积分';
+
+  @override
+  String get wallet_quick_actions => '快速操作';
+
+  @override
+  String get wallet_action_top_up => '充值';
+
+  @override
+  String get wallet_action_withdraw => '提现';
+
+  @override
+  String get wallet_action_transfer => '转账';
+
+  @override
+  String get wallet_insights_title => '本月概览';
+
+  @override
+  String get wallet_insights_description => '随时掌握活动收入与订阅支出的趋势。';
+
+  @override
+  String get wallet_help_description => '钱包功能正在内测，当前为示例数据，欢迎先体验界面设计。';
+
+  @override
+  String get wallet_help_close => '知道了';
+
+  @override
+  String get wallet_insight_income => '活动收入';
+
+  @override
+  String get wallet_insight_expense => '订阅支出';
+
+  @override
+  String get wallet_view_statements => '账单与对账';
+
+  @override
+  String get wallet_view_statements_subtitle => '导出详细结算记录';
+
+  @override
+  String get wallet_manage_methods => '支付方式管理';
+
+  @override
+  String get wallet_manage_methods_subtitle => '管理银行卡与收款账户';
+
+  @override
+  String get wallet_recent_activity => '最近交易';
+
+  @override
+  String get wallet_activity_empty => '暂无交易记录';
+
+  @override
+  String get wallet_transaction_payout_title => '活动收入';
+
+  @override
+  String get wallet_transaction_payout_subtitle => '城市骑行团 · 4月12日';
+
+  @override
+  String get wallet_transaction_refund_title => '费用退款';
+
+  @override
+  String get wallet_transaction_refund_subtitle => '海岸露营会 · 行程取消';
+
+  @override
+  String get wallet_transaction_subscription_title => 'Crew Plus 订阅';
+
+  @override
+  String get wallet_transaction_subscription_subtitle => '自动续费';
 }

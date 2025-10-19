@@ -2047,6 +2047,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create quick trip'**
   String get map_select_location_create_trip;
+
+  /// No description provided for @wallet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get wallet_title;
+
+  /// No description provided for @wallet_overview_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View balance, rewards and statements'**
+  String get wallet_overview_subtitle;
+
+  /// No description provided for @wallet_balance_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Available balance'**
+  String get wallet_balance_label;
+
+  /// No description provided for @wallet_last_updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {timeAgo} ago'**
+  String wallet_last_updated(Object timeAgo);
+
+  /// No description provided for @wallet_reserved_funds.
+  ///
+  /// In en, this message translates to:
+  /// **'On hold'**
+  String get wallet_reserved_funds;
+
+  /// No description provided for @wallet_reward_points.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward points'**
+  String get wallet_reward_points;
+
+  /// No description provided for @wallet_quick_actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get wallet_quick_actions;
+
+  /// No description provided for @wallet_action_top_up.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up'**
+  String get wallet_action_top_up;
+
+  /// No description provided for @wallet_action_withdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw'**
+  String get wallet_action_withdraw;
+
+  /// No description provided for @wallet_action_transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get wallet_action_transfer;
+
+  /// No description provided for @wallet_insights_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly insights'**
+  String get wallet_insights_title;
+
+  /// No description provided for @wallet_insights_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Track how your balance grows across events and subscriptions.'**
+  String get wallet_insights_description;
+
+  /// No description provided for @wallet_help_description.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet preview shows demo data so you can explore the upcoming experience.'**
+  String get wallet_help_description;
+
+  /// No description provided for @wallet_help_close.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get wallet_help_close;
+
+  /// No description provided for @wallet_insight_income.
+  ///
+  /// In en, this message translates to:
+  /// **'Event income'**
+  String get wallet_insight_income;
+
+  /// No description provided for @wallet_insight_expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription costs'**
+  String get wallet_insight_expense;
+
+  /// No description provided for @wallet_view_statements.
+  ///
+  /// In en, this message translates to:
+  /// **'Statements'**
+  String get wallet_view_statements;
+
+  /// No description provided for @wallet_view_statements_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export detailed settlement history'**
+  String get wallet_view_statements_subtitle;
+
+  /// No description provided for @wallet_manage_methods.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment methods'**
+  String get wallet_manage_methods;
+
+  /// No description provided for @wallet_manage_methods_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage cards and payout accounts'**
+  String get wallet_manage_methods_subtitle;
+
+  /// No description provided for @wallet_recent_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get wallet_recent_activity;
+
+  /// No description provided for @wallet_activity_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get wallet_activity_empty;
+
+  /// No description provided for @wallet_transaction_payout_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Event payout'**
+  String get wallet_transaction_payout_title;
+
+  /// No description provided for @wallet_transaction_payout_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'City cycling crew · Apr 12'**
+  String get wallet_transaction_payout_subtitle;
+
+  /// No description provided for @wallet_transaction_refund_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense refund'**
+  String get wallet_transaction_refund_title;
+
+  /// No description provided for @wallet_transaction_refund_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coastal camp · Trip cancelled'**
+  String get wallet_transaction_refund_subtitle;
+
+  /// No description provided for @wallet_transaction_subscription_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Crew Plus subscription'**
+  String get wallet_transaction_subscription_title;
+
+  /// No description provided for @wallet_transaction_subscription_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto renewal'**
+  String get wallet_transaction_subscription_subtitle;
 }
 
 class _AppLocalizationsDelegate

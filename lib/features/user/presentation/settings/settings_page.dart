@@ -122,6 +122,13 @@ class SettingsPage extends ConsumerWidget {
             title: loc.settings_section_subscription,
             children: [
               ListTile(
+                leading: const Icon(Icons.account_balance_wallet_outlined),
+                title: Text(loc.wallet_title),
+                subtitle: Text(loc.wallet_overview_subtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).pushNamed('/wallet'),
+              ),
+              ListTile(
                 leading: const Icon(Icons.workspace_premium_outlined),
                 title: Text(loc.settings_subscription_current_plan),
                 subtitle: Text(

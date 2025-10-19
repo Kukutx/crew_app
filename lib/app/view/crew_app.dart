@@ -8,6 +8,7 @@ import 'package:crew_app/features/user/presentation/settings/pages/preferences/p
 import 'package:crew_app/features/user/presentation/settings/settings_page.dart';
 import 'package:crew_app/features/user/presentation/settings/state/settings_providers.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
+import 'package:crew_app/features/user/presentation/wallet/wallet_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +41,7 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/preferences': (context) => PreferencesPage(),
   '/messages_chat': (context) => const ChatSheet(),
   '/expenses': (context) => const ExpensesPage(),
+  '/wallet': (context) => const WalletPage(),
   '/profile': (context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     final uid = args is String ? args : null;

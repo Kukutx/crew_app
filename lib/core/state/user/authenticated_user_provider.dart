@@ -1,7 +1,6 @@
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
-import 'package:crew_app/core/state/di/providers.dart';
-import 'package:crew_app/features/models/user/ensure_user_request.dart';
+import 'package:crew_app/features/auth/ensure_user_service.dart';
 import 'package:crew_app/features/models/user/user_profile_dto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,41 +17,29 @@ class AuthenticatedUserNotifier
   AuthenticatedUserNotifier(this._ref)
       : super(const AsyncValue<UserProfileDto?>.data(null)) {
     _listenToAuthChanges();
-    _initialize();
   }
 
   final Ref _ref;
 
   void _listenToAuthChanges() {
-    _ref.listen<User?>(currentUserProvider, (previous, next) {
-      final previousUser = previous;
-      final currentUser = next;
+    _ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
+      final previousUser = previous?.valueOrNull;
+      final currentUser = next.valueOrNull;
 
       if (currentUser == null) {
         state = const AsyncValue<UserProfileDto?>.data(null);
+        _ref.read(ensureUserServiceProvider).reset();
         return;
       }
 
       if (previousUser == null || previousUser.uid != currentUser.uid) {
-        refreshProfile();
+        state = const AsyncValue<UserProfileDto?>.loading();
+        return;
       }
     });
   }
 
-  Future<void> _initialize() async {
-    final user = _ref.read(currentUserProvider);
-    if (user == null) {
-      state = const AsyncValue<UserProfileDto?>.data(null);
-      return;
-    }
-
-    state = const AsyncValue<UserProfileDto?>.loading();
-    final nextState = await AsyncValue.guard(_loadProfile);
-    if (!mounted) return;
-    state = nextState;
-  }
-
-  Future<UserProfileDto?> refreshProfile() async {
+  Future<UserProfileDto?> refreshProfile({bool forceEnsure = false}) async {
     final user = _ref.read(currentUserProvider);
     if (user == null) {
       state = const AsyncValue<UserProfileDto?>.data(null);
@@ -60,37 +47,23 @@ class AuthenticatedUserNotifier
     }
 
     state = const AsyncValue<UserProfileDto?>.loading();
-    final nextState = await AsyncValue.guard(_loadProfile);
+    final nextState = await AsyncValue.guard(
+      () => _loadProfile(forceEnsure: forceEnsure),
+    );
     if (!mounted) return null;
     state = nextState;
     return state.asData?.value;
   }
 
-  Future<UserProfileDto?> _loadProfile() async {
-    final api = _ref.read(apiServiceProvider);
+  Future<UserProfileDto?> _loadProfile({bool forceEnsure = false}) async {
     final firebaseUser = _ref.read(currentUserProvider);
     if (firebaseUser == null) {
       return null;
     }
 
-    final displayName = firebaseUser.displayName?.trim();
-    final email = firebaseUser.email?.trim();
-    final request = EnsureUserRequest(
-      firebaseUid: firebaseUser.uid,
-      displayName: (displayName != null && displayName.isNotEmpty)
-          ? displayName
-          : (email != null && email.isNotEmpty
-              ? email
-              : 'Crew Member'),
-      email: email ?? '${firebaseUser.uid}@firebase.local',
-      role: 'User',
-      avatarUrl: firebaseUser.photoURL,
-      bio: null,
-      tags: null,
-    );
-
+    final ensureService = _ref.read(ensureUserServiceProvider);
     try {
-      return await api.ensureUser(request);
+      return await ensureService.ensureUser(force: forceEnsure);
     } on ApiException catch (error) {
       final status = error.statusCode;
       if (status == null) {

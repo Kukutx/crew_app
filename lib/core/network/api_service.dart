@@ -5,8 +5,6 @@ import 'package:crew_app/features/models/event/event_card_dto.dart';
 import 'package:crew_app/features/models/event/event_detail_dto.dart';
 import 'package:crew_app/features/models/event/event_feed_response_dto.dart';
 import 'package:crew_app/features/models/event/event_summary_dto.dart';
-import 'package:crew_app/features/models/user/ensure_user_request.dart';
-import 'package:crew_app/features/models/user/user_profile_dto.dart';
 import 'package:dio/dio.dart';
 
 class ApiService {
@@ -52,31 +50,6 @@ class ApiService {
         throw ApiException('Failed to acquire authentication token');
       }
       return const {};
-    }
-  }
-
-  Future<UserProfileDto> ensureUser(EnsureUserRequest request) async {
-    final headers = await _buildAuthHeaders(required: true);
-    try {
-      final response = await _dio.post(
-        'users/ensure',
-        data: request.toJson(),
-        options: Options(headers: headers),
-      );
-      if (response.statusCode == 200) {
-        final data = _asJsonMap(response.data, 'Unexpected user payload type');
-        return UserProfileDto.fromJson(data);
-      }
-      throw ApiException(
-        'Failed to ensure user profile',
-        statusCode: response.statusCode,
-      );
-    } on DioException catch (e) {
-      final message = _extractErrorMessage(e) ?? 'Request error';
-      throw ApiException(
-        message,
-        statusCode: e.response?.statusCode,
-      );
     }
   }
 

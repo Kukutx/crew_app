@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
+import 'package:crew_app/features/auth/state/ensure_user_listener.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_moments_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
@@ -10,7 +10,6 @@ import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,7 +29,6 @@ class _AppState extends ConsumerState<App> {
   Timer? _scrollDebounceTimer;
   late final PageController _overlayController = PageController(initialPage: 1);
   ProviderSubscription<int>? _overlayIndexSubscription;
-  ProviderSubscription<AsyncValue<User?>>? _authStateSubscription;
 
   @override
   void initState() {
@@ -55,19 +53,7 @@ class _AppState extends ConsumerState<App> {
       },
     );
 
-    _authStateSubscription = ref.listenManual<AsyncValue<User?>>(
-      authStateProvider,
-      _handleAuthStateChanged,
-      fireImmediately: true,
-    );
-
-    final currentUser = ref.read(currentUserProvider);
-    if (currentUser != null) {
-      scheduleMicrotask(() {
-        if (!mounted) return;
-        ref.read(authenticatedUserProvider.notifier).refreshProfile();
-      });
-    }
+    ref.read(ensureUserAuthStateListenerProvider);
   }
 
   @override
@@ -75,26 +61,7 @@ class _AppState extends ConsumerState<App> {
     _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _overlayIndexSubscription?.close();
-    _authStateSubscription?.close();
     super.dispose();
-  }
-
-  void _handleAuthStateChanged(
-    AsyncValue<User?>? previous,
-    AsyncValue<User?> next,
-  ) {
-    final previousUser = previous?.valueOrNull;
-    final currentUser = next.valueOrNull;
-
-    if (currentUser == null) {
-      return;
-    }
-
-    if (previousUser != null && previousUser.uid == currentUser.uid) {
-      return;
-    }
-
-    ref.read(authenticatedUserProvider.notifier).refreshProfile();
   }
 
   void _handleScrollActivity(bool scrolling) {

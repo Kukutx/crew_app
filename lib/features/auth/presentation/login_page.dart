@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/core/error/api_exception.dart';
-import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
@@ -73,13 +72,9 @@ class LoginPage extends ConsumerWidget {
           fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
             final messenger = ScaffoldMessenger.of(context);
             try {
-              await ref
-                  .read(authServiceProvider)
-                  .getIdToken(forceRefresh: true);
-
               final profile = await ref
                   .read(authenticatedUserProvider.notifier)
-                  .refreshProfile();
+                  .refreshProfile(forceEnsure: true);
 
               if (profile != null) {
                 debugPrint('Authenticated user: ${profile.email}');

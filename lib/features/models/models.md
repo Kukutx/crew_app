@@ -42,7 +42,7 @@
 
 ### 用户相关模型
 
-- **EnsureUserRequest**（创建/同步当前登录用户资料时发送的请求体）
+- **EnsureUserRequest**（创建/同步当前登录用户资料时发送的请求体，定义在 `lib/features/users/models/ensure_user_request.dart`）
   字段：`firebaseUid`、`displayName`、`email`、`role`、`avatarUrl`、`bio`、`tags`。`tags` 可以为空，后端允许 `null`。
 - **UserSummaryDto**（公开用户列表返回的简要信息）
   字段：`id`、`displayName`、`email`、`role`、`avatarUrl`、`createdAt`。

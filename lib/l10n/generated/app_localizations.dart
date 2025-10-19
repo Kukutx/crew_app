@@ -422,6 +422,42 @@ abstract class AppLocalizations {
   /// **'Adjust any number to match the actual expenses for this trip.'**
   String get event_cost_calculator_hint;
 
+  /// No description provided for @event_expense_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense calculation'**
+  String get event_expense_section_title;
+
+  /// No description provided for @event_expense_section_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep track of shared costs with your crew and settle up easily after the trip.'**
+  String get event_expense_section_description;
+
+  /// No description provided for @event_expense_calculate_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate'**
+  String get event_expense_calculate_button;
+
+  /// No description provided for @event_group_expense_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Group ledger'**
+  String get event_group_expense_title;
+
+  /// No description provided for @event_group_expense_intro.
+  ///
+  /// In en, this message translates to:
+  /// **'Create and track shared expenses for everyone on this trip.'**
+  String get event_group_expense_intro;
+
+  /// No description provided for @event_group_expense_hint.
+  ///
+  /// In en, this message translates to:
+  /// **"Add participants, log costs on the go, and we'll help you settle balances fairly."**
+  String get event_group_expense_hint;
+
   /// No description provided for @event_waypoints_title.
   ///
   /// In en, this message translates to:

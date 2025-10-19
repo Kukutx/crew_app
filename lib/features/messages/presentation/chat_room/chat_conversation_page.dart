@@ -12,6 +12,7 @@ import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_r
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -294,6 +295,14 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
+  void _openUserProfile(ChatParticipant participant) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => UserProfilePage(uid: participant.id),
+      ),
+    );
+  }
+
   Future<void> _showSearchSheet() async {
     final selectedMessage = await showModalBottomSheet<ChatMessage>(
       context: context,
@@ -329,6 +338,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         onSearchTap: _showSearchSheet,
         onVideoCallTap: () =>
             _showFeatureComingSoon(loc.chat_action_video_call),
+        onParticipantTap: _openUserProfile,
       );
     }
 
@@ -360,14 +370,18 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       titleSpacing: 0,
       title: Row(
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: avatarColor.withValues(alpha: .15),
-            child: Text(
-              partnerInitials,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: avatarColor,
+          InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => _openUserProfile(partner),
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: avatarColor.withValues(alpha: .15),
+              child: Text(
+                partnerInitials,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: avatarColor,
+                ),
               ),
             ),
           ),
@@ -429,6 +443,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
               repliesLabelBuilder: loc.chat_reply_count,
               messageKeys: _messageKeys,
               highlightedMessageId: _highlightedMessageId,
+              onAvatarTap: _openUserProfile,
             ),
           ),
           ChatRoomMessageComposer(

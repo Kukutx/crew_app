@@ -13,6 +13,7 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onSearchTap,
     this.onVideoCallTap,
     this.onPhoneCallTap,
+    this.onParticipantTap,
   });
 
   final String channelTitle;
@@ -21,6 +22,7 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onSearchTap;
   final VoidCallback? onVideoCallTap;
   final VoidCallback? onPhoneCallTap;
+  final ValueChanged<ChatParticipant>? onParticipantTap;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 72);
@@ -77,7 +79,10 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               final participant = participants[index];
-              return ChatRoomParticipantAvatar(participant: participant);
+              return ChatRoomParticipantAvatar(
+                participant: participant,
+                onTap: onParticipantTap,
+              );
             },
             separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemCount: participants.length,

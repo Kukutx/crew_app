@@ -1,4 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
+import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomMessageTile extends StatelessWidget {
@@ -9,6 +10,7 @@ class ChatRoomMessageTile extends StatelessWidget {
     required this.youLabel,
     required this.repliesLabelBuilder,
     this.isHighlighted = false,
+    this.onAvatarTap,
   });
 
   final ChatMessage message;
@@ -16,6 +18,7 @@ class ChatRoomMessageTile extends StatelessWidget {
   final String youLabel;
   final String Function(int) repliesLabelBuilder;
   final bool isHighlighted;
+  final ValueChanged<ChatParticipant>? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -53,28 +56,33 @@ class ChatRoomMessageTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
-          if (!isMine)
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: showAvatar ? 1 : 0,
-              child: showAvatar
-                  ? CircleAvatar(
-                      radius: 18,
-                      backgroundColor: senderColor.withValues(alpha: .15),
-                      child: Text(
-                        senderInitials,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: senderColor,
+            if (!isMine)
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: showAvatar ? 1 : 0,
+                child: showAvatar
+                    ? GestureDetector(
+                        onTap: onAvatarTap == null
+                            ? null
+                            : () => onAvatarTap!(message.sender),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: senderColor.withValues(alpha: .15),
+                          child: Text(
+                            senderInitials,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: senderColor,
+                            ),
+                          ),
                         ),
-                      ),
-                    )
-                  : const SizedBox(width: 36),
-            )
-          else
-            const SizedBox(width: 36),
-          const SizedBox(width: 12),
-          Flexible(
+                      )
+                    : const SizedBox(width: 36),
+              )
+            else
+              const SizedBox(width: 36),
+            const SizedBox(width: 12),
+            Flexible(
             child: Column(
               crossAxisAlignment:
                   isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -202,7 +210,6 @@ class ChatRoomMessageTile extends StatelessWidget {
             ),
           ),
         ],
-      ),
       ),
     );
   }

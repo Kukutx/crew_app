@@ -6,10 +6,12 @@ class DirectChatList extends StatelessWidget {
     super.key,
     required this.conversations,
     this.onConversationTap,
+    this.onAvatarTap,
   });
 
   final List<DirectChatPreview> conversations;
   final ValueChanged<DirectChatPreview>? onConversationTap;
+  final ValueChanged<DirectChatPreview>? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -49,18 +51,25 @@ class DirectChatList extends StatelessWidget {
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: avatarColor.withValues(alpha: .12),
-                          child: Text(
-                            (conversation.initials ?? conversation.displayName)
-                                .characters
-                                .take(2)
-                                .toString()
-                                .toUpperCase(),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: avatarColor,
+                        InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: onAvatarTap == null
+                              ? null
+                              : () => onAvatarTap!(conversation),
+                          child: CircleAvatar(
+                            radius: 24,
+                            backgroundColor: avatarColor.withValues(alpha: .12),
+                            child: Text(
+                              (conversation.initials ??
+                                      conversation.displayName)
+                                  .characters
+                                  .take(2)
+                                  .toString()
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: avatarColor,
+                              ),
                             ),
                           ),
                         ),

@@ -10,6 +10,7 @@ export 'package:crew_app/shared/widgets/toggle_tab_chip.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 
 class ChatSheet extends StatefulWidget {
   const ChatSheet({super.key});
@@ -84,6 +85,12 @@ class _ChatSheetState extends State<ChatSheet> {
         ),
       )
       .toList(growable: false);
+
+  late final Map<String, ChatParticipant> _privateContactsByConversationId =
+      Map.fromIterables(
+    _samplePrivateConversations.map((conversation) => conversation.id),
+    _privateContacts,
+  );
 
   late final List<List<ChatMessage>> _samplePrivateMessages = [
     [
@@ -506,6 +513,17 @@ class _ChatSheetState extends State<ChatSheet> {
                         key: ValueKey('private-$query'),
                         conversations: privateResults,
                         onConversationTap: _openPrivateChat,
+                        onAvatarTap: (conversation) {
+                          final participant =
+                              _privateContactsByConversationId[conversation.id];
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => UserProfilePage(
+                                uid: participant?.id ?? conversation.id,
+                              ),
+                            ),
+                          );
+                        },
                       )
                     : GroupChatList(
                         key: ValueKey('registered-$query'),

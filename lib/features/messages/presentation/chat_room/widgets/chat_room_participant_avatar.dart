@@ -6,9 +6,11 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
   const ChatRoomParticipantAvatar({
     super.key,
     required this.participant,
+    this.onTap,
   });
 
   final ChatParticipant participant;
+  final ValueChanged<ChatParticipant>? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,46 +24,50 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
             participant.displayName.characters.take(2).toString())
         .toUpperCase();
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor,
-              width: participant.isCurrentUser ? 2 : 1,
+    return InkWell(
+      onTap: onTap == null ? null : () => onTap!(participant),
+      borderRadius: BorderRadius.circular(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: borderColor,
+                width: participant.isCurrentUser ? 2 : 1,
+              ),
             ),
-          ),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundColor: avatarColor.withValues(alpha: .12),
-            child: Text(
-              initials,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: avatarColor,
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: avatarColor.withValues(alpha: .12),
+              child: Text(
+                initials,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: avatarColor,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: 64,
-          child: Text(
-            participant.isCurrentUser
-                ? AppLocalizations.of(context)!.chat_you_label
-                : participant.displayName,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurfaceVariant,
+          const SizedBox(height: 6),
+          SizedBox(
+            width: 64,
+            child: Text(
+              participant.isCurrentUser
+                  ? AppLocalizations.of(context)!.chat_you_label
+                  : participant.displayName,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

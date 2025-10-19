@@ -28,13 +28,30 @@ class EnsureUserRequest {
         tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
       );
 
-  Map<String, dynamic> toJson() => {
-        'firebaseUid': firebaseUid,
-        'displayName': displayName,
-        'email': email,
-        'role': role,
-        'avatarUrl': avatarUrl,
-        'bio': bio,
-        'tags': tags,
-      };
+  Map<String, dynamic> toJson() {
+    final normalizedTags = tags
+        ?.map((tag) => tag.trim())
+        .where((tag) => tag.isNotEmpty)
+        .toList(growable: false);
+
+    return <String, dynamic>{
+      'firebaseUid': firebaseUid.trim(),
+      'displayName': displayName.trim(),
+      'email': email.trim(),
+      'role': role.trim(),
+      if (_normalizeOptional(avatarUrl) != null)
+        'avatarUrl': _normalizeOptional(avatarUrl),
+      if (_normalizeOptional(bio) != null) 'bio': _normalizeOptional(bio),
+      if (normalizedTags != null && normalizedTags.isNotEmpty)
+        'tags': normalizedTags,
+    };
+  }
+}
+
+String? _normalizeOptional(String? value) {
+  if (value == null) {
+    return null;
+  }
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? null : trimmed;
 }

@@ -400,6 +400,8 @@
   "map_quick_actions_full_trip_desc": "打开完整表单规划详细行程。",
   "map_quick_actions_create_moment": "分享瞬间",
   "map_quick_actions_create_moment_desc": "向社区发布照片或动态。",
+  "map_quick_actions_empty_title": "暂无快捷操作",
+  "map_quick_actions_empty_message": "有新的快捷工具时会在这里显示。",
   "map_quick_trip_select_start_tip": "在地图上长按选择起点。",
   "map_selection_sheet_tap_to_expand": "点击展开",
   "map_select_location_destination_tip": "点击地图选择终点。",

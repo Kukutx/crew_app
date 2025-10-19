@@ -18,13 +18,16 @@ class UserActivityDto {
   });
 
   factory UserActivityDto.fromJson(Map<String, dynamic> json) => UserActivityDto(
-        eventId: json['eventId'],
-        title: json['title'],
-        startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
-        role: json['role'],
-        isCreator: json['isCreator'],
-        confirmedParticipants: json['confirmedParticipants'],
-        maxParticipants: json['maxParticipants'],
+        eventId: json['eventId'] as String,
+        title: json['title'] as String,
+        startTime: json['startTime'] != null
+            ? DateTime.parse(json['startTime'] as String)
+            : null,
+        role: json['role'] as String,
+        isCreator: json['isCreator'] as bool? ?? false,
+        confirmedParticipants:
+            (json['confirmedParticipants'] as num?)?.toInt() ?? 0,
+        maxParticipants: (json['maxParticipants'] as num?)?.toInt() ?? 0,
       );
 
   Map<String, dynamic> toJson() => {

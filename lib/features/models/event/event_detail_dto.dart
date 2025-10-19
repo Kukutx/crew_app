@@ -39,22 +39,26 @@ class EventDetailDto {
   });
 
   factory EventDetailDto.fromJson(Map<String, dynamic> json) => EventDetailDto(
-        id: json['id'],
-        ownerId: json['ownerId'],
-        title: json['title'],
-        description: json['description'],
-        startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
-        endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
-        startPoint: (json['startPoint'] as List?)?.map((e) => (e as num).toDouble()).toList(),
-        endPoint: (json['endPoint'] as List?)?.map((e) => (e as num).toDouble()).toList(),
-        routePolyline: json['routePolyline'],
-        maxParticipants: json['maxParticipants'],
-        visibility: json['visibility'],
-        segments: (json['segments'] as List).map((e) => EventSegmentDto.fromJson(e)).toList(),
-        memberCount: json['memberCount'],
-        isRegistered: json['isRegistered'],
-        tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
-        moments: (json['moments'] as List).map((e) => MomentSummaryDto.fromJson(e)).toList(),
+        id: json['id'] as String,
+        ownerId: json['ownerId'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String?,
+        startTime: json['startTime'] != null
+            ? DateTime.parse(json['startTime'] as String)
+            : null,
+        endTime: json['endTime'] != null
+            ? DateTime.parse(json['endTime'] as String)
+            : null,
+        startPoint: _asNullableDoubleList(json['startPoint']),
+        endPoint: _asNullableDoubleList(json['endPoint']),
+        routePolyline: json['routePolyline'] as String?,
+        maxParticipants: (json['maxParticipants'] as num?)?.toInt() ?? 0,
+        visibility: json['visibility'] as String,
+        segments: _asSegments(json['segments']),
+        memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+        isRegistered: json['isRegistered'] as bool? ?? false,
+        tags: _asStringList(json['tags']),
+        moments: _asMoments(json['moments']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -75,4 +79,43 @@ class EventDetailDto {
         'tags': tags,
         'moments': moments.map((e) => e.toJson()).toList(),
       };
+}
+
+List<double>? _asNullableDoubleList(dynamic value) {
+  if (value is List) {
+    final result = value
+        .whereType<num>()
+        .map((item) => item.toDouble())
+        .toList(growable: false);
+    return result.isEmpty ? null : result;
+  }
+  return null;
+}
+
+List<EventSegmentDto> _asSegments(dynamic value) {
+  if (value is List) {
+    return value
+        .whereType<Map<String, dynamic>>()
+        .map(EventSegmentDto.fromJson)
+        .toList(growable: false);
+  }
+  return const <EventSegmentDto>[];
+}
+
+List<MomentSummaryDto> _asMoments(dynamic value) {
+  if (value is List) {
+    return value
+        .whereType<Map<String, dynamic>>()
+        .map(MomentSummaryDto.fromJson)
+        .toList(growable: false);
+  }
+  return const <MomentSummaryDto>[];
+}
+
+List<String>? _asStringList(dynamic value) {
+  if (value is List) {
+    final result = value.whereType<String>().map((e) => e.trim()).toList();
+    return result.isEmpty ? null : List.unmodifiable(result);
+  }
+  return null;
 }

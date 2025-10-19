@@ -28,18 +28,20 @@ class EventCardDto {
   });
 
   factory EventCardDto.fromJson(Map<String, dynamic> json) => EventCardDto(
-        id: json['id'],
-        ownerId: json['ownerId'],
-        title: json['title'],
-        description: json['description'],
-        startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
-        createdAt: DateTime.parse(json['createdAt']),
-        coordinates: (json['coordinates'] as List).map((e) => (e as num).toDouble()).toList(),
+        id: json['id'] as String,
+        ownerId: json['ownerId'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String?,
+        startTime: json['startTime'] != null
+            ? DateTime.parse(json['startTime'] as String)
+            : null,
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        coordinates: _asDoubleList(json['coordinates']),
         distanceKm: (json['distanceKm'] as num?)?.toDouble(),
-        registrations: json['registrations'],
-        likes: json['likes'],
+        registrations: (json['registrations'] as num?)?.toInt() ?? 0,
+        likes: (json['likes'] as num?)?.toInt() ?? 0,
         engagement: (json['engagement'] as num?)?.toDouble(),
-        tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
+        tags: _asStringList(json['tags']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -56,4 +58,22 @@ class EventCardDto {
         'engagement': engagement,
         'tags': tags,
       };
+}
+
+List<double> _asDoubleList(dynamic value) {
+  if (value is List) {
+    return value
+        .whereType<num>()
+        .map((item) => item.toDouble())
+        .toList(growable: false);
+  }
+  return const <double>[];
+}
+
+List<String>? _asStringList(dynamic value) {
+  if (value is List) {
+    final result = value.whereType<String>().map((e) => e.trim()).toList();
+    return result.isEmpty ? null : List.unmodifiable(result);
+  }
+  return null;
 }

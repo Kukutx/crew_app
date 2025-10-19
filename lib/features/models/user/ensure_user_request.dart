@@ -5,7 +5,8 @@ class EnsureUserRequest {
   final String role;
   final String? avatarUrl;
   final String? bio;
-  final List<String>? tags;    /// 可为 null
+  /// 可为 null
+  final List<String>? tags;
 
   EnsureUserRequest({
     required this.firebaseUid,

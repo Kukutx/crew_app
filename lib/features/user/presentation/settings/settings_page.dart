@@ -4,7 +4,7 @@ import 'package:crew_app/features/user/presentation/settings/state/settings_prov
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/about/about_page.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/developer_test/crash_test_page.dart';
-import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
+import 'package:crew_app/features/models/user/user_profile_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/foundation.dart';
@@ -455,7 +455,7 @@ class _SettingsSection extends StatelessWidget {
 
 String _resolveEmail(
   fa.User user,
-  AuthenticatedUserDto? backendUser,
+  UserProfileDto? backendUser,
   AppLocalizations loc,
 ) {
   final backendEmail = backendUser?.email.trim();
@@ -471,8 +471,8 @@ String _resolveEmail(
   return loc.email_unbound;
 }
 
-String _resolveUid(fa.User user, AuthenticatedUserDto? backendUser) {
-  final backendId = backendUser?.uid.trim();
+String _resolveUid(fa.User user, UserProfileDto? backendUser) {
+  final backendId = backendUser?.id.trim();
   if (backendId != null && backendId.isNotEmpty) {
     return backendId;
   }

@@ -1,8 +1,8 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class ExpensePage extends StatelessWidget {
-  const ExpensePage({super.key});
+class ExpensesPage extends StatelessWidget {
+  const ExpensesPage({super.key});
 
   @override
   Widget build(BuildContext context) {

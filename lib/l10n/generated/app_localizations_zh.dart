@@ -969,6 +969,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_trip_create_failed => '创建行程失败。';
 
   @override
+  String get map_quick_actions_title => '快捷操作';
+
+  @override
+  String get map_quick_actions_subtitle => '选择你想要进行的操作。';
+
+  @override
+  String get map_quick_actions_quick_trip => '快速自驾';
+
+  @override
+  String get map_quick_actions_quick_trip_desc => '在地图上直接选择起点和终点。';
+
+  @override
+  String get map_quick_actions_full_trip => '完整自驾活动';
+
+  @override
+  String get map_quick_actions_full_trip_desc => '打开完整表单规划详细行程。';
+
+  @override
+  String get map_quick_actions_create_moment => '分享瞬间';
+
+  @override
+  String get map_quick_actions_create_moment_desc => '向社区发布照片或动态。';
+
+  @override
+  String get map_quick_trip_select_start_tip => '在地图上长按选择起点。';
+
+  @override
   String get map_selection_sheet_tap_to_expand => '点击展开';
 
   @override

@@ -178,7 +178,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
   }
 
   void _openGroupExpensePage() {
-    Navigator.of(context).pushNamed("/expense");
+    Navigator.of(context).pushNamed("/expenses");
   }
 
   double get _currentHeaderHeight =>

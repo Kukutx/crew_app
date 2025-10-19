@@ -39,7 +39,7 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/settings': (context) => const SettingsPage(),
   '/preferences': (context) => PreferencesPage(),
   '/messages_chat': (context) => const ChatSheet(),
-  '/expense': (context) => const ExpensesPage(),
+  '/expenses': (context) => const ExpensesPage(),
   '/profile': (context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     final uid = args is String ? args : null;

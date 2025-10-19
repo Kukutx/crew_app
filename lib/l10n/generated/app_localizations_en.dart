@@ -657,7 +657,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_display_name_placeholder => 'Your Crew name';
 
   @override
-  String get preferences_name_empty_error => "Display name can't be empty";
+  String get preferences_name_empty_error => 'Display name can\'t be empty';
 
   @override
   String get preferences_bio_label => 'Bio';
@@ -668,7 +668,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get preferences_bio_placeholder =>
-      "Tell the community what you're into";
+      'Tell the community what you\'re into';
 
   @override
   String get preferences_tags_title => 'Interests & tags';
@@ -687,7 +687,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_tag_duplicate => 'That tag is already added';
 
   @override
-  String preferences_tag_limit_reached(int count) {
+  String preferences_tag_limit_reached(Object count) {
     return 'You can add up to $count tags';
   }
 
@@ -701,8 +701,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_avatar_action => 'Update avatar';
 
   @override
-  String get preferences_feature_unavailable =>
-      'Image editing is coming soon';
+  String get preferences_feature_unavailable => 'Image editing is coming soon';
 
   @override
   String get preferences_save_success => 'Profile updated';

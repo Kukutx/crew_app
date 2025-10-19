@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:characters/characters.dart';
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';

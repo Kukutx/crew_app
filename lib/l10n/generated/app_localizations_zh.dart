@@ -663,7 +663,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferences_tag_duplicate => '这个标签已经添加过啦';
 
   @override
-  String preferences_tag_limit_reached(int count) {
+  String preferences_tag_limit_reached(Object count) {
     return '最多添加 $count 个标签';
   }
 

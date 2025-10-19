@@ -192,7 +192,7 @@ class _ExpensesPageState extends State<ExpensesPage> with TickerProviderStateMix
                     child: ListView.separated(
                       controller: controller,
                       itemCount: participant.expenses.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      separatorBuilder: (_, _) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final expense = participant.expenses[index];
                         return _ExpenseListTile(expense: expense);
@@ -331,7 +331,7 @@ class _ExpensesPageState extends State<ExpensesPage> with TickerProviderStateMix
                   ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<_Participant>(
-                    value: selectedParticipant,
+                    initialValue : selectedParticipant,
                     decoration: const InputDecoration(labelText: '支付人'),
                     items: _participants
                         .map(
@@ -364,7 +364,7 @@ class _ExpensesPageState extends State<ExpensesPage> with TickerProviderStateMix
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: category,
+                    initialValue : category,
                     decoration: const InputDecoration(labelText: '类别'),
                     items: const [
                       DropdownMenuItem(value: '餐饮', child: Text('餐饮')),
@@ -598,7 +598,7 @@ class _ParticipantBubbleState extends State<_ParticipantBubble>
                       gradient: LinearGradient(
                         colors: [
                           const Color(0xAA66D69D),
-                          Colors.white.withOpacity(0.7),
+                          Colors.white.withValues(alpha: 0.7),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -650,7 +650,7 @@ class _ParticipantBubbleState extends State<_ParticipantBubble>
                   ],
                   border: participant.isCreator
                       ? Border.all(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: .8),
                           width: 3,
                         )
                       : null,
@@ -755,7 +755,7 @@ class _ExpenseListTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1B8A5C).withOpacity(0.12),
+                  color: const Color(0xFF1B8A5C).withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -891,7 +891,7 @@ class _Avatar extends StatelessWidget {
         : name.trim().split(RegExp(r'\s+')).map((part) => part[0]).take(2).join();
     return CircleAvatar(
       radius: isPrimary ? 32 : 24,
-      backgroundColor: isPrimary ? Colors.white.withOpacity(0.24) : const Color(0xFF1B8A5C),
+      backgroundColor: isPrimary ? Colors.white.withValues(alpha: .24) : const Color(0xFF1B8A5C),
       child: Text(
         initials,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(

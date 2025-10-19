@@ -1283,7 +1283,7 @@ abstract class AppLocalizations {
   /// No description provided for @preferences_name_empty_error.
   ///
   /// In en, this message translates to:
-  /// **'Display name can't be empty'**
+  /// **'Display name can\'t be empty'**
   String get preferences_name_empty_error;
 
   /// No description provided for @preferences_bio_label.
@@ -1301,7 +1301,7 @@ abstract class AppLocalizations {
   /// No description provided for @preferences_bio_placeholder.
   ///
   /// In en, this message translates to:
-  /// **"Tell the community what you're into"**
+  /// **'Tell the community what you\'re into'**
   String get preferences_bio_placeholder;
 
   /// No description provided for @preferences_tags_title.
@@ -1338,7 +1338,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'You can add up to {count} tags'**
-  String preferences_tag_limit_reached(int count);
+  String preferences_tag_limit_reached(Object count);
 
   /// No description provided for @preferences_recommended_tags_title.
   ///

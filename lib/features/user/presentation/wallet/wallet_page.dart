@@ -161,7 +161,7 @@ class _WalletBalanceCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             colorScheme.primary,
-            colorScheme.primary.withOpacity(0.65),
+            colorScheme.primary.withValues(alpha: .65),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -169,7 +169,7 @@ class _WalletBalanceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.35),
+            color: colorScheme.primary.withValues(alpha: .35),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -185,13 +185,13 @@ class _WalletBalanceCard extends StatelessWidget {
               Text(
                 loc.wallet_balance_label,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onPrimary.withOpacity(0.9),
+                  color: colorScheme.onPrimary.withValues(alpha: .9),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: colorScheme.onPrimary.withOpacity(0.12),
+                  color: colorScheme.onPrimary.withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Row(
@@ -265,7 +265,7 @@ class _WalletInfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
-        color: colorScheme.onPrimary.withOpacity(0.1),
+        color: colorScheme.onPrimary.withValues(alpha: .1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -274,7 +274,7 @@ class _WalletInfoChip extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: colorScheme.onPrimary.withOpacity(0.85),
+              color: colorScheme.onPrimary.withValues(alpha: .85),
               fontSize: 13,
             ),
           ),
@@ -319,7 +319,7 @@ class _WalletQuickAction extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
-          color: background.withOpacity(0.55),
+          color: background.withValues(alpha: .55),
           borderRadius: BorderRadius.circular(22),
         ),
         child: Column(
@@ -360,7 +360,7 @@ class _WalletInsightsCard extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      color: colorScheme.surfaceVariant.withOpacity(0.55),
+      color: colorScheme.surfaceContainerHighest.withValues(alpha: .55),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -601,7 +601,7 @@ class _WalletTransactionsCard extends StatelessWidget {
                   return ListTile(
                     leading: CircleAvatar(
                       radius: 24,
-                      backgroundColor: transaction.iconColor.withOpacity(0.12),
+                      backgroundColor: transaction.iconColor.withValues(alpha: .12),
                       child: Icon(
                         transaction.icon,
                         color: transaction.iconColor,
@@ -623,7 +623,7 @@ class _WalletTransactionsCard extends StatelessWidget {
                 separatorBuilder: (context, index) => Divider(
                   indent: 20,
                   endIndent: 20,
-                  color: theme.dividerColor.withOpacity(0.08),
+                  color: theme.dividerColor.withValues(alpha: .08),
                 ),
                 itemCount: transactions.length,
               ),

@@ -627,6 +627,62 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferences_title => '个人资料';
 
   @override
+  String get preferences_basic_info_title => '基础信息';
+
+  @override
+  String get preferences_display_name_label => '显示名称';
+
+  @override
+  String get preferences_display_name_placeholder => '你的 Crew 昵称';
+
+  @override
+  String get preferences_name_empty_error => '显示名称不能为空';
+
+  @override
+  String get preferences_bio_label => '个人简介';
+
+  @override
+  String get preferences_bio_hint => '写点想让大家了解的自己';
+
+  @override
+  String get preferences_bio_placeholder => '告诉伙伴们你热爱的事';
+
+  @override
+  String get preferences_tags_title => '兴趣标签';
+
+  @override
+  String get preferences_tags_empty_helper => '加几个标签，让大家更快认识你';
+
+  @override
+  String get preferences_add_tag_label => '新增标签';
+
+  @override
+  String get preferences_tag_input_hint => '输入后按回车添加';
+
+  @override
+  String get preferences_tag_duplicate => '这个标签已经添加过啦';
+
+  @override
+  String preferences_tag_limit_reached(int count) {
+    return '最多添加 $count 个标签';
+  }
+
+  @override
+  String get preferences_recommended_tags_title => '热门标签';
+
+  @override
+  String get preferences_cover_action => '更换封面';
+
+  @override
+  String get preferences_avatar_action => '更换头像';
+
+  @override
+  String get preferences_feature_unavailable => '图片编辑功能即将上线';
+
+  @override
+  String get preferences_save_success => '个人资料已更新';
+
+  @override
   String get please_enter_city => '请输入城市';
 
   @override

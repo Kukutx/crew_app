@@ -648,6 +648,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_title => 'Profile info';
 
   @override
+  String get preferences_basic_info_title => 'Basics';
+
+  @override
+  String get preferences_display_name_label => 'Display name';
+
+  @override
+  String get preferences_display_name_placeholder => 'Your Crew name';
+
+  @override
+  String get preferences_name_empty_error => "Display name can't be empty";
+
+  @override
+  String get preferences_bio_label => 'Bio';
+
+  @override
+  String get preferences_bio_hint =>
+      'Share what the Crew should know about you';
+
+  @override
+  String get preferences_bio_placeholder =>
+      "Tell the community what you're into";
+
+  @override
+  String get preferences_tags_title => 'Interests & tags';
+
+  @override
+  String get preferences_tags_empty_helper =>
+      'Add a few tags so others know your vibe';
+
+  @override
+  String get preferences_add_tag_label => 'Add a tag';
+
+  @override
+  String get preferences_tag_input_hint => 'Press enter to add';
+
+  @override
+  String get preferences_tag_duplicate => 'That tag is already added';
+
+  @override
+  String preferences_tag_limit_reached(int count) {
+    return 'You can add up to $count tags';
+  }
+
+  @override
+  String get preferences_recommended_tags_title => 'Popular on Crew';
+
+  @override
+  String get preferences_cover_action => 'Change cover';
+
+  @override
+  String get preferences_avatar_action => 'Update avatar';
+
+  @override
+  String get preferences_feature_unavailable =>
+      'Image editing is coming soon';
+
+  @override
+  String get preferences_save_success => 'Profile updated';
+
+  @override
   String get please_enter_city => 'Please enter a city.';
 
   @override

@@ -8,6 +8,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
+import 'package:crew_app/features/expenses/routing/expenses_routes.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -178,7 +179,12 @@ class _EventDetailBodyState extends State<EventDetailBody>
   }
 
   void _openGroupExpensePage() {
-    Navigator.of(context).pushNamed("/expense");
+    Navigator.of(context).push(
+      ExpensesRoutes.bubble(
+        eventId: widget.event.id,
+        title: widget.event.title,
+      ),
+    );
   }
 
   double get _currentHeaderHeight =>

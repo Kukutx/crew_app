@@ -87,7 +87,7 @@ class _AppState extends ConsumerState<App> {
       builder: (sheetContext) {
         return FractionallySizedBox(
           heightFactor: 0.92,
-          child: const MapEventsExploreSheet(),
+          child: const MapMomentsSheet(),
         );
       },
     );

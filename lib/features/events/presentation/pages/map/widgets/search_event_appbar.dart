@@ -12,7 +12,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onSearch,
     required this.onChanged,
     required this.onClear,
-    required this.onCreateRoadTripTap,
+    this.onAddTap,
     required this.onAvatarTap,
     required this.onResultTap,
     required this.showResults,
@@ -28,7 +28,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final void Function(String keyword) onSearch;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
-  final VoidCallback onCreateRoadTripTap;
+  final VoidCallback? onAddTap;
   final void Function(bool authed) onAvatarTap;
   final void Function(Event event) onResultTap;
   final bool showResults;
@@ -121,10 +121,12 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: IconButton(
-                              icon: const Icon(Icons.add_circle_outline),
-                              onPressed: onCreateRoadTripTap,
-                            ),
+                            prefixIcon: onAddTap != null
+                                ? IconButton(
+                                    icon: const Icon(Icons.add_circle_outline),
+                                    onPressed: onAddTap,
+                                  )
+                                : null,
                             suffixIconConstraints: const BoxConstraints(
                               minWidth: 96,
                               minHeight: 44,

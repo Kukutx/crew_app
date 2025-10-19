@@ -180,7 +180,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onSearch: _onSearchSubmitted,
         onChanged: _onQueryChanged,
         onClear: _onSearchClear,
-        onCreateRoadTripTap: _onCreateRoadTripTap,
+        onAddTap: () => unawaited(_onAddTap()),
         onAvatarTap: _onAvatarTap,
         onResultTap: _onSearchResultTap,
         showResults: searchState.showResults,
@@ -789,6 +789,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return buffer.join(', ');
   }
 
+  Future<void> _onAddTap() async {
+    if (_searchFocusNode.hasFocus) {
+      _searchFocusNode.unfocus();
+    }
+    ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
+    await showCreateMomentSheet(context);
+  }
+
   void _showSnackBar(String message) {
     if (!mounted) {
       return;
@@ -796,14 +804,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _onCreateRoadTripTap() {
-    if (_searchFocusNode.hasFocus) {
-      _searchFocusNode.unfocus();
-    }
-    ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-    ref.read(appOverlayIndexProvider.notifier).state = 0;
   }
 
   void _onAvatarTap(bool authed) {

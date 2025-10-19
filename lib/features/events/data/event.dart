@@ -73,6 +73,7 @@ class Event {
   final DateTime? updatedAt;
   final int? maxParticipants;
   final int? currentParticipants;
+  final int likes;
   final bool isFavorite;
   final bool isRegistered;
   final bool isFree;
@@ -100,6 +101,7 @@ class Event {
     this.updatedAt,
     this.maxParticipants,
     this.currentParticipants,
+    this.likes = 0,
     this.isFavorite = false,
     this.isRegistered = false,
     this.isFree = false,
@@ -239,6 +241,16 @@ class Event {
           json['currentPeople'],
     );
 
+    final likes = parseInt(
+          statsJson?['likeCount'] ??
+              statsJson?['likes'] ??
+              statsJson?['favorites'] ??
+              json['likeCount'] ??
+              json['likes'] ??
+              json['favoriteCount'],
+        ) ??
+        0;
+
     final isFavorite = parseBool(
           statsJson?['isFavorite'] ??
               statsJson?['isUserFavorite'] ??
@@ -318,6 +330,7 @@ class Event {
       maxParticipants: maxParticipants,
       currentParticipants: currentParticipants,
       isFavorite: isFavorite,
+      likes: likes,
       isRegistered: isRegistered,
       isFree: isFree,
       price: price,
@@ -354,6 +367,7 @@ class Event {
         'updatedAt': updatedAt?.toIso8601String(),
         'maxParticipants': maxParticipants,
         'currentParticipants': currentParticipants,
+        'likes': likes,
         'isFavorite': isFavorite,
         'isRegistered': isRegistered,
         'isFree': isFree,

@@ -30,6 +30,7 @@ void main() {
           'currentParticipants': 12,
           'isUserFavorite': true,
           'isUserJoined': false,
+          'likeCount': 342,
         },
         'organizer': {
           'id': 'user-42',
@@ -58,6 +59,7 @@ void main() {
       expect(event.currentParticipants, 12);
       expect(event.isFavorite, isTrue);
       expect(event.isRegistered, isFalse);
+      expect(event.likes, 342);
       expect(event.organizer?.name, 'Alice');
       expect(event.organizer?.avatarUrl, 'https://example.com/avatar.png');
       expect(event.organizer?.bio, contains('Outdoor enthusiast'));
@@ -85,6 +87,7 @@ void main() {
         'currentParticipants': 15,
         'isFavorite': false,
         'isRegistered': true,
+        'likes': 28,
         'organizerId': 'org-1',
         'organizerName': 'Crew Team',
         'organizerAvatar': 'https://example.com/crew.png',
@@ -97,6 +100,7 @@ void main() {
       expect(event.organizer?.name, 'Crew Team');
       expect(event.isRegistered, isTrue);
       expect(event.isFull, isTrue);
+      expect(event.likes, 28);
       expect(event.firstAvailableImageUrl, 'https://example.com/coffee.png');
     });
   });
@@ -118,6 +122,7 @@ void main() {
         currentParticipants: 10,
         isFavorite: true,
         isRegistered: false,
+        likes: 512,
         price: 12.5,
         tags: const ['Games', 'Social'],
         organizer: const EventOrganizer(
@@ -137,6 +142,7 @@ void main() {
       expect(json['startTime'], '2024-08-03T18:30:00.000Z');
       expect(json['maxParticipants'], 24);
       expect(json['currentParticipants'], 10);
+      expect(json['likes'], 512);
       expect(json['isFavorite'], true);
       expect(json['tags'], ['Games', 'Social']);
       expect(json['organizer'], {

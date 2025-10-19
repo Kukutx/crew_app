@@ -86,7 +86,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     }
   }
 
-  void _showMoreActions(BuildContext context, User profile) {
+  void _showMoreActions(
+    BuildContext context,
+    User profile,
+    bool isViewingSelf,
+  ) {
     final messenger = ScaffoldMessenger.of(context);
     final link = 'https://crew.app/users/${profile.uid}';
     final localization = AppLocalizations.of(context)!;
@@ -95,38 +99,47 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       context: context,
       showDragHandle: true,
       builder: (sheetContext) {
+        final actions = <Widget>[];
+
+        if (!isViewingSelf) {
+          actions.addAll([
+            ListTile(
+              leading: const Icon(Icons.block),
+              title: const Text('拉黑'),
+              onTap: () async {
+                Navigator.of(sheetContext).pop();
+                await _confirmBlockUser(context, profile, messenger);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag),
+              title: Text(localization.report_issue),
+              onTap: () async {
+                Navigator.of(sheetContext).pop();
+                await _showReportSheet(context, profile, messenger);
+              },
+            ),
+          ]);
+        }
+
+        actions.add(
+          ListTile(
+            leading: const Icon(Icons.link),
+            title: const Text('复制链接'),
+            onTap: () async {
+              Navigator.of(sheetContext).pop();
+              await Clipboard.setData(ClipboardData(text: link));
+              messenger.showSnackBar(
+                SnackBar(content: Text('已复制链接：$link')),
+              );
+            },
+          ),
+        );
+
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.block),
-                title: const Text('拉黑'),
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await _confirmBlockUser(context, profile, messenger);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.flag),
-                title: Text(localization.report_issue),
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await _showReportSheet(context, profile, messenger);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.link),
-                title: const Text('复制链接'),
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await Clipboard.setData(ClipboardData(text: link));
-                  messenger.showSnackBar(
-                    SnackBar(content: Text('已复制链接：$link')),
-                  );
-                },
-              ),
-            ],
+            children: actions,
           ),
         );
       },
@@ -265,7 +278,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       actions: [
         IconButton(
           icon: const Icon(Icons.more_vert),
-          onPressed: () => _showMoreActions(context, profile),
+          onPressed: () => _showMoreActions(context, profile, isViewingSelf),
         ),
         if (isViewingSelf)
           IconButton(

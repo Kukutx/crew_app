@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_moments_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
@@ -110,6 +111,7 @@ class _AppState extends ConsumerState<App> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final currentUser = ref.watch(currentUserProvider);
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -199,6 +201,7 @@ class _AppState extends ConsumerState<App> {
                 ScrollActivityListener(
                   onScrollActivityChanged: _handleScrollActivity,
                   child: UserProfilePage(
+                    uid: currentUser?.uid,
                     onClose: () {
                       ref.read(appOverlayIndexProvider.notifier).state = 1;
                     },

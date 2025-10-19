@@ -12,6 +12,7 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.onMessagePressed,
     required this.onGuestbookPressed,
     this.showUserActions = true,
+    this.onEditProfile,
   });
 
   final User userProfile;
@@ -19,6 +20,7 @@ class ProfileHeaderCard extends StatelessWidget {
   final VoidCallback onMessagePressed;
   final VoidCallback onGuestbookPressed;
   final bool showUserActions;
+  final VoidCallback? onEditProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +105,10 @@ class ProfileHeaderCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 4),
+                      ],
+                      if (onEditProfile != null) ...[
+                        _EditProfileButton(onPressed: onEditProfile!),
+                        const SizedBox(height: 8),
                       ],
                       TextButton(
                         onPressed: onGuestbookPressed,
@@ -322,6 +328,26 @@ class _MessageButton extends StatelessWidget {
       ),
       icon: const Icon(Icons.mail_outline, size: 18),
       label: const Text('私信'),
+    );
+  }
+}
+
+class _EditProfileButton extends StatelessWidget {
+  const _EditProfileButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.white,
+        side: const BorderSide(color: Colors.white70),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      icon: const Icon(Icons.edit_outlined, size: 18),
+      label: const Text('编辑主页'),
     );
   }
 }

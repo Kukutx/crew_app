@@ -212,6 +212,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
+  void _openEditProfile() {
+    Navigator.of(context).pushNamed('/preferences');
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
@@ -312,6 +316,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                             _startPrivateMessage(context, profile),
                         onGuestbookPressed: _openGuestbookPage,
                         showUserActions: !isViewingSelf,
+                        onEditProfile: isViewingSelf ? _openEditProfile : null,
                       ),
                     ),
                   ),

@@ -87,16 +87,16 @@ class PlazaPostCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                CircleAvatar(
-                  backgroundColor: post.accentColor.withValues(alpha: 0.15),
-                  child: Text(
-                    post.authorInitials,
-                    style: TextStyle(
-                      color: post.accentColor,
-                      fontWeight: FontWeight.w600,
+                  CircleAvatar(
+                    backgroundColor: post.accentColor.withValues(alpha: 0.15),
+                    child: Text(
+                      post.authorInitials,
+                      style: TextStyle(
+                        color: post.accentColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -129,7 +129,20 @@ class PlazaPostCard extends StatelessWidget {
               post.content,
               style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
             ),
-            if (post.previewLabel != null) ...[
+            if (post.mediaAssets.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
+                  height: 148,
+                  width: double.infinity,
+                  child: _PlazaPostMediaPreview(
+                    mediaAssets: post.mediaAssets,
+                    accentColor: post.accentColor,
+                  ),
+                ),
+              ),
+            ] else if (post.previewLabel != null) ...[
               const SizedBox(height: 12),
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
@@ -206,7 +219,64 @@ class PlazaPostCard extends StatelessWidget {
           ],
         ),
       ),
-      ),
+    );
+  }
+}
+
+class _PlazaPostMediaPreview extends StatelessWidget {
+  final List<String> mediaAssets;
+  final Color accentColor;
+
+  const _PlazaPostMediaPreview({
+    required this.mediaAssets,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final firstAsset = mediaAssets.first;
+    final remainingCount = mediaAssets.length - 1;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: accentColor.withValues(alpha: 0.08),
+          ),
+          child: Image.asset(
+            firstAsset,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Center(
+              child: Icon(
+                Icons.image_not_supported_outlined,
+                color: accentColor,
+                size: 32,
+              ),
+            ),
+          ),
+        ),
+        if (remainingCount > 0)
+          Positioned(
+            right: 12,
+            bottom: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Text(
+                '+$remainingCount',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

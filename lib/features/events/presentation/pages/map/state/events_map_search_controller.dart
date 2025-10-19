@@ -113,10 +113,12 @@ class EventsMapSearchController extends StateNotifier<EventsMapSearchState> {
 
   Future<void> _performSearch(String query) async {
     try {
-      final data = await _api.searchEvents(query);
+      final data = await _api.searchEvents(query: query);
+      final events =
+          data.map(Event.fromSummary).toList(growable: false);
       if (mounted && state.query == query) {
         state = state.copyWith(
-          results: data,
+          results: events,
           errorText: null,
           isLoading: false,
         );

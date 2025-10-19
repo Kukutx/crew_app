@@ -6,6 +6,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_share_sheet.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/report_sheet.dart';
@@ -38,10 +39,14 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   );
 
   bool _following = false;
+  late Event _event;
+  bool _isLoadingDetail = false;
 
   @override
   void initState() {
     super.initState();
+    _event = widget.event;
+    _loadEventDetail();
     _captureCurrentOverlayStyle();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -65,10 +70,30 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     );
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final url = widget.event.firstAvailableImageUrl;
+  Future<void> _loadEventDetail() async {
+    if (_isLoadingDetail) {
+      return;
+    }
+    _isLoadingDetail = true;
+    try {
+      final updated =
+          await ref.read(eventsProvider.notifier).loadEventDetail(_event);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _event = updated;
+      });
+      _precacheEventImage();
+    } catch (error, stackTrace) {
+      debugPrint('Failed to load event detail: $error\n$stackTrace');
+    } finally {
+      _isLoadingDetail = false;
+    }
+  }
+
+  void _precacheEventImage() {
+    final url = _event.firstAvailableImageUrl;
     if (url != null && url.isNotEmpty) {
       precacheImage(
         Image.network(url).image,
@@ -80,10 +105,26 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     }
   }
 
-  String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _precacheEventImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant EventDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.event.id != widget.event.id) {
+      _event = widget.event;
+      _precacheEventImage();
+      _loadEventDetail();
+    }
+  }
+
+  String get _eventShareLink => 'https://crewapp.events/${_event.id}';
 
   String _buildShareMessage() {
-    final event = widget.event;
+    final event = _event;
     return '${event.title} · ${event.location}\n$_eventShareLink';
   }
 
@@ -94,7 +135,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => EventShareSheet(
-        event: widget.event,
+        event: _event,
         loc: loc,
         previewKey: _sharePreviewKey,
         shareLink: _eventShareLink,
@@ -177,7 +218,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       final Uint8List pngBytes = byteData.buffer.asUint8List();
       final result = await ImageGallerySaverPlus.saveImage(
         pngBytes,
-        name: 'crew_event_${widget.event.id}',
+        name: 'crew_event_${_event.id}',
         quality: 100,
         isReturnImagePathOfIOS: true,
       );
@@ -291,7 +332,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final event = widget.event;
+    final event = _event;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
     final hostName = (organizer?.name.isNotEmpty ?? false)
@@ -349,7 +390,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
           );
         },
         isFollowing: _following,
-        onTapLocation: () => Navigator.pop(context, widget.event),
+        onTapLocation: () => Navigator.pop(context, _event),
         heroTag: 'event-media-${event.id}',
       ),
     );

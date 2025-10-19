@@ -3,7 +3,7 @@ class EventSummaryDto {
   final String ownerId;
   final String title;
   final DateTime? startTime;
-  final List<double> center;    // [lon, lat]
+  final List<double> center; // [lon, lat]
   final int memberCount;
   final int maxParticipants;
   final bool isRegistered;
@@ -22,17 +22,17 @@ class EventSummaryDto {
   });
 
   factory EventSummaryDto.fromJson(Map<String, dynamic> json) => EventSummaryDto(
-        id: json['id'],
-        ownerId: json['ownerId'],
-        title: json['title'],
+        id: json['id'] as String,
+        ownerId: json['ownerId'] as String,
+        title: json['title'] as String,
         startTime: json['startTime'] != null
-            ? DateTime.parse(json['startTime'])
+            ? DateTime.parse(json['startTime'] as String)
             : null,
-        center: (json['center'] as List).map((e) => (e as num).toDouble()).toList(),
-        memberCount: json['memberCount'],
-        maxParticipants: json['maxParticipants'],
-        isRegistered: json['isRegistered'],
-        tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
+        center: _asDoubleList(json['center']),
+        memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+        maxParticipants: (json['maxParticipants'] as num?)?.toInt() ?? 0,
+        isRegistered: json['isRegistered'] as bool? ?? false,
+        tags: _asStringList(json['tags']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -46,4 +46,22 @@ class EventSummaryDto {
         'isRegistered': isRegistered,
         'tags': tags,
       };
+}
+
+List<double> _asDoubleList(dynamic value) {
+  if (value is List) {
+    return value
+        .whereType<num>()
+        .map((item) => item.toDouble())
+        .toList(growable: false);
+  }
+  return const <double>[];
+}
+
+List<String>? _asStringList(dynamic value) {
+  if (value is List) {
+    final result = value.whereType<String>().map((e) => e.trim()).toList();
+    return result.isEmpty ? null : List.unmodifiable(result);
+  }
+  return null;
 }

@@ -19,7 +19,6 @@ import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet
 import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
 
 import '../../../data/event.dart';
-import '../../../../../core/error/api_exception.dart';
 import '../../../../../core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
@@ -692,8 +691,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   Future<void> _createQuickRoadTrip(_QuickRoadTripResult result) async {
-    final destination = result.destination;
-    if (destination == null) {
+    if (result.destination == null) {
       return;
     }
     if (!await _ensureNetworkAvailable()) {
@@ -707,28 +705,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
 
     final loc = AppLocalizations.of(context)!;
-    final title = result.title.trim();
-    final startDisplay = _formatLocationDisplay(result.startAddress, result.start, loc);
-    final destinationDisplay =
-        _formatLocationDisplay(result.destinationAddress, destination, loc);
-
-    try {
-      await ref.read(eventsProvider.notifier).createEvent(
-            title: title.isEmpty ? loc.map_quick_trip_default_title : title,
-            description:
-                loc.map_quick_trip_description(startDisplay, destinationDisplay),
-            pos: result.start,
-            locationName: '$startDisplay → $destinationDisplay',
-          );
-      _showSnackBar(loc.map_quick_trip_created);
-    } on ApiException catch (error) {
-      final message = error.message.isEmpty
-          ? loc.map_quick_trip_create_failed
-          : error.message;
-      _showSnackBar(message);
-    } catch (_) {
-      _showSnackBar(loc.map_quick_trip_create_failed);
-    }
+    _showSnackBar(loc.feature_not_ready);
   }
 
   Future<String?> _reverseGeocode(LatLng latlng) async {

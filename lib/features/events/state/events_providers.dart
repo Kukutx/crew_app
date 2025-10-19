@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,8 +17,7 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
 
   @override
   Future<List<Event>> build() async {
-    final api = ref.read(apiServiceProvider);
-    final events = await api.getEvents();
+    final events = await _loadEvents();
     state = AsyncData(events);
     _startPolling();
     return events;
@@ -29,16 +29,7 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
     required LatLng pos,
     required String locationName,
   }) async {
-    final api = ref.read(apiServiceProvider);
-    final newEv = await api.createEvent(
-      title,
-      locationName,
-      description,
-      pos.latitude,
-      pos.longitude,
-    );
-    await _refreshEvents();
-    return newEv;
+    throw ApiException('Event creation is not supported in this build.');
   }
 
   // 每隔30 秒自动刷新
@@ -54,8 +45,25 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
     });
   }
 
-  Future<void> _refreshEvents() async {
+  Future<List<Event>> _loadEvents() async {
     final api = ref.read(apiServiceProvider);
-    state = await AsyncValue.guard(() => api.getEvents());
+    final summaries = await api.searchEvents();
+    return summaries.map(Event.fromSummary).toList(growable: false);
+  }
+
+  Future<void> _refreshEvents() async {
+    state = await AsyncValue.guard(_loadEvents);
+  }
+
+  Future<Event> loadEventDetail(Event event) async {
+    final api = ref.read(apiServiceProvider);
+    final detail = await api.getEventDetail(event.id);
+    final updated = event.copyWithDetail(detail);
+    state = state.whenData((events) {
+      return events
+          .map((item) => item.id == updated.id ? updated : item)
+          .toList(growable: false);
+    });
+    return updated;
   }
 }

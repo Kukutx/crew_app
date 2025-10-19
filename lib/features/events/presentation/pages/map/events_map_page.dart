@@ -203,7 +203,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onSearch: _onSearchSubmitted,
         onChanged: _onQueryChanged,
         onClear: _onSearchClear,
-        onCreateRoadTripTap: _onCreateRoadTripTap,
+        onQuickActionsTap: _onQuickActionsTap,
         onAvatarTap: _onAvatarTap,
         onResultTap: _onSearchResultTap,
         showResults: searchState.showResults,
@@ -841,7 +841,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _showSnackBar(loc.map_quick_trip_select_start_tip);
   }
 
-  void _onCreateRoadTripTap() {
+  void _onQuickActionsTap() {
     if (_searchFocusNode.hasFocus) {
       _searchFocusNode.unfocus();
     }

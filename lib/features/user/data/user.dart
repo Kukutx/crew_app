@@ -22,15 +22,26 @@ class User {
     this.tags = const [],
   });
 
-  User copyWith({bool? followed, int? followers, List<String>? tags}) => User(
+  User copyWith({
+    String? name,
+    String? bio,
+    String? avatar,
+    String? cover,
+    int? followers,
+    int? following,
+    int? events,
+    bool? followed,
+    List<String>? tags,
+  }) =>
+      User(
         uid: uid,
-        name: name,
-        bio: bio,
-        avatar: avatar,
-        cover: cover,
+        name: name ?? this.name,
+        bio: bio ?? this.bio,
+        avatar: avatar ?? this.avatar,
+        cover: cover ?? this.cover,
         followers: followers ?? this.followers,
-        following: following,
-        events: events,
+        following: following ?? this.following,
+        events: events ?? this.events,
         followed: followed ?? this.followed,
         tags: tags ?? this.tags,
       );

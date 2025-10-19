@@ -1262,6 +1262,114 @@ abstract class AppLocalizations {
   /// **'Profile info'**
   String get preferences_title;
 
+  /// No description provided for @preferences_basic_info_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Basics'**
+  String get preferences_basic_info_title;
+
+  /// No description provided for @preferences_display_name_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get preferences_display_name_label;
+
+  /// No description provided for @preferences_display_name_placeholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Crew name'**
+  String get preferences_display_name_placeholder;
+
+  /// No description provided for @preferences_name_empty_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name can't be empty'**
+  String get preferences_name_empty_error;
+
+  /// No description provided for @preferences_bio_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio'**
+  String get preferences_bio_label;
+
+  /// No description provided for @preferences_bio_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share what the Crew should know about you'**
+  String get preferences_bio_hint;
+
+  /// No description provided for @preferences_bio_placeholder.
+  ///
+  /// In en, this message translates to:
+  /// **"Tell the community what you're into"**
+  String get preferences_bio_placeholder;
+
+  /// No description provided for @preferences_tags_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests & tags'**
+  String get preferences_tags_title;
+
+  /// No description provided for @preferences_tags_empty_helper.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a few tags so others know your vibe'**
+  String get preferences_tags_empty_helper;
+
+  /// No description provided for @preferences_add_tag_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a tag'**
+  String get preferences_add_tag_label;
+
+  /// No description provided for @preferences_tag_input_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Press enter to add'**
+  String get preferences_tag_input_hint;
+
+  /// No description provided for @preferences_tag_duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'That tag is already added'**
+  String get preferences_tag_duplicate;
+
+  /// No description provided for @preferences_tag_limit_reached.
+  ///
+  /// In en, this message translates to:
+  /// **'You can add up to {count} tags'**
+  String preferences_tag_limit_reached(int count);
+
+  /// No description provided for @preferences_recommended_tags_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular on Crew'**
+  String get preferences_recommended_tags_title;
+
+  /// No description provided for @preferences_cover_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Change cover'**
+  String get preferences_cover_action;
+
+  /// No description provided for @preferences_avatar_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Update avatar'**
+  String get preferences_avatar_action;
+
+  /// No description provided for @preferences_feature_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Image editing is coming soon'**
+  String get preferences_feature_unavailable;
+
+  /// No description provided for @preferences_save_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get preferences_save_success;
+
   /// No description provided for @please_enter_city.
   ///
   /// In en, this message translates to:

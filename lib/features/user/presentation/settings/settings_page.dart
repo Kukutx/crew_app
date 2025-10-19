@@ -119,42 +119,6 @@ class SettingsPage extends ConsumerWidget {
             ],
           ),
           _SettingsSection(
-            title: loc.settings_section_support,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: Text(loc.settings_help_feedback),
-                subtitle: Text(loc.settings_help_feedback_subtitle),
-                onTap: () async {
-                  final feedbackService = ref.read(feedbackServiceProvider);
-                  final submitted = await feedbackService.collectFeedback(
-                    context,
-                  );
-                  if (!context.mounted) {
-                    return;
-                  }
-                  if (submitted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(loc.feedback_thanks)),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: Text(loc.settings_app_version),
-                subtitle: Text(loc.settings_app_version_subtitle),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AboutPage()),
-                  );
-                },
-              ),
-            ],
-          ),
-          _SettingsSection(
             title: loc.settings_section_subscription,
             children: [
               ListTile(
@@ -181,33 +145,6 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.credit_card_outlined),
                 title: Text(loc.settings_subscription_payment_methods),
-                onTap: () => _showComingSoon(context, loc),
-              ),
-            ],
-          ),
-          _SettingsSection(
-            title: loc.settings_section_privacy,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.location_on_outlined),
-                title: Text(loc.settings_location_permission),
-                subtitle: Text(currentPermission.label(loc)),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _showLocationPermissionSheet(
-                  context,
-                  ref,
-                  loc,
-                  currentPermission,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.block_outlined),
-                title: Text(loc.settings_manage_blocklist),
-                onTap: () => _showComingSoon(context, loc),
-              ),
-              ListTile(
-                leading: const Icon(Icons.privacy_tip_outlined),
-                title: Text(loc.settings_privacy_documents),
                 onTap: () => _showComingSoon(context, loc),
               ),
             ],
@@ -248,25 +185,69 @@ class SettingsPage extends ConsumerWidget {
               ),
             ],
           ),
-          if (kDebugMode)
-            _SettingsSection(
-              title: loc.settings_section_developer,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.science_outlined),
-                  title: const Text('测试 Crashlytics'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CrashTestPage(),
-                      ),
-                    );
-                  },
+          _SettingsSection(
+            title: loc.settings_section_privacy,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.location_on_outlined),
+                title: Text(loc.settings_location_permission),
+                subtitle: Text(currentPermission.label(loc)),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showLocationPermissionSheet(
+                  context,
+                  ref,
+                  loc,
+                  currentPermission,
                 ),
-              ],
-            ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.block_outlined),
+                title: Text(loc.settings_manage_blocklist),
+                onTap: () => _showComingSoon(context, loc),
+              ),
+              ListTile(
+                leading: const Icon(Icons.privacy_tip_outlined),
+                title: Text(loc.settings_privacy_documents),
+                onTap: () => _showComingSoon(context, loc),
+              ),
+            ],
+          ),
+          _SettingsSection(
+            title: loc.settings_section_support,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.help_outline),
+                title: Text(loc.settings_help_feedback),
+                subtitle: Text(loc.settings_help_feedback_subtitle),
+                onTap: () async {
+                  final feedbackService = ref.read(feedbackServiceProvider);
+                  final submitted = await feedbackService.collectFeedback(
+                    context,
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  if (submitted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(loc.feedback_thanks)),
+                    );
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(loc.settings_app_version),
+                subtitle: Text(loc.settings_app_version_subtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutPage()),
+                  );
+                },
+              ),
+            ],
+          ),
           _SettingsSection(
             title: loc.settings_section_account,
             children: [
@@ -291,12 +272,6 @@ class SettingsPage extends ConsumerWidget {
                 onTap: () => Navigator.pushNamed(context, '/history'),
               ),
               ListTile(
-                leading: const Icon(Icons.verified_user),
-                title: Text(loc.verification_preferences),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/preferences'),
-              ),
-              ListTile(
                 leading: const Icon(Icons.logout),
                 title: Text(loc.action_logout),
                 onTap: () async {
@@ -310,6 +285,25 @@ class SettingsPage extends ConsumerWidget {
               ),
             ],
           ),
+          if (kDebugMode)
+            _SettingsSection(
+              title: loc.settings_section_developer,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.science_outlined),
+                  title: const Text('测试 Crashlytics'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CrashTestPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
         ],
       ),
     );

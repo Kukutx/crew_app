@@ -407,5 +407,38 @@
       "start": {},
       "destination": {}
     }
-  }
+  },
+  "wallet_title": "我的钱包",
+  "wallet_overview_subtitle": "查看余额、积分与账单",
+  "wallet_balance_label": "可用余额",
+  "wallet_last_updated": "{timeAgo}前更新",
+  "@wallet_last_updated": {
+    "placeholders": {
+      "timeAgo": {}
+    }
+  },
+  "wallet_reserved_funds": "预留中",
+  "wallet_reward_points": "积分",
+  "wallet_quick_actions": "快速操作",
+  "wallet_action_top_up": "充值",
+  "wallet_action_withdraw": "提现",
+  "wallet_action_transfer": "转账",
+  "wallet_insights_title": "本月概览",
+  "wallet_insights_description": "随时掌握活动收入与订阅支出的趋势。",
+  "wallet_help_description": "钱包功能正在内测，当前为示例数据，欢迎先体验界面设计。",
+  "wallet_help_close": "知道了",
+  "wallet_insight_income": "活动收入",
+  "wallet_insight_expense": "订阅支出",
+  "wallet_view_statements": "账单与对账",
+  "wallet_view_statements_subtitle": "导出详细结算记录",
+  "wallet_manage_methods": "支付方式管理",
+  "wallet_manage_methods_subtitle": "管理银行卡与收款账户",
+  "wallet_recent_activity": "最近交易",
+  "wallet_activity_empty": "暂无交易记录",
+  "wallet_transaction_payout_title": "活动收入",
+  "wallet_transaction_payout_subtitle": "城市骑行团 · 4月12日",
+  "wallet_transaction_refund_title": "费用退款",
+  "wallet_transaction_refund_subtitle": "海岸露营会 · 行程取消",
+  "wallet_transaction_subscription_title": "Crew Plus 订阅",
+  "wallet_transaction_subscription_subtitle": "自动续费"
 }

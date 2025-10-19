@@ -1033,4 +1033,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_select_location_create_trip => 'Create quick trip';
+
+  @override
+  String get wallet_title => 'Wallet';
+
+  @override
+  String get wallet_overview_subtitle => 'View balance, rewards and statements';
+
+  @override
+  String get wallet_balance_label => 'Available balance';
+
+  @override
+  String wallet_last_updated(Object timeAgo) {
+    return 'Updated $timeAgo ago';
+  }
+
+  @override
+  String get wallet_reserved_funds => 'On hold';
+
+  @override
+  String get wallet_reward_points => 'Reward points';
+
+  @override
+  String get wallet_quick_actions => 'Quick actions';
+
+  @override
+  String get wallet_action_top_up => 'Top up';
+
+  @override
+  String get wallet_action_withdraw => 'Withdraw';
+
+  @override
+  String get wallet_action_transfer => 'Transfer';
+
+  @override
+  String get wallet_insights_title => 'Monthly insights';
+
+  @override
+  String get wallet_insights_description =>
+      'Track how your balance grows across events and subscriptions.';
+
+  @override
+  String get wallet_help_description =>
+      'This wallet preview shows demo data so you can explore the upcoming experience.';
+
+  @override
+  String get wallet_help_close => 'Got it';
+
+  @override
+  String get wallet_insight_income => 'Event income';
+
+  @override
+  String get wallet_insight_expense => 'Subscription costs';
+
+  @override
+  String get wallet_view_statements => 'Statements';
+
+  @override
+  String get wallet_view_statements_subtitle =>
+      'Export detailed settlement history';
+
+  @override
+  String get wallet_manage_methods => 'Payment methods';
+
+  @override
+  String get wallet_manage_methods_subtitle =>
+      'Manage cards and payout accounts';
+
+  @override
+  String get wallet_recent_activity => 'Recent activity';
+
+  @override
+  String get wallet_activity_empty => 'No transactions yet';
+
+  @override
+  String get wallet_transaction_payout_title => 'Event payout';
+
+  @override
+  String get wallet_transaction_payout_subtitle =>
+      'City cycling crew · Apr 12';
+
+  @override
+  String get wallet_transaction_refund_title => 'Expense refund';
+
+  @override
+  String get wallet_transaction_refund_subtitle =>
+      'Coastal camp · Trip cancelled';
+
+  @override
+  String get wallet_transaction_subscription_title =>
+      'Crew Plus subscription';
+
+  @override
+  String get wallet_transaction_subscription_subtitle => 'Auto renewal';
 }

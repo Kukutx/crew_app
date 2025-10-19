@@ -407,5 +407,38 @@
       "start": {},
       "destination": {}
     }
-  }
+  },
+  "wallet_title": "Wallet",
+  "wallet_overview_subtitle": "View balance, rewards and statements",
+  "wallet_balance_label": "Available balance",
+  "wallet_last_updated": "Updated {timeAgo} ago",
+  "@wallet_last_updated": {
+    "placeholders": {
+      "timeAgo": {}
+    }
+  },
+  "wallet_reserved_funds": "On hold",
+  "wallet_reward_points": "Reward points",
+  "wallet_quick_actions": "Quick actions",
+  "wallet_action_top_up": "Top up",
+  "wallet_action_withdraw": "Withdraw",
+  "wallet_action_transfer": "Transfer",
+  "wallet_insights_title": "Monthly insights",
+  "wallet_insights_description": "Track how your balance grows across events and subscriptions.",
+  "wallet_help_description": "This wallet preview shows demo data so you can explore the upcoming experience.",
+  "wallet_help_close": "Got it",
+  "wallet_insight_income": "Event income",
+  "wallet_insight_expense": "Subscription costs",
+  "wallet_view_statements": "Statements",
+  "wallet_view_statements_subtitle": "Export detailed settlement history",
+  "wallet_manage_methods": "Payment methods",
+  "wallet_manage_methods_subtitle": "Manage cards and payout accounts",
+  "wallet_recent_activity": "Recent activity",
+  "wallet_activity_empty": "No transactions yet",
+  "wallet_transaction_payout_title": "Event payout",
+  "wallet_transaction_payout_subtitle": "City cycling crew · Apr 12",
+  "wallet_transaction_refund_title": "Expense refund",
+  "wallet_transaction_refund_subtitle": "Coastal camp · Trip cancelled",
+  "wallet_transaction_subscription_title": "Crew Plus subscription",
+  "wallet_transaction_subscription_subtitle": "Auto renewal"
 }

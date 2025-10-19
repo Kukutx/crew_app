@@ -1030,6 +1030,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Post photos or updates to the community.';
 
   @override
+  String get map_quick_actions_empty_title => 'Nothing to show yet';
+
+  @override
+  String get map_quick_actions_empty_message =>
+      'We\'ll add shortcuts here as soon as they\'re ready.';
+
+  @override
   String get map_quick_trip_select_start_tip =>
       'Long press on the map to pick a starting point.';
 

@@ -400,6 +400,8 @@
   "map_quick_actions_full_trip_desc": "Open the complete form to plan a detailed journey.",
   "map_quick_actions_create_moment": "Share a moment",
   "map_quick_actions_create_moment_desc": "Post photos or updates to the community.",
+  "map_quick_actions_empty_title": "Nothing to show yet",
+  "map_quick_actions_empty_message": "We'll add shortcuts here as soon as they're ready.",
   "map_quick_trip_select_start_tip": "Long press on the map to pick a starting point.",
   "map_selection_sheet_tap_to_expand": "Tap to expand",
   "map_select_location_destination_tip": "Tap the map to choose a destination.",

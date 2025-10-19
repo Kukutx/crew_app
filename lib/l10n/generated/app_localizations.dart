@@ -1982,6 +1982,18 @@ abstract class AppLocalizations {
   /// **'Post photos or updates to the community.'**
   String get map_quick_actions_create_moment_desc;
 
+  /// No description provided for @map_quick_actions_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to show yet'**
+  String get map_quick_actions_empty_title;
+
+  /// No description provided for @map_quick_actions_empty_message.
+  ///
+  /// In en, this message translates to:
+  /// **'We'll add shortcuts here as soon as they're ready.'**
+  String get map_quick_actions_empty_message;
+
   /// No description provided for @map_quick_trip_select_start_tip.
   ///
   /// In en, this message translates to:

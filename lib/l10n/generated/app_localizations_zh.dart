@@ -993,6 +993,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_create_moment_desc => '向社区发布照片或动态。';
 
   @override
+  String get map_quick_actions_empty_title => '暂无快捷操作';
+
+  @override
+  String get map_quick_actions_empty_message => '有新的快捷工具时会在这里显示。';
+
+  @override
   String get map_quick_trip_select_start_tip => '在地图上长按选择起点。';
 
   @override

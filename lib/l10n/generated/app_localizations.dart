@@ -1991,7 +1991,7 @@ abstract class AppLocalizations {
   /// No description provided for @map_quick_actions_empty_message.
   ///
   /// In en, this message translates to:
-  /// **'We'll add shortcuts here as soon as they're ready.'**
+  /// **'We\'ll add shortcuts here as soon as they\'re ready.'**
   String get map_quick_actions_empty_message;
 
   /// No description provided for @map_quick_trip_select_start_tip.

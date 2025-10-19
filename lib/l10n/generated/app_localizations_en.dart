@@ -1141,8 +1141,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wallet_transaction_payout_title => 'Event payout';
 
   @override
-  String get wallet_transaction_payout_subtitle =>
-      'City cycling crew · Apr 12';
+  String get wallet_transaction_payout_subtitle => 'City cycling crew · Apr 12';
 
   @override
   String get wallet_transaction_refund_title => 'Expense refund';
@@ -1152,8 +1151,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Coastal camp · Trip cancelled';
 
   @override
-  String get wallet_transaction_subscription_title =>
-      'Crew Plus subscription';
+  String get wallet_transaction_subscription_title => 'Crew Plus subscription';
 
   @override
   String get wallet_transaction_subscription_subtitle => 'Auto renewal';

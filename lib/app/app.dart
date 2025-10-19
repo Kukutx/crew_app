@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
-import 'package:crew_app/features/events/presentation/pages/map/quick_actions_page.dart';
+import 'package:crew_app/features/events/presentation/pages/quick/quick_actions_page.dart';
 import 'state/app_overlay_provider.dart';
 import 'state/bottom_navigation_visibility_provider.dart';
 

@@ -149,11 +149,6 @@ class SettingsPage extends ConsumerWidget {
                 title: Text(loc.settings_subscription_cancel),
                 onTap: () => _showComingSoon(context, loc),
               ),
-              ListTile(
-                leading: const Icon(Icons.credit_card_outlined),
-                title: Text(loc.settings_subscription_payment_methods),
-                onTap: () => _showComingSoon(context, loc),
-              ),
             ],
           ),
           _SettingsSection(

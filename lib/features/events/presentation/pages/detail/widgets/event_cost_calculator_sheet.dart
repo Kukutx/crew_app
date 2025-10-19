@@ -28,8 +28,7 @@ class _EventCostCalculatorSheetState extends State<EventCostCalculatorSheet> {
   void initState() {
     super.initState();
     final participants = widget.event.currentParticipants ??
-        widget.event.maxParticipants ??
-        4;
+        widget.event.maxParticipants;
     final price = widget.event.price;
     _participantsCtrl = TextEditingController(
       text: participants > 0 ? participants.toString() : '4',

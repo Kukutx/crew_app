@@ -723,20 +723,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
-  String _formatLocationDisplay(
-    String? address,
-    LatLng coords,
-    AppLocalizations loc,
-  ) {
-    final trimmed = address?.trim();
-    if (trimmed != null && trimmed.isNotEmpty) {
-      return trimmed;
-    }
-    return loc.location_coordinates(
-      coords.latitude.toStringAsFixed(6),
-      coords.longitude.toStringAsFixed(6),
-    );
-  }
+  // String _formatLocationDisplay(
+  //   String? address,
+  //   LatLng coords,
+  //   AppLocalizations loc,
+  // ) {
+  //   final trimmed = address?.trim();
+  //   if (trimmed != null && trimmed.isNotEmpty) {
+  //     return trimmed;
+  //   }
+  //   return loc.location_coordinates(
+  //     coords.latitude.toStringAsFixed(6),
+  //     coords.longitude.toStringAsFixed(6),
+  //   );
+  // }
 
   String? _formatPlacemark(Placemark place) {
     final parts = [

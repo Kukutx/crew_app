@@ -41,7 +41,7 @@ class EventSummaryCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              event.description,
+              event.description!,
               style: const TextStyle(fontSize: 14, height: 1.5),
             ),
           ],

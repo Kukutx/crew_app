@@ -219,7 +219,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
           onTap: () => onResultTap(event),
           title: Text(event.title),
           subtitle: Text(
-            event.description,
+            event.description!,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

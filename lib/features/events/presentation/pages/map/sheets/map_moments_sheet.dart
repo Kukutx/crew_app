@@ -14,15 +14,15 @@ import '../../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
-class MapEventsExploreSheet extends ConsumerStatefulWidget {
-  const MapEventsExploreSheet({super.key});
+class MapMomentsSheet extends ConsumerStatefulWidget {
+  const MapMomentsSheet({super.key});
 
   @override
-  ConsumerState<MapEventsExploreSheet> createState() =>
+  ConsumerState<MapMomentsSheet> createState() =>
       _MapEventsExploreSheetState();
 }
 
-class _MapEventsExploreSheetState extends ConsumerState<MapEventsExploreSheet> {
+class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
   int _tab = 0;
   String? _selectedCountry;
 

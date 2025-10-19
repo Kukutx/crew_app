@@ -16,6 +16,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
 
 import '../../../data/event.dart';
@@ -55,6 +56,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _searchController = TextEditingController();
   late final FocusNode _searchFocusNode;
   ProviderSubscription<Event?>? _mapFocusSubscription;
+  ProviderSubscription<MapQuickAction?>? _quickActionSubscription;
 
   @override
   void initState() {
@@ -73,6 +75,26 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _focusOnEvent(event);
       ref.read(mapFocusEventProvider.notifier).state = null;
     });
+    _quickActionSubscription = ref.listenManual(
+      mapQuickActionProvider,
+      (previous, next) {
+        final action = next;
+        if (action == null) {
+          return;
+        }
+        switch (action) {
+          case MapQuickAction.startQuickTrip:
+            unawaited(_startQuickTripFromQuickActions());
+            break;
+          case MapQuickAction.showMomentSheet:
+            if (mounted) {
+              unawaited(showCreateMomentSheet(context));
+            }
+            break;
+        }
+        ref.read(mapQuickActionProvider.notifier).state = null;
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -87,6 +109,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     _mapFocusSubscription?.close();
+    _quickActionSubscription?.close();
     _eventCardController.dispose();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
@@ -796,6 +819,26 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _startQuickTripFromQuickActions() async {
+    if (!mounted) {
+      return;
+    }
+    _hideEventCard();
+    await _clearSelectedLocation();
+    final selectionController =
+        ref.read(mapSelectionControllerProvider.notifier);
+    final userLocation = ref.read(userLocationProvider).value;
+    if (userLocation != null) {
+      selectionController.setSelectedLatLng(userLocation);
+      selectionController.setDestinationLatLng(null);
+      await _moveCamera(userLocation, zoom: 15);
+      await _showLocationSelectionSheet();
+      return;
+    }
+    final loc = AppLocalizations.of(context)!;
+    _showSnackBar(loc.map_quick_trip_select_start_tip);
   }
 
   void _onCreateRoadTripTap() {

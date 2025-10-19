@@ -1,10 +1,10 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class GroupExpensePage extends StatelessWidget {
-  static const routeName = '/group-expense';
+class ExpensePage extends StatelessWidget {
+  static const routeName = '/expense';
 
-  const GroupExpensePage({super.key});
+  const ExpensePage({super.key});
 
   @override
   Widget build(BuildContext context) {

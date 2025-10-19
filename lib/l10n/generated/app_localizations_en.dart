@@ -196,7 +196,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get event_group_expense_hint =>
-      "Add participants, log costs on the go, and we'll help you settle balances fairly.";
+      'Add participants, log costs on the go, and we\'ll help you settle balances fairly.';
 
   @override
   String get event_waypoints_title => 'Waypoints';

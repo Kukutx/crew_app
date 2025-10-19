@@ -455,7 +455,7 @@ abstract class AppLocalizations {
   /// No description provided for @event_group_expense_hint.
   ///
   /// In en, this message translates to:
-  /// **"Add participants, log costs on the go, and we'll help you settle balances fairly."**
+  /// **'Add participants, log costs on the go, and we\'ll help you settle balances fairly.'**
   String get event_group_expense_hint;
 
   /// No description provided for @event_waypoints_title.

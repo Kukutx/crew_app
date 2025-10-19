@@ -178,6 +178,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Adjust any number to match the actual expenses for this trip.';
 
   @override
+  String get event_expense_section_title => 'Expense calculation';
+
+  @override
+  String get event_expense_section_description =>
+      'Keep track of shared costs with your crew and settle up easily after the trip.';
+
+  @override
+  String get event_expense_calculate_button => 'Calculate';
+
+  @override
+  String get event_group_expense_title => 'Group ledger';
+
+  @override
+  String get event_group_expense_intro =>
+      'Create and track shared expenses for everyone on this trip.';
+
+  @override
+  String get event_group_expense_hint =>
+      "Add participants, log costs on the go, and we'll help you settle balances fairly.";
+
+  @override
   String get event_waypoints_title => 'Waypoints';
 
   @override

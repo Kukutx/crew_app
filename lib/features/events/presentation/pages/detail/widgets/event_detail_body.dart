@@ -1,14 +1,15 @@
-import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_cost_calculator_sheet.dart';
-import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'dart:math' as math;
 
+import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_expense_action_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
+import 'package:crew_app/features/events/presentation/pages/group_expense/group_expense_page.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -177,15 +178,8 @@ class _EventDetailBodyState extends State<EventDetailBody>
     widget.onPageChanged(index);
   }
 
-  void _showCostCalculator() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => EventCostCalculatorSheet(
-        event: widget.event,
-        loc: widget.loc,
-      ),
-    );
+  void _openGroupExpensePage() {
+    Navigator.of(context).pushNamed(GroupExpensePage.routeName);
   }
 
   double get _currentHeaderHeight =>
@@ -321,11 +315,15 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   child: EventSummaryCard(event: widget.event, loc: widget.loc),
                 ),
                 const SizedBox(height: 10),
+                EventExpenseActionCard(
+                  loc: widget.loc,
+                  onPressed: _openGroupExpensePage,
+                ),
+                const SizedBox(height: 10),
                 EventInfoCard(
                   event: widget.event,
                   loc: widget.loc,
                   onTapLocation: widget.onTapLocation,
-                  onTapCostCalculator: _showCostCalculator,
                 ),
                 const SizedBox(height: 10),
                 EventPlazaCard(loc: widget.loc),

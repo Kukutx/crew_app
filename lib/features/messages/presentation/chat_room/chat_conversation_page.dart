@@ -296,6 +296,10 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   }
 
   void _openUserProfile(ChatParticipant participant) {
+    if (participant.isCurrentUser) {
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => UserProfilePage(uid: participant.id),

@@ -24,8 +24,10 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
             participant.displayName.characters.take(2).toString())
         .toUpperCase();
 
+    final canTap = onTap != null && !participant.isCurrentUser;
+
     return InkWell(
-      onTap: onTap == null ? null : () => onTap!(participant),
+      onTap: canTap ? () => onTap!(participant) : null,
       borderRadius: BorderRadius.circular(32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

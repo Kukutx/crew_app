@@ -639,6 +639,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferences_name_empty_error => '显示名称不能为空';
 
   @override
+  String get preferences_country_label => '国家 / 地区';
+
+  @override
+  String get preferences_country_hint => '在头像旁展示国旗';
+
+  @override
+  String get preferences_country_unset => '未设置';
+
+  @override
+  String get country_name_china => '中国';
+
+  @override
+  String get country_name_united_states => '美国';
+
+  @override
+  String get country_name_japan => '日本';
+
+  @override
+  String get country_name_korea => '韩国';
+
+  @override
+  String get country_name_united_kingdom => '英国';
+
+  @override
+  String get country_name_australia => '澳大利亚';
+
+  @override
   String get preferences_bio_label => '个人简介';
 
   @override

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
   late final TextEditingController _bioController;
   late final TextEditingController _tagInputController;
   late List<String> _tags;
+  String? _countryCode;
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
     _bioController = TextEditingController(text: profile.bio);
     _tagInputController = TextEditingController();
     _tags = [...profile.tags];
+    _countryCode = profile.countryCode;
   }
 
   @override
@@ -70,6 +73,7 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
       name: name,
       bio: bio.isEmpty ? notifier.state.bio : bio,
       tags: _tags,
+      countryCode: _countryCode,
     );
 
     _showSnack(loc.preferences_save_success);
@@ -148,6 +152,7 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
                 ? loc.preferences_bio_placeholder
                 : _bioController.text.trim(),
             tags: _tags,
+            countryCode: _countryCode ?? profile.countryCode,
             onEditCover: _showComingSoon,
             onEditAvatar: _showComingSoon,
           ),
@@ -165,6 +170,33 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
               labelText: loc.preferences_display_name_label,
               hintText: loc.preferences_display_name_placeholder,
             ),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String?>(
+            value: _countryCode,
+            decoration: InputDecoration(
+              labelText: loc.preferences_country_label,
+              helperText: loc.preferences_country_hint,
+            ),
+            items: [
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Text(loc.preferences_country_unset),
+              ),
+              for (final option in _buildCountryOptions(loc))
+                DropdownMenuItem<String?>(
+                  value: option.key,
+                  child: _CountryMenuLabel(
+                    flag: countryCodeToEmoji(option.key) ?? '',
+                    name: option.value,
+                  ),
+                ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _countryCode = value;
+              });
+            },
           ),
           const SizedBox(height: 12),
           TextField(
@@ -240,6 +272,35 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
   }
 }
 
+List<MapEntry<String, String>> _buildCountryOptions(AppLocalizations loc) => [
+      MapEntry('CN', loc.country_name_china),
+      MapEntry('US', loc.country_name_united_states),
+      MapEntry('JP', loc.country_name_japan),
+      MapEntry('KR', loc.country_name_korea),
+      MapEntry('GB', loc.country_name_united_kingdom),
+      MapEntry('AU', loc.country_name_australia),
+    ];
+
+class _CountryMenuLabel extends StatelessWidget {
+  const _CountryMenuLabel({required this.flag, required this.name});
+
+  final String flag;
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        if (flag.isNotEmpty) ...[
+          Text(flag, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 8),
+        ],
+        Text(name),
+      ],
+    );
+  }
+}
+
 class _ProfilePreview extends StatelessWidget {
   const _ProfilePreview({
     required this.coverUrl,
@@ -247,6 +308,7 @@ class _ProfilePreview extends StatelessWidget {
     required this.displayName,
     required this.bio,
     required this.tags,
+    required this.countryCode,
     required this.onEditCover,
     required this.onEditAvatar,
   });
@@ -256,6 +318,7 @@ class _ProfilePreview extends StatelessWidget {
   final String displayName;
   final String bio;
   final List<String> tags;
+  final String? countryCode;
   final VoidCallback onEditCover;
   final VoidCallback onEditAvatar;
 
@@ -263,6 +326,7 @@ class _ProfilePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final flagEmoji = countryCodeToEmoji(countryCode);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -315,6 +379,34 @@ class _ProfilePreview extends StatelessWidget {
                         radius: 40,
                         backgroundImage: CachedNetworkImageProvider(avatarUrl),
                       ),
+                      if (flagEmoji != null)
+                        Positioned(
+                          bottom: -6,
+                          left: -6,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              child: Text(
+                                flagEmoji,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        ),
                       Positioned(
                         bottom: -4,
                         right: -4,

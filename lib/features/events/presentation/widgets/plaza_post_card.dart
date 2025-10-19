@@ -219,6 +219,7 @@ class PlazaPostCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }

@@ -1,16 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/theme/app_colors.dart';
+import 'package:crew_app/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
 class EventHostCard extends StatelessWidget {
-  final AppLocalizations loc;
-  final String name;
-  final String? bio;
-  final String? avatarUrl;
-  final VoidCallback onTapProfile;
-  final VoidCallback onToggleFollow;
-  final bool isFollowing;
-
   const EventHostCard({
     super.key,
     required this.loc,
@@ -22,88 +16,135 @@ class EventHostCard extends StatelessWidget {
     required this.isFollowing,
   });
 
+  final AppLocalizations loc;
+  final String name;
+  final String? bio;
+  final String? avatarUrl;
+  final VoidCallback onTapProfile;
+  final VoidCallback onToggleFollow;
+  final bool isFollowing;
+
   @override
   Widget build(BuildContext context) {
     final description = (bio != null && bio!.isNotEmpty)
         ? bio!
         : loc.share_card_subtitle;
-    final avatar = avatarUrl;
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 2,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(24),
         onTap: onTapProfile,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(20),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 28,
-                backgroundImage: (avatar != null && avatar.isNotEmpty)
-                    ? CachedNetworkImageProvider(avatar)
+                radius: 32,
+                backgroundColor: AppColors.primary.withOpacity(0.12),
+                backgroundImage: (avatarUrl != null && avatarUrl!.isNotEmpty)
+                    ? CachedNetworkImageProvider(avatarUrl!)
                     : null,
-                backgroundColor: Colors.orange.shade50,
-                child: (avatar == null || avatar.isEmpty)
-                    ? Icon(Icons.person, color: Colors.orange.shade400)
+                child: (avatarUrl == null || avatarUrl!.isEmpty)
+                    ? Text(
+                        name.isNotEmpty ? name.characters.first.toUpperCase() : '?',
+                        style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                      )
                     : null,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 18),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTextStyles.title,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
+                      style: AppTextStyles.bodyMuted,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        _MetaChip(icon: Icons.timeline, label: loc.tag_city_explore),
+                        _MetaChip(icon: Icons.emoji_people, label: loc.tag_easy_social),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              SizedBox(
-                height: 36,
-                child: isFollowing
-                    ? OutlinedButton.icon(
-                        onPressed: onToggleFollow,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.orange,
-                          side: BorderSide(color: Colors.orange.shade300),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        icon: const Icon(Icons.check, size: 18),
-                        label: Text(loc.action_following),
-                      )
-                    : ElevatedButton.icon(
-                        onPressed: onToggleFollow,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        icon: const Icon(Icons.person_add_alt_1, size: 18),
-                        label: Text(loc.action_follow),
-                      ),
+              const SizedBox(width: 12),
+              _FollowButton(
+                isFollowing: isFollowing,
+                onToggleFollow: onToggleFollow,
+                loc: loc,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: AppColors.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppTextStyles.chip.copyWith(color: AppColors.primary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FollowButton extends StatelessWidget {
+  const _FollowButton({
+    required this.isFollowing,
+    required this.onToggleFollow,
+    required this.loc,
+  });
+
+  final bool isFollowing;
+  final VoidCallback onToggleFollow;
+  final AppLocalizations loc;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onToggleFollow,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      ),
+      icon: Icon(isFollowing ? Icons.check : Icons.person_add_alt_1_rounded),
+      label: Text(isFollowing ? loc.action_following : loc.action_follow),
     );
   }
 }

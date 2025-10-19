@@ -40,7 +40,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
   late final TabController _tabController;
   late int _currentTabIndex;
-  final List<Tab> _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
+  final List<Tab> _tabs = const [Tab(text: 'Activities'), Tab(text: 'Highlights')];
 
   @override
   void initState() {
@@ -343,10 +343,27 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         preferredSize: const Size.fromHeight(_tabBarHeight),
         child: Material(
           color: theme.scaffoldBackgroundColor,
-          child: TabBar(
-            controller: _tabController,
-            tabs: _tabs,
-            indicatorSize: TabBarIndicatorSize.tab,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                tabs: _tabs,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelStyle: theme.textTheme.labelLarge,
+                unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
+                indicator: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ),
           ),
         ),
       ),

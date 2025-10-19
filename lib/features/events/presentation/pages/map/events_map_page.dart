@@ -103,7 +103,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final theme = Theme.of(context);
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
     final cardVisible = _isEventCardVisible && _carouselEvents.isNotEmpty;
-    final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
+    final bottomPadding = (cardVisible ? 220 : 120) + safeBottom;
     final searchState = ref.watch(eventsMapSearchControllerProvider);
     final loc = AppLocalizations.of(context)!;
     // 跟随定位（只在无选中事件时）
@@ -236,29 +236,25 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: FloatingActionButton(
-              heroTag: 'events_map_add_fab',
-              backgroundColor: theme.colorScheme.secondary,
-              foregroundColor: theme.colorScheme.onSecondary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              onPressed: () => showCreateMomentSheet(context),
-              child: const Icon(Icons.add),
-            ),
+          FloatingActionButton.extended(
+            heroTag: 'events_map_add_fab',
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: Colors.white,
+            onPressed: () => showCreateMomentSheet(context),
+            icon: const Icon(Icons.add),
+            label: Text(loc.create_event_title),
           ),
+          const SizedBox(height: 12),
           AppFloatingActionButton(
             heroTag: 'events_map_my_location_fab',
-            margin: EdgeInsets.only(top: 12, bottom: bottomPadding, right: 6),
+            margin: EdgeInsets.only(top: 0, bottom: bottomPadding, right: 6),
             onPressed: () async {
               final loc = ref.read(userLocationProvider).value;
               if (loc != null) {
                 await _moveCamera(loc, zoom: 14);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Unable to get location")),
+                  const SnackBar(content: Text('Unable to get location')),
                 );
               }
             },

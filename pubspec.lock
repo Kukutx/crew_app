@@ -571,6 +571,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+  google_fonts:
+    dependency: "direct main"
+    description:
+      name: google_fonts
+      sha256: "b9b6d7e5291a0c826b77c79fbeb59ea59c78e50e88895a76ec2cc75b8d9f658c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.1"
   flutter_staggered_grid_view:
     dependency: "direct main"
     description:

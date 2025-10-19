@@ -8,6 +8,7 @@ import 'package:crew_app/features/user/presentation/settings/settings_page.dart'
 import 'package:crew_app/features/user/presentation/settings/state/settings_providers.dart';
 import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,8 +24,8 @@ class CrewApp extends ConsumerWidget {
       locale: settings.locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.light(),
       themeMode: settings.themeMode,
       navigatorObservers: [routeObserver],
       routes: appRoutes,

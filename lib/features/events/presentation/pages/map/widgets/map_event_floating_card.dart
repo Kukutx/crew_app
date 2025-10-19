@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/theme/app_colors.dart';
+import 'package:crew_app/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,180 +33,239 @@ class MapEventFloatingCard extends StatelessWidget {
         ? DateFormat('MM.dd HH:mm').format(startTime.toLocal())
         : loc.to_be_announced;
 
-    return Material(
-      elevation: 12,
-      borderRadius: BorderRadius.circular(20),
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       clipBehavior: Clip.antiAlias,
-      color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 150,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: SizedBox(
-                      width: 96,
-                      height: 96,
-                      child: imageUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              fit: BoxFit.cover,
-                              placeholder: (_, _) => const Center(
+                  Hero(
+                    tag: 'event-media-${event.id}',
+                    child: imageUrl != null && imageUrl.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => const DecoratedBox(
+                              decoration: BoxDecoration(color: Color(0xFFDFE6F4)),
+                              child: Center(
                                 child: SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                               ),
-                              errorWidget: (_, _, _) => const ColoredBox(
-                                color: Colors.black12,
-                                child: Center(child: Icon(Icons.error)),
-                              ),
-                            )
-                          : const ColoredBox(
-                              color: Colors.black12,
-                              child: Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  color: Colors.black45,
-                                ),
-                              ),
                             ),
-                    ),
+                            errorWidget: (_, __, ___) => const DecoratedBox(
+                              decoration: BoxDecoration(color: Color(0xFFD6DDEB)),
+                              child: Center(child: Icon(Icons.landscape_outlined)),
+                            ),
+                          )
+                        : const DecoratedBox(
+                            decoration: BoxDecoration(color: Color(0xFFD6DDEB)),
+                            child: Center(child: Icon(Icons.landscape_outlined)),
+                          ),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: _Pill(text: timeLabel),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                event.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: onFavorite,
-                              visualDensity: VisualDensity.compact,
-                              icon: Icon(
-                                event.isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: onClose,
-                              visualDensity: VisualDensity.compact,
-                              icon: const Icon(Icons.close),
-                            ),
-                          ],
+                        _CircularIconButton(
+                          icon: event.isFavorite
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          onTap: onFavorite,
+                          selected: event.isFavorite,
                         ),
-                        Text(
-                          timeLabel,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.place, size: 16, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                event.location,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: Colors.black54),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            _smallChip(context, loc.registration_open),
-                            const SizedBox(width: 6),
-                            const Icon(Icons.groups, size: 16, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                participantSummary,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: Colors.black54),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                minimumSize: const Size(0, 0),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: onRegister,
-                              child: Text(
-                                loc.action_register_now,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.copyWith(color: Colors.white),
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 8),
+                        _CircularIconButton(
+                          icon: Icons.close,
+                          onTap: onClose,
                         ),
                       ],
                     ),
                   ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.0),
+                            Colors.black.withOpacity(0.35),
+                          ],
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          event.title,
+                          style: AppTextStyles.headline.copyWith(
+                            color: Colors.white,
+                            fontSize: 22,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.place_outlined,
+                        size: 18,
+                        color: AppColors.mutedText,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          event.location,
+                          style: AppTextStyles.bodyMuted,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      _Chip(icon: Icons.groups_rounded, label: participantSummary),
+                      if (event.distanceLabel != null &&
+                          event.distanceLabel!.trim().isNotEmpty)
+                        _Chip(
+                          icon: Icons.navigation_outlined,
+                          label: event.distanceLabel!,
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: FilledButton.icon(
+                onPressed: onRegister,
+                icon: const Icon(Icons.auto_awesome),
+                label: Text(loc.action_register_now),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _smallChip(BuildContext context, String text) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+class _Pill extends StatelessWidget {
+  const _Pill({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        color: Colors.white.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Text(
-        text,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.secondary,
-          fontWeight: FontWeight.w600,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Text(
+          text,
+          style: AppTextStyles.chip.copyWith(color: AppColors.onSurface),
+        ),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: AppColors.primary),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: AppTextStyles.chip.copyWith(color: AppColors.primary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CircularIconButton extends StatelessWidget {
+  const _CircularIconButton({
+    required this.icon,
+    required this.onTap,
+    this.selected = false,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected
+          ? AppColors.primary.withOpacity(0.92)
+          : Colors.white.withOpacity(0.9),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            icon,
+            color: selected ? Colors.white : AppColors.onSurface,
+            size: 20,
+          ),
         ),
       ),
     );

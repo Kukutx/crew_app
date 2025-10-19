@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_share_sheet.dart';
@@ -303,14 +302,10 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
         ? organizer!.avatarUrl!
         : _fallbackHost.avatar;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7E9),
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
-      appBar: EventDetailAppBar(
-        onBack: () => Navigator.pop(context),
-        onShare: () => _showShareSheet(context),
-        onMore: () => _showMoreActions(loc),
-      ),
       bottomNavigationBar: EventDetailBottomBar(
         loc: loc,
         isFavorite: event.isFavorite,
@@ -351,6 +346,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         isFollowing: _following,
         onTapLocation: () => Navigator.pop(context, widget.event),
         heroTag: 'event-media-${event.id}',
+        onBack: () => Navigator.pop(context),
+        onShare: () => _showShareSheet(context),
+        onMore: () => _showMoreActions(loc),
       ),
     );
   }
@@ -367,13 +365,13 @@ class _PlazaPostFab extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       onPressed: onPressed,
       tooltip: label,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
-      shape: const CircleBorder(),
-      child: const Icon(Icons.add),
+      icon: const Icon(Icons.add),
+      label: Text(label),
     );
   }
 }

@@ -29,6 +29,7 @@ import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'sheets/map_place_details_sheet.dart';
+import 'sheets/map_quick_actions_sheet.dart';
 import '../detail/events_detail_page.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
@@ -803,7 +804,44 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _searchFocusNode.unfocus();
     }
     ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-    ref.read(appOverlayIndexProvider.notifier).state = 0;
+    unawaited(_showQuickActions());
+  }
+
+  Future<void> _showQuickActions() async {
+    if (!mounted) {
+      return;
+    }
+    final action = await showMapQuickActionsSheet(context);
+    if (!mounted || action == null) {
+      return;
+    }
+    switch (action) {
+      case MapQuickAction.quickTrip:
+        await _startQuickTripFromCurrentLocation();
+        break;
+      case MapQuickAction.fullTrip:
+        ref.read(appOverlayIndexProvider.notifier).state = 0;
+        break;
+      case MapQuickAction.moment:
+        await showCreateMomentSheet(context);
+        break;
+    }
+  }
+
+  Future<void> _startQuickTripFromCurrentLocation() async {
+    final current = ref.read(userLocationProvider).value;
+    final loc = AppLocalizations.of(context)!;
+    if (current == null) {
+      _showSnackBar(loc.map_quick_actions_location_missing);
+      return;
+    }
+    await _clearSelectedLocation();
+    if (!mounted) {
+      return;
+    }
+    ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(current);
+    await _moveCamera(current, zoom: 14);
+    await _beginDestinationSelection();
   }
 
   void _onAvatarTap(bool authed) {

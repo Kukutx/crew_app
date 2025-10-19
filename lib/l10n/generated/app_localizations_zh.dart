@@ -969,6 +969,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_trip_create_failed => '创建行程失败。';
 
   @override
+  String get map_quick_actions_title => '快捷操作';
+
+  @override
+  String get map_quick_actions_subtitle => '选择一种方式快速开始规划。';
+
+  @override
+  String get map_quick_actions_quick_trip => '快速行程';
+
+  @override
+  String get map_quick_actions_quick_trip_desc => '使用当前位置作为起点，选择目的地即可发布。';
+
+  @override
+  String get map_quick_actions_full_trip => '完整行程';
+
+  @override
+  String get map_quick_actions_full_trip_desc => '进入完整表单，补充更详细的信息。';
+
+  @override
+  String get map_quick_actions_moment => '发布瞬间';
+
+  @override
+  String get map_quick_actions_moment_desc => '分享此刻的见闻与想法。';
+
+  @override
+  String get map_quick_actions_location_missing => '暂时无法获取当前位置，请稍后重试。';
+
+  @override
   String get map_selection_sheet_tap_to_expand => '点击展开';
 
   @override

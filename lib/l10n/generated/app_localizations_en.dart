@@ -1003,6 +1003,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_trip_create_failed => 'We couldn\'t create this trip.';
 
   @override
+  String get map_quick_actions_title => 'Quick actions';
+
+  @override
+  String get map_quick_actions_subtitle =>
+      'Pick how you\'d like to start planning.';
+
+  @override
+  String get map_quick_actions_quick_trip => 'Quick trip';
+
+  @override
+  String get map_quick_actions_quick_trip_desc =>
+      'Use your current location as the starting point and choose a destination.';
+
+  @override
+  String get map_quick_actions_full_trip => 'Detailed trip';
+
+  @override
+  String get map_quick_actions_full_trip_desc =>
+      'Open the full form to add every detail.';
+
+  @override
+  String get map_quick_actions_moment => 'Share a moment';
+
+  @override
+  String get map_quick_actions_moment_desc =>
+      'Post photos or text about what\'s happening now.';
+
+  @override
+  String get map_quick_actions_location_missing =>
+      'We couldn\'t get your location. Try again later.';
+
+  @override
   String get map_selection_sheet_tap_to_expand => 'Tap to expand';
 
   @override

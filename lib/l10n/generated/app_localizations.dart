@@ -1934,6 +1934,60 @@ abstract class AppLocalizations {
   /// **'We couldn\'t create this trip.'**
   String get map_quick_trip_create_failed;
 
+  /// No description provided for @map_quick_actions_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get map_quick_actions_title;
+
+  /// No description provided for @map_quick_actions_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick how you'd like to start planning.'**
+  String get map_quick_actions_subtitle;
+
+  /// No description provided for @map_quick_actions_quick_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick trip'**
+  String get map_quick_actions_quick_trip;
+
+  /// No description provided for @map_quick_actions_quick_trip_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your current location as the starting point and choose a destination.'**
+  String get map_quick_actions_quick_trip_desc;
+
+  /// No description provided for @map_quick_actions_full_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed trip'**
+  String get map_quick_actions_full_trip;
+
+  /// No description provided for @map_quick_actions_full_trip_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the full form to add every detail.'**
+  String get map_quick_actions_full_trip_desc;
+
+  /// No description provided for @map_quick_actions_moment.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a moment'**
+  String get map_quick_actions_moment;
+
+  /// No description provided for @map_quick_actions_moment_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Post photos or text about what's happening now.'**
+  String get map_quick_actions_moment_desc;
+
+  /// No description provided for @map_quick_actions_location_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn't get your location. Try again later.'**
+  String get map_quick_actions_location_missing;
+
   /// No description provided for @map_selection_sheet_tap_to_expand.
   ///
   /// In en, this message translates to:

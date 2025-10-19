@@ -2,8 +2,6 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class ExpensePage extends StatelessWidget {
-  static const routeName = '/expense';
-
   const ExpensePage({super.key});
 
   @override

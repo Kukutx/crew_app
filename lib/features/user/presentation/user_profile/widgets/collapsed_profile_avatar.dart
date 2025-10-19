@@ -24,9 +24,42 @@ class CollapsedProfileAvatar extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: CircleAvatar(
-          radius: 20,
-          backgroundImage: CachedNetworkImageProvider(user.avatar),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: CachedNetworkImageProvider(user.avatar),
+            ),
+            if (user.countryFlag != null)
+              Positioned(
+                bottom: -6,
+                right: -6,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    child: Text(
+                      user.countryFlag!,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

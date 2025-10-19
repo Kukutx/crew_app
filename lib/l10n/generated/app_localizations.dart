@@ -1286,6 +1286,60 @@ abstract class AppLocalizations {
   /// **'Display name can't be empty'**
   String get preferences_name_empty_error;
 
+  /// No description provided for @preferences_country_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Country / region'**
+  String get preferences_country_label;
+
+  /// No description provided for @preferences_country_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a flag next to your avatar'**
+  String get preferences_country_hint;
+
+  /// No description provided for @preferences_country_unset.
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
+  String get preferences_country_unset;
+
+  /// No description provided for @country_name_china.
+  ///
+  /// In en, this message translates to:
+  /// **'China'**
+  String get country_name_china;
+
+  /// No description provided for @country_name_united_states.
+  ///
+  /// In en, this message translates to:
+  /// **'United States'**
+  String get country_name_united_states;
+
+  /// No description provided for @country_name_japan.
+  ///
+  /// In en, this message translates to:
+  /// **'Japan'**
+  String get country_name_japan;
+
+  /// No description provided for @country_name_korea.
+  ///
+  /// In en, this message translates to:
+  /// **'South Korea'**
+  String get country_name_korea;
+
+  /// No description provided for @country_name_united_kingdom.
+  ///
+  /// In en, this message translates to:
+  /// **'United Kingdom'**
+  String get country_name_united_kingdom;
+
+  /// No description provided for @country_name_australia.
+  ///
+  /// In en, this message translates to:
+  /// **'Australia'**
+  String get country_name_australia;
+
   /// No description provided for @preferences_bio_label.
   ///
   /// In en, this message translates to:

@@ -9,6 +9,10 @@ class User {
   final int events;
   final bool followed;
   final List<String> tags;
+  final String? countryCode;
+
+  String? get countryFlag => countryCodeToEmoji(countryCode);
+
   User({
     required this.uid,
     required this.name,
@@ -20,6 +24,7 @@ class User {
     required this.events,
     required this.followed,
     this.tags = const [],
+    this.countryCode,
   });
 
   User copyWith({
@@ -32,6 +37,7 @@ class User {
     int? events,
     bool? followed,
     List<String>? tags,
+    String? countryCode,
   }) =>
       User(
         uid: uid,
@@ -44,6 +50,18 @@ class User {
         events: events ?? this.events,
         followed: followed ?? this.followed,
         tags: tags ?? this.tags,
+        countryCode: countryCode ?? this.countryCode,
       );
 }
 
+String? countryCodeToEmoji(String? countryCode) {
+  if (countryCode == null || countryCode.length != 2) {
+    return null;
+  }
+
+  final upper = countryCode.toUpperCase();
+  final codeUnits = upper.codeUnits
+      .map((unit) => 0x1F1E6 + unit - 'A'.codeUnitAt(0))
+      .toList();
+  return String.fromCharCodes(codeUnits);
+}

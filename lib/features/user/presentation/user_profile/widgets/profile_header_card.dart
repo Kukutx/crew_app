@@ -130,14 +130,47 @@ class ProfileHeaderCard extends StatelessWidget {
                   ),
                 );
 
-                final avatar = ClipRRect(
-                  borderRadius: BorderRadius.circular(48),
-                  child: CachedNetworkImage(
-                    imageUrl: userProfile.avatar,
-                    width: 64,
-                    height: 64,
-                    fit: BoxFit.cover,
-                  ),
+                final avatar = Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(48),
+                      child: CachedNetworkImage(
+                        imageUrl: userProfile.avatar,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    if (userProfile.countryFlag != null)
+                      Positioned(
+                        bottom: -6,
+                        right: -6,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: Text(
+                              userProfile.countryFlag!,
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 );
 
                 if (isCompact) {

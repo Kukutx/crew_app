@@ -660,6 +660,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_name_empty_error => "Display name can't be empty";
 
   @override
+  String get preferences_country_label => 'Country / region';
+
+  @override
+  String get preferences_country_hint => 'Show a flag next to your avatar';
+
+  @override
+  String get preferences_country_unset => 'Not specified';
+
+  @override
+  String get country_name_china => 'China';
+
+  @override
+  String get country_name_united_states => 'United States';
+
+  @override
+  String get country_name_japan => 'Japan';
+
+  @override
+  String get country_name_korea => 'South Korea';
+
+  @override
+  String get country_name_united_kingdom => 'United Kingdom';
+
+  @override
+  String get country_name_australia => 'Australia';
+
+  @override
   String get preferences_bio_label => 'Bio';
 
   @override

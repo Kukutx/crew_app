@@ -92,6 +92,8 @@
   "event_copy_address_success": "地址已复制",
   "event_participants_title": "参与人数",
   "event_time_title": "活动时间",
+  "event_fee_title": "报名费用",
+  "event_fee_free": "免费",
   "event_cost_calculator_title": "费用计算器",
   "event_cost_calculator_description": "估算报名费用、拼车成本和佣金分成。",
   "event_cost_calculator_button": "开始计算",

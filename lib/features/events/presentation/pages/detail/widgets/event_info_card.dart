@@ -23,6 +23,7 @@ class EventInfoCard extends StatelessWidget {
     final routeType = event.isRoundTrip;
     final distanceKm = event.distanceKm;
     final localeTag = Localizations.localeOf(context).toString();
+    final feeText = _formatFee(localeTag);
     final addressText =
         event.address?.isNotEmpty == true ? event.address! : event.location;
     final distanceText = distanceKm != null
@@ -49,6 +50,7 @@ class EventInfoCard extends StatelessWidget {
             const Divider(height: 20),
             const SizedBox(height: 12),
             _detailRow(Icons.calendar_today, loc.event_time_title, timeText),
+            _detailRow(Icons.payments, loc.event_fee_title, feeText),
             _detailRow(Icons.people, loc.event_participants_title, participantText),
             InkWell(
               onTap: onTapLocation,
@@ -181,6 +183,21 @@ class EventInfoCard extends StatelessWidget {
     }
     final endFmt = DateFormat('HH:mm').format(end.toLocal());
     return '$startFmt - $endFmt';
+  }
+
+  String _formatFee(String localeTag) {
+    if (event.isFree) {
+      return loc.event_fee_free;
+    }
+    final price = event.price;
+    if (price == null) {
+      return loc.to_be_announced;
+    }
+    final formatter = NumberFormat.simpleCurrency(locale: localeTag);
+    if (price <= 0) {
+      return loc.event_fee_free;
+    }
+    return formatter.format(price);
   }
 
   String _formatDistance(double kilometers, String localeTag) {

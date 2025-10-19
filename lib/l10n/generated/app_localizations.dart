@@ -344,6 +344,18 @@ abstract class AppLocalizations {
   /// **'Event time'**
   String get event_time_title;
 
+  /// No description provided for @event_fee_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration fee'**
+  String get event_fee_title;
+
+  /// No description provided for @event_fee_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get event_fee_free;
+
   /// No description provided for @event_cost_calculator_title.
   ///
   /// In en, this message translates to:

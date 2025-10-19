@@ -11,12 +11,14 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.onFollowToggle,
     required this.onMessagePressed,
     required this.onGuestbookPressed,
+    this.showUserActions = true,
   });
 
   final User userProfile;
   final VoidCallback onFollowToggle;
   final VoidCallback onMessagePressed;
   final VoidCallback onGuestbookPressed;
+  final bool showUserActions;
 
   @override
   Widget build(BuildContext context) {
@@ -87,19 +89,21 @@ class ProfileHeaderCard extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          _MessageButton(onPressed: onMessagePressed),
-                          _FollowButton(
-                            followed: userProfile.followed,
-                            onPressed: onFollowToggle,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
+                      if (showUserActions) ...[
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            _MessageButton(onPressed: onMessagePressed),
+                            _FollowButton(
+                              followed: userProfile.followed,
+                              onPressed: onFollowToggle,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                      ],
                       TextButton(
                         onPressed: onGuestbookPressed,
                         style: TextButton.styleFrom(

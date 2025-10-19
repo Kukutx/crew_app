@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -213,6 +214,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final isLoggedIn = currentUser != null;
     final theme = Theme.of(context);
     final topPadding = MediaQuery.paddingOf(context).top;
 
@@ -221,7 +224,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         onRefresh: _onRefresh,
         child: NestedScrollView(
           headerSliverBuilder: (_, _) => [
-            _buildSliverAppBar(context, profile, topPadding, theme),
+            _buildSliverAppBar(
+              context,
+              profile,
+              topPadding,
+              theme,
+              isLoggedIn,
+            ),
           ],
           body: ProfileTabView(controller: _tabController),
         ),
@@ -234,6 +243,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     User profile,
     double topPadding,
     ThemeData theme,
+    bool isLoggedIn,
   ) {
     return SliverAppBar(
       pinned: true,
@@ -251,10 +261,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           icon: const Icon(Icons.more_vert),
           onPressed: () => _showMoreActions(context, profile),
         ),
-        IconButton(
-          icon: const Icon(Icons.settings),
-          onPressed: () => Navigator.of(context).pushNamed('/settings'),
-        ),
+        if (!isLoggedIn)
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+          ),
       ],
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
@@ -298,6 +309,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                         onMessagePressed: () =>
                             _startPrivateMessage(context, profile),
                         onGuestbookPressed: _openGuestbookPage,
+                        showUserActions: !isLoggedIn,
                       ),
                     ),
                   ),

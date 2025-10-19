@@ -18,8 +18,9 @@ import 'package:crew_app/features/user/presentation/user_profile/widgets/profile
 import 'package:crew_app/shared/widgets/report_sheet.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
-  const UserProfilePage({super.key, this.onClose});
+  const UserProfilePage({super.key, this.uid, this.onClose});
 
+  final String? uid;
   final VoidCallback? onClose;
 
   @override
@@ -215,7 +216,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
     final currentUser = ref.watch(currentUserProvider);
-    final isLoggedIn = currentUser != null;
+    final isViewingSelf =
+        widget.uid != null && widget.uid == currentUser?.uid;
     final theme = Theme.of(context);
     final topPadding = MediaQuery.paddingOf(context).top;
 
@@ -229,7 +231,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               profile,
               topPadding,
               theme,
-              isLoggedIn,
+              isViewingSelf,
             ),
           ],
           body: ProfileTabView(controller: _tabController),
@@ -243,7 +245,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     User profile,
     double topPadding,
     ThemeData theme,
-    bool isLoggedIn,
+    bool isViewingSelf,
   ) {
     return SliverAppBar(
       pinned: true,
@@ -261,7 +263,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           icon: const Icon(Icons.more_vert),
           onPressed: () => _showMoreActions(context, profile),
         ),
-        if (!isLoggedIn)
+        if (isViewingSelf)
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.of(context).pushNamed('/settings'),
@@ -309,7 +311,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                         onMessagePressed: () =>
                             _startPrivateMessage(context, profile),
                         onGuestbookPressed: _openGuestbookPage,
-                        showUserActions: !isLoggedIn,
+                        showUserActions: !isViewingSelf,
                       ),
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/plaza_post_detail_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
+import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -135,6 +136,9 @@ class EventPlazaCard extends StatelessWidget {
             margin: EdgeInsets.fromLTRB(16, i == 0 ? 0 : 12, 16, 0),
             onTap: () => _openPostDetail(context, _posts[i]),
             onCommentTap: () => showPlazaPostCommentsSheet(context, _posts[i]),
+            onAuthorTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const UserProfilePage()),
+            ),
           ),
       ],
     );

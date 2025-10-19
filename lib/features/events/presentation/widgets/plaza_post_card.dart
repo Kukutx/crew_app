@@ -57,6 +57,7 @@ class PlazaPostCard extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final VoidCallback? onTap;
   final VoidCallback? onCommentTap;
+  final VoidCallback? onAuthorTap;
 
   const PlazaPostCard({
     super.key,
@@ -64,6 +65,7 @@ class PlazaPostCard extends StatelessWidget {
     this.margin,
     this.onTap,
     this.onCommentTap,
+    this.onAuthorTap,
   });
 
   @override
@@ -87,41 +89,46 @@ class PlazaPostCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: post.accentColor.withValues(alpha: 0.15),
-                    child: Text(
-                      post.authorInitials,
-                      style: TextStyle(
-                        color: post.accentColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        post.author,
-                        style: theme.textTheme.titleMedium?.copyWith(
+                  InkWell(
+                    onTap: onAuthorTap,
+                    customBorder: const CircleBorder(),
+                    child: CircleAvatar(
+                      backgroundColor:
+                          post.accentColor.withValues(alpha: 0.15),
+                      child: Text(
+                        post.authorInitials,
+                        style: TextStyle(
+                          color: post.accentColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        post.timeLabel,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                Icon(
-                  Icons.more_horiz,
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.author,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          post.timeLabel,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.more_horiz,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
               ],
             ),
             const SizedBox(height: 12),

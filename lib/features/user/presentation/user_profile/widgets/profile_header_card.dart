@@ -146,27 +146,17 @@ class ProfileHeaderCard extends StatelessWidget {
                       Positioned(
                         bottom: -6,
                         right: -6,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 4,
+                        child: Text(
+                          userProfile.countryFlag!,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 6,
+                                color: Colors.black45,
                                 offset: Offset(0, 2),
                               ),
                             ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: Text(
-                              userProfile.countryFlag!,
-                              style: const TextStyle(fontSize: 18),
-                            ),
                           ),
                         ),
                       ),

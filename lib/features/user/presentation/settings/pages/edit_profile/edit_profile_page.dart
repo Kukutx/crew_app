@@ -381,28 +381,20 @@ class _ProfilePreview extends StatelessWidget {
                       ),
                       if (flagEmoji != null)
                         Positioned(
-                          bottom: -6,
-                          left: -6,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              child: Text(
-                                flagEmoji,
-                                style: const TextStyle(fontSize: 18),
+                          bottom: -4,
+                          left: -4,
+                          child: Padding(
+                            padding: const EdgeInsets.all(2),
+                            child: Text(
+                              flagEmoji,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black45,
+                                    blurRadius: 6,
+                                  ),
+                                ],
                               ),
                             ),
                           ),

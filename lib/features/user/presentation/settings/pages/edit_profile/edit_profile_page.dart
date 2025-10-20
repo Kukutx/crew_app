@@ -5,14 +5,14 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PreferencesPage extends ConsumerStatefulWidget {
-  const PreferencesPage({super.key});
+class EditProfilePage extends ConsumerStatefulWidget {
+  const EditProfilePage({super.key});
 
   @override
-  ConsumerState<PreferencesPage> createState() => _PreferencesPageState();
+  ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _PreferencesPageState extends ConsumerState<PreferencesPage> {
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   static const _maxBioLength = 120;
   static const _maxTagCount = 6;
   static const List<String> _suggestedTags = [
@@ -173,7 +173,7 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String?>(
-            value: _countryCode,
+            initialValue : _countryCode,
             decoration: InputDecoration(
               labelText: loc.preferences_country_label,
               helperText: loc.preferences_country_hint,

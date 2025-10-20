@@ -3,6 +3,7 @@ import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/user/presentation/settings/state/settings_providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/about/about_page.dart';
+import 'package:crew_app/features/user/presentation/settings/pages/blocklist/blocklist_page.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/developer_test/crash_test_page.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
@@ -206,7 +207,15 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.block_outlined),
                 title: Text(loc.settings_manage_blocklist),
-                onTap: () => _showComingSoon(context, loc),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BlocklistPage(),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.privacy_tip_outlined),

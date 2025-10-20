@@ -853,6 +853,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_privacy_documents => '隐私政策 / 用户协议';
 
   @override
+  String get privacy_documents_page_title => '隐私政策与用户协议';
+
+  @override
+  String get privacy_documents_intro => '我们珍视你的信任，本页概述我们如何处理你的数据以及保障 Crew 社区安全的使用规则。';
+
+  @override
+  String get privacy_documents_privacy_title => '隐私政策';
+
+  @override
+  String get privacy_documents_privacy_body =>
+      '你在创建或管理账户时提供的姓名、联系方式与资料内容，以及为实现发现、安全和个性化功能所需的使用数据、设备信号和位置信息，都会被我们谨慎处理。\n\n我们仅将这些信息用于提供服务、发送重要通知并持续优化 Crew 体验。我们不会出售你的个人信息，访问权限仅限履行保密义务的团队成员与受托合作伙伴。\n\n你可以随时在“设置 > 账号”中查看、更新或申请删除个人数据，也可以直接与我们联系。';
+
+  @override
+  String get privacy_documents_user_agreement_title => '用户协议';
+
+  @override
+  String get privacy_documents_user_agreement_body =>
+      '使用 Crew 即表示你同意：1）提供真实信息并妥善保护账户安全；2）遵守社区准则与相关法律，尊重其他成员；3）合理使用活动工具，禁止垃圾信息、骚扰或未经授权的商业行为；4）理解若违反政策，我们有权暂停或终止访问。\n\n部分功能依赖设备权限（例如定位）。你可以在设备中管理权限，但禁用后某些功能可能受限。';
+
+  @override
+  String get privacy_documents_contact_title => '联系我们';
+
+  @override
+  String get privacy_documents_contact_body =>
+      '如需了解隐私或协议详情，可发送邮件至 support@crewapp.com，我们会尽快回复。';
+
+  @override
   String get settings_account_info => '账号信息';
 
   @override

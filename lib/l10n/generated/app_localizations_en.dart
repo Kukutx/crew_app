@@ -880,6 +880,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_privacy_documents => 'Privacy policy & user agreement';
 
   @override
+  String get privacy_documents_page_title => 'Privacy policy & user agreement';
+
+  @override
+  String get privacy_documents_intro =>
+      'We value your trust. This page summarizes how we handle your data and the rules that keep Crew safe for everyone.';
+
+  @override
+  String get privacy_documents_privacy_title => 'Privacy policy';
+
+  @override
+  String get privacy_documents_privacy_body =>
+      'We collect information you share when creating and managing your account, including your name, contact details, and profile content. We also process usage data, device signals, and location information to power discovery, safety, and personalization features.\n\nWe use this data to deliver the service, communicate important updates, and improve the Crew experience. We never sell your personal information. Access is restricted to authorized team members and vetted partners who follow strict confidentiality obligations.\n\nYou may review, update, or request deletion of your personal data at any time from Settings > Account or by contacting us directly.';
+
+  @override
+  String get privacy_documents_user_agreement_title => 'User agreement';
+
+  @override
+  String get privacy_documents_user_agreement_body =>
+      'By using Crew you agree to: (1) provide accurate information and keep your account secure, (2) respect other members by following our community guidelines and applicable laws, (3) use event tools responsibly without spam, harassment, or unauthorized commercial activity, and (4) acknowledge that we may suspend or terminate access when policies are violated.\n\nSome features rely on device permissions (such as location). You can manage these settings on your device, but certain functionality may be limited when permissions are disabled.';
+
+  @override
+  String get privacy_documents_contact_title => 'Contact us';
+
+  @override
+  String get privacy_documents_contact_body =>
+      'Questions about privacy or the agreement? Reach our support team at support@crewapp.com and we will respond as quickly as possible.';
+
+  @override
   String get settings_account_info => 'Account details';
 
   @override

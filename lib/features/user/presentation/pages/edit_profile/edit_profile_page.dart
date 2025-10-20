@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
@@ -7,6 +5,7 @@ import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
@@ -18,14 +17,6 @@ class EditProfilePage extends ConsumerStatefulWidget {
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   static const _maxBioLength = 120;
   static const _maxTagCount = 6;
-  static const List<String> _presetAvatars = [
-    'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2',
-    'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6',
-    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518',
-    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde',
-    'https://images.unsplash.com/photo-1520854221050-0f4caff449fb',
-  ];
   static const List<String> _suggestedTags = [
     '露营玩家',
     '摄影控',
@@ -44,7 +35,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   String? _countryCode;
   late Gender _gender;
   late String _selectedAvatar;
-  bool _isAvatarUpdating = false;
 
   @override
   void initState() {
@@ -144,34 +134,41 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   Future<void> _handleEditAvatar() async {
     final loc = AppLocalizations.of(context)!;
-    final selected = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (context) => _AvatarPickerSheet(
-        currentAvatar: _selectedAvatar,
-        options: _presetAvatars,
-      ),
-    );
-
-    if (!mounted || selected == null || selected == _selectedAvatar) {
-      return;
-    }
-
-    setState(() {
-      _isAvatarUpdating = true;
-    });
-
-    await Future.delayed(const Duration(milliseconds: 450));
-
     if (!mounted) return;
 
-    setState(() {
-      _selectedAvatar = selected;
-      _isAvatarUpdating = false;
-    });
-
-    _showSnack(loc.preferences_avatar_update_success);
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black.withValues(alpha: .75),
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return _AvatarPreviewOverlay(
+          imageUrl: _selectedAvatar,
+          changeLabel: loc.preferences_avatar_action,
+          onCancel: () => Navigator.of(dialogContext).maybePop(),
+          onChange: () async {
+            final picker = ImagePicker();
+            await picker.pickImage(source: ImageSource.gallery);
+            if (!mounted) return;
+            if (dialogContext.mounted) {
+              Navigator.of(dialogContext).maybePop();
+            }
+          },
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation =
+            CurvedAnimation(parent: animation, curve: Curves.easeOut);
+        return FadeTransition(
+          opacity: curvedAnimation,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1).animate(curvedAnimation),
+            child: child,
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -206,7 +203,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             gender: _gender,
             onEditCover: _showComingSoon,
             onEditAvatar: _handleEditAvatar,
-            isAvatarUpdating: _isAvatarUpdating,
           ),
           const SizedBox(height: 24),
           Text(
@@ -393,7 +389,6 @@ class _ProfilePreview extends StatelessWidget {
     required this.gender,
     required this.onEditCover,
     required this.onEditAvatar,
-    this.isAvatarUpdating = false,
   });
 
   final String coverUrl;
@@ -405,7 +400,6 @@ class _ProfilePreview extends StatelessWidget {
   final Gender gender;
   final VoidCallback onEditCover;
   final VoidCallback onEditAvatar;
-  final bool isAvatarUpdating;
 
   @override
   Widget build(BuildContext context) {
@@ -474,25 +468,6 @@ class _ProfilePreview extends StatelessWidget {
                                 backgroundImage:
                                     CachedNetworkImageProvider(avatarUrl),
                               ),
-                              if (isAvatarUpdating)
-                                Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.4),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Center(
-                                    child: SizedBox(
-                                      width: 28,
-                                      height: 28,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.4,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
                             ],
                           ),
                         ),
@@ -609,132 +584,75 @@ class _ProfilePreview extends StatelessWidget {
   }
 }
 
-class _AvatarPickerSheet extends StatefulWidget {
-  const _AvatarPickerSheet({
-    required this.currentAvatar,
-    required this.options,
+class _AvatarPreviewOverlay extends StatelessWidget {
+  const _AvatarPreviewOverlay({
+    required this.imageUrl,
+    required this.changeLabel,
+    required this.onCancel,
+    required this.onChange,
   });
 
-  final String currentAvatar;
-  final List<String> options;
-
-  @override
-  State<_AvatarPickerSheet> createState() => _AvatarPickerSheetState();
-}
-
-class _AvatarPickerSheetState extends State<_AvatarPickerSheet> {
-  late String _selected;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.currentAvatar;
-  }
-
-  void _handleSelect(String value) {
-    setState(() {
-      _selected = value;
-    });
-  }
-
-  void _handleRandomPick() {
-    final random = Random();
-    final next = widget.options[random.nextInt(widget.options.length)];
-    _handleSelect(next);
-  }
+  final String imageUrl;
+  final String changeLabel;
+  final VoidCallback onCancel;
+  final Future<void> Function() onChange;
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
-    final bottomPadding = mediaQuery.viewInsets.bottom + mediaQuery.padding.bottom;
 
     return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 16,
-          bottom: bottomPadding > 0 ? bottomPadding : 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: Stack(
           children: [
-            Text(
-              loc.preferences_avatar_picker_title,
-              style: theme.textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              loc.preferences_avatar_picker_subtitle,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: min(320, mediaQuery.size.height * 0.45),
-              child: GridView.builder(
-                itemCount: widget.options.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final avatar = widget.options[index];
-                  final isSelected = avatar == _selected;
-                  return GestureDetector(
-                    onTap: () => _handleSelect(avatar),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : Colors.transparent,
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          if (isSelected)
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                              blurRadius: 18,
-                              spreadRadius: 1,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: ClipOval(
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: imageUrl.isEmpty
+                        ? Container(
+                            color: Colors.black26,
+                            child: const Icon(
+                              Icons.person,
+                              size: 120,
+                              color: Colors.white,
                             ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: avatar,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                OutlinedButton.icon(
-                  onPressed: _handleRandomPick,
-                  icon: const Icon(Icons.auto_awesome_outlined),
-                  label: Text(loc.preferences_avatar_picker_random),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => Navigator.of(context).pop(_selected),
-                    child: Text(loc.preferences_avatar_picker_apply),
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
-              ],
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: onCancel,
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                child: FilledButton(
+                  onPressed: () async {
+                    await onChange();
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                  ),
+                  child: Text(changeLabel),
+                ),
+              ),
             ),
           ],
         ),

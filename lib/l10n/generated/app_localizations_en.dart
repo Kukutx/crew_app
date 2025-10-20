@@ -740,22 +740,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_avatar_action => 'Update avatar';
 
   @override
-  String get preferences_avatar_picker_title => 'Choose an avatar';
-
-  @override
-  String get preferences_avatar_picker_subtitle =>
-      'Preview a new look from our preset gallery.';
-
-  @override
-  String get preferences_avatar_picker_random => 'Surprise me';
-
-  @override
-  String get preferences_avatar_picker_apply => 'Use this avatar';
-
-  @override
-  String get preferences_avatar_update_success => 'Avatar updated!';
-
-  @override
   String get preferences_feature_unavailable => 'Image editing is coming soon';
 
   @override

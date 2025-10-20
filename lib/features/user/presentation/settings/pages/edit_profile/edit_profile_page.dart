@@ -31,6 +31,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late final TextEditingController _tagInputController;
   late List<String> _tags;
   String? _countryCode;
+  late Gender _gender;
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _tagInputController = TextEditingController();
     _tags = [...profile.tags];
     _countryCode = profile.countryCode;
+    _gender = profile.gender;
   }
 
   @override
@@ -74,6 +76,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       bio: bio.isEmpty ? notifier.state.bio : bio,
       tags: _tags,
       countryCode: _countryCode,
+      gender: _gender,
     );
 
     _showSnack(loc.preferences_save_success);
@@ -153,6 +156,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 : _bioController.text.trim(),
             tags: _tags,
             countryCode: _countryCode ?? profile.countryCode,
+            gender: _gender,
             onEditCover: _showComingSoon,
             onEditAvatar: _showComingSoon,
           ),
@@ -172,8 +176,30 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             ),
           ),
           const SizedBox(height: 12),
+          Text(
+            loc.preferences_gender_label,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final gender in Gender.values)
+                ChoiceChip(
+                  label: Text('${gender.emoji} ${_genderLabel(loc, gender)}'),
+                  selected: _gender == gender,
+                  onSelected: (_) {
+                    setState(() {
+                      _gender = gender;
+                    });
+                  },
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
           DropdownButtonFormField<String?>(
-            initialValue : _countryCode,
+            initialValue: _countryCode,
             decoration: InputDecoration(
               labelText: loc.preferences_country_label,
               helperText: loc.preferences_country_hint,
@@ -309,6 +335,7 @@ class _ProfilePreview extends StatelessWidget {
     required this.bio,
     required this.tags,
     required this.countryCode,
+    required this.gender,
     required this.onEditCover,
     required this.onEditAvatar,
   });
@@ -319,6 +346,7 @@ class _ProfilePreview extends StatelessWidget {
   final String bio;
   final List<String> tags;
   final String? countryCode;
+  final Gender gender;
   final VoidCallback onEditCover;
   final VoidCallback onEditAvatar;
 
@@ -427,12 +455,25 @@ class _ProfilePreview extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          displayName,
-                          style: textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                displayName,
+                                style: textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            if (gender.shouldDisplay) ...[
+                              const SizedBox(width: 8),
+                              Text(
+                                gender.emoji,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 6),
                         Text(
@@ -478,5 +519,16 @@ class _ProfilePreview extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _genderLabel(AppLocalizations loc, Gender gender) {
+  switch (gender) {
+    case Gender.female:
+      return loc.preferences_gender_female;
+    case Gender.male:
+      return loc.preferences_gender_male;
+    case Gender.undisclosed:
+      return loc.preferences_gender_other;
   }
 }

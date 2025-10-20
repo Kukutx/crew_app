@@ -45,12 +45,26 @@ class ProfileHeaderCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          userProfile.name,
-                          style: t.titleMedium!.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                userProfile.name,
+                                style: t.titleMedium!.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            if (userProfile.gender.shouldDisplay) ...[
+                              const SizedBox(width: 8),
+                              Text(
+                                userProfile.gender.emoji,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ],
+                          ],
                         ),
                         if (userProfile.tags.isNotEmpty) ...[
                           const SizedBox(height: 6),

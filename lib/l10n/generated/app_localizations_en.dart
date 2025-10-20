@@ -660,6 +660,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_name_empty_error => 'Display name can\'t be empty';
 
   @override
+  String get preferences_gender_label => 'Gender';
+
+  @override
+  String get preferences_gender_female => 'Female';
+
+  @override
+  String get preferences_gender_male => 'Male';
+
+  @override
+  String get preferences_gender_other => 'Prefer not to say';
+
+  @override
   String get preferences_country_label => 'Country / region';
 
   @override

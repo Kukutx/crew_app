@@ -35,27 +35,17 @@ class CollapsedProfileAvatar extends StatelessWidget {
               Positioned(
                 bottom: -6,
                 right: -6,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
+                child: Text(
+                  user.countryFlag!,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 6,
+                        color: Colors.black38,
                         offset: Offset(0, 2),
                       ),
                     ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    child: Text(
-                      user.countryFlag!,
-                      style: const TextStyle(fontSize: 14),
-                    ),
                   ),
                 ),
               ),

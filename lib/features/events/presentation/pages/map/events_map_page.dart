@@ -51,6 +51,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   List<Event> _carouselEvents = const <Event>[];
   bool _isHandlingLongPress = false;
   BuildContext? _selectionSheetContext;
+  bool _showStartSelectionPrompt = false;
+  bool _showDestinationTip = false;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -141,6 +143,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final userLoc = ref.watch(userLocationProvider).value;
     final startCenter = userLoc ?? const LatLng(48.8566, 2.3522);
     final selectionState = ref.watch(mapSelectionControllerProvider);
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
 
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
@@ -162,13 +165,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         Marker(
           markerId: const MarkerId('selected_location'),
           position: selected,
-          draggable: true,
+          draggable: false,
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueAzure,
           ),
-          onTap: () => unawaited(_showLocationSelectionSheet()),
-          onDrag: _onSelectedLocationDrag,
-          onDragEnd: _onSelectedLocationDragEnd,
+          onTap: () => _setStartPromptVisible(true),
         ),
       );
     }
@@ -183,7 +184,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueGreen,
           ),
-          onTap: () => unawaited(_showLocationSelectionSheet()),
+          onTap: () => unawaited(_showDestinationSelectionSheet()),
         ),
       );
     }
@@ -241,6 +242,40 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               mapPadding: selectionState.mapPadding,
             ),
           ),
+          if (_showStartSelectionPrompt &&
+              selectionState.selectedLatLng != null &&
+              !selectionState.isSelectingDestination)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 0,
+              child: SafeArea(
+                minimum: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: _StartSelectionOverlay(
+                  positionListenable: selectionController.selectedLatLngListenable,
+                  reverseGeocode: _reverseGeocode,
+                  fetchNearbyPlaces: selectionController.getNearbyPlaces,
+                  onConfirm: () => unawaited(_beginDestinationSelection()),
+                  onCancel: () => unawaited(_clearSelectedLocation()),
+                ),
+              ),
+            ),
+          if (_showDestinationTip &&
+              selectionState.isSelectingDestination &&
+              selectionState.destinationLatLng == null)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 0,
+              child: SafeArea(
+                minimum: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: _DestinationSelectionTip(
+                  message: loc.map_select_location_destination_tip,
+                  onCancel: () =>
+                      unawaited(_clearSelectedLocation(dismissSheet: false)),
+                ),
+              ),
+            ),
           EventsMapEventCarousel(
             events: _carouselEvents,
             visible: _isEventCardVisible && _carouselEvents.isNotEmpty,
@@ -368,6 +403,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
   }
 
+  void _setStartPromptVisible(bool value) {
+    if (!mounted || _showStartSelectionPrompt == value) {
+      return;
+    }
+    setState(() {
+      _showStartSelectionPrompt = value;
+    });
+  }
+
+  void _setDestinationTipVisible(bool value) {
+    if (!mounted || _showDestinationTip == value) {
+      return;
+    }
+    setState(() {
+      _showDestinationTip = value;
+    });
+  }
+
   Future<void> _onMapLongPress(LatLng latlng) async {
     if (!mounted) {
       return;
@@ -386,7 +439,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       await _clearSelectedLocation();
       ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(latlng);
       await _moveCamera(latlng, zoom: 17);
-      await _showLocationSelectionSheet();
+      _setDestinationTipVisible(false);
+      _setStartPromptVisible(true);
+      HapticFeedback.lightImpact();
     } finally {
       _isHandlingLongPress = false;
     }
@@ -400,18 +455,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     selectionController.setDestinationLatLng(position);
+    _setDestinationTipVisible(false);
     await _moveCamera(position, zoom: 12);
     HapticFeedback.lightImpact();
     await _showDestinationSelectionSheet();
-  }
-
-  void _onSelectedLocationDrag(LatLng position) {
-    ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(position);
-  }
-
-  void _onSelectedLocationDragEnd(LatLng position) {
-    _onSelectedLocationDrag(position);
-    HapticFeedback.lightImpact();
   }
 
   Future<void> _waitForSelectionSheetToClose() async {
@@ -435,6 +482,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
 
     selectionController.resetSelection();
+    _setStartPromptVisible(false);
+    _setDestinationTipVisible(false);
   }
 
   Future<T?> _presentSelectionSheet<T>({
@@ -503,40 +552,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return result;
   }
 
-  Future<void> _showLocationSelectionSheet() async {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final selectionState = ref.read(mapSelectionControllerProvider);
-    if (!mounted ||
-        selectionState.selectedLatLng == null ||
-        selectionState.isSelectionSheetOpen) {
-      return;
-    }
-
-    final bottomInset = MediaQuery.of(context).viewPadding.bottom;
-    final paddingValue = 320.0 + bottomInset;
-
-    final proceed = await _presentSelectionSheet<bool>(
-      expandedPadding: paddingValue,
-      builder: (sheetContext, collapsedNotifier) {
-        return _StartLocationSheet(
-          positionListenable: selectionController.selectedLatLngListenable,
-          onConfirm: () => Navigator.of(sheetContext).pop(true),
-          onCancel: () => Navigator.of(sheetContext).pop(false),
-          reverseGeocode: _reverseGeocode,
-          fetchNearbyPlaces: selectionController.getNearbyPlaces,
-          collapsedListenable: collapsedNotifier,
-          onExpand: () => collapsedNotifier.value = false,
-        );
-      },
-    );
-
-    if (proceed != null && proceed) {
-      await _beginDestinationSelection();
-    } else {
-      await _clearSelectedLocation(dismissSheet: false);
-    }
-  }
-
   Future<void> _beginDestinationSelection() async {
     if (!mounted) {
       return;
@@ -551,9 +566,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     selectionController.setSelectingDestination(true);
     selectionController.setDestinationLatLng(null);
-    await _moveCamera(start, zoom: 6);
-    final loc = AppLocalizations.of(context)!;
-    _showSnackBar(loc.map_select_location_destination_tip);
+    _setStartPromptVisible(false);
+    _setDestinationTipVisible(true);
+    await _moveCamera(start, zoom: 16);
   }
 
   Future<void> _showDestinationSelectionSheet() async {
@@ -833,8 +848,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (userLocation != null) {
       selectionController.setSelectedLatLng(userLocation);
       selectionController.setDestinationLatLng(null);
-      await _moveCamera(userLocation, zoom: 15);
-      await _showLocationSelectionSheet();
+      await _moveCamera(userLocation, zoom: 17);
+      _setDestinationTipVisible(false);
+      _setStartPromptVisible(true);
+      HapticFeedback.lightImpact();
       return;
     }
     final loc = AppLocalizations.of(context)!;
@@ -1067,6 +1084,206 @@ class _CollapsibleSheetRouteContent<T> extends StatelessWidget {
         );
       },
       child: sheet,
+    );
+  }
+}
+
+class _StartSelectionOverlay extends StatelessWidget {
+  const _StartSelectionOverlay({
+    required this.positionListenable,
+    required this.onConfirm,
+    required this.onCancel,
+    required this.reverseGeocode,
+    required this.fetchNearbyPlaces,
+  });
+
+  final ValueListenable<LatLng?> positionListenable;
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+  final Future<String?> Function(LatLng) reverseGeocode;
+  final Future<List<NearbyPlace>> Function(LatLng) fetchNearbyPlaces;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final tipStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurface.withValues(alpha: .7),
+    );
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Material(
+          elevation: 12,
+          borderRadius: BorderRadius.circular(24),
+          color: theme.colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: ValueListenableBuilder<LatLng?>(
+              valueListenable: positionListenable,
+              builder: (context, position, _) {
+                if (position == null) {
+                  return const SizedBox.shrink();
+                }
+
+                final coords = loc.location_coordinates(
+                  position.latitude.toStringAsFixed(6),
+                  position.longitude.toStringAsFixed(6),
+                );
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                loc.map_select_location_title,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                loc.map_select_location_tip,
+                                style: tipStyle,
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: loc.action_cancel,
+                          icon: const Icon(Icons.close),
+                          onPressed: onCancel,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _LocationSheetRow(
+                      icon: const Icon(
+                        Icons.place_outlined,
+                        color: Colors.redAccent,
+                      ),
+                      child: Text(
+                        coords,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    FutureBuilder<String?>(
+                      key: ValueKey(
+                        '${position.latitude}_${position.longitude}_start_overlay',
+                      ),
+                      future: reverseGeocode(position),
+                      builder: (context, snapshot) {
+                        final icon = Icon(
+                          Icons.home_outlined,
+                          color: Colors.blueGrey.shade600,
+                        );
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return _LocationSheetRow(
+                            icon: icon,
+                            child: Text(loc.map_location_info_address_loading),
+                          );
+                        }
+                        if (snapshot.hasError) {
+                          return _LocationSheetRow(
+                            icon: icon,
+                            child: Text(loc.map_location_info_address_unavailable),
+                          );
+                        }
+                        final address = snapshot.data;
+                        if (address == null || address.isEmpty) {
+                          return _LocationSheetRow(
+                            icon: icon,
+                            child: Text(loc.map_location_info_address_unavailable),
+                          );
+                        }
+                        return _LocationSheetRow(
+                          icon: icon,
+                          child: Text(address, maxLines: 2),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _NearbyPlacesPreview(
+                      future: fetchNearbyPlaces(position),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: onCancel,
+                          child: Text(loc.action_cancel),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton.icon(
+                          onPressed: onConfirm,
+                          icon: const Icon(Icons.flag),
+                          label: Text(loc.map_location_info_create_event),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DestinationSelectionTip extends StatelessWidget {
+  const _DestinationSelectionTip({
+    required this.message,
+    required this.onCancel,
+  });
+
+  final String message;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 380),
+        child: Material(
+          elevation: 10,
+          borderRadius: BorderRadius.circular(24),
+          color: theme.colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.flag_outlined, color: Colors.green),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+                IconButton(
+                  tooltip: loc.action_cancel,
+                  icon: const Icon(Icons.close),
+                  onPressed: onCancel,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

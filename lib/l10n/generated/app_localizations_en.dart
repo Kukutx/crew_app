@@ -834,56 +834,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_section_developer => 'Developer tools';
 
   @override
-  String get settings_developer_stripe_test => 'Stripe payment test';
-
-  @override
-  String get settings_developer_stripe_test_subtitle => 'Open the Stripe payment sheet with test data';
-
-  @override
-  String get developer_test_stripe_title => 'Stripe payment test';
-
-  @override
-  String get developer_test_stripe_description => 'Use Stripe's test environment to simulate payments before integrating the real flow.';
-
-  @override
-  String get developer_test_stripe_button => 'Start test payment';
-
-  @override
-  String get developer_test_stripe_last_status => 'Last status';
-
-  @override
-  String get developer_test_stripe_reset => 'Clear status';
-
-  @override
-  String get developer_test_stripe_success => 'Payment completed successfully.';
-
-  @override
-  String get developer_test_stripe_cancelled => 'Payment cancelled.';
-
-  @override
-  String developer_test_stripe_failure(Object error) {
-    return 'Payment failed: $error';
-  }
-
-  @override
-  String get developer_test_stripe_option_registration_sponsor => 'Registration fee + sponsorship (€1.00)';
-
-  @override
-  String get developer_test_stripe_option_registration_sponsor_detail => 'Combines the sample registration fee and an optional sponsorship add-on.';
-
-  @override
-  String get developer_test_stripe_option_registration_only => 'Registration fee (€0.50)';
-
-  @override
-  String get developer_test_stripe_option_registration_only_detail => 'Only includes the base registration fee.';
-
-  @override
-  String get developer_test_stripe_option_sponsor_only => 'Sponsorship (€0.75)';
-
-  @override
-  String get developer_test_stripe_option_sponsor_only_detail => 'Only includes the sponsorship add-on.';
-
-  @override
   String get settings_help_feedback => 'Help & feedback';
 
   @override
@@ -1360,4 +1310,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wallet_transaction_subscription_subtitle => 'Auto renewal';
+
+  @override
+  String get settings_developer_stripe_test => 'Stripe payment test';
+
+  @override
+  String get settings_developer_stripe_test_subtitle =>
+      'Open the Stripe payment sheet with test data';
+
+  @override
+  String get developer_test_stripe_title => 'Stripe payment test';
+
+  @override
+  String get developer_test_stripe_description =>
+      'Use Stripe\'s test environment to simulate payments before integrating the real flow.';
+
+  @override
+  String get developer_test_stripe_button => 'Start test payment';
+
+  @override
+  String get developer_test_stripe_last_status => 'Last status';
+
+  @override
+  String get developer_test_stripe_reset => 'Clear status';
+
+  @override
+  String get developer_test_stripe_success => 'Payment completed successfully.';
+
+  @override
+  String get developer_test_stripe_cancelled => 'Payment cancelled.';
+
+  @override
+  String get developer_test_stripe_option_registration_sponsor =>
+      'Registration fee + sponsorship (€1.00)';
+
+  @override
+  String get developer_test_stripe_option_registration_sponsor_detail =>
+      'Combines the sample registration fee and an optional sponsorship add-on.';
+
+  @override
+  String get developer_test_stripe_option_registration_only =>
+      'Registration fee (€0.50)';
+
+  @override
+  String get developer_test_stripe_option_registration_only_detail =>
+      'Only includes the base registration fee.';
+
+  @override
+  String get developer_test_stripe_option_sponsor_only => 'Sponsorship (€0.75)';
+
+  @override
+  String get developer_test_stripe_option_sponsor_only_detail =>
+      'Only includes the sponsorship add-on.';
+
+  @override
+  String developer_test_stripe_failure(Object error) {
+    return 'Payment failed: $error';
+  }
 }

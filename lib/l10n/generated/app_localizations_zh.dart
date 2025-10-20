@@ -809,6 +809,56 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_section_developer => '开发者工具';
 
   @override
+  String get settings_developer_stripe_test => 'Stripe 支付测试';
+
+  @override
+  String get settings_developer_stripe_test_subtitle => '使用测试数据打开 Stripe 支付面板';
+
+  @override
+  String get developer_test_stripe_title => 'Stripe 支付测试';
+
+  @override
+  String get developer_test_stripe_description => '使用 Stripe 的测试环境来模拟支付流程，方便在正式接入前验证。';
+
+  @override
+  String get developer_test_stripe_button => '开始测试支付';
+
+  @override
+  String get developer_test_stripe_last_status => '最近状态';
+
+  @override
+  String get developer_test_stripe_reset => '清除状态';
+
+  @override
+  String get developer_test_stripe_success => '支付已成功完成。';
+
+  @override
+  String get developer_test_stripe_cancelled => '支付已取消。';
+
+  @override
+  String developer_test_stripe_failure(Object error) {
+    return '支付失败：$error';
+  }
+
+  @override
+  String get developer_test_stripe_option_registration_sponsor => '报名费 + 赞助费（€1.00）';
+
+  @override
+  String get developer_test_stripe_option_registration_sponsor_detail => '包含示例报名费以及可选的赞助费用。';
+
+  @override
+  String get developer_test_stripe_option_registration_only => '报名费（€0.50）';
+
+  @override
+  String get developer_test_stripe_option_registration_only_detail => '仅包含基础报名费用。';
+
+  @override
+  String get developer_test_stripe_option_sponsor_only => '赞助费（€0.75）';
+
+  @override
+  String get developer_test_stripe_option_sponsor_only_detail => '仅包含赞助附加费用。';
+
+  @override
   String get settings_help_feedback => '帮助与反馈';
 
   @override

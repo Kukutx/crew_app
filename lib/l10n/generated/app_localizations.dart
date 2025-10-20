@@ -1622,6 +1622,102 @@ abstract class AppLocalizations {
   /// **'Developer tools'**
   String get settings_section_developer;
 
+  /// No description provided for @settings_developer_stripe_test.
+  ///
+  /// In en, this message translates to:
+  /// **'Stripe payment test'**
+  String get settings_developer_stripe_test;
+
+  /// No description provided for @settings_developer_stripe_test_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the Stripe payment sheet with test data'**
+  String get settings_developer_stripe_test_subtitle;
+
+  /// No description provided for @developer_test_stripe_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Stripe payment test'**
+  String get developer_test_stripe_title;
+
+  /// No description provided for @developer_test_stripe_description.
+  ///
+  /// In en, this message translates to:
+  /// **"Use Stripe's test environment to simulate payments before integrating the real flow."**
+  String get developer_test_stripe_description;
+
+  /// No description provided for @developer_test_stripe_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Start test payment'**
+  String get developer_test_stripe_button;
+
+  /// No description provided for @developer_test_stripe_last_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Last status'**
+  String get developer_test_stripe_last_status;
+
+  /// No description provided for @developer_test_stripe_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear status'**
+  String get developer_test_stripe_reset;
+
+  /// No description provided for @developer_test_stripe_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment completed successfully.'**
+  String get developer_test_stripe_success;
+
+  /// No description provided for @developer_test_stripe_cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled.'**
+  String get developer_test_stripe_cancelled;
+
+  /// No description provided for @developer_test_stripe_failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed: {error}'**
+  String developer_test_stripe_failure(Object error);
+
+  /// No description provided for @developer_test_stripe_option_registration_sponsor.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration fee + sponsorship (€1.00)'**
+  String get developer_test_stripe_option_registration_sponsor;
+
+  /// No description provided for @developer_test_stripe_option_registration_sponsor_detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Combines the sample registration fee and an optional sponsorship add-on.'**
+  String get developer_test_stripe_option_registration_sponsor_detail;
+
+  /// No description provided for @developer_test_stripe_option_registration_only.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration fee (€0.50)'**
+  String get developer_test_stripe_option_registration_only;
+
+  /// No description provided for @developer_test_stripe_option_registration_only_detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Only includes the base registration fee.'**
+  String get developer_test_stripe_option_registration_only_detail;
+
+  /// No description provided for @developer_test_stripe_option_sponsor_only.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsorship (€0.75)'**
+  String get developer_test_stripe_option_sponsor_only;
+
+  /// No description provided for @developer_test_stripe_option_sponsor_only_detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Only includes the sponsorship add-on.'**
+  String get developer_test_stripe_option_sponsor_only_detail;
+
   /// No description provided for @settings_help_feedback.
   ///
   /// In en, this message translates to:

@@ -511,5 +511,26 @@
   "wallet_transaction_refund_title": "Expense refund",
   "wallet_transaction_refund_subtitle": "Coastal camp · Trip cancelled",
   "wallet_transaction_subscription_title": "Crew Plus subscription",
-  "wallet_transaction_subscription_subtitle": "Auto renewal"
+  "wallet_transaction_subscription_subtitle": "Auto renewal",
+  "settings_developer_stripe_test": "Stripe payment test",
+  "settings_developer_stripe_test_subtitle": "Open the Stripe payment sheet with test data",
+  "developer_test_stripe_title": "Stripe payment test",
+  "developer_test_stripe_description": "Use Stripe's test environment to simulate payments before integrating the real flow.",
+  "developer_test_stripe_button": "Start test payment",
+  "developer_test_stripe_last_status": "Last status",
+  "developer_test_stripe_reset": "Clear status",
+  "developer_test_stripe_success": "Payment completed successfully.",
+  "developer_test_stripe_cancelled": "Payment cancelled.",
+  "developer_test_stripe_option_registration_sponsor": "Registration fee + sponsorship (€1.00)",
+  "developer_test_stripe_option_registration_sponsor_detail": "Combines the sample registration fee and an optional sponsorship add-on.",
+  "developer_test_stripe_option_registration_only": "Registration fee (€0.50)",
+  "developer_test_stripe_option_registration_only_detail": "Only includes the base registration fee.",
+  "developer_test_stripe_option_sponsor_only": "Sponsorship (€0.75)",
+  "developer_test_stripe_option_sponsor_only_detail": "Only includes the sponsorship add-on.",
+  "developer_test_stripe_failure": "Payment failed: {error}",
+  "@developer_test_stripe_failure": {
+    "placeholders": {
+      "error": {}
+    }
+  }
 }

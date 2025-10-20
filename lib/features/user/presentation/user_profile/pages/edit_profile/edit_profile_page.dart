@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
-import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
+import 'package:crew_app/features/user/presentation/user_profile/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

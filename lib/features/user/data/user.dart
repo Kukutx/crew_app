@@ -8,11 +8,11 @@ extension GenderEmoji on Gender {
   String get emoji {
     switch (this) {
       case Gender.female:
-        return '👩';
+        return '♀';
       case Gender.male:
-        return '👨';
+        return '♂';
       case Gender.undisclosed:
-        return '✨';
+        return '✦';
     }
   }
 

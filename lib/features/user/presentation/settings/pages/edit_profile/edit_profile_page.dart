@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
+import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -187,7 +188,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             children: [
               for (final gender in Gender.values)
                 ChoiceChip(
-                  label: Text('${gender.emoji} ${_genderLabel(loc, gender)}'),
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GenderBadge(gender: gender, size: 22),
+                      const SizedBox(width: 8),
+                      Text(_genderLabel(loc, gender)),
+                    ],
+                  ),
                   selected: _gender == gender,
                   onSelected: (_) {
                     setState(() {
@@ -468,10 +476,7 @@ class _ProfilePreview extends StatelessWidget {
                             ),
                             if (gender.shouldDisplay) ...[
                               const SizedBox(width: 8),
-                              Text(
-                                gender.emoji,
-                                style: const TextStyle(fontSize: 20),
-                              ),
+                              GenderBadge(gender: gender, size: 26),
                             ],
                           ],
                         ),

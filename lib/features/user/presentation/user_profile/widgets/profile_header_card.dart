@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
@@ -59,10 +60,7 @@ class ProfileHeaderCard extends StatelessWidget {
                             ),
                             if (userProfile.gender.shouldDisplay) ...[
                               const SizedBox(width: 8),
-                              Text(
-                                userProfile.gender.emoji,
-                                style: const TextStyle(fontSize: 20),
-                              ),
+                              GenderBadge(gender: userProfile.gender),
                             ],
                           ],
                         ),

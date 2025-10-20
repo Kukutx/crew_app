@@ -23,7 +23,7 @@ class SubscriptionPlanPage extends ConsumerWidget {
           loc.subscription_plan_free_feature_notifications,
         ],
         gradient: [
-          colorScheme.surfaceVariant.withOpacity(0.65),
+          colorScheme.surfaceContainerHighest.withValues(alpha: .65),
           colorScheme.surface,
         ],
         accentColor: colorScheme.primary,
@@ -37,8 +37,8 @@ class SubscriptionPlanPage extends ConsumerWidget {
           loc.subscription_plan_plus_feature_support,
         ],
         gradient: [
-          colorScheme.primary.withOpacity(0.18),
-          colorScheme.primary.withOpacity(0.05),
+          colorScheme.primary.withValues(alpha: .18),
+          colorScheme.primary.withValues(alpha: .05),
         ],
         accentColor: colorScheme.primary,
         highlight: true,
@@ -52,8 +52,8 @@ class SubscriptionPlanPage extends ConsumerWidget {
           loc.subscription_plan_pro_feature_history,
         ],
         gradient: [
-          colorScheme.secondary.withOpacity(0.18),
-          colorScheme.secondary.withOpacity(0.05),
+          colorScheme.secondary.withValues(alpha: .18),
+          colorScheme.secondary.withValues(alpha: .05),
         ],
         accentColor: colorScheme.secondary,
       ),
@@ -85,7 +85,7 @@ class SubscriptionPlanPage extends ConsumerWidget {
           Text(
             loc.subscription_plan_subtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: .8),
             ),
           ),
           const SizedBox(height: 16),
@@ -158,7 +158,7 @@ class _CurrentPlanCard extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.12),
+                    color: colorScheme.primary.withValues(alpha: .12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(12),
@@ -195,7 +195,7 @@ class _CurrentPlanCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                color: theme.textTheme.bodyMedium?.color?.withValues(alpha: .7),
               ),
             ),
           ],
@@ -243,13 +243,13 @@ class _PlanOptionCard extends ConsumerWidget {
         border: Border.all(
           color: isCurrent
               ? option.accentColor
-              : colorScheme.outlineVariant.withOpacity(0.5),
+              : colorScheme.outlineVariant.withValues(alpha: .5),
           width: 1.4,
         ),
         boxShadow: option.highlight
             ? [
                 BoxShadow(
-                  color: option.accentColor.withOpacity(0.18),
+                  color: option.accentColor.withValues(alpha: .18),
                   blurRadius: 22,
                   offset: const Offset(0, 12),
                 ),
@@ -289,7 +289,7 @@ class _PlanOptionCard extends ConsumerWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: option.accentColor.withOpacity(0.12),
+                    color: option.accentColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -321,7 +321,7 @@ class _PlanOptionCard extends ConsumerWidget {
                       feature,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color:
-                            theme.textTheme.bodyMedium?.color?.withOpacity(0.85),
+                            theme.textTheme.bodyMedium?.color?.withValues(alpha: .85),
                       ),
                     ),
                   ),
@@ -335,7 +335,7 @@ class _PlanOptionCard extends ConsumerWidget {
               onPressed: isCurrent ? null : onSelect,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    isCurrent ? option.accentColor.withOpacity(0.3) : null,
+                    isCurrent ? option.accentColor.withValues(alpha: .3) : null,
                 foregroundColor:
                     isCurrent ? colorScheme.onPrimary : null,
                 elevation: isCurrent ? 0 : null,
@@ -385,7 +385,7 @@ class _CancellationCard extends StatelessWidget {
               onPressed: onCancel,
               style: OutlinedButton.styleFrom(
                 foregroundColor: colorScheme.error,
-                side: BorderSide(color: colorScheme.error.withOpacity(0.6)),
+                side: BorderSide(color: colorScheme.error.withValues(alpha: .6)),
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

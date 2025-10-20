@@ -1709,7 +1709,7 @@ abstract class AppLocalizations {
   /// No description provided for @subscription_plan_current_hint.
   ///
   /// In en, this message translates to:
-  /// **'You're on the {plan} plan right now.'**
+  /// **'You\'re on the {plan} plan right now.'**
   String subscription_plan_current_hint(Object plan);
 
   /// No description provided for @subscription_plan_price_free.

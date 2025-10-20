@@ -881,7 +881,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String subscription_plan_current_hint(Object plan) {
-    return "You're on the $plan plan right now.";
+    return 'You\'re on the $plan plan right now.';
   }
 
   @override

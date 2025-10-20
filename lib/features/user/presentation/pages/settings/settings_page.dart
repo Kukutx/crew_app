@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }
 

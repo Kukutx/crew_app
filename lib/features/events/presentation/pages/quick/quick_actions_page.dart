@@ -86,6 +86,8 @@ class MapQuickActionsPage extends ConsumerWidget {
 
       return ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        primary: false,
+        shrinkWrap: true,
         children: tiles,
       );
     }

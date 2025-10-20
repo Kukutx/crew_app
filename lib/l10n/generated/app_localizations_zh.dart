@@ -874,12 +874,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get blocklist_unblock_confirm_title => '取消拉黑？';
 
   @override
-  String blocklist_unblock_confirm_message(String name) {
+  String blocklist_unblock_confirm_message(Object name) {
     return '确定要解除对$name的拉黑吗？';
   }
 
   @override
-  String blocklist_unblocked_snackbar(String name) {
+  String blocklist_unblocked_snackbar(Object name) {
     return '已取消拉黑 $name';
   }
 
@@ -890,7 +890,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get privacy_documents_page_title => '隐私政策与用户协议';
 
   @override
-  String get privacy_documents_intro => '我们珍视你的信任，本页概述我们如何处理你的数据以及保障 Crew 社区安全的使用规则。';
+  String get privacy_documents_intro =>
+      '我们珍视你的信任，本页概述我们如何处理你的数据以及保障 Crew 社区安全的使用规则。';
 
   @override
   String get privacy_documents_privacy_title => '隐私政策';

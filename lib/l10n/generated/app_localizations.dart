@@ -1733,7 +1733,7 @@ abstract class AppLocalizations {
   /// No description provided for @blocklist_empty.
   ///
   /// In en, this message translates to:
-  /// **'You haven't blocked anyone yet.'**
+  /// **'You haven\'t blocked anyone yet.'**
   String get blocklist_empty;
 
   /// No description provided for @blocklist_unblock.
@@ -1752,13 +1752,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Remove {name} from your block list?'**
-  String blocklist_unblock_confirm_message(String name);
+  String blocklist_unblock_confirm_message(Object name);
 
   /// No description provided for @blocklist_unblocked_snackbar.
   ///
   /// In en, this message translates to:
   /// **'Unblocked {name}'**
-  String blocklist_unblocked_snackbar(String name);
+  String blocklist_unblocked_snackbar(Object name);
 
   /// No description provided for @settings_privacy_documents.
   ///

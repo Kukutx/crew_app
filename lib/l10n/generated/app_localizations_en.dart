@@ -892,7 +892,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blocklist_title => 'Blocked users';
 
   @override
-  String get blocklist_empty => "You haven't blocked anyone yet.";
+  String get blocklist_empty => 'You haven\'t blocked anyone yet.';
 
   @override
   String get blocklist_unblock => 'Unblock';
@@ -901,12 +901,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blocklist_unblock_confirm_title => 'Unblock user?';
 
   @override
-  String blocklist_unblock_confirm_message(String name) {
+  String blocklist_unblock_confirm_message(Object name) {
     return 'Remove $name from your block list?';
   }
 
   @override
-  String blocklist_unblocked_snackbar(String name) {
+  String blocklist_unblocked_snackbar(Object name) {
     return 'Unblocked $name';
   }
 

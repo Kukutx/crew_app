@@ -639,6 +639,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferences_name_empty_error => '显示名称不能为空';
 
   @override
+  String get preferences_gender_label => '性别';
+
+  @override
+  String get preferences_gender_female => '女生';
+
+  @override
+  String get preferences_gender_male => '男生';
+
+  @override
+  String get preferences_gender_other => '不透露';
+
+  @override
   String get preferences_country_label => '国家 / 地区';
 
   @override

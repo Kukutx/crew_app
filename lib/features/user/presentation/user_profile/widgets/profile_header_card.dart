@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
@@ -45,12 +46,23 @@ class ProfileHeaderCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          userProfile.name,
-                          style: t.titleMedium!.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                userProfile.name,
+                                style: t.titleMedium!.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            if (userProfile.gender.shouldDisplay) ...[
+                              const SizedBox(width: 8),
+                              GenderBadge(gender: userProfile.gender),
+                            ],
+                          ],
                         ),
                         if (userProfile.tags.isNotEmpty) ...[
                           const SizedBox(height: 6),

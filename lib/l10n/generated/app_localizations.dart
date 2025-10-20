@@ -1286,6 +1286,30 @@ abstract class AppLocalizations {
   /// **'Display name can\'t be empty'**
   String get preferences_name_empty_error;
 
+  /// No description provided for @preferences_gender_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get preferences_gender_label;
+
+  /// No description provided for @preferences_gender_female.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get preferences_gender_female;
+
+  /// No description provided for @preferences_gender_male.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get preferences_gender_male;
+
+  /// No description provided for @preferences_gender_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefer not to say'**
+  String get preferences_gender_other;
+
   /// No description provided for @preferences_country_label.
   ///
   /// In en, this message translates to:

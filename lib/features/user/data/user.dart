@@ -1,3 +1,24 @@
+enum Gender {
+  female,
+  male,
+  undisclosed,
+}
+
+extension GenderEmoji on Gender {
+  String get emoji {
+    switch (this) {
+      case Gender.female:
+        return '♀';
+      case Gender.male:
+        return '♂';
+      case Gender.undisclosed:
+        return '✦';
+    }
+  }
+
+  bool get shouldDisplay => this != Gender.undisclosed;
+}
+
 class User {
   final String uid;
   final String name;
@@ -10,6 +31,7 @@ class User {
   final bool followed;
   final List<String> tags;
   final String? countryCode;
+  final Gender gender;
 
   String? get countryFlag => countryCodeToEmoji(countryCode);
 
@@ -23,6 +45,7 @@ class User {
     required this.following,
     required this.events,
     required this.followed,
+    this.gender = Gender.undisclosed,
     this.tags = const [],
     this.countryCode,
   });
@@ -38,6 +61,7 @@ class User {
     bool? followed,
     List<String>? tags,
     String? countryCode,
+    Gender? gender,
   }) =>
       User(
         uid: uid,
@@ -51,6 +75,7 @@ class User {
         followed: followed ?? this.followed,
         tags: tags ?? this.tags,
         countryCode: countryCode ?? this.countryCode,
+        gender: gender ?? this.gender,
       );
 }
 

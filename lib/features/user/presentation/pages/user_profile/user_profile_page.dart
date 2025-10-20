@@ -10,11 +10,11 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/presentation/user_profile/state/user_profile_provider.dart';
-import 'package:crew_app/features/user/presentation/user_profile/widgets/collapsed_profile_avatar.dart';
-import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_header_card.dart';
-import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_tab_view.dart';
-import 'package:crew_app/features/user/presentation/user_profile/widgets/profile_guestbook_page.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/collapsed_profile_avatar.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_header_card.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_guestbook_page.dart';
 import 'package:crew_app/shared/widgets/report_sheet.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {

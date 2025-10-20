@@ -10,7 +10,7 @@ export 'package:crew_app/shared/widgets/toggle_tab_chip.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 
 class ChatSheet extends StatefulWidget {
   const ChatSheet({super.key});

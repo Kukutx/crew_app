@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_moments_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
-import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';

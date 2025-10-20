@@ -1,7 +1,7 @@
 import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/plaza_post_detail_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
-import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 

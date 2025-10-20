@@ -11,7 +11,7 @@ import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_r
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/features/user/presentation/user_profile/user_profile_page.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 

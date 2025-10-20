@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'package:crew_app/features/user/presentation/user_profile/state/profile_guestbook_provider.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/state/profile_guestbook_provider.dart';
 
 class ProfileGuestbook extends ConsumerWidget {
   const ProfileGuestbook({super.key});

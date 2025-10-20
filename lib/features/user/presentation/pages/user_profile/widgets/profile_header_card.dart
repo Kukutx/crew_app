@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/presentation/user_profile/widgets/gender_badge.dart';
+import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({

@@ -716,6 +716,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferences_avatar_action => '更换头像';
 
   @override
+  String get preferences_avatar_picker_title => '选择一个头像';
+
+  @override
+  String get preferences_avatar_picker_subtitle => '从预设图库中挑选一个全新形象';
+
+  @override
+  String get preferences_avatar_picker_random => '帮我挑一个';
+
+  @override
+  String get preferences_avatar_picker_apply => '使用这个头像';
+
+  @override
+  String get preferences_avatar_update_success => '头像已更新';
+
+  @override
   String get preferences_feature_unavailable => '图片编辑功能即将上线';
 
   @override

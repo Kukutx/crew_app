@@ -1436,6 +1436,36 @@ abstract class AppLocalizations {
   /// **'Update avatar'**
   String get preferences_avatar_action;
 
+  /// No description provided for @preferences_avatar_picker_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an avatar'**
+  String get preferences_avatar_picker_title;
+
+  /// No description provided for @preferences_avatar_picker_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview a new look from our preset gallery.'**
+  String get preferences_avatar_picker_subtitle;
+
+  /// No description provided for @preferences_avatar_picker_random.
+  ///
+  /// In en, this message translates to:
+  /// **'Surprise me'**
+  String get preferences_avatar_picker_random;
+
+  /// No description provided for @preferences_avatar_picker_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this avatar'**
+  String get preferences_avatar_picker_apply;
+
+  /// No description provided for @preferences_avatar_update_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar updated!'**
+  String get preferences_avatar_update_success;
+
   /// No description provided for @preferences_feature_unavailable.
   ///
   /// In en, this message translates to:

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
@@ -16,6 +18,14 @@ class EditProfilePage extends ConsumerStatefulWidget {
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   static const _maxBioLength = 120;
   static const _maxTagCount = 6;
+  static const List<String> _presetAvatars = [
+    'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2',
+    'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6',
+    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
+    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde',
+    'https://images.unsplash.com/photo-1520854221050-0f4caff449fb',
+  ];
   static const List<String> _suggestedTags = [
     '露营玩家',
     '摄影控',
@@ -33,6 +43,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late List<String> _tags;
   String? _countryCode;
   late Gender _gender;
+  late String _selectedAvatar;
+  bool _isAvatarUpdating = false;
 
   @override
   void initState() {
@@ -44,6 +56,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _tags = [...profile.tags];
     _countryCode = profile.countryCode;
     _gender = profile.gender;
+    _selectedAvatar = profile.avatar;
   }
 
   @override
@@ -78,6 +91,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       tags: _tags,
       countryCode: _countryCode,
       gender: _gender,
+      avatar: _selectedAvatar,
     );
 
     _showSnack(loc.preferences_save_success);
@@ -128,6 +142,38 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _showSnack(loc.preferences_feature_unavailable);
   }
 
+  Future<void> _handleEditAvatar() async {
+    final loc = AppLocalizations.of(context)!;
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => _AvatarPickerSheet(
+        currentAvatar: _selectedAvatar,
+        options: _presetAvatars,
+      ),
+    );
+
+    if (!mounted || selected == null || selected == _selectedAvatar) {
+      return;
+    }
+
+    setState(() {
+      _isAvatarUpdating = true;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 450));
+
+    if (!mounted) return;
+
+    setState(() {
+      _selectedAvatar = selected;
+      _isAvatarUpdating = false;
+    });
+
+    _showSnack(loc.preferences_avatar_update_success);
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -148,7 +194,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         children: [
           _ProfilePreview(
             coverUrl: profile.cover,
-            avatarUrl: profile.avatar,
+            avatarUrl: _selectedAvatar,
             displayName: _nameController.text.trim().isEmpty
                 ? loc.preferences_display_name_placeholder
                 : _nameController.text.trim(),
@@ -159,7 +205,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             countryCode: _countryCode ?? profile.countryCode,
             gender: _gender,
             onEditCover: _showComingSoon,
-            onEditAvatar: _showComingSoon,
+            onEditAvatar: _handleEditAvatar,
+            isAvatarUpdating: _isAvatarUpdating,
           ),
           const SizedBox(height: 24),
           Text(
@@ -346,6 +393,7 @@ class _ProfilePreview extends StatelessWidget {
     required this.gender,
     required this.onEditCover,
     required this.onEditAvatar,
+    this.isAvatarUpdating = false,
   });
 
   final String coverUrl;
@@ -357,6 +405,7 @@ class _ProfilePreview extends StatelessWidget {
   final Gender gender;
   final VoidCallback onEditCover;
   final VoidCallback onEditAvatar;
+  final bool isAvatarUpdating;
 
   @override
   Widget build(BuildContext context) {
@@ -417,9 +466,34 @@ class _ProfilePreview extends StatelessWidget {
                         label: loc.preferences_avatar_action,
                         child: GestureDetector(
                           onTap: onEditAvatar,
-                          child: CircleAvatar(
-                            radius: 40,
-                            backgroundImage: CachedNetworkImageProvider(avatarUrl),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 40,
+                                backgroundImage:
+                                    CachedNetworkImageProvider(avatarUrl),
+                              ),
+                              if (isAvatarUpdating)
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.4),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 28,
+                                      height: 28,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.4,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
@@ -527,6 +601,140 @@ class _ProfilePreview extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AvatarPickerSheet extends StatefulWidget {
+  const _AvatarPickerSheet({
+    required this.currentAvatar,
+    required this.options,
+  });
+
+  final String currentAvatar;
+  final List<String> options;
+
+  @override
+  State<_AvatarPickerSheet> createState() => _AvatarPickerSheetState();
+}
+
+class _AvatarPickerSheetState extends State<_AvatarPickerSheet> {
+  late String _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.currentAvatar;
+  }
+
+  void _handleSelect(String value) {
+    setState(() {
+      _selected = value;
+    });
+  }
+
+  void _handleRandomPick() {
+    final random = Random();
+    final next = widget.options[random.nextInt(widget.options.length)];
+    _handleSelect(next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final mediaQuery = MediaQuery.of(context);
+    final theme = Theme.of(context);
+    final bottomPadding = mediaQuery.viewInsets.bottom + mediaQuery.padding.bottom;
+
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 16,
+          bottom: bottomPadding > 0 ? bottomPadding : 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              loc.preferences_avatar_picker_title,
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              loc.preferences_avatar_picker_subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: min(320, mediaQuery.size.height * 0.45),
+              child: GridView.builder(
+                itemCount: widget.options.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final avatar = widget.options[index];
+                  final isSelected = avatar == _selected;
+                  return GestureDetector(
+                    onTap: () => _handleSelect(avatar),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : Colors.transparent,
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          if (isSelected)
+                            BoxShadow(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                              blurRadius: 18,
+                              spreadRadius: 1,
+                            ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: avatar,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _handleRandomPick,
+                  icon: const Icon(Icons.auto_awesome_outlined),
+                  label: Text(loc.preferences_avatar_picker_random),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).pop(_selected),
+                    child: Text(loc.preferences_avatar_picker_apply),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

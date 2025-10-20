@@ -11,7 +11,7 @@ class PrivacyDocumentsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.privacy_documents_page_title),
+        title: Text(loc!.privacy_documents_page_title),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),

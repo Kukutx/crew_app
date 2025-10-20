@@ -21,17 +21,18 @@ class MapQuickActionsPage extends ConsumerWidget {
       ref.read(mapQuickActionProvider.notifier).state = action;
     }
 
+    final quickTripAction = _QuickActionDefinition(
+      icon: Icons.alt_route,
+      title: loc.map_quick_actions_quick_trip,
+      description: loc.map_quick_actions_quick_trip_desc,
+      color: colorScheme.primary,
+      onTap: () {
+        triggerAction(MapQuickAction.startQuickTrip);
+        onClose();
+      },
+    );
+
     final actions = <_QuickActionDefinition>[
-      _QuickActionDefinition(
-        icon: Icons.alt_route,
-        title: loc.map_quick_actions_quick_trip,
-        description: loc.map_quick_actions_quick_trip_desc,
-        color: colorScheme.primary,
-        onTap: () {
-          triggerAction(MapQuickAction.startQuickTrip);
-          onClose();
-        },
-      ),
       _QuickActionDefinition(
         icon: Icons.edit_calendar_outlined,
         title: loc.map_quick_actions_full_trip,
@@ -60,49 +61,152 @@ class MapQuickActionsPage extends ConsumerWidget {
       ),
     ];
 
-    Widget buildBody() {
-      if (actions.isEmpty) {
-        return _QuickActionsEmptyState(
-          title: loc.map_quick_actions_empty_title,
-          message: loc.map_quick_actions_empty_message,
-        );
-      }
-
-      final tiles = <Widget>[
-        Text(
-          loc.map_quick_actions_subtitle,
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ),
-        const SizedBox(height: 16),
-      ];
-
-      for (var i = 0; i < actions.length; i++) {
-        tiles.add(_MapQuickActionTile(definition: actions[i]));
-        if (i != actions.length - 1) {
-          tiles.add(const SizedBox(height: 12));
-        }
-      }
-
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-        primary: false,
-        shrinkWrap: true,
-        children: tiles,
-      );
-    }
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(loc.map_quick_actions_title),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: onClose,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              backgroundColor: colorScheme.surface,
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: onClose,
+              ),
+              title: Text(loc.map_quick_actions_title),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.map_quick_actions_subtitle,
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 16),
+                    _QuickActionsHeroCard(
+                      definition: quickTripAction,
+                      buttonLabel: loc.action_create,
+                    ),
+                    const SizedBox(height: 28),
+                  ],
+                ),
+              ),
+            ),
+            if (actions.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: _QuickActionsEmptyState(
+                    title: loc.map_quick_actions_empty_title,
+                    message: loc.map_quick_actions_empty_message,
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final definition = actions[index];
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == actions.length - 1 ? 0 : 12,
+                        ),
+                        child: _MapQuickActionTile(definition: definition),
+                      );
+                    },
+                    childCount: actions.length,
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
-      body: SafeArea(
-        child: buildBody(),
+    );
+  }
+}
+
+class _QuickActionsHeroCard extends StatelessWidget {
+  const _QuickActionsHeroCard({
+    required this.definition,
+    required this.buttonLabel,
+  });
+
+  final _QuickActionDefinition definition;
+  final String buttonLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final onPrimary = colorScheme.onPrimary;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            definition.color,
+            definition.color.withOpacity(0.75),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: onPrimary.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Icon(definition.icon, size: 28, color: onPrimary),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              definition.title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: onPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              definition.description,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: onPrimary.withOpacity(0.9),
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                foregroundColor: definition.color,
+                backgroundColor: colorScheme.surface,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              onPressed: definition.onTap,
+              child: Text(
+                buttonLabel,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -150,7 +254,7 @@ class _MapQuickActionTile extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: definition.color.withValues(alpha: 0.12),
+                  color: definition.color.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(definition.icon, color: definition.color, size: 24),

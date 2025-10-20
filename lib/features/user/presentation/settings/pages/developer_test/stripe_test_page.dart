@@ -1,8 +1,9 @@
+// lib/features/user/presentation/settings/pages/developer_test/stripe_test_page.dart
+
 import 'package:crew_app/features/user/presentation/settings/pages/developer_test/stripe_test_service.dart';
-import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 
 class StripeTestPage extends ConsumerStatefulWidget {
   const StripeTestPage({super.key});
@@ -18,40 +19,30 @@ class _StripeTestPageState extends ConsumerState<StripeTestPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.developer_test_stripe_title),
-      ),
+      appBar: AppBar(title: const Text('Stripe PaymentSheet · Dev Test')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            loc.developer_test_stripe_description,
+            '使用 Glitch 演示后端创建 PaymentIntent，打开 PaymentSheet 测试支付流程（测试卡 4242 4242 4242 4242）。',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           Card(
             child: Column(
               children: [
-                for (final scenario in StripeTestScenario.values)
+                for (final s in StripeTestScenario.values)
                   RadioListTile<StripeTestScenario>(
-                    value: scenario,
+                    title: Text(s.label),
+                    subtitle: Text(s.subtitle),
+                    value: s,
                     groupValue: _scenario,
                     onChanged: _isProcessing
                         ? null
-                        : (value) {
-                            if (value == null) {
-                              return;
-                            }
-                            setState(() {
-                              _scenario = value;
-                            });
-                          },
-                    title: Text(scenario.label(loc)),
-                    subtitle: Text(scenario.subtitle(loc)),
+                        : (v) => setState(() => _scenario = v ?? _scenario),
                   ),
               ],
             ),
@@ -65,29 +56,19 @@ class _StripeTestPageState extends ConsumerState<StripeTestPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.play_arrow_rounded),
-            label: Text(loc.developer_test_stripe_button),
+            label: const Text('开始测试支付'),
             onPressed: _isProcessing ? null : () => _runPayment(context),
           ),
           if (_lastStatus != null) ...[
-            const SizedBox(height: 32),
-            Text(
-              loc.developer_test_stripe_last_status,
-              style: theme.textTheme.titleMedium,
-            ),
+            const SizedBox(height: 24),
+            Text('最近状态：', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            Text(
-              _lastStatus!,
-              style: theme.textTheme.bodyMedium,
-            ),
+            Text(_lastStatus!, style: theme.textTheme.bodyMedium),
             TextButton(
               onPressed: _isProcessing
                   ? null
-                  : () {
-                      setState(() {
-                        _lastStatus = null;
-                      });
-                    },
-              child: Text(loc.developer_test_stripe_reset),
+                  : () => setState(() => _lastStatus = null),
+              child: const Text('清除状态'),
             ),
           ],
         ],
@@ -96,8 +77,6 @@ class _StripeTestPageState extends ConsumerState<StripeTestPage> {
   }
 
   Future<void> _runPayment(BuildContext context) async {
-    final loc = AppLocalizations.of(context)!;
-    final scenario = _scenario;
     setState(() {
       _isProcessing = true;
       _lastStatus = null;
@@ -105,89 +84,71 @@ class _StripeTestPageState extends ConsumerState<StripeTestPage> {
 
     try {
       final service = ref.read(stripeTestServiceProvider);
-      final config = await service.createPaymentSheet(
-        amountInCents: scenario.amountInCents,
+
+      // 1) 向演示后端要 PaymentSheet 所需配置
+      final cfg = await service.createPaymentSheet(
+        amountInCents: _scenario.amountInCents,
         currency: 'eur',
-        description: scenario.apiDescription,
+        description: _scenario.apiDescription,
       );
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
-      Stripe.publishableKey = config.publishableKey;
+      // 2) 设置 publishableKey（v12 仍然需要）
+      Stripe.publishableKey = cfg.publishableKey;
+
+      // 3) 初始化 PaymentSheet（v12 参数）
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: config.paymentIntentClientSecret,
-          customerEphemeralKeySecret: config.customerEphemeralKeySecret,
-          customerId: config.customerId,
+          paymentIntentClientSecret: cfg.paymentIntentClientSecret,
+          customerId: cfg.customerId,
+          customerEphemeralKeySecret: cfg.customerEphemeralKeySecret,
           merchantDisplayName: 'Crew Dev Tools',
-          merchantCountryCode: 'IE',
           style: Theme.of(context).brightness == Brightness.dark
               ? ThemeMode.dark
               : ThemeMode.light,
-          billingDetails: const BillingDetails(
-            name: 'Crew Test User',
-            email: 'test@example.com',
+          // ✅ Google Pay
+          googlePay: const PaymentSheetGooglePay(
+            merchantCountryCode: 'DE', // 你的结算国家
+            testEnv: true, // 上线前要改为 false
           ),
-          testEnv: true,
+
+          // ✅ Apple Pay
+          applePay: const PaymentSheetApplePay(
+            merchantCountryCode: 'DE',
+          ),
         ),
       );
 
+      // 4) 展示 PaymentSheet
       await Stripe.instance.presentPaymentSheet();
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _lastStatus = loc.developer_test_stripe_success;
-      });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(loc.developer_test_stripe_success)));
-    } on StripeTestException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _lastStatus = loc.developer_test_stripe_failure(error: error.message);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.developer_test_stripe_failure(error: error.message))),
-      );
-    } on StripeException catch (error) {
-      final message = error.error.localizedMessage ?? error.error.message;
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _lastStatus = message == null
-            ? loc.developer_test_stripe_cancelled
-            : loc.developer_test_stripe_failure(error: message);
-      });
-      if (message == null) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(loc.developer_test_stripe_cancelled)));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(loc.developer_test_stripe_failure(error: message))),
-        );
-      }
-    } catch (error) {
-      final message = error.toString();
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _lastStatus = loc.developer_test_stripe_failure(error: message);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.developer_test_stripe_failure(error: message))),
-      );
+
+      if (!mounted) return;
+      setState(() => _lastStatus = '✅ 支付完成（模拟环境）');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('支付成功')));
+    } on StripeException catch (e) {
+      // Stripe 自身异常（取消 or 失败）
+      final msg = e.error.localizedMessage ?? e.error.message ?? '已取消或失败';
+      if (!mounted) return;
+      setState(() => _lastStatus = '❌ $msg');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } on StripeTestException catch (e) {
+      if (!mounted) return;
+      setState(() => _lastStatus = '❌ ${e.message}');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _lastStatus = '❌ ${e.toString()}');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-      await Stripe.instance.resetPaymentSheetCustomerCache();
       if (mounted) {
-        setState(() {
-          _isProcessing = false;
-        });
+        setState(() => _isProcessing = false);
       }
     }
   }
@@ -200,25 +161,25 @@ enum StripeTestScenario {
 }
 
 extension on StripeTestScenario {
-  String label(AppLocalizations loc) {
+  String get label {
     switch (this) {
       case StripeTestScenario.registrationWithSponsorship:
-        return loc.developer_test_stripe_option_registration_sponsor;
+        return '报名 + 赞助(€1.00)';
       case StripeTestScenario.registrationOnly:
-        return loc.developer_test_stripe_option_registration_only;
+        return '仅报名(€0.50)';
       case StripeTestScenario.sponsorshipOnly:
-        return loc.developer_test_stripe_option_sponsor_only;
+        return '仅赞助(€0.75)';
     }
   }
 
-  String subtitle(AppLocalizations loc) {
+  String get subtitle {
     switch (this) {
       case StripeTestScenario.registrationWithSponsorship:
-        return loc.developer_test_stripe_option_registration_sponsor_detail;
+        return '同时创建报名与赞助的 PaymentIntent';
       case StripeTestScenario.registrationOnly:
-        return loc.developer_test_stripe_option_registration_only_detail;
+        return '只创建报名费用的 PaymentIntent';
       case StripeTestScenario.sponsorshipOnly:
-        return loc.developer_test_stripe_option_sponsor_only_detail;
+        return '只创建赞助费用的 PaymentIntent';
     }
   }
 

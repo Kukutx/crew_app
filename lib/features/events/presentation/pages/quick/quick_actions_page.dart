@@ -68,27 +68,25 @@ class MapQuickActionsPage extends ConsumerWidget {
         );
       }
 
-      return ListView.separated(
+      final tiles = <Widget>[
+        Text(
+          loc.map_quick_actions_subtitle,
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: 16),
+      ];
+
+      for (var i = 0; i < actions.length; i++) {
+        tiles.add(_MapQuickActionTile(definition: actions[i]));
+        if (i != actions.length - 1) {
+          tiles.add(const SizedBox(height: 12));
+        }
+      }
+
+      return ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  loc.map_quick_actions_subtitle,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-                const SizedBox(height: 16),
-                _MapQuickActionTile(definition: actions[index]),
-              ],
-            );
-          }
-          return _MapQuickActionTile(definition: actions[index]);
-        },
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
-        itemCount: actions.length,
+        children: tiles,
       );
     }
 

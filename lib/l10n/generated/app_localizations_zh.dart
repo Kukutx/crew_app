@@ -844,6 +844,78 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_subscription_cancel => '取消订阅';
 
   @override
+  String get subscription_plan_title => '订阅计划';
+
+  @override
+  String get subscription_plan_subtitle => '根据需求选择最适合你的方案，随时升级或取消。';
+
+  @override
+  String get subscription_plan_current_label => '当前订阅';
+
+  @override
+  String subscription_plan_current_hint(Object plan) {
+    return '你正在使用 $plan 计划。';
+  }
+
+  @override
+  String get subscription_plan_price_free => '免费';
+
+  @override
+  String get subscription_plan_price_plus => '¥28 / 月';
+
+  @override
+  String get subscription_plan_price_pro => '¥68 / 月';
+
+  @override
+  String get subscription_plan_button_selected => '当前方案';
+
+  @override
+  String subscription_plan_button_upgrade(Object plan) {
+    return '升级至 $plan';
+  }
+
+  @override
+  String subscription_plan_button_switch(Object plan) {
+    return '切换至 $plan';
+  }
+
+  @override
+  String get subscription_plan_button_cancel => '取消订阅';
+
+  @override
+  String get subscription_plan_cancel_description => '恢复为 Free 计划，保留基础功能。';
+
+  @override
+  String get subscription_plan_badge_popular => '热门推荐';
+
+  @override
+  String get subscription_plan_free_feature_discover => '探索周边活动和发起人';
+
+  @override
+  String get subscription_plan_free_feature_save => '收藏心仪玩法';
+
+  @override
+  String get subscription_plan_free_feature_notifications => '接收基础提醒';
+
+  @override
+  String get subscription_plan_plus_feature_filters => '高级筛选与智能推荐';
+
+  @override
+  String get subscription_plan_plus_feature_private => '创建更多私密局';
+
+  @override
+  String get subscription_plan_plus_feature_support => '专属优先客服';
+
+  @override
+  String get subscription_plan_pro_feature_collaboration => '团队协作面板';
+
+  @override
+  String get subscription_plan_pro_feature_insights => '详细数据洞察';
+
+  @override
+  String get subscription_plan_pro_feature_history => '无限制活动记录';
+
+  @override
   String get settings_subscription_payment_methods => '支付方式管理';
 
   @override

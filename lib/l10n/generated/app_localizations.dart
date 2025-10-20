@@ -1688,6 +1688,138 @@ abstract class AppLocalizations {
   /// **'Cancel subscription'**
   String get settings_subscription_cancel;
 
+  /// No description provided for @subscription_plan_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription plans'**
+  String get subscription_plan_title;
+
+  /// No description provided for @subscription_plan_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the option that fits you best. You can upgrade or cancel at any time.'**
+  String get subscription_plan_subtitle;
+
+  /// No description provided for @subscription_plan_current_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Current subscription'**
+  String get subscription_plan_current_label;
+
+  /// No description provided for @subscription_plan_current_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'You're on the {plan} plan right now.'**
+  String subscription_plan_current_hint(Object plan);
+
+  /// No description provided for @subscription_plan_price_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get subscription_plan_price_free;
+
+  /// No description provided for @subscription_plan_price_plus.
+  ///
+  /// In en, this message translates to:
+  /// **'¥28 / month'**
+  String get subscription_plan_price_plus;
+
+  /// No description provided for @subscription_plan_price_pro.
+  ///
+  /// In en, this message translates to:
+  /// **'¥68 / month'**
+  String get subscription_plan_price_pro;
+
+  /// No description provided for @subscription_plan_button_selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Current plan'**
+  String get subscription_plan_button_selected;
+
+  /// No description provided for @subscription_plan_button_upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to {plan}'**
+  String subscription_plan_button_upgrade(Object plan);
+
+  /// No description provided for @subscription_plan_button_switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to {plan}'**
+  String subscription_plan_button_switch(Object plan);
+
+  /// No description provided for @subscription_plan_button_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel subscription'**
+  String get subscription_plan_button_cancel;
+
+  /// No description provided for @subscription_plan_cancel_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Downgrade to the Free plan and keep essential features.'**
+  String get subscription_plan_cancel_description;
+
+  /// No description provided for @subscription_plan_badge_popular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular choice'**
+  String get subscription_plan_badge_popular;
+
+  /// No description provided for @subscription_plan_free_feature_discover.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover nearby activities and hosts'**
+  String get subscription_plan_free_feature_discover;
+
+  /// No description provided for @subscription_plan_free_feature_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your favourite experiences'**
+  String get subscription_plan_free_feature_save;
+
+  /// No description provided for @subscription_plan_free_feature_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive essential notifications'**
+  String get subscription_plan_free_feature_notifications;
+
+  /// No description provided for @subscription_plan_plus_feature_filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced filters and smarter recommendations'**
+  String get subscription_plan_plus_feature_filters;
+
+  /// No description provided for @subscription_plan_plus_feature_private.
+  ///
+  /// In en, this message translates to:
+  /// **'Create additional private events'**
+  String get subscription_plan_plus_feature_private;
+
+  /// No description provided for @subscription_plan_plus_feature_support.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority member support'**
+  String get subscription_plan_plus_feature_support;
+
+  /// No description provided for @subscription_plan_pro_feature_collaboration.
+  ///
+  /// In en, this message translates to:
+  /// **'Team collaboration dashboard'**
+  String get subscription_plan_pro_feature_collaboration;
+
+  /// No description provided for @subscription_plan_pro_feature_insights.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed performance insights'**
+  String get subscription_plan_pro_feature_insights;
+
+  /// No description provided for @subscription_plan_pro_feature_history.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited activity history'**
+  String get subscription_plan_pro_feature_history;
+
   /// No description provided for @settings_subscription_payment_methods.
   ///
   /// In en, this message translates to:

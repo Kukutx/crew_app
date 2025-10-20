@@ -362,6 +362,7 @@ class _ProfilePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final loc = AppLocalizations.of(context)!;
     final flagEmoji = countryCodeToEmoji(countryCode);
 
     return Card(
@@ -398,7 +399,7 @@ class _ProfilePreview extends StatelessWidget {
               child: FilledButton.tonalIcon(
                 onPressed: onEditCover,
                 icon: const Icon(Icons.photo_outlined),
-                label: Text(AppLocalizations.of(context)!.preferences_cover_action),
+                label: Text(loc.preferences_cover_action),
               ),
             ),
             Positioned(
@@ -411,9 +412,16 @@ class _ProfilePreview extends StatelessWidget {
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: CachedNetworkImageProvider(avatarUrl),
+                      Semantics(
+                        button: true,
+                        label: loc.preferences_avatar_action,
+                        child: GestureDetector(
+                          onTap: onEditAvatar,
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundImage: CachedNetworkImageProvider(avatarUrl),
+                          ),
+                        ),
                       ),
                       if (flagEmoji != null)
                         Positioned(

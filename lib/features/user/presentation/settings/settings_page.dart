@@ -5,6 +5,7 @@ import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/about/about_page.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/blocklist/blocklist_page.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/developer_test/crash_test_page.dart';
+import 'package:crew_app/features/user/presentation/settings/pages/developer_test/stripe_test_page.dart';
 import 'package:crew_app/features/user/presentation/settings/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -309,6 +310,21 @@ class SettingsPage extends ConsumerWidget {
             _SettingsSection(
               title: loc.settings_section_developer,
               children: [
+                ListTile(
+                  leading: const Icon(Icons.credit_card_outlined),
+                  title: Text(loc.settings_developer_stripe_test),
+                  subtitle: Text(loc.settings_developer_stripe_test_subtitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StripeTestPage(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.science_outlined),
                   title: const Text('测试 Crashlytics'),

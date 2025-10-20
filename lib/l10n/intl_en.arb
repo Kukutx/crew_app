@@ -353,6 +353,22 @@
   "settings_location_permission_while_using": "Allow only while using the app",
   "settings_location_permission_deny": "Deny location access",
   "settings_manage_blocklist": "Blocked & muted users",
+  "blocklist_title": "Blocked users",
+  "blocklist_empty": "You haven't blocked anyone yet.",
+  "blocklist_unblock": "Unblock",
+  "blocklist_unblock_confirm_title": "Unblock user?",
+  "blocklist_unblock_confirm_message": "Remove {name} from your block list?",
+  "@blocklist_unblock_confirm_message": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "blocklist_unblocked_snackbar": "Unblocked {name}",
+  "@blocklist_unblocked_snackbar": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "settings_privacy_documents": "Privacy policy & user agreement",
   "settings_account_info": "Account details",
   "settings_account_email_label": "Email",

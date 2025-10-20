@@ -850,6 +850,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_blocklist => '屏蔽 / 拉黑管理';
 
   @override
+  String get blocklist_title => '拉黑用户';
+
+  @override
+  String get blocklist_empty => '暂时还没有拉黑任何人';
+
+  @override
+  String get blocklist_unblock => '取消拉黑';
+
+  @override
+  String get blocklist_unblock_confirm_title => '取消拉黑？';
+
+  @override
+  String blocklist_unblock_confirm_message(String name) {
+    return '确定要解除对$name的拉黑吗？';
+  }
+
+  @override
+  String blocklist_unblocked_snackbar(String name) {
+    return '已取消拉黑 $name';
+  }
+
+  @override
   String get settings_privacy_documents => '隐私政策 / 用户协议';
 
   @override

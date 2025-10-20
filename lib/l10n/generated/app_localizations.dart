@@ -1700,6 +1700,42 @@ abstract class AppLocalizations {
   /// **'Blocked & muted users'**
   String get settings_manage_blocklist;
 
+  /// No description provided for @blocklist_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked users'**
+  String get blocklist_title;
+
+  /// No description provided for @blocklist_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven't blocked anyone yet.'**
+  String get blocklist_empty;
+
+  /// No description provided for @blocklist_unblock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get blocklist_unblock;
+
+  /// No description provided for @blocklist_unblock_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock user?'**
+  String get blocklist_unblock_confirm_title;
+
+  /// No description provided for @blocklist_unblock_confirm_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from your block list?'**
+  String blocklist_unblock_confirm_message(String name);
+
+  /// No description provided for @blocklist_unblocked_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblocked {name}'**
+  String blocklist_unblocked_snackbar(String name);
+
   /// No description provided for @settings_privacy_documents.
   ///
   /// In en, this message translates to:

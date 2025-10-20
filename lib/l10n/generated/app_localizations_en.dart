@@ -877,6 +877,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_manage_blocklist => 'Blocked & muted users';
 
   @override
+  String get blocklist_title => 'Blocked users';
+
+  @override
+  String get blocklist_empty => "You haven't blocked anyone yet.";
+
+  @override
+  String get blocklist_unblock => 'Unblock';
+
+  @override
+  String get blocklist_unblock_confirm_title => 'Unblock user?';
+
+  @override
+  String blocklist_unblock_confirm_message(String name) {
+    return 'Remove $name from your block list?';
+  }
+
+  @override
+  String blocklist_unblocked_snackbar(String name) {
+    return 'Unblocked $name';
+  }
+
+  @override
   String get settings_privacy_documents => 'Privacy policy & user agreement';
 
   @override

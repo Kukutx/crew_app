@@ -5,13 +5,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-class MapQuickActionsPage extends ConsumerWidget {
+class MapQuickActionsPage extends ConsumerStatefulWidget {
   const MapQuickActionsPage({super.key, required this.onClose});
 
   final VoidCallback onClose;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MapQuickActionsPage> createState() =>
+      _MapQuickActionsPageState();
+}
+
+class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
+  @override
+  Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -29,7 +35,7 @@ class MapQuickActionsPage extends ConsumerWidget {
         color: colorScheme.primary,
         onTap: () {
           triggerAction(MapQuickAction.startQuickTrip);
-          onClose();
+          widget.onClose();
         },
       ),
       _QuickActionDefinition(
@@ -38,7 +44,7 @@ class MapQuickActionsPage extends ConsumerWidget {
         description: loc.map_quick_actions_full_trip_desc,
         color: colorScheme.secondary,
         onTap: () {
-          onClose();
+          widget.onClose();
           navigator.push(
             MaterialPageRoute(
               builder: (routeContext) => CreateRoadTripPage(
@@ -55,7 +61,7 @@ class MapQuickActionsPage extends ConsumerWidget {
         color: colorScheme.tertiary,
         onTap: () {
           triggerAction(MapQuickAction.showMomentSheet);
-          onClose();
+          widget.onClose();
         },
       ),
     ];
@@ -98,7 +104,7 @@ class MapQuickActionsPage extends ConsumerWidget {
         title: Text(loc.map_quick_actions_title),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: onClose,
+          onPressed: widget.onClose,
         ),
       ),
       body: SafeArea(

@@ -870,6 +870,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_subscription_cancel => 'Cancel subscription';
 
   @override
+  String get subscription_plan_title => 'Subscription plans';
+
+  @override
+  String get subscription_plan_subtitle =>
+      'Pick the option that fits you best. You can upgrade or cancel at any time.';
+
+  @override
+  String get subscription_plan_current_label => 'Current subscription';
+
+  @override
+  String subscription_plan_current_hint(Object plan) {
+    return "You're on the $plan plan right now.";
+  }
+
+  @override
+  String get subscription_plan_price_free => 'Free';
+
+  @override
+  String get subscription_plan_price_plus => '¥28 / month';
+
+  @override
+  String get subscription_plan_price_pro => '¥68 / month';
+
+  @override
+  String get subscription_plan_button_selected => 'Current plan';
+
+  @override
+  String subscription_plan_button_upgrade(Object plan) {
+    return 'Upgrade to $plan';
+  }
+
+  @override
+  String subscription_plan_button_switch(Object plan) {
+    return 'Switch to $plan';
+  }
+
+  @override
+  String get subscription_plan_button_cancel => 'Cancel subscription';
+
+  @override
+  String get subscription_plan_cancel_description =>
+      'Downgrade to the Free plan and keep essential features.';
+
+  @override
+  String get subscription_plan_badge_popular => 'Popular choice';
+
+  @override
+  String get subscription_plan_free_feature_discover =>
+      'Discover nearby activities and hosts';
+
+  @override
+  String get subscription_plan_free_feature_save =>
+      'Save your favourite experiences';
+
+  @override
+  String get subscription_plan_free_feature_notifications =>
+      'Receive essential notifications';
+
+  @override
+  String get subscription_plan_plus_feature_filters =>
+      'Advanced filters and smarter recommendations';
+
+  @override
+  String get subscription_plan_plus_feature_private =>
+      'Create additional private events';
+
+  @override
+  String get subscription_plan_plus_feature_support =>
+      'Priority member support';
+
+  @override
+  String get subscription_plan_pro_feature_collaboration =>
+      'Team collaboration dashboard';
+
+  @override
+  String get subscription_plan_pro_feature_insights =>
+      'Detailed performance insights';
+
+  @override
+  String get subscription_plan_pro_feature_history =>
+      'Unlimited activity history';
+
+  @override
   String get settings_subscription_payment_methods => 'Manage payment methods';
 
   @override

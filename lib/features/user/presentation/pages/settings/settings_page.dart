@@ -7,13 +7,14 @@ import 'package:crew_app/features/user/presentation/pages/settings/pages/blockli
 import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/crash_test_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/stripe_test_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
+import 'package:crew_app/features/user/presentation/pages/settings/pages/subscription/subscription_plan_page.dart';
+import 'package:crew_app/features/user/presentation/pages/settings/state/subscription_plan.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }
@@ -31,26 +32,8 @@ extension LocationPermissionOptionLabel on LocationPermissionOption {
   }
 }
 
-enum SubscriptionPlan { free, plus, pro }
-
-extension SubscriptionPlanLabel on SubscriptionPlan {
-  String label(AppLocalizations loc) {
-    switch (this) {
-      case SubscriptionPlan.free:
-        return loc.settings_subscription_plan_free;
-      case SubscriptionPlan.plus:
-        return loc.settings_subscription_plan_plus;
-      case SubscriptionPlan.pro:
-        return loc.settings_subscription_plan_pro;
-    }
-  }
-}
-
 final locationPermissionProvider = StateProvider<LocationPermissionOption>(
   (ref) => LocationPermissionOption.allow,
-);
-final subscriptionPlanProvider = StateProvider<SubscriptionPlan>(
-  (ref) => SubscriptionPlan.free,
 );
 final eventReminderProvider = StateProvider<bool>((ref) => true);
 final followingUpdatesProvider = StateProvider<bool>((ref) => true);
@@ -140,17 +123,14 @@ class SettingsPage extends ConsumerWidget {
                   ),
                 ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => _showSubscriptionPlanSheet(context, ref, loc),
-              ),
-              ListTile(
-                leading: const Icon(Icons.trending_up_outlined),
-                title: Text(loc.settings_subscription_upgrade),
-                onTap: () => _showComingSoon(context, loc),
-              ),
-              ListTile(
-                leading: const Icon(Icons.cancel_schedule_send_outlined),
-                title: Text(loc.settings_subscription_cancel),
-                onTap: () => _showComingSoon(context, loc),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SubscriptionPlanPage(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -356,41 +336,6 @@ class SettingsPage extends ConsumerWidget {
     Navigator.of(
       context,
     ).popUntil((route) => route.settings.name == '/' || route.isFirst);
-  }
-
-  void _showSubscriptionPlanSheet(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations loc,
-  ) {
-    final currentPlan = ref.read(subscriptionPlanProvider);
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final plan in SubscriptionPlan.values)
-                ListTile(
-                  title: Text(plan.label(loc)),
-                  trailing: Icon(
-                    plan == currentPlan
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off,
-                  ),
-                  selected: plan == currentPlan,
-                  onTap: () {
-                    ref.read(subscriptionPlanProvider.notifier).state = plan;
-                    Navigator.of(context).pop();
-                    _showSavedSnackBar(context, loc);
-                  },
-                ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _showLocationPermissionSheet(

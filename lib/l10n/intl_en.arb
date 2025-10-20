@@ -351,6 +351,43 @@
   "settings_subscription_plan_pro": "Pro",
   "settings_subscription_upgrade": "Upgrade subscription",
   "settings_subscription_cancel": "Cancel subscription",
+  "subscription_plan_title": "Subscription plans",
+  "subscription_plan_subtitle": "Pick the option that fits you best. You can upgrade or cancel at any time.",
+  "subscription_plan_current_label": "Current subscription",
+  "subscription_plan_current_hint": "You're on the {plan} plan right now.",
+  "@subscription_plan_current_hint": {
+    "placeholders": {
+      "plan": {}
+    }
+  },
+  "subscription_plan_price_free": "Free",
+  "subscription_plan_price_plus": "¥28 / month",
+  "subscription_plan_price_pro": "¥68 / month",
+  "subscription_plan_button_selected": "Current plan",
+  "subscription_plan_button_upgrade": "Upgrade to {plan}",
+  "@subscription_plan_button_upgrade": {
+    "placeholders": {
+      "plan": {}
+    }
+  },
+  "subscription_plan_button_switch": "Switch to {plan}",
+  "@subscription_plan_button_switch": {
+    "placeholders": {
+      "plan": {}
+    }
+  },
+  "subscription_plan_button_cancel": "Cancel subscription",
+  "subscription_plan_cancel_description": "Downgrade to the Free plan and keep essential features.",
+  "subscription_plan_badge_popular": "Popular choice",
+  "subscription_plan_free_feature_discover": "Discover nearby activities and hosts",
+  "subscription_plan_free_feature_save": "Save your favourite experiences",
+  "subscription_plan_free_feature_notifications": "Receive essential notifications",
+  "subscription_plan_plus_feature_filters": "Advanced filters and smarter recommendations",
+  "subscription_plan_plus_feature_private": "Create additional private events",
+  "subscription_plan_plus_feature_support": "Priority member support",
+  "subscription_plan_pro_feature_collaboration": "Team collaboration dashboard",
+  "subscription_plan_pro_feature_insights": "Detailed performance insights",
+  "subscription_plan_pro_feature_history": "Unlimited activity history",
   "settings_subscription_payment_methods": "Manage payment methods",
   "settings_location_permission": "Location permission",
   "settings_location_permission_allow": "Allow location access",

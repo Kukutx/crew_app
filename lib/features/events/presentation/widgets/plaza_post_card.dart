@@ -320,15 +320,3 @@ class _PlazaPostAction extends StatelessWidget {
     );
   }
 }
-
-enum _PlazaPostMenuAction { edit, delete }
-
-void _showDefaultActionMessage(BuildContext context, String message) {
-  final messenger = ScaffoldMessenger.maybeOf(context);
-  if (messenger == null) {
-    return;
-  }
-  messenger
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(message)));
-}

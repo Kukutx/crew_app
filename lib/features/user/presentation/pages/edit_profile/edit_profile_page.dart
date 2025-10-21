@@ -313,7 +313,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String?>(
-                  value: _countryCode,
+                  initialValue: _countryCode,
                   decoration: InputDecoration(
                     labelText: loc.preferences_country_label,
                     helperText: loc.preferences_country_hint,
@@ -512,14 +512,14 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseColor = theme.colorScheme.surfaceVariant;
+    final baseColor = theme.colorScheme.surfaceContainerHighest;
     final opacity = theme.colorScheme.brightness == Brightness.dark ? 0.35 : 0.65;
 
     return Card(
       margin: EdgeInsets.zero,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
-      color: baseColor.withOpacity(opacity),
+      color: baseColor.withValues(alpha: opacity),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16),

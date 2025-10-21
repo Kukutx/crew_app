@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/legacy.dart';
 

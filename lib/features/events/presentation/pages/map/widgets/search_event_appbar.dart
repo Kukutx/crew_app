@@ -50,16 +50,16 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     const itemHeight = 60.0;
     const maxVisible = 4;
-    final visibleCount =
-        results.length > maxVisible ? maxVisible : results.length;
+    final visibleCount = results.length > maxVisible
+        ? maxVisible
+        : results.length;
     return visibleCount * itemHeight + padding;
   }
 
   // 搜索框 ~56 + 余量12 + 结果列表高度
   @override
-  Size get preferredSize => Size.fromHeight(
-        (showClearSelectionAction ? 112 : 68) + _resultsHeight,
-      );
+  Size get preferredSize =>
+      Size.fromHeight((showClearSelectionAction ? 112 : 68) + _resultsHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +120,10 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: IconButton(
+                              icon: const Icon(Icons.menu),
+                              onPressed: () => {},
                             ),
                             // prefixIcon: IconButton(
                             //   icon: const Icon(Icons.my_location),
@@ -228,5 +232,4 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
     );
   }
-
 }

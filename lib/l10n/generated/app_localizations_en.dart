@@ -51,6 +51,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get action_cancel => 'Cancel';
+  @override
+  String get action_confirm => 'Confirm';
 
   @override
   String get action_create => 'Create';
@@ -206,6 +208,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get event_waypoints_title => 'Waypoints';
+  @override
+  String get event_waypoints_add => 'Add waypoint';
+  @override
+  String get event_waypoints_edit => 'Edit waypoint';
+  @override
+  String get event_waypoints_delete => 'Remove waypoint';
+  @override
+  String get event_waypoints_empty_hint => 'Add stops to plan your journey.';
+  @override
+  String get event_waypoints_select_prompt =>
+      'Long press on the map to pick a waypoint.';
+  @override
+  String event_waypoints_confirm_add(Object location) {
+    return 'Add $location as a waypoint?';
+  }
 
   @override
   String get event_route_type_title => 'Route type';

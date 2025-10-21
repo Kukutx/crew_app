@@ -113,6 +113,40 @@ class Event {
     this.organizer,
   });
 
+  Event copyWith({
+    List<String>? waypoints,
+    bool? isRoundTrip,
+  }) {
+    return Event(
+      id: id,
+      title: title,
+      location: location,
+      description: description,
+      latitude: latitude,
+      longitude: longitude,
+      imageUrls: imageUrls,
+      videoUrls: videoUrls,
+      coverImageUrl: coverImageUrl,
+      address: address,
+      startTime: startTime,
+      endTime: endTime,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      maxParticipants: maxParticipants,
+      currentParticipants: currentParticipants,
+      likes: likes,
+      isFavorite: isFavorite,
+      isRegistered: isRegistered,
+      isFree: isFree,
+      price: price,
+      tags: tags,
+      waypoints: List.unmodifiable(waypoints ?? this.waypoints),
+      isRoundTrip: isRoundTrip ?? this.isRoundTrip,
+      distanceKm: distanceKm,
+      organizer: organizer,
+    );
+  }
+
   factory Event.fromJson(Map<String, dynamic> json) {
     final locationJson = _asMap(json['location']) ?? _asMap(json['meetingPoint']);
     final mediaJson =

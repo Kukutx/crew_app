@@ -1,4 +1,5 @@
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/utils/waypoint_formatter.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,11 +9,17 @@ class EventInfoCard extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
   final VoidCallback onTapLocation;
+  final ValueChanged<int>? onWaypointTap;
+  final VoidCallback? onAddWaypointTap;
+  final VoidCallback? onRouteTypeTap;
   const EventInfoCard({
     super.key,
     required this.event,
     required this.loc,
     required this.onTapLocation,
+    this.onWaypointTap,
+    this.onAddWaypointTap,
+    this.onRouteTypeTap,
   });
 
   @override
@@ -82,13 +89,8 @@ class EventInfoCard extends StatelessWidget {
                 ),
               ),
             ),
-            if (waypoints.isNotEmpty) _waypointsRow(waypoints, loc),
-            if (routeType != null)
-              _detailRow(
-                routeType ? Icons.loop : Icons.trending_flat,
-                loc.event_route_type_title,
-                routeType ? loc.event_route_type_round : loc.event_route_type_one_way,
-              ),
+            _waypointsSection(context, waypoints, loc),
+            _routeTypeRow(context, routeType, loc),
             if (distanceText != null)
               _detailRow(
                 Icons.straighten,
@@ -133,7 +135,12 @@ class EventInfoCard extends StatelessWidget {
         ),
       );
 
-  Widget _waypointsRow(List<String> waypoints, AppLocalizations loc) => Padding(
+  Widget _waypointsSection(
+    BuildContext context,
+    List<String> waypoints,
+    AppLocalizations loc,
+  ) =>
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,30 +153,71 @@ class EventInfoCard extends StatelessWidget {
                 children: [
                   Text(loc.event_waypoints_title, style: const TextStyle(fontSize: 14)),
                   const SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: waypoints
-                          .map(
-                            (point) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: Chip(
-                                label: Text(point),
-                                backgroundColor: Colors.orange.shade50,
-                                labelStyle:
-                                    const TextStyle(fontSize: 13, color: Colors.black87),
-                              ),
-                            ),
-                          )
-                          .toList(growable: false),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: _WaypointsTagList(
+                      waypoints: waypoints,
+                      onTap: onWaypointTap,
+                      onAddTap: onAddWaypointTap,
                     ),
                   ),
+                  if (waypoints.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        loc.event_waypoints_empty_hint,
+                        style: const TextStyle(fontSize: 12, color: Colors.black45),
+                      ),
+                    ),
                 ],
               ),
             ),
           ],
         ),
       );
+
+  Widget _routeTypeRow(
+    BuildContext context,
+    bool? routeType,
+    AppLocalizations loc,
+  ) {
+    final label = _formatRouteTypeLabel(loc, routeType);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(routeType == true ? Icons.loop : Icons.trending_flat,
+              size: 20, color: Colors.orange),
+          const SizedBox(width: 12),
+          Text(loc.event_route_type_title, style: const TextStyle(fontSize: 14)),
+          const Spacer(),
+          OutlinedButton(
+            onPressed: onRouteTypeTap,
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatRouteTypeLabel(AppLocalizations loc, bool? routeType) {
+    if (routeType == null) {
+      return '${loc.to_be_announced} ⚙️';
+    }
+    return routeType
+        ? '${loc.event_route_type_round} 🔁'
+        : '${loc.event_route_type_one_way} 🚗';
+  }
 
   String _formatTime() {
     final start = event.startTime;
@@ -203,5 +251,191 @@ class EventInfoCard extends StatelessWidget {
   String _formatDistance(double kilometers, String localeTag) {
     final formatter = NumberFormat('#,##0.0', localeTag);
     return formatter.format(kilometers);
+  }
+}
+
+class _WaypointsTagList extends StatefulWidget {
+  final List<String> waypoints;
+  final ValueChanged<int>? onTap;
+  final VoidCallback? onAddTap;
+
+  const _WaypointsTagList({
+    required this.waypoints,
+    this.onTap,
+    this.onAddTap,
+  });
+
+  @override
+  State<_WaypointsTagList> createState() => _WaypointsTagListState();
+}
+
+class _WaypointsTagListState extends State<_WaypointsTagList> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  late List<String> _items;
+
+  @override
+  void initState() {
+    super.initState();
+    _items = List<String>.of(widget.waypoints);
+  }
+
+  @override
+  void didUpdateWidget(covariant _WaypointsTagList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncItems(widget.waypoints);
+  }
+
+  void _syncItems(List<String> newItems) {
+    final listState = _listKey.currentState;
+    if (listState == null) {
+      _items = List<String>.of(newItems);
+      return;
+    }
+
+    var index = 0;
+    while (index < _items.length && index < newItems.length) {
+      final oldItem = _items[index];
+      final newItem = newItems[index];
+      if (oldItem == newItem) {
+        index++;
+        continue;
+      }
+      final newIndexOfOld = newItems.indexOf(oldItem);
+      if (newIndexOfOld == -1) {
+        final removed = _items.removeAt(index);
+        listState.removeItem(
+          index,
+          (context, animation) => _buildTag(
+            context,
+            removed,
+            animation,
+            index: index,
+            enableTap: false,
+          ),
+        );
+      } else {
+        final inserted = newItems[index];
+        _items.insert(index, inserted);
+        listState.insertItem(index);
+        index++;
+      }
+    }
+
+    while (_items.length > newItems.length) {
+      final removeIndex = _items.length - 1;
+      final removed = _items.removeAt(removeIndex);
+      listState.removeItem(
+        removeIndex,
+        (context, animation) => _buildTag(
+          context,
+          removed,
+          animation,
+          index: removeIndex,
+          enableTap: false,
+        ),
+      );
+    }
+
+    while (_items.length < newItems.length) {
+      final insertIndex = _items.length;
+      final inserted = newItems[insertIndex];
+      _items.insert(insertIndex, inserted);
+      listState.insertItem(insertIndex);
+    }
+
+    for (var i = 0; i < _items.length; i++) {
+      if (_items[i] != newItems[i]) {
+        _items[i] = newItems[i];
+      }
+    }
+
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final addTap = widget.onAddTap;
+    return SizedBox(
+      height: 36,
+      child: Row(
+        children: [
+          Expanded(
+            child: AnimatedList(
+              key: _listKey,
+              scrollDirection: Axis.horizontal,
+              initialItemCount: _items.length,
+              itemBuilder: (context, index, animation) => _buildTag(
+                context,
+                _items[index],
+                animation,
+                index: index,
+              ),
+            ),
+          ),
+          if (addTap != null) ...[
+            const SizedBox(width: 6),
+            _AddWaypointButton(onTap: addTap),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTag(
+    BuildContext context,
+    String value,
+    Animation<double> animation, {
+    required int index,
+    bool enableTap = true,
+  }) {
+    final label = formatWaypointLabel(value);
+    final tag = InkWell(
+      onTap: enableTap && widget.onTap != null ? () => widget.onTap!(index) : null,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.orange.shade200),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 13, color: Colors.black87),
+        ),
+      ),
+    );
+    return SizeTransition(
+      sizeFactor: animation,
+      axis: Axis.horizontal,
+      child: FadeTransition(
+        opacity: animation,
+        child: tag,
+      ),
+    );
+  }
+}
+
+class _AddWaypointButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AddWaypointButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.orange.shade200),
+        ),
+        child: const Icon(Icons.add, size: 18, color: Colors.orange),
+      ),
+    );
   }
 }

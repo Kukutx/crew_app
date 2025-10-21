@@ -30,9 +30,11 @@ import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'sheets/map_place_details_sheet.dart';
+import '../detail/event_detail_result.dart';
 import '../detail/events_detail_page.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
+import '../../utils/waypoint_formatter.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -51,6 +53,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   List<Event> _carouselEvents = const <Event>[];
   bool _isHandlingLongPress = false;
   BuildContext? _selectionSheetContext;
+  final Map<String, Event> _eventOverrides = <String, Event>{};
+  _WaypointEditRequest? _pendingWaypointEdit;
 
   // 搜索框
   final _searchController = TextEditingController();
@@ -302,16 +306,149 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   Future<void> _openEventDetails(Event event) async {
     final navigator = Navigator.of(context);
-    final result = await navigator.push<Event>(
-      MaterialPageRoute(builder: (_) => EventDetailPage(event: event)),
+    final resolved = _resolveEvent(event);
+    final result = await navigator.push<EventDetailResult>(
+      MaterialPageRoute(builder: (_) => EventDetailPage(event: resolved)),
     );
     if (!mounted) {
       return;
     }
-    if (result != null) {
-      _focusOnEvent(result);
+    if (result == null) {
+      return;
+    }
+    _handleDetailResult(result);
+  }
+
+  void _handleDetailResult(EventDetailResult result) {
+    final updatedEvent = result.event;
+    _setEventOverride(updatedEvent);
+    if (result.action != EventDetailAction.startAddWaypoint &&
+        result.action != EventDetailAction.startEditWaypoint) {
+      setState(() {
+        _pendingWaypointEdit = null;
+      });
+    }
+    switch (result.action) {
+      case EventDetailAction.startAddWaypoint:
+        _beginWaypointSelection(
+          _WaypointEditRequest(event: updatedEvent),
+        );
+        break;
+      case EventDetailAction.startEditWaypoint:
+        _beginWaypointSelection(
+          _WaypointEditRequest(
+            event: updatedEvent,
+            index: result.waypointIndex,
+          ),
+        );
+        break;
+      case EventDetailAction.showOnMap:
+        _focusOnEvent(updatedEvent);
+        break;
+      default:
+        _focusOnEvent(updatedEvent);
     }
   }
+
+  void _beginWaypointSelection(_WaypointEditRequest request) {
+    setState(() {
+      _pendingWaypointEdit = request;
+    });
+    _hideEventCard();
+    _focusOnEvent(request.event, showEventCard: false);
+    _showWaypointSelectionPrompt();
+  }
+
+  void _showWaypointSelectionPrompt() {
+    if (!mounted) {
+      return;
+    }
+    final loc = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(loc.event_waypoints_select_prompt)),
+    );
+  }
+
+  Future<void> _handleWaypointSelection(LatLng position) async {
+    final request = _pendingWaypointEdit;
+    if (request == null || !mounted) {
+      return;
+    }
+
+    final loc = AppLocalizations.of(context)!;
+    final address = await _reverseGeocode(position);
+    if (!mounted) {
+      return;
+    }
+    final display = (address?.trim().isNotEmpty ?? false)
+        ? address!.trim()
+        : _formatLocationDisplay(null, position, loc);
+    final shortLabel = formatWaypointLabel(display);
+
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.place_outlined),
+                title: Text(loc.event_waypoints_confirm_add(shortLabel)),
+                subtitle: Text(display),
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const Icon(Icons.check_circle_outline),
+                title: Text(loc.action_confirm),
+                onTap: () => Navigator.of(sheetContext).pop(true),
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const Icon(Icons.close),
+                title: Text(loc.action_cancel),
+                onTap: () => Navigator.of(sheetContext).pop(false),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (!mounted || confirmed != true) {
+      return;
+    }
+
+    final updatedWaypoints = List<String>.of(request.event.waypoints);
+    if (request.isEdit &&
+        request.index != null &&
+        request.index! >= 0 &&
+        request.index! < updatedWaypoints.length) {
+      updatedWaypoints[request.index!] = shortLabel;
+    } else {
+      updatedWaypoints.add(shortLabel);
+    }
+
+    final updatedEvent = request.event.copyWith(waypoints: updatedWaypoints);
+    setState(() {
+      _pendingWaypointEdit = null;
+    });
+    _setEventOverride(updatedEvent);
+    _focusOnEvent(updatedEvent, showEventCard: false);
+    unawaited(_openEventDetails(updatedEvent));
+  }
+
+  void _setEventOverride(Event event) {
+    setState(() {
+      _eventOverrides[event.id] = event;
+      _carouselEvents = _carouselEvents
+          .map((item) => item.id == event.id ? event : item)
+          .toList(growable: false);
+    });
+  }
+
+  Event _resolveEvent(Event event) => _eventOverrides[event.id] ?? event;
 
   void _hideEventCard() {
     if (!_isEventCardVisible) {
@@ -370,6 +507,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   Future<void> _onMapLongPress(LatLng latlng) async {
     if (!mounted) {
+      return;
+    }
+    final editRequest = _pendingWaypointEdit;
+    if (editRequest != null) {
+      if (_isHandlingLongPress) {
+        return;
+      }
+      _isHandlingLongPress = true;
+      try {
+        await _handleWaypointSelection(latlng);
+      } finally {
+        _isHandlingLongPress = false;
+      }
       return;
     }
     final selectionState = ref.read(mapSelectionControllerProvider);
@@ -620,14 +770,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     final asyncEvents = ref.read(eventsProvider);
-    final list = asyncEvents.maybeWhen(
+    final rawList = asyncEvents.maybeWhen(
       data: (events) => events,
       orElse: () => const <Event>[],
     );
-    final selectedIndex = list.indexWhere((event) => event.id == ev.id);
+    final resolvedList = rawList.map(_resolveEvent).toList(growable: false);
+    final selectedIndex = resolvedList.indexWhere((event) => event.id == ev.id);
     if (selectedIndex == -1) {
       setState(() {
-        _carouselEvents = <Event>[ev];
+        _carouselEvents = <Event>[_resolveEvent(ev)];
         _isEventCardVisible = true;
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -641,7 +792,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
 
     setState(() {
-      _carouselEvents = list;
+      _carouselEvents = resolvedList;
       _isEventCardVisible = true;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -660,10 +811,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    _moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
+    final resolved = _resolveEvent(event);
+    _moveCamera(LatLng(resolved.latitude, resolved.longitude), zoom: 14);
     _movedToSelected = true;
     if (showEventCard) {
-      _showEventCard(event);
+      _showEventCard(resolved);
     }
   }
 
@@ -784,11 +936,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  String? _formatPlacemark(Placemark place) {
-    final parts = [
-      place.name,
-      place.street,
-      place.subLocality,
+String? _formatPlacemark(Placemark place) {
+  final parts = [
+    place.name,
+    place.street,
+    place.subLocality,
       place.locality,
       place.subAdministrativeArea,
       place.administrativeArea,
@@ -809,8 +961,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (buffer.isEmpty) {
       return null;
     }
-    return buffer.join(', ');
-  }
+  return buffer.join(', ');
+}
+
+class _WaypointEditRequest {
+  final Event event;
+  final int? index;
+
+  const _WaypointEditRequest({required this.event, this.index});
+
+  bool get isEdit => index != null;
+}
 
   void _showSnackBar(String message) {
     if (!mounted) {

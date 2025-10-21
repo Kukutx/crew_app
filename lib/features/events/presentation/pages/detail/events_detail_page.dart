@@ -1,10 +1,12 @@
 import 'dart:ui' as ui;
 
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/event_detail_result.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_share_sheet.dart';
+import 'package:crew_app/features/events/presentation/sheets/route_type_sheet.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -30,6 +32,8 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
   SystemUiOverlayStyle? _previousOverlayStyle;
+  late Event _currentEvent;
+  bool _didPop = false;
 
   static const _fallbackHost = (
     name: 'Crew Host',
@@ -42,6 +46,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   @override
   void initState() {
     super.initState();
+    _currentEvent = widget.event;
     _captureCurrentOverlayStyle();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -68,7 +73,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final url = widget.event.firstAvailableImageUrl;
+    final url = _currentEvent.firstAvailableImageUrl;
     if (url != null && url.isNotEmpty) {
       precacheImage(
         Image.network(url).image,
@@ -80,10 +85,18 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     }
   }
 
-  String get _eventShareLink => 'https://crewapp.events/${widget.event.id}';
+  @override
+  void didUpdateWidget(covariant EventDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.event.id != widget.event.id) {
+      _currentEvent = widget.event;
+    }
+  }
+
+  String get _eventShareLink => 'https://crewapp.events/${_currentEvent.id}';
 
   String _buildShareMessage() {
-    final event = widget.event;
+    final event = _currentEvent;
     return '${event.title} · ${event.location}\n$_eventShareLink';
   }
 
@@ -94,7 +107,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => EventShareSheet(
-        event: widget.event,
+        event: _currentEvent,
         loc: loc,
         previewKey: _sharePreviewKey,
         shareLink: _eventShareLink,
@@ -177,7 +190,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       final Uint8List pngBytes = byteData.buffer.asUint8List();
       final result = await ImageGallerySaverPlus.saveImage(
         pngBytes,
-        name: 'crew_event_${widget.event.id}',
+        name: 'crew_event_${_currentEvent.id}',
         quality: 100,
         isReturnImagePathOfIOS: true,
       );
@@ -280,6 +293,121 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     );
   }
 
+  void _handleBack() {
+    _popWithResult();
+  }
+
+  Future<bool> _handleWillPop() async {
+    if (_didPop) {
+      return true;
+    }
+    _popWithResult();
+    return false;
+  }
+
+  void _popWithResult({EventDetailAction? action, int? waypointIndex}) {
+    if (_didPop || !mounted) {
+      return;
+    }
+    _didPop = true;
+    Navigator.of(context).pop(
+      EventDetailResult(
+        event: _currentEvent,
+        action: action,
+        waypointIndex: waypointIndex,
+      ),
+    );
+  }
+
+  void _updateEvent(Event Function(Event) updater) {
+    setState(() {
+      _currentEvent = updater(_currentEvent);
+    });
+  }
+
+  Future<void> _openRouteTypeSheet() async {
+    final result = await showRouteTypeSheet(
+      context: context,
+      initialValue: _currentEvent.isRoundTrip,
+    );
+    if (result == null || result == _currentEvent.isRoundTrip) {
+      return;
+    }
+    _updateEvent((event) => event.copyWith(isRoundTrip: result));
+  }
+
+  Future<void> _showWaypointActionsSheet({int? selectedIndex}) async {
+    final loc = AppLocalizations.of(context)!;
+    final waypoints = _currentEvent.waypoints;
+    final hasSelection = selectedIndex != null &&
+        selectedIndex >= 0 &&
+        selectedIndex < waypoints.length;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.add_location_alt_outlined),
+                title: Text(loc.event_waypoints_add),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  if (!mounted) return;
+                  _popWithResult(action: EventDetailAction.startAddWaypoint);
+                },
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const Icon(Icons.edit_location_alt_outlined),
+                enabled: hasSelection,
+                title: Text(loc.event_waypoints_edit),
+                onTap: hasSelection
+                    ? () {
+                        final index = selectedIndex!;
+                        Navigator.of(sheetContext).pop();
+                        if (!mounted) return;
+                        _popWithResult(
+                          action: EventDetailAction.startEditWaypoint,
+                          waypointIndex: index,
+                        );
+                      }
+                    : null,
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const Icon(Icons.delete_outline),
+                enabled: hasSelection,
+                title: Text(loc.event_waypoints_delete),
+                onTap: hasSelection
+                    ? () {
+                        final index = selectedIndex!;
+                        final updated = List<String>.of(waypoints);
+                        updated.removeAt(index);
+                        Navigator.of(sheetContext).pop();
+                        if (!mounted) return;
+                        _updateEvent(
+                          (event) => event.copyWith(waypoints: updated),
+                        );
+                      }
+                    : null,
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const Icon(Icons.close),
+                title: Text(loc.action_cancel),
+                onTap: () => Navigator.of(sheetContext).pop(),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _pageCtrl.dispose();
@@ -291,7 +419,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final event = widget.event;
+    final event = _currentEvent;
     final loc = AppLocalizations.of(context)!;
     final organizer = event.organizer;
     final hostName = (organizer?.name.isNotEmpty ?? false)
@@ -303,14 +431,16 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
         ? organizer!.avatarUrl!
         : _fallbackHost.avatar;
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF7E9),
-      extendBodyBehindAppBar: true,
-      appBar: EventDetailAppBar(
-        onBack: () => Navigator.pop(context),
-        onShare: () => _showShareSheet(context),
-        onMore: () => _showMoreActions(loc),
-      ),
+    return WillPopScope(
+      onWillPop: (_) => _handleWillPop(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFFF7E9),
+        extendBodyBehindAppBar: true,
+        appBar: EventDetailAppBar(
+          onBack: _handleBack,
+          onShare: () => _showShareSheet(context),
+          onMore: () => _showMoreActions(loc),
+        ),
       bottomNavigationBar: EventDetailBottomBar(
         loc: loc,
         isFavorite: event.isFavorite,
@@ -321,37 +451,42 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
             SnackBar(content: Text(loc.registration_not_implemented)),
           );
         },
-      ),
-      floatingActionButton: _PlazaPostFab(
+        ),
+        floatingActionButton: _PlazaPostFab(
         label: loc.event_detail_publish_plaza,
         onPressed: () => showCreateMomentSheet(context),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: EventDetailBody(
-        event: event,
-        loc: loc,
-        pageController: _pageCtrl,
-        currentPage: _page,
-        onPageChanged: (index) => setState(() => _page = index),
-        hostName: hostName,
-        hostBio: hostBio,
-        hostAvatarUrl: hostAvatar,
-        onTapHostProfile: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => UserProfilePage()),
-          );
-        },
-        onToggleFollow: () async {
-          // TODO: integrate backend follow logic
-          setState(() => _following = !_following);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_following ? loc.followed : loc.unfollowed)),
-          );
-        },
-        isFollowing: _following,
-        onTapLocation: () => Navigator.pop(context, widget.event),
-        heroTag: 'event-media-${event.id}',
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        body: EventDetailBody(
+          event: event,
+          loc: loc,
+          pageController: _pageCtrl,
+          currentPage: _page,
+          onPageChanged: (index) => setState(() => _page = index),
+          hostName: hostName,
+          hostBio: hostBio,
+          hostAvatarUrl: hostAvatar,
+          onTapHostProfile: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => UserProfilePage()),
+            );
+          },
+          onToggleFollow: () async {
+            // TODO: integrate backend follow logic
+            setState(() => _following = !_following);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(_following ? loc.followed : loc.unfollowed)),
+            );
+          },
+          isFollowing: _following,
+          onTapLocation: () => _popWithResult(action: EventDetailAction.showOnMap),
+          onWaypointTap: (index) =>
+              _showWaypointActionsSheet(selectedIndex: index),
+          onAddWaypointTap: () => _showWaypointActionsSheet(),
+          onRouteTypeTap: _openRouteTypeSheet,
+          heroTag: 'event-media-${event.id}',
+        ),
       ),
     );
   }

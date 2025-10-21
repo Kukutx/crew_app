@@ -23,6 +23,7 @@
   "about_update_status_unknown": "Unable to determine the latest version right now.",
   "action_apply": "Apply",
   "action_cancel": "Cancel",
+  "action_confirm": "Confirm",
   "action_create": "Create",
   "action_follow": "Follow",
   "action_following": "Following",
@@ -73,6 +74,17 @@
   "event_group_expense_intro": "Create and track shared expenses for everyone on this trip.",
   "event_group_expense_hint": "Add participants, log costs on the go, and we'll help you settle balances fairly.",
   "event_waypoints_title": "Waypoints",
+  "event_waypoints_add": "Add waypoint",
+  "event_waypoints_edit": "Edit waypoint",
+  "event_waypoints_delete": "Remove waypoint",
+  "event_waypoints_empty_hint": "Add stops to plan your journey.",
+  "event_waypoints_select_prompt": "Long press on the map to pick a waypoint.",
+  "event_waypoints_confirm_add": "Add {location} as a waypoint?",
+  "@event_waypoints_confirm_add": {
+    "placeholders": {
+      "location": {}
+    }
+  },
   "event_route_type_title": "Route type",
   "event_route_type_round": "Round trip",
   "event_route_type_one_way": "One-way",

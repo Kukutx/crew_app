@@ -259,7 +259,8 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                                 itemBuilder: (context, i) => EventGridCard(
                                   event: events[i],
                                   heroTag: 'event_$i',
-                                  onShowOnMap: (event) {
+                                  onShowOnMap: (result) {
+                                    final event = result.event;
                                     Navigator.of(context).maybePop();
                                     ref
                                             .read(

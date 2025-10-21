@@ -25,6 +25,9 @@ class EventDetailBody extends StatefulWidget {
   final VoidCallback onToggleFollow;
   final bool isFollowing;
   final VoidCallback onTapLocation;
+  final ValueChanged<int>? onWaypointTap;
+  final VoidCallback? onAddWaypointTap;
+  final VoidCallback? onRouteTypeTap;
   final String heroTag;
 
   const EventDetailBody({
@@ -41,6 +44,9 @@ class EventDetailBody extends StatefulWidget {
     required this.onToggleFollow,
     required this.isFollowing,
     required this.onTapLocation,
+    this.onWaypointTap,
+    this.onAddWaypointTap,
+    this.onRouteTypeTap,
     required this.heroTag,
   });
 
@@ -323,6 +329,9 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   event: widget.event,
                   loc: widget.loc,
                   onTapLocation: widget.onTapLocation,
+                  onWaypointTap: widget.onWaypointTap,
+                  onAddWaypointTap: widget.onAddWaypointTap,
+                  onRouteTypeTap: widget.onRouteTypeTap,
                 ),
                 const SizedBox(height: 10),
                 EventPlazaCard(loc: widget.loc),

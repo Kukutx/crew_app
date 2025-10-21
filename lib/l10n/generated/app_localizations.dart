@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get action_cancel;
 
+  /// No description provided for @action_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get action_confirm;
+
   /// No description provided for @action_create.
   ///
   /// In en, this message translates to:
@@ -475,6 +481,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waypoints'**
   String get event_waypoints_title;
+
+  /// No description provided for @event_waypoints_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add waypoint'**
+  String get event_waypoints_add;
+
+  /// No description provided for @event_waypoints_edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit waypoint'**
+  String get event_waypoints_edit;
+
+  /// No description provided for @event_waypoints_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove waypoint'**
+  String get event_waypoints_delete;
+
+  /// No description provided for @event_waypoints_empty_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add stops to plan your journey.'**
+  String get event_waypoints_empty_hint;
+
+  /// No description provided for @event_waypoints_select_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press on the map to pick a waypoint.'**
+  String get event_waypoints_select_prompt;
+
+  /// No description provided for @event_waypoints_confirm_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {location} as a waypoint?'**
+  String event_waypoints_confirm_add(Object location);
 
   /// No description provided for @event_route_type_title.
   ///

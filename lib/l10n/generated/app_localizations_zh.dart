@@ -50,6 +50,8 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get action_cancel => '取消';
+  @override
+  String get action_confirm => '确定';
 
   @override
   String get action_create => '创建';
@@ -200,6 +202,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get event_waypoints_title => '途径点';
+  @override
+  String get event_waypoints_add => '添加途径点';
+  @override
+  String get event_waypoints_edit => '修改途径点';
+  @override
+  String get event_waypoints_delete => '删除途径点';
+  @override
+  String get event_waypoints_empty_hint => '添加途径点以丰富路线。';
+  @override
+  String get event_waypoints_select_prompt => '长按地图即可选择途径点。';
+  @override
+  String event_waypoints_confirm_add(Object location) {
+    return '是否将 $location 添加为途径点？';
+  }
 
   @override
   String get event_route_type_title => '路线类型';

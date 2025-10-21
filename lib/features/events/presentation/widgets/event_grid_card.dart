@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import '../../data/event.dart';
+import '../pages/detail/event_detail_result.dart';
 import '../pages/detail/events_detail_page.dart';
 import 'event_image_placeholder.dart';
 
@@ -18,7 +19,7 @@ class EventGridCard extends StatelessWidget {
 
   final Event event;
   final String heroTag;
-  final ValueChanged<Event>? onShowOnMap;
+  final ValueChanged<EventDetailResult>? onShowOnMap;
 
   void _onFavoriteTap(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -40,7 +41,7 @@ class EventGridCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () async {
-          final result = await Navigator.push<Event>(
+          final result = await Navigator.push<EventDetailResult>(
             context,
             MaterialPageRoute(
               builder: (_) => EventDetailPage(event: event),

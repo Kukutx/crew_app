@@ -49,7 +49,7 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/moments': (context) => const MyMomentsPage(),
   '/drafts': (context) => const MyDraftsPage(),
   '/add_friend': (context) => const AddFriendPage(),
-  '/qr-scanner': (context) => const QrScannerPage(),
+  '/qr-scanner': (context) => const QrScannerScreen(),
   '/profile': (context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     final uid = args is String ? args : null;

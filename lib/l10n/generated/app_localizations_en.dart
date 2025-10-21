@@ -1277,6 +1277,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_bottom_settings => 'Settings';
 
   @override
+  String get qr_scanner_title => 'Scan QR Code';
+
+  @override
+  String get qr_scanner_instruction =>
+      'Align the QR code within the frame to scan';
+
+  @override
+  String get qr_scanner_torch_hint => 'Tap to light up';
+
+  @override
+  String get qr_scanner_my_code => 'My QR code';
+
+  @override
+  String get qr_scanner_album => 'Album';
+
+  @override
   String get map_quick_trip_select_start_tip =>
       'Long press on the map to pick a starting point.';
 

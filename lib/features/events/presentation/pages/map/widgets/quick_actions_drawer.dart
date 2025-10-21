@@ -73,10 +73,10 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
         icon: Icons.qr_code_scanner_outlined,
         label: loc.map_quick_actions_bottom_scan,
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(loc.feature_not_ready)),
-          );
           widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/qr-scanner');
+          });
         },
       ),
       _BottomActionDefinition(

@@ -3,6 +3,7 @@ import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/expenses/expenses_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
+import 'package:crew_app/features/qr_scanner/presentation/pages/qr_scanner_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/history/history_page.dart';
 import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/settings_page.dart';
@@ -42,6 +43,7 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/messages_chat': (context) => const ChatSheet(),
   '/expenses': (context) => const ExpensesPage(),
   '/wallet': (context) => const WalletPage(),
+  '/qr-scanner': (context) => const QrScannerPage(),
   '/profile': (context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     final uid = args is String ? args : null;

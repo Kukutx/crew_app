@@ -1225,6 +1225,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_bottom_settings => '设置';
 
   @override
+  String get qr_scanner_title => '扫描二维码';
+
+  @override
+  String get qr_scanner_instruction => '请将二维码对准扫描框中心';
+
+  @override
+  String get qr_scanner_torch_hint => '轻触照亮';
+
+  @override
+  String get qr_scanner_my_code => '我的二维码';
+
+  @override
+  String get qr_scanner_album => '相册';
+
+  @override
   String get map_quick_trip_select_start_tip => '在地图上长按选择起点。';
 
   @override

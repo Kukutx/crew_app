@@ -2474,6 +2474,36 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get map_quick_actions_bottom_settings;
 
+  /// No description provided for @qr_scanner_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR Code'**
+  String get qr_scanner_title;
+
+  /// No description provided for @qr_scanner_instruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Align the QR code within the frame to scan'**
+  String get qr_scanner_instruction;
+
+  /// No description provided for @qr_scanner_torch_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to light up'**
+  String get qr_scanner_torch_hint;
+
+  /// No description provided for @qr_scanner_my_code.
+  ///
+  /// In en, this message translates to:
+  /// **'My QR code'**
+  String get qr_scanner_my_code;
+
+  /// No description provided for @qr_scanner_album.
+  ///
+  /// In en, this message translates to:
+  /// **'Album'**
+  String get qr_scanner_album;
+
   /// No description provided for @my_moments_title.
   ///
   /// In en, this message translates to:

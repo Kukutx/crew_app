@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../widgets/plaza_post_card.dart';
@@ -22,6 +24,11 @@ class _EditMomentPageState extends State<EditMomentPage> {
   late final TextEditingController _locationController;
   late final List<String> _tagSuggestions;
   late final Set<String> _selectedTags;
+  late final PageController _pageController;
+
+  late List<String> _mediaAssets;
+  late List<String> _availableMediaAssets;
+  int _currentImageIndex = 0;
 
   @override
   void initState() {
@@ -29,6 +36,16 @@ class _EditMomentPageState extends State<EditMomentPage> {
     _contentController = TextEditingController(text: widget.post.content);
     _locationController = TextEditingController(text: widget.post.location);
     _selectedTags = widget.post.tags.toSet();
+    _mediaAssets = widget.post.mediaAssets.toList();
+    _availableMediaAssets = {
+      ...widget.post.mediaAssets,
+      'assets/images/crew.png',
+      'assets/images/Image_20250917233011_307_216.png',
+      'assets/images/icons/app_icon.png',
+      'assets/images/icons/logo.png',
+    }.toList()
+      ..sort();
+    _pageController = PageController();
     _tagSuggestions = {
       ...widget.post.tags,
       '周末',
@@ -47,6 +64,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
   void dispose() {
     _contentController.dispose();
     _locationController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -54,7 +72,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final mediaAssets = widget.post.mediaAssets;
+    final mediaAssets = _mediaAssets;
 
     return Scaffold(
       appBar: AppBar(
@@ -70,39 +88,129 @@ class _EditMomentPageState extends State<EditMomentPage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
           children: [
-            if (mediaAssets.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: AspectRatio(
-                  aspectRatio: 3 / 4,
-                  child: Image.asset(
-                    mediaAssets.first,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              )
-            else
-              Container(
-                height: 220,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: colorScheme.surfaceVariant,
-                ),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.photo_outlined,
-                  size: 48,
-                  color: colorScheme.onSurfaceVariant,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: AspectRatio(
+                aspectRatio: 3 / 4,
+                child: mediaAssets.isNotEmpty
+                    ? Stack(
+                        children: [
+                          PageView.builder(
+                            controller: _pageController,
+                            onPageChanged: (index) {
+                              setState(() {
+                                _currentImageIndex = index;
+                              });
+                            },
+                            itemCount: mediaAssets.length,
+                            itemBuilder: (context, index) {
+                              final asset = mediaAssets[index];
+                              return Image.asset(
+                                asset,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          ),
+                          if (mediaAssets.length > 1)
+                            Positioned(
+                              bottom: 12,
+                              left: 0,
+                              right: 0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  for (var i = 0; i < mediaAssets.length; i++)
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                                      height: 6,
+                                      width: _currentImageIndex == i ? 16 : 6,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.8),
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      )
+                    : Container(
+                        color: colorScheme.surfaceVariant,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.photo_outlined,
+                          size: 48,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+              ),
+            ),
+            if (mediaAssets.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 78,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final asset = mediaAssets[index];
+                    final isSelected = index == _currentImageIndex;
+                    return GestureDetector(
+                      onTap: () {
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOut,
+                        );
+                      },
+                      child: Container(
+                        width: 72,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.outlineVariant,
+                          ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Image.asset(
+                          asset,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemCount: mediaAssets.length,
                 ),
               ),
+            ],
             const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () => _showPreviewMessage('更换封面'),
-                icon: const Icon(Icons.photo_library_outlined),
-                label: const Text('更换封面'),
-              ),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.end,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _openImagePicker,
+                  icon: const Icon(Icons.add_photo_alternate_outlined),
+                  label: const Text('添加图片'),
+                ),
+                if (mediaAssets.isNotEmpty)
+                  OutlinedButton.icon(
+                    onPressed:
+                        mediaAssets.length > 1 ? _setCurrentImageAsCover : null,
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('设为封面'),
+                  ),
+                if (mediaAssets.isNotEmpty)
+                  OutlinedButton.icon(
+                    onPressed: _removeCurrentImage,
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('移除当前图片'),
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
             Text(
@@ -186,6 +294,154 @@ class _EditMomentPageState extends State<EditMomentPage> {
       return;
     }
     Navigator.of(context).pop(true);
+  }
+
+  Future<void> _openImagePicker() async {
+    final options = _availableMediaAssets;
+    final hasNewImage =
+        options.any((asset) => !_mediaAssets.contains(asset));
+    if (!hasNewImage) {
+      _showPreviewMessage('暂无更多可选图片');
+      return;
+    }
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final maxHeight = math.min(
+          MediaQuery.of(context).size.height * 0.6,
+          160 + options.length * 92,
+        );
+        return SafeArea(
+          child: SizedBox(
+            height: maxHeight,
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '选择图片',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      final asset = options[index];
+                      final alreadyAdded = _mediaAssets.contains(asset);
+                      return ListTile(
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 8),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            asset,
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        title: Text(asset.split('/').last),
+                        trailing: alreadyAdded
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : null,
+                        enabled: !alreadyAdded,
+                        onTap: alreadyAdded
+                            ? null
+                            : () {
+                                Navigator.of(context).pop(asset);
+                              },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || selected == null) {
+      return;
+    }
+    if (_mediaAssets.contains(selected)) {
+      _showPreviewMessage('该图片已添加');
+      return;
+    }
+    setState(() {
+      _mediaAssets.add(selected);
+      _currentImageIndex = _mediaAssets.length - 1;
+    });
+    await Future<void>.delayed(Duration.zero);
+    if (_pageController.hasClients) {
+      _pageController.animateToPage(
+        _currentImageIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    }
+    _showPreviewMessage('已添加新的图片');
+  }
+
+  void _setCurrentImageAsCover() {
+    if (_mediaAssets.isEmpty || _currentImageIndex == 0) {
+      _showPreviewMessage('这已经是封面图片');
+      return;
+    }
+    setState(() {
+      final asset = _mediaAssets.removeAt(_currentImageIndex);
+      _mediaAssets.insert(0, asset);
+      _currentImageIndex = 0;
+    });
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    _showPreviewMessage('封面已更新');
+  }
+
+  void _removeCurrentImage() {
+    if (_mediaAssets.isEmpty) {
+      _showPreviewMessage('当前没有可移除的图片');
+      return;
+    }
+    final removedAsset = _mediaAssets[_currentImageIndex];
+    setState(() {
+      _mediaAssets.removeAt(_currentImageIndex);
+      if (_mediaAssets.isEmpty) {
+        _currentImageIndex = 0;
+      } else {
+        if (_currentImageIndex >= _mediaAssets.length) {
+          _currentImageIndex = _mediaAssets.length - 1;
+        }
+      }
+    });
+    if (_mediaAssets.isNotEmpty && _pageController.hasClients) {
+      _pageController.animateToPage(
+        _currentImageIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    }
+    _showPreviewMessage('已移除图片：${removedAsset.split('/').last}');
   }
 
   void _showPreviewMessage(String message) {

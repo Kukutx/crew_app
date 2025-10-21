@@ -122,7 +122,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon: IconButton(
-                              icon: const Icon(Icons.my_location),
+                              icon: const Icon(Icons.menu_rounded),
+                              tooltip: loc.map_quick_actions_title,
                               onPressed: onQuickActionsTap,
                             ),
                             suffixIconConstraints: const BoxConstraints(

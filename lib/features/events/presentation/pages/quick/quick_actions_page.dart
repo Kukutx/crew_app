@@ -66,6 +66,11 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
       ),
     ];
 
+    final drawerRadius = const BorderRadius.only(
+      topRight: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+
     Widget buildBody() {
       if (actions.isEmpty) {
         return _QuickActionsEmptyState(
@@ -74,41 +79,108 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
         );
       }
 
-      final tiles = <Widget>[
-        Text(
-          loc.map_quick_actions_subtitle,
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
+      return ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        itemCount: actions.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (_, index) => _MapQuickActionTile(
+          definition: actions[index],
         ),
-        const SizedBox(height: 16),
-      ];
-
-      for (var i = 0; i < actions.length; i++) {
-        tiles.add(_MapQuickActionTile(definition: actions[i]));
-        if (i != actions.length - 1) {
-          tiles.add(const SizedBox(height: 12));
-        }
-      }
-
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-        primary: false,
-        shrinkWrap: true,
-        children: tiles,
       );
     }
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(loc.map_quick_actions_title),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: widget.onClose,
-        ),
-      ),
+      backgroundColor: Colors.black.withOpacity(0.32),
       body: SafeArea(
-        child: buildBody(),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.onClose,
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 360),
+                child: Material(
+                  elevation: 12,
+                  shadowColor: Colors.black.withOpacity(0.25),
+                  borderRadius: drawerRadius,
+                  color: colorScheme.surface,
+                  child: ClipRRect(
+                    borderRadius: drawerRadius,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 28, 12, 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      loc.map_quick_actions_title,
+                                      style: theme.textTheme.headlineSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      loc.map_quick_actions_subtitle,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                tooltip:
+                                    MaterialLocalizations.of(context).closeButtonLabel,
+                                onPressed: widget.onClose,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: actions.isEmpty
+                                ? Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                      ),
+                                      child: buildBody(),
+                                    ),
+                                  )
+                                : ScrollConfiguration(
+                                    behavior: const ScrollBehavior()
+                                        .copyWith(scrollbars: false),
+                                    child: buildBody(),
+                                  ),
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        const SafeArea(
+                          top: false,
+                          child: SizedBox(height: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -141,16 +213,16 @@ class _MapQuickActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    return Material(
+      color: colorScheme.surfaceVariant.withValues(alpha: 0.24),
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: definition.onTap,
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 48,
@@ -159,7 +231,11 @@ class _MapQuickActionTile extends StatelessWidget {
                   color: definition.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(definition.icon, color: definition.color, size: 24),
+                child: Icon(
+                  definition.icon,
+                  color: definition.color,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -170,7 +246,7 @@ class _MapQuickActionTile extends StatelessWidget {
                       definition.title,
                       style: theme.textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
                       definition.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -179,6 +255,10 @@ class _MapQuickActionTile extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
               ),
             ],
           ),
@@ -201,31 +281,28 @@ class _QuickActionsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.upcoming_outlined,
-                size: 48, color: colorScheme.onSurfaceVariant),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-          ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.upcoming_outlined,
+          size: 48,
+          color: colorScheme.onSurfaceVariant,
         ),
-      ),
+        const SizedBox(height: 16),
+        Text(
+          title,
+          style: theme.textTheme.titleMedium,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: colorScheme.onSurfaceVariant),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
@@ -31,10 +32,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late final TextEditingController _nameController;
   late final TextEditingController _bioController;
   late final TextEditingController _tagInputController;
+  late final TextEditingController _birthdayController;
+  late final TextEditingController _schoolController;
+  late final TextEditingController _locationController;
   late List<String> _tags;
   String? _countryCode;
   late Gender _gender;
   late String _selectedAvatar;
+  DateTime? _birthday;
 
   @override
   void initState() {
@@ -43,10 +48,15 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _nameController = TextEditingController(text: profile.name);
     _bioController = TextEditingController(text: profile.bio);
     _tagInputController = TextEditingController();
+    _birthdayController =
+        TextEditingController(text: _formatBirthday(profile.birthday));
+    _schoolController = TextEditingController(text: profile.school ?? '');
+    _locationController = TextEditingController(text: profile.location ?? '');
     _tags = [...profile.tags];
     _countryCode = profile.countryCode;
     _gender = profile.gender;
     _selectedAvatar = profile.avatar;
+    _birthday = profile.birthday;
   }
 
   @override
@@ -54,6 +64,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _nameController.dispose();
     _bioController.dispose();
     _tagInputController.dispose();
+    _birthdayController.dispose();
+    _schoolController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -68,6 +81,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final loc = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     final bio = _bioController.text.trim();
+    final school = _schoolController.text.trim();
+    final location = _locationController.text.trim();
 
     if (name.isEmpty) {
       _showSnack(loc.preferences_name_empty_error);
@@ -82,10 +97,51 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       countryCode: _countryCode,
       gender: _gender,
       avatar: _selectedAvatar,
+      birthday: _birthday,
+      school: school.isEmpty ? null : school,
+      location: location.isEmpty ? null : location,
     );
 
     _showSnack(loc.preferences_save_success);
     Navigator.of(context).maybePop();
+  }
+
+  String _formatBirthday(DateTime? date) {
+    if (date == null) {
+      return '';
+    }
+
+    return DateFormat('yyyy年MM月dd日').format(date);
+  }
+
+  Future<void> _pickBirthday() async {
+    FocusScope.of(context).unfocus();
+    final now = DateTime.now();
+    final initialDate = _birthday ?? DateTime(now.year - 20, now.month, now.day);
+    final firstDate = DateTime(now.year - 100);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: now,
+      helpText: '选择生日',
+      cancelText: '取消',
+      confirmText: '确定',
+    );
+
+    if (picked != null) {
+      setState(() {
+        _birthday = picked;
+        _birthdayController.text = _formatBirthday(picked);
+      });
+    }
+  }
+
+  void _clearBirthday() {
+    setState(() {
+      _birthday = null;
+      _birthdayController.clear();
+    });
   }
 
   void _handleAddTag() {
@@ -201,6 +257,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             tags: _tags,
             countryCode: _countryCode ?? profile.countryCode,
             gender: _gender,
+            birthday: _birthday,
+            school: _schoolController.text.trim(),
+            location: _locationController.text.trim(),
             onEditCover: _showComingSoon,
             onEditAvatar: _handleEditAvatar,
           ),
@@ -210,81 +269,135 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _nameController,
-            maxLength: 24,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: loc.preferences_display_name_label,
-              hintText: loc.preferences_display_name_placeholder,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            loc.preferences_gender_label,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final gender in Gender.values)
-                ChoiceChip(
-                  label: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GenderBadge(gender: gender, size: 22),
-                      const SizedBox(width: 8),
-                      Text(_genderLabel(loc, gender)),
-                    ],
+          _SectionCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  maxLength: 24,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    labelText: loc.preferences_display_name_label,
+                    hintText: loc.preferences_display_name_placeholder,
                   ),
-                  selected: _gender == gender,
-                  onSelected: (_) {
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  loc.preferences_gender_label,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final gender in Gender.values)
+                      ChoiceChip(
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GenderBadge(gender: gender, size: 22),
+                            const SizedBox(width: 8),
+                            Text(_genderLabel(loc, gender)),
+                          ],
+                        ),
+                        selected: _gender == gender,
+                        onSelected: (_) {
+                          setState(() {
+                            _gender = gender;
+                          });
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String?>(
+                  value: _countryCode,
+                  decoration: InputDecoration(
+                    labelText: loc.preferences_country_label,
+                    helperText: loc.preferences_country_hint,
+                  ),
+                  items: [
+                    DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text(loc.preferences_country_unset),
+                    ),
+                    for (final option in _buildCountryOptions(loc))
+                      DropdownMenuItem<String?>(
+                        value: option.key,
+                        child: _CountryMenuLabel(
+                          flag: countryCodeToEmoji(option.key) ?? '',
+                          name: option.value,
+                        ),
+                      ),
+                  ],
+                  onChanged: (value) {
                     setState(() {
-                      _gender = gender;
+                      _countryCode = value;
                     });
                   },
                 ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          DropdownButtonFormField<String?>(
-            initialValue: _countryCode,
-            decoration: InputDecoration(
-              labelText: loc.preferences_country_label,
-              helperText: loc.preferences_country_hint,
-            ),
-            items: [
-              DropdownMenuItem<String?>(
-                value: null,
-                child: Text(loc.preferences_country_unset),
-              ),
-              for (final option in _buildCountryOptions(loc))
-                DropdownMenuItem<String?>(
-                  value: option.key,
-                  child: _CountryMenuLabel(
-                    flag: countryCodeToEmoji(option.key) ?? '',
-                    name: option.value,
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _birthdayController,
+                  readOnly: true,
+                  showCursor: false,
+                  onTap: _pickBirthday,
+                  decoration: InputDecoration(
+                    labelText: '生日',
+                    hintText: '选择你的生日',
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_birthday != null)
+                          IconButton(
+                            tooltip: '清除',
+                            icon: const Icon(Icons.close),
+                            onPressed: _clearBirthday,
+                          ),
+                        IconButton(
+                          tooltip: '选择生日',
+                          icon: const Icon(Icons.cake_outlined),
+                          onPressed: _pickBirthday,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _countryCode = value;
-              });
-            },
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _bioController,
-            maxLines: 4,
-            maxLength: _maxBioLength,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: loc.preferences_bio_label,
-              hintText: loc.preferences_bio_hint,
-              alignLabelWithHint: true,
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _schoolController,
+                  maxLength: 30,
+                  onChanged: (_) => setState(() {}),
+                  decoration: const InputDecoration(
+                    labelText: '学校',
+                    hintText: '填写就读或毕业学校',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _locationController,
+                  maxLength: 30,
+                  onChanged: (_) => setState(() {}),
+                  decoration: const InputDecoration(
+                    labelText: '常驻地区',
+                    hintText: '例如 广东 · 深圳',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _bioController,
+                  maxLines: 4,
+                  maxLength: _maxBioLength,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    labelText: loc.preferences_bio_label,
+                    hintText: loc.preferences_bio_hint,
+                    alignLabelWithHint: true,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -293,55 +406,68 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          if (_tags.isEmpty)
-            Text(
-              loc.preferences_tags_empty_helper,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Theme.of(context).hintColor),
-            ),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final tag in _tags)
-                InputChip(
-                  label: Text(tag),
-                  onDeleted: () => _handleRemoveTag(tag),
+          _SectionCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_tags.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      loc.preferences_tags_empty_helper,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Theme.of(context).hintColor),
+                    ),
+                  ),
+                if (_tags.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final tag in _tags)
+                          InputChip(
+                            label: Text(tag),
+                            onDeleted: () => _handleRemoveTag(tag),
+                          ),
+                      ],
+                    ),
+                  ),
+                TextField(
+                  controller: _tagInputController,
+                  onSubmitted: (_) => _handleAddTag(),
+                  decoration: InputDecoration(
+                    labelText: loc.preferences_add_tag_label,
+                    hintText: loc.preferences_tag_input_hint,
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.add_circle_outline),
+                      onPressed: _handleAddTag,
+                    ),
+                  ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _tagInputController,
-            onSubmitted: (_) => _handleAddTag(),
-            decoration: InputDecoration(
-              labelText: loc.preferences_add_tag_label,
-              hintText: loc.preferences_tag_input_hint,
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.add_circle_outline),
-                onPressed: _handleAddTag,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            loc.preferences_recommended_tags_title,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final tag in _suggestedTags)
-                FilterChip(
-                  label: Text(tag),
-                  selected: _tags.contains(tag),
-                  onSelected: (_) => _handleSuggestedTag(tag),
+                const SizedBox(height: 16),
+                Text(
+                  loc.preferences_recommended_tags_title,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
-            ],
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final tag in _suggestedTags)
+                      FilterChip(
+                        label: Text(tag),
+                        selected: _tags.contains(tag),
+                        onSelected: (_) => _handleSuggestedTag(tag),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -378,6 +504,31 @@ class _CountryMenuLabel extends StatelessWidget {
   }
 }
 
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final baseColor = theme.colorScheme.surfaceVariant;
+    final opacity = theme.colorScheme.brightness == Brightness.dark ? 0.35 : 0.65;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      clipBehavior: Clip.antiAlias,
+      color: baseColor.withOpacity(opacity),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: child,
+      ),
+    );
+  }
+}
+
 class _ProfilePreview extends StatelessWidget {
   const _ProfilePreview({
     required this.coverUrl,
@@ -387,6 +538,9 @@ class _ProfilePreview extends StatelessWidget {
     required this.tags,
     required this.countryCode,
     required this.gender,
+    required this.birthday,
+    required this.school,
+    required this.location,
     required this.onEditCover,
     required this.onEditAvatar,
   });
@@ -398,6 +552,9 @@ class _ProfilePreview extends StatelessWidget {
   final List<String> tags;
   final String? countryCode;
   final Gender gender;
+  final DateTime? birthday;
+  final String? school;
+  final String? location;
   final VoidCallback onEditCover;
   final VoidCallback onEditAvatar;
 
@@ -407,6 +564,32 @@ class _ProfilePreview extends StatelessWidget {
     final textTheme = theme.textTheme;
     final loc = AppLocalizations.of(context)!;
     final flagEmoji = countryCodeToEmoji(countryCode);
+    final infoBadges = <Widget>[];
+    final birthdayLabel =
+        birthday == null ? null : DateFormat('yyyy年MM月dd日').format(birthday!);
+    final schoolLabel = school?.trim();
+    final locationLabel = location?.trim();
+
+    if (birthdayLabel != null) {
+      infoBadges.add(_InfoBadge(
+        icon: Icons.cake_outlined,
+        label: birthdayLabel,
+      ));
+    }
+
+    if (schoolLabel?.isNotEmpty ?? false) {
+      infoBadges.add(_InfoBadge(
+        icon: Icons.school_outlined,
+        label: schoolLabel!,
+      ));
+    }
+
+    if (locationLabel?.isNotEmpty ?? false) {
+      infoBadges.add(_InfoBadge(
+        icon: Icons.place_outlined,
+        label: locationLabel!,
+      ));
+    }
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -571,6 +754,14 @@ class _ProfilePreview extends StatelessWidget {
                             ],
                           ),
                         ],
+                        if (infoBadges.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: infoBadges,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -579,6 +770,38 @@ class _ProfilePreview extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _InfoBadge extends StatelessWidget {
+  const _InfoBadge({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textStyle =
+        theme.textTheme.labelMedium?.copyWith(color: Colors.white) ??
+            const TextStyle(color: Colors.white);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(label, style: textStyle),
+        ],
       ),
     );
   }

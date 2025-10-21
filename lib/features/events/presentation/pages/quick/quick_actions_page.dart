@@ -104,8 +104,7 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
     final drawerBackground = theme.colorScheme.surface;
     return Drawer(
       backgroundColor: drawerBackground,
-      child: SafeArea(
-        child: Column(
+      child:Column(
           children: [
             if (actions.isEmpty)
               Expanded(
@@ -149,7 +148,6 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
             ),
           ],
         ),
-      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 ///是用来给现有类添加新功能的方法，而不需要继承或修改原始类。它们很适合给内置类型或第三方库类型增加自定义方法。
 
 /// 🔹 String 扩展
@@ -38,41 +39,33 @@ extension IntExt on int {
 
   /// 将较大的数字格式化为更紧凑的展示形式，例如 1.2k
   String toCompactString() {
-    final absValue = abs();
-    if (absValue < 1000) {
-      return toString();
-    }
+    final n = this;
+    final absValue = n.abs();
+    if (absValue < 1000) return toString();
 
-    final sign = this < 0 ? '-' : '';
+    final sign = n.isNegative ? '-' : '';
     final valueInThousands = absValue / 1000;
-    final bool showDecimal = absValue < 10000 && absValue % 1000 != 0;
-    final formatted = showDecimal
-        ? valueInThousands.toStringAsFixed(1)
-        : valueInThousands.floor().toString();
-    final sanitized = formatted.endsWith('.0')
-        ? formatted.substring(0, formatted.length - 2)
-        : formatted;
-    return '$sign$sanitizedk';
+
+    // 1k 到 9.9k 显示一位小数，其余直接取整
+    final formatted = absValue < 10000
+        ? (valueInThousands * 10).floor() / 10
+        : valueInThousands.floor();
+
+    return '$sign${formatted.toStringAsFixed(formatted % 1 == 0 ? 0 : 1)}k';
   }
 }
 
 /// 🔹 Widget 扩展
 extension WidgetExt on Widget {
   /// 快速添加内边距
-  Widget paddingAll(double value) => Padding(
-        padding: EdgeInsets.all(value),
-        child: this,
-      );
+  Widget paddingAll(double value) =>
+      Padding(padding: EdgeInsets.all(value), child: this);
 
   /// 快速添加圆角
-  Widget withBorderRadius(double radius) => ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: this,
-      );
+  Widget withBorderRadius(double radius) =>
+      ClipRRect(borderRadius: BorderRadius.circular(radius), child: this);
 
   /// 快速点击事件
-  Widget onTap(VoidCallback onTap) => GestureDetector(
-        onTap: onTap,
-        child: this,
-      );
+  Widget onTap(VoidCallback onTap) =>
+      GestureDetector(onTap: onTap, child: this);
 }

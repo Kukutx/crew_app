@@ -10,7 +10,7 @@ final userProfileProvider = StateProvider<User>((ref) {
     cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
     followers: 200,
     following: 5,
-    events: 32,
+    events: 3200,
     followed: false,
     gender: Gender.female,
     tags: ['露营玩家', '摄影控', '旅拍达人'],

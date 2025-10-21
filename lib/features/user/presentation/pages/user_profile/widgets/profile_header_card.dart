@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
@@ -79,17 +80,17 @@ class ProfileHeaderCard extends StatelessWidget {
                           children: [
                             _ProfileStat(
                               label: '粉丝',
-                              value: userProfile.followers,
+                              value: userProfile.followers.toCompactString(),
                             ),
                             const _ProfileStatDot(),
                             _ProfileStat(
                               label: '关注',
-                              value: userProfile.following,
+                              value: userProfile.following.toCompactString(),
                             ),
                             const _ProfileStatDot(),
                             _ProfileStat(
                               label: '活动',
-                              value: userProfile.events,
+                              value: userProfile.events.toCompactString(),
                             ),
                           ],
                         ),
@@ -257,7 +258,7 @@ class _ProfileStat extends StatelessWidget {
   const _ProfileStat({required this.label, required this.value});
 
   final String label;
-  final int value;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +268,7 @@ class _ProfileStat extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '$value',
+          value,
           style: theme.textTheme.titleSmall!.copyWith(
             color: color,
             fontWeight: FontWeight.w700,

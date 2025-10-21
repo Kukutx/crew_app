@@ -203,6 +203,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       drawer: MapQuickActionsPage(
         onClose: () => Navigator.of(context).pop(),
       ),
+      onDrawerChanged: (isOpened) {
+        _updateBottomNavigation(!isOpened && !_isEventCardVisible);
+      },
       appBar: SearchEventAppBar(
         controller: _searchController,
         focusNode: _searchFocusNode,

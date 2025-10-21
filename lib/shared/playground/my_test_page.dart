@@ -36,16 +36,6 @@ class _MyTestPageState extends ConsumerState<MyTestPage> {
           widget.onClose();
         },
       ),
-      _QuickActionDefinition(
-        icon: Icons.photo_library_outlined,
-        title: loc.map_quick_actions_create_moment,
-        description: loc.map_quick_actions_create_moment_desc,
-        color: colorScheme.tertiary,
-        onTap: () {
-          triggerAction(MapQuickAction.showMomentSheet);
-          widget.onClose();
-        },
-      ),
     ];
 
     Widget buildBody() {

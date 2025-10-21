@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/legacy.dart';
 
 enum MapQuickAction {
   startQuickTrip,
-  showMomentSheet,
 }
 
 final mapQuickActionProvider =

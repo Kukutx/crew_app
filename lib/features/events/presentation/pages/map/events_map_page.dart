@@ -88,11 +88,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           case MapQuickAction.startQuickTrip:
             unawaited(_startQuickTripFromQuickActions());
             break;
-          case MapQuickAction.showMomentSheet:
-            if (mounted) {
-              unawaited(showCreateMomentSheet(context));
-            }
-            break;
         }
         ref.read(mapQuickActionProvider.notifier).state = null;
       },

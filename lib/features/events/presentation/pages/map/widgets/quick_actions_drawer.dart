@@ -56,16 +56,6 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
           });
         },
       ),
-      _QuickActionDefinition(
-        icon: Icons.photo_library_outlined,
-        title: loc.map_quick_actions_create_moment,
-        description: loc.map_quick_actions_create_moment_desc,
-        color: colorScheme.tertiary,
-        onTap: () {
-          triggerAction(MapQuickAction.showMomentSheet);
-          widget.onClose();
-        },
-      ),
     ];
 
     final bottomActions = <_BottomActionDefinition>[

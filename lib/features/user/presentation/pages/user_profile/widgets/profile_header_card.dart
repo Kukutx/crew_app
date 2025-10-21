@@ -42,6 +42,18 @@ class ProfileHeaderCard extends StatelessWidget {
                 final isCompact = constraints.maxWidth < 420;
 
                 Widget buildProfileDetails() {
+                  final infoBadges = <Widget>[];
+                  final locationLabel = userProfile.location?.trim();
+
+                  if (locationLabel?.isNotEmpty ?? false) {
+                    infoBadges.add(
+                      _ProfileInfoBadge(
+                        icon: Icons.place_outlined,
+                        label: locationLabel!,
+                      ),
+                    );
+                  }
+
                   return DefaultTextStyle(
                     style: t.bodyMedium!.copyWith(color: Colors.white),
                     child: Column(
@@ -75,6 +87,14 @@ class ProfileHeaderCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        if (infoBadges.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: infoBadges,
+                          ),
+                        ],
                         const SizedBox(height: 8),
                         Row(
                           children: [
@@ -323,6 +343,39 @@ class _ProfileTag extends StatelessWidget {
             .textTheme
             .labelSmall!
             .copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+      ),
+    );
+  }
+}
+
+class _ProfileInfoBadge extends StatelessWidget {
+  const _ProfileInfoBadge({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall!
+                .copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }

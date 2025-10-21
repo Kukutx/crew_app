@@ -19,6 +19,8 @@ extension GenderEmoji on Gender {
   bool get shouldDisplay => this != Gender.undisclosed;
 }
 
+const _sentinel = Object();
+
 class User {
   final String uid;
   final String name;
@@ -32,6 +34,9 @@ class User {
   final List<String> tags;
   final String? countryCode;
   final Gender gender;
+  final DateTime? birthday;
+  final String? school;
+  final String? location;
 
   String? get countryFlag => countryCodeToEmoji(countryCode);
 
@@ -48,6 +53,9 @@ class User {
     this.gender = Gender.undisclosed,
     this.tags = const [],
     this.countryCode,
+    this.birthday,
+    this.school,
+    this.location,
   });
 
   User copyWith({
@@ -62,6 +70,9 @@ class User {
     List<String>? tags,
     String? countryCode,
     Gender? gender,
+    Object? birthday = _sentinel,
+    Object? school = _sentinel,
+    Object? location = _sentinel,
   }) =>
       User(
         uid: uid,
@@ -76,6 +87,10 @@ class User {
         tags: tags ?? this.tags,
         countryCode: countryCode ?? this.countryCode,
         gender: gender ?? this.gender,
+        birthday: birthday == _sentinel ? this.birthday : birthday as DateTime?,
+        school: school == _sentinel ? this.school : school as String?,
+        location:
+            location == _sentinel ? this.location : location as String?,
       );
 }
 

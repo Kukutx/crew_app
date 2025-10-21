@@ -29,15 +29,15 @@ class UserProfilePage extends ConsumerStatefulWidget {
 
 class _UserProfilePageState extends ConsumerState<UserProfilePage>
     with TickerProviderStateMixin {
-  static const double _expandedHeight = 320;
+  static const double _expandedHeight = 380;
   static const double _tabBarHeight = 48;
   List<String> _reportTypes(AppLocalizations localization) => [
-        localization.report_user_type_harassment,
-        localization.report_user_type_impersonation,
-        localization.report_user_type_inappropriate,
-        localization.report_user_type_spam,
-        localization.report_user_type_other,
-      ];
+    localization.report_user_type_harassment,
+    localization.report_user_type_impersonation,
+    localization.report_user_type_inappropriate,
+    localization.report_user_type_spam,
+    localization.report_user_type_other,
+  ];
 
   late final TabController _tabController;
   late int _currentTabIndex;
@@ -129,18 +129,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             onTap: () async {
               Navigator.of(sheetContext).pop();
               await Clipboard.setData(ClipboardData(text: link));
-              messenger.showSnackBar(
-                SnackBar(content: Text('已复制链接：$link')),
-              );
+              messenger.showSnackBar(SnackBar(content: Text('已复制链接：$link')));
             },
           ),
         );
 
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: actions,
-          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: actions),
         );
       },
     );
@@ -233,8 +228,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
     final currentUser = ref.watch(currentUserProvider);
-    final isViewingSelf =
-        widget.uid != null && widget.uid == currentUser?.uid;
+    final isViewingSelf = widget.uid != null && widget.uid == currentUser?.uid;
     final theme = Theme.of(context);
     final topPadding = MediaQuery.paddingOf(context).top;
 
@@ -349,6 +343,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                     ),
                   ),
                 ),
+              // 保持状态栏占位
               Positioned(
                 top: 0,
                 left: 0,
@@ -393,7 +388,9 @@ class _BlockUserConfirmationSheet extends StatelessWidget {
           children: [
             Text(
               '确认拉黑',
-              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 12),
             Text('确定要拉黑 $name 吗？', style: textTheme.bodyMedium),

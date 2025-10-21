@@ -387,37 +387,9 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                 label: const Text('创建活动'),
               ),
               const SizedBox(height: 24),
-
-              // 备注区域（集成指引）
-              _Hints(),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _Hints extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('集成提示', style: TextStyle(fontWeight: FontWeight.w600)),
-          SizedBox(height: 8),
-          Text('1) 起点/途经点建议接入 Google Places/Maps：点击选择地图点位写回文本。'),
-          Text('2) 登录：使用 Firebase Auth，提交时附带用户ID到 Crew.Api。'),
-          Text('3) 上传：封面图可先传 Firebase Storage，拿到下载URL再发给 Crew.Api。'),
-          Text('4) 权限：隐私为私密时，后端应生成邀请链接/邀请码。'),
-          Text('5) 校验：后端需二次校验时间范围、人数上限、字段长度与敏感词等。'),
-        ],
       ),
     );
   }

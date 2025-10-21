@@ -209,3 +209,13 @@ class _QuickActionsEmptyState extends StatelessWidget {
     );
   }
 }
+
+
+// 用来使用的
+  // void _onQuickActionsTap() {
+  //   if (_searchFocusNode.hasFocus) {
+  //     _searchFocusNode.unfocus();
+  //   }
+  //   ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
+  //   ref.read(appOverlayIndexProvider.notifier).state = 0;
+  // }

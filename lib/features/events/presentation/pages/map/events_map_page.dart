@@ -18,7 +18,7 @@ import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/edit_create_road_trip_page.dart';
-import 'package:crew_app/features/events/presentation/pages/quick/quick_actions_page.dart';
+import 'package:crew_app/features/events/presentation/pages/map/widgets/quick_actions_drawer.dart';
 
 import '../../../data/event.dart';
 import '../../../../../core/error/api_exception.dart';
@@ -200,7 +200,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return Scaffold(
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
       key: _scaffoldKey,
-      drawer: MapQuickActionsPage(
+      drawer: MapQuickActionsDrawer(
         onClose: () => Navigator.of(context).pop(),
       ),
       onDrawerChanged: (isOpened) {
@@ -859,14 +859,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final loc = AppLocalizations.of(context)!;
     _showSnackBar(loc.map_quick_trip_select_start_tip);
   }
-
-  // void _onQuickActionsTap() {
-  //   if (_searchFocusNode.hasFocus) {
-  //     _searchFocusNode.unfocus();
-  //   }
-  //   ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-  //   ref.read(appOverlayIndexProvider.notifier).state = 0;
-  // }
 
   void _onAvatarTap(bool authed) {
     if (_searchFocusNode.hasFocus) {

@@ -7,12 +7,12 @@ import 'package:image_picker/image_picker.dart';
 export 'data/road_trip_editor_models.dart';
 
 import 'data/road_trip_editor_models.dart';
-import 'editor/widgets/road_trip_basic_section.dart';
-import 'editor/widgets/road_trip_gallery_section.dart';
-import 'editor/widgets/road_trip_preferences_section.dart';
-import 'editor/widgets/road_trip_route_section.dart';
-import 'editor/widgets/road_trip_story_section.dart';
-import 'editor/widgets/road_trip_team_section.dart';
+import 'widgets/road_trip_basic_section.dart';
+import 'widgets/road_trip_gallery_section.dart';
+import 'widgets/road_trip_preferences_section.dart';
+import 'widgets/road_trip_route_section.dart';
+import 'widgets/road_trip_story_section.dart';
+import 'widgets/road_trip_team_section.dart';
 
 /// API provider stub ---------------------------------------------------------
 final eventsApiProvider = Provider<EventsApi>((ref) => EventsApi());

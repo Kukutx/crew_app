@@ -80,7 +80,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
           ),
           const SizedBox(height: 20),
           DropdownButtonFormField<Participant>(
-            value: _selectedParticipant,
+            initialValue: _selectedParticipant,
             decoration: const InputDecoration(labelText: '支付人'),
             items: widget.participants
                 .map(
@@ -113,7 +113,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _category,
+            initialValue: _category,
             decoration: const InputDecoration(labelText: '类别'),
             items: const [
               DropdownMenuItem(value: '餐饮', child: Text('餐饮')),

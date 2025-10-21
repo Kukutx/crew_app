@@ -66,7 +66,7 @@ class MemberDetailsSheet extends StatelessWidget {
             child: ListView.separated(
               controller: scrollController,
               itemCount: participant.expenses.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              separatorBuilder: (_, _) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final expense = participant.expenses[index];
                 return ExpenseListTile(expense: expense);

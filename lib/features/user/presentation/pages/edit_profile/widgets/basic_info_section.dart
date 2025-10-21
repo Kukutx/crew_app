@@ -83,7 +83,7 @@ class BasicInfoSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String?>(
-            value: countryCode,
+            initialValue: countryCode,
             decoration: InputDecoration(
               labelText: loc.preferences_country_label,
               helperText: loc.preferences_country_hint,

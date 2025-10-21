@@ -29,7 +29,7 @@ class RoadTripPreferencesSection extends StatelessWidget {
       subtitle: '车辆与标签',
       children: [
         DropdownButtonFormField<String>(
-          value: carType,
+          initialValue : carType,
           decoration: roadTripInputDecoration(context, '车辆类型（可选）', null),
           items: const [
             DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
@@ -42,7 +42,7 @@ class RoadTripPreferencesSection extends StatelessWidget {
         const SizedBox(height: 12),
         TextField(
           controller: tagInputController,
-          decoration: roadTripInputDecoration(context, '添加标签', '回车或点击 + 添加').copyWith(
+          decoration: roadTripInputDecoration(context, '添加标签', '添加').copyWith(
             suffixIcon: IconButton(
               icon: const Icon(Icons.add_circle_outline),
               onPressed: onSubmitTag,

@@ -2384,6 +2384,42 @@ abstract class AppLocalizations {
   /// **'Post photos or updates to the community.'**
   String get map_quick_actions_create_moment_desc;
 
+  /// No description provided for @map_quick_actions_history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get map_quick_actions_history;
+
+  /// No description provided for @map_quick_actions_history_desc.
+  ///
+  /// In en, this message translates to:
+  /// **"Revisit the trips and moments you've opened recently."**
+  String get map_quick_actions_history_desc;
+
+  /// No description provided for @map_quick_actions_history_message.
+  ///
+  /// In en, this message translates to:
+  /// **'History will be available soon.'**
+  String get map_quick_actions_history_message;
+
+  /// No description provided for @map_quick_actions_scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get map_quick_actions_scan;
+
+  /// No description provided for @map_quick_actions_support.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & support'**
+  String get map_quick_actions_support;
+
+  /// No description provided for @map_quick_actions_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get map_quick_actions_settings;
+
   /// No description provided for @map_quick_actions_empty_title.
   ///
   /// In en, this message translates to:

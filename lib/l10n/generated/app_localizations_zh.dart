@@ -1210,6 +1210,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_create_moment_desc => '向社区发布照片或动态。';
 
   @override
+  String get map_quick_actions_history => '历史记录';
+
+  @override
+  String get map_quick_actions_history_desc => '快速查看你最近浏览的行程与瞬间。';
+
+  @override
+  String get map_quick_actions_history_message => '历史记录功能即将上线。';
+
+  @override
+  String get map_quick_actions_scan => '扫一扫';
+
+  @override
+  String get map_quick_actions_support => '帮助与客服';
+
+  @override
+  String get map_quick_actions_settings => '设置';
+
+  @override
   String get map_quick_actions_empty_title => '暂无快捷操作';
 
   @override

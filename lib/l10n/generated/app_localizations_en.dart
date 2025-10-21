@@ -1261,6 +1261,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Post photos or updates to the community.';
 
   @override
+  String get map_quick_actions_history => 'History';
+
+  @override
+  String get map_quick_actions_history_desc =>
+      'Revisit the trips and moments you\'ve opened recently.';
+
+  @override
+  String get map_quick_actions_history_message =>
+      'History will be available soon.';
+
+  @override
+  String get map_quick_actions_scan => 'Scan';
+
+  @override
+  String get map_quick_actions_support => 'Help & support';
+
+  @override
+  String get map_quick_actions_settings => 'Settings';
+
+  @override
   String get map_quick_actions_empty_title => 'Nothing to show yet';
 
   @override

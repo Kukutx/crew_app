@@ -91,6 +91,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               unawaited(showCreateMomentSheet(context));
             }
             break;
+          case MapQuickAction.viewHistory:
+            if (mounted) {
+              final loc = AppLocalizations.of(context)!;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(loc.map_quick_actions_history_message)),
+              );
+            }
+            break;
         }
         ref.read(mapQuickActionProvider.notifier).state = null;
       },

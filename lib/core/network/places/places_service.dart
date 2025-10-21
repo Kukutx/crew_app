@@ -49,6 +49,18 @@ class NearbyPlace {
   final String? photoUrl;
 }
 
+class CityPrediction {
+  const CityPrediction({
+    required this.primaryText,
+    this.secondaryText,
+    this.placeId,
+  });
+
+  final String primaryText;
+  final String? secondaryText;
+  final String? placeId;
+}
+
 class PlacesService {
   PlacesService({Dio? dio, String? apiKey})
       : _dio = dio ?? Dio(BaseOptions(baseUrl: 'https://places.googleapis.com/v1/')),
@@ -216,6 +228,103 @@ class PlacesService {
       formattedAddress: formattedAddress,
       location: location,
       photoUrl: photoUrl,
+    );
+  }
+
+  Future<List<CityPrediction>> autocompleteCities(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      return const <CityPrediction>[];
+    }
+    if (!_hasValidKey) {
+      throw PlacesApiException('Google Places API key is not configured');
+    }
+
+    try {
+      final response = await _dio.post(
+        'places:autocomplete',
+        data: {
+          'input': trimmed,
+          'includedPrimaryTypes': ['locality', 'administrative_area_level_3'],
+          'includedRegionCodes': <String>[],
+        },
+        options: Options(
+          headers: {
+            'X-Goog-Api-Key': _apiKey,
+            'X-Goog-FieldMask':
+                'suggestions.placePrediction.placeId,suggestions.placePrediction.structuredFormat.primaryText.text,suggestions.placePrediction.structuredFormat.secondaryText.text',
+          },
+        ),
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        return const <CityPrediction>[];
+      }
+      final suggestions = data['suggestions'];
+      if (suggestions is! List) {
+        return const <CityPrediction>[];
+      }
+
+      return suggestions
+          .whereType<Map<String, dynamic>>()
+          .map(_mapCityPrediction)
+          .whereType<CityPrediction>()
+          .toList(growable: false);
+    } on DioException catch (error) {
+      throw PlacesApiException(
+        _resolveErrorMessage(error) ?? 'Failed to fetch autocomplete results',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  CityPrediction? _mapCityPrediction(Map<String, dynamic> data) {
+    final placePrediction = data['placePrediction'];
+    if (placePrediction is! Map<String, dynamic>) {
+      return null;
+    }
+
+    final placeId = placePrediction['placeId'];
+    String? parsedId;
+    if (placeId is String && placeId.isNotEmpty) {
+      parsedId = placeId;
+    }
+
+    String? primaryText;
+    String? secondaryText;
+    final structured = placePrediction['structuredFormat'];
+    if (structured is Map<String, dynamic>) {
+      final primary = structured['primaryText'];
+      if (primary is Map<String, dynamic>) {
+        final text = primary['text'];
+        if (text is String && text.isNotEmpty) {
+          primaryText = text;
+        }
+      } else if (primary is String && primary.isNotEmpty) {
+        primaryText = primary;
+      }
+
+      final secondary = structured['secondaryText'];
+      if (secondary is Map<String, dynamic>) {
+        final text = secondary['text'];
+        if (text is String && text.isNotEmpty) {
+          secondaryText = text;
+        }
+      } else if (secondary is String && secondary.isNotEmpty) {
+        secondaryText = secondary;
+      }
+    }
+
+    primaryText ??= placePrediction['text'] as String?;
+    if (primaryText == null || primaryText.isEmpty) {
+      return null;
+    }
+
+    return CityPrediction(
+      primaryText: primaryText,
+      secondaryText: secondaryText,
+      placeId: parsedId,
     );
   }
 

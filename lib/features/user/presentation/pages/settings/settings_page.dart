@@ -6,7 +6,6 @@ import 'package:crew_app/features/user/presentation/pages/settings/pages/about/a
 import 'package:crew_app/features/user/presentation/pages/settings/pages/blocklist/blocklist_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/crash_test_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/stripe_test_page.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/subscription/subscription_plan_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/state/subscription_plan.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
@@ -199,55 +198,6 @@ class SettingsPage extends ConsumerWidget {
                   );
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.privacy_tip_outlined),
-                title: Text(loc.settings_privacy_documents),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PrivacyDocumentsPage(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          _SettingsSection(
-            title: loc.settings_section_support,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: Text(loc.settings_help_feedback),
-                subtitle: Text(loc.settings_help_feedback_subtitle),
-                onTap: () async {
-                  final feedbackService = ref.read(feedbackServiceProvider);
-                  final submitted = await feedbackService.collectFeedback(
-                    context,
-                  );
-                  if (!context.mounted) {
-                    return;
-                  }
-                  if (submitted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(loc.feedback_thanks)),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: Text(loc.settings_app_version),
-                subtitle: Text(loc.settings_app_version_subtitle),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AboutPage()),
-                  );
-                },
-              ),
             ],
           ),
           _SettingsSection(
@@ -321,6 +271,42 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ],
             ),
+          _SettingsSection(
+            title: loc.settings_section_support,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.help_outline),
+                title: Text(loc.settings_help_feedback),
+                subtitle: Text(loc.settings_help_feedback_subtitle),
+                onTap: () async {
+                  final feedbackService = ref.read(feedbackServiceProvider);
+                  final submitted = await feedbackService.collectFeedback(
+                    context,
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  if (submitted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(loc.feedback_thanks)),
+                    );
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(loc.settings_app_version),
+                subtitle: Text(loc.settings_app_version_subtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutPage()),
+                  );
+                },
+              ),
+            ],
+          ),
         ],
       ),
     );

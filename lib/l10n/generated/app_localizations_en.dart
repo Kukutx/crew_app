@@ -840,11 +840,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_help_feedback_subtitle => 'FAQ, contact support';
 
   @override
-  String get settings_app_version => 'App version';
+  String get settings_app_version => 'About Crew';
 
   @override
   String get settings_app_version_subtitle =>
-      'View release notes and build info';
+      'View Crew version details and legal documents';
 
   @override
   String get settings_subscription_current_plan => 'Current plan';

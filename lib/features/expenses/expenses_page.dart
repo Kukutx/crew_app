@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class ExpensesPage extends StatefulWidget {

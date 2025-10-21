@@ -159,35 +159,15 @@ class EventInfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(loc.event_waypoints_title, style: const TextStyle(fontSize: 14)),
-                const SizedBox(height: 8),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: waypoints
-                              .map(
-                                (point) => Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: Chip(
-                                    label: Text(point),
-                                    backgroundColor: Colors.orange.shade50,
-                                    labelStyle: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(growable: false),
-                        ),
-                      ),
+                    Text(
+                      loc.event_waypoints_title,
+                      style: const TextStyle(fontSize: 14),
                     ),
-                    if (showDropdown) ...[
-                      const SizedBox(width: 8),
+                    const Spacer(),
+                    if (showDropdown)
                       PopupMenuButton<String>(
                         tooltip: loc.event_waypoints_title,
                         icon: const Icon(
@@ -204,8 +184,28 @@ class EventInfoCard extends StatelessWidget {
                             .toList(growable: false),
                         onSelected: (_) {},
                       ),
-                    ],
                   ],
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: waypoints
+                        .map(
+                          (point) => Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Chip(
+                              label: Text(point),
+                              backgroundColor: Colors.orange.shade50,
+                              labelStyle: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
                 ),
               ],
             ),

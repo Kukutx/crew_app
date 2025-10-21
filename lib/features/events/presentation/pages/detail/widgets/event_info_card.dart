@@ -5,6 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class EventInfoCard extends StatelessWidget {
+  static const List<String> _defaultWaypoints = [
+    '柏林大教堂',
+    '御林广场',
+    '波茨坦广场',
+  ];
+  static const bool _defaultIsRoundTrip = true;
+
   final Event event;
   final AppLocalizations loc;
   final VoidCallback onTapLocation;
@@ -20,7 +27,10 @@ class EventInfoCard extends StatelessWidget {
     final timeText = _formatTime();
     final participantText = event.participantSummary ?? loc.to_be_announced;
     final waypoints = event.waypoints;
+    final displayWaypoints =
+        waypoints.isNotEmpty ? waypoints : _defaultWaypoints;
     final routeType = event.isRoundTrip;
+    final displayRouteType = routeType ?? _defaultIsRoundTrip;
     final distanceKm = event.distanceKm;
     final localeTag = Localizations.localeOf(context).toString();
     final feeText = _formatFee(localeTag);
@@ -82,13 +92,15 @@ class EventInfoCard extends StatelessWidget {
                 ),
               ),
             ),
-            if (waypoints.isNotEmpty) _waypointsRow(waypoints, loc),
-            if (routeType != null)
-              _detailRow(
-                routeType ? Icons.loop : Icons.trending_flat,
-                loc.event_route_type_title,
-                routeType ? loc.event_route_type_round : loc.event_route_type_one_way,
-              ),
+            if (displayWaypoints.isNotEmpty)
+              _waypointsRow(displayWaypoints, loc),
+            _detailRow(
+              displayRouteType ? Icons.loop : Icons.trending_flat,
+              loc.event_route_type_title,
+              displayRouteType
+                  ? loc.event_route_type_round
+                  : loc.event_route_type_one_way,
+            ),
             if (distanceText != null)
               _detailRow(
                 Icons.straighten,

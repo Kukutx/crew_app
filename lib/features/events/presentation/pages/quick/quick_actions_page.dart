@@ -102,7 +102,6 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
     ];
 
     return Drawer(
-      child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -178,7 +177,6 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
             ),
           ],
         ),
-      ),
     );
   }
 }

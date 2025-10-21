@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 
+import 'edit_moment_page.dart';
+
 import 'sheets/plaza_post_comments_sheet.dart';
 
 class PlazaPostDetailPage extends StatefulWidget {
@@ -103,6 +105,126 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailPage> {
     showPlazaPostCommentsSheet(context, widget.post);
   }
 
+  Future<void> _showMomentActions() async {
+    HapticFeedback.selectionClick();
+    final action = await showModalBottomSheet<_MomentAction>(
+      context: context,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        final colorScheme = theme.colorScheme;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text('编辑瞬间'),
+                onTap: () =>
+                    Navigator.of(sheetContext).pop(_MomentAction.edit),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.delete_outline,
+                  color: colorScheme.error,
+                ),
+                title: Text(
+                  '删除瞬间',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () =>
+                    Navigator.of(sheetContext).pop(_MomentAction.delete),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (!mounted || action == null) {
+      return;
+    }
+
+    switch (action) {
+      case _MomentAction.edit:
+        await _openEditMoment();
+        break;
+      case _MomentAction.delete:
+        await _confirmDeleteMoment();
+        break;
+    }
+  }
+
+  Future<void> _openEditMoment() async {
+    final updated = await Navigator.of(context).push<bool>(
+      EditMomentPage.route(post: widget.post),
+    );
+
+    if (!mounted || updated != true) {
+      return;
+    }
+
+    _showActionFeedback('瞬间已更新');
+  }
+
+  Future<void> _confirmDeleteMoment() async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('删除瞬间'),
+            content: const Text('确定要删除这条瞬间吗？'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('取消'),
+              ),
+              FilledButton.tonal(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('删除'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!mounted || !confirmed) {
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+    _showActionFeedback('瞬间已删除');
+    _popWithResult();
+  }
+
+  void _showActionFeedback(String message) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    messenger
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaAssets = _mediaAssets;
@@ -150,7 +272,10 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailPage> {
                       ? Material(color: Colors.black, child: viewer)
                       : Hero(
                           tag: heroTag,
-                          child: Material(color: Colors.black, child: viewer),
+                          child: Material(
+                            color: Colors.black,
+                            child: viewer,
+                          ),
                         ),
                 ),
                 Positioned(
@@ -166,6 +291,21 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailPage> {
                       onPressed: _popWithResult,
                       tooltip:
                           MaterialLocalizations.of(context).closeButtonTooltip,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.more_horiz, color: Colors.white),
+                      tooltip: '更多操作',
+                      onPressed: _showMomentActions,
                     ),
                   ),
                 ),
@@ -215,6 +355,8 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailPage> {
     );
   }
 }
+
+enum _MomentAction { edit, delete }
 
 class _PlazaFullscreenPageIndicator extends StatelessWidget {
   const _PlazaFullscreenPageIndicator({

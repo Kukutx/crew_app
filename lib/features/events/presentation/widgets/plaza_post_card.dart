@@ -59,6 +59,8 @@ class PlazaPostCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onCommentTap;
   final VoidCallback? onAuthorTap;
+  final VoidCallback? onEditTap;
+  final VoidCallback? onDeleteTap;
 
   const PlazaPostCard({
     super.key,
@@ -67,6 +69,8 @@ class PlazaPostCard extends StatelessWidget {
     this.onTap,
     this.onCommentTap,
     this.onAuthorTap,
+    this.onEditTap,
+    this.onDeleteTap,
   });
 
   @override
@@ -126,9 +130,57 @@ class PlazaPostCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.more_horiz,
-                    color: colorScheme.onSurfaceVariant,
+                  PopupMenuButton<_PlazaPostMenuAction>(
+                    icon: Icon(
+                      Icons.more_horiz,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    onSelected: (action) {
+                      switch (action) {
+                        case _PlazaPostMenuAction.edit:
+                          if (onEditTap != null) {
+                            onEditTap!();
+                          } else {
+                            _showDefaultActionMessage(
+                              context,
+                              '编辑功能暂不可用',
+                            );
+                          }
+                          break;
+                        case _PlazaPostMenuAction.delete:
+                          if (onDeleteTap != null) {
+                            onDeleteTap!();
+                          } else {
+                            _showDefaultActionMessage(
+                              context,
+                              '删除功能暂不可用',
+                            );
+                          }
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem<_PlazaPostMenuAction>(
+                        value: _PlazaPostMenuAction.edit,
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit, size: 18),
+                            SizedBox(width: 12),
+                            Text('编辑'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<_PlazaPostMenuAction>(
+                        value: _PlazaPostMenuAction.delete,
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, size: 18),
+                            SizedBox(width: 12),
+                            Text('删除'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),
@@ -335,4 +387,18 @@ class _PlazaPostAction extends StatelessWidget {
       ),
     );
   }
+}
+
+enum _PlazaPostMenuAction { edit, delete }
+
+void _showDefaultActionMessage(BuildContext context, String message) {
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  if (messenger == null) {
+    return;
+  }
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(content: Text(message)),
+    );
 }

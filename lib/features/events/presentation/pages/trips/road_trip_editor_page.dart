@@ -154,7 +154,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         title: const Text('添加途经点'),
         content: TextField(
           controller: ctrl,
-          decoration: const InputDecoration(hintText: '例如：Pisa Tower 或者具体地址'),
+          decoration: const InputDecoration(hintText: '例如: Pisa Tower 或者具体地址'),
         ),
         actions: [
           TextButton(

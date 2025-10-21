@@ -192,9 +192,24 @@ class SettingsPage extends ConsumerWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const BlocklistPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const BlocklistPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+          _SettingsSection(
+            title: loc.settings_section_support,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(loc.settings_app_version),
+                subtitle: Text(loc.settings_app_version_subtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutPage()),
                   );
                 },
               ),
@@ -216,12 +231,6 @@ class SettingsPage extends ConsumerWidget {
                         ],
                       )
                     : Text(loc.login_prompt),
-              ),
-              ListTile(
-                leading: const Icon(Icons.history),
-                title: Text(loc.browsing_history),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/history'),
               ),
               ListTile(
                 leading: const Icon(Icons.logout),
@@ -255,7 +264,25 @@ class SettingsPage extends ConsumerWidget {
                     );
                   },
                 ),
-                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.help_outline),
+                  title: Text(loc.settings_help_feedback),
+                  subtitle: Text(loc.settings_help_feedback_subtitle),
+                  onTap: () async {
+                    final feedbackService = ref.read(feedbackServiceProvider);
+                    final submitted = await feedbackService.collectFeedback(
+                      context,
+                    );
+                    if (!context.mounted) {
+                      return;
+                    }
+                    if (submitted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(loc.feedback_thanks)),
+                      );
+                    }
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.science_outlined),
                   title: const Text('测试 Crashlytics'),
@@ -271,42 +298,6 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ],
             ),
-          _SettingsSection(
-            title: loc.settings_section_support,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: Text(loc.settings_help_feedback),
-                subtitle: Text(loc.settings_help_feedback_subtitle),
-                onTap: () async {
-                  final feedbackService = ref.read(feedbackServiceProvider);
-                  final submitted = await feedbackService.collectFeedback(
-                    context,
-                  );
-                  if (!context.mounted) {
-                    return;
-                  }
-                  if (submitted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(loc.feedback_thanks)),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: Text(loc.settings_app_version),
-                subtitle: Text(loc.settings_app_version_subtitle),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AboutPage()),
-                  );
-                },
-              ),
-            ],
-          ),
         ],
       ),
     );

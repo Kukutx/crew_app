@@ -4,14 +4,14 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-class QrScannerPage extends StatefulWidget {
-  const QrScannerPage({super.key});
+class QrScannerScreen extends StatefulWidget {
+  const QrScannerScreen({super.key});
 
   @override
-  State<QrScannerPage> createState() => _QrScannerPageState();
+  State<QrScannerScreen> createState() => _QrScannerScreenState();
 }
 
-class _QrScannerPageState extends State<QrScannerPage> {
+class _QrScannerScreenState extends State<QrScannerScreen> {
   late final MobileScannerController _controller;
 
   @override

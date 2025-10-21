@@ -42,8 +42,7 @@ class CreateRoadTripInput {
     this.existingImageUrls = const <String>[],
   });
 
-  File? get coverImage =>
-      galleryImages.isEmpty ? null : galleryImages[0];
+  File? get coverImage => galleryImages.isEmpty ? null : galleryImages[0];
 }
 
 /// --- API provider (stub) --------------------------------------------------
@@ -130,14 +129,11 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
         ..addAll(initial.waypoints);
       if (initial.existingImageUrls.isNotEmpty) {
         _galleryItems.addAll(
-          initial.existingImageUrls
-              .map((url) => _GalleryItem.network(url)),
+          initial.existingImageUrls.map((url) => _GalleryItem.network(url)),
         );
       }
       if (initial.galleryImages.isNotEmpty) {
-        _galleryItems.addAll(
-          initial.galleryImages.map(_GalleryItem.file),
-        );
+        _galleryItems.addAll(initial.galleryImages.map(_GalleryItem.file));
       }
     }
   }
@@ -169,9 +165,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
   }
 
   Future<void> _pickImages() async {
-    final picked = await _picker.pickMultiImage(
-      imageQuality: 85,
-    );
+    final picked = await _picker.pickMultiImage(imageQuality: 85);
     if (picked.isEmpty) return;
     setState(() {
       final newItems = picked.map((x) => _GalleryItem.file(File(x.path)));
@@ -243,9 +237,9 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
     if (_pricingType == PricingType.paid) {
       final price = double.tryParse(_priceCtrl.text.trim());
       if (price == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('请输入正确的人均费用')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('请输入正确的人均费用')));
         return;
       }
     }
@@ -287,9 +281,9 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
 
       final id = await ref.read(eventsApiProvider).createRoadTrip(input);
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('${widget.isEditing ? '更新' : '创建'}成功：$id')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${widget.isEditing ? '更新' : '创建'}成功：$id')),
+      );
       Navigator.pop(context, id);
     } catch (e) {
       if (context.mounted) {
@@ -319,291 +313,287 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
         ),
       ),
       body: SafeArea(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 120),
-              children: [
-                Text(
-                  widget.isEditing ? '更新旅程，焕新体验' : '让灵感变成下一次旅程',
-                  style: titleStyle,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 120),
+            children: [
+              Text(
+                widget.isEditing ? '更新旅程，焕新体验' : '让灵感变成下一次旅程',
+                style: titleStyle,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '完成关卡式表单，召集伙伴一起上路！',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  '完成关卡式表单，召集伙伴一起上路！',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 24),
+              _buildSectionCard(
+                icon: Icons.rocket_launch_outlined,
+                title: '基础信息',
+                subtitle: '命名旅程并锁定时间',
+                children: [
+                  TextFormField(
+                    controller: _titleCtrl,
+                    decoration: _inputDecoration('旅程标题', '如：五渔村海岸线一日自驾'),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '请输入标题' : null,
                   ),
-                ),
-                const SizedBox(height: 24),
-                _buildSectionCard(
-                  icon: Icons.rocket_launch_outlined,
-                  title: '基础信息',
-                  subtitle: '命名旅程并锁定时间',
-                  children: [
-                    TextFormField(
-                      controller: _titleCtrl,
-                      decoration: _inputDecoration('旅程标题', '如：五渔村海岸线一日自驾'),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? '请输入标题' : null,
+                  const SizedBox(height: 16),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.calendar_month,
+                      color: theme.colorScheme.primary,
                     ),
-                    const SizedBox(height: 16),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading:
-                          Icon(Icons.calendar_month, color: theme.colorScheme.primary),
-                      title: const Text('活动日期'),
-                      subtitle: Text(
-                        _dateRange == null
-                            ? '点击选择日期范围'
-                            : '${_formatDate(_dateRange!.start)} → ${_formatDate(_dateRange!.end)}',
+                    title: const Text('活动日期'),
+                    subtitle: Text(
+                      _dateRange == null
+                          ? '点击选择日期范围'
+                          : '${_formatDate(_dateRange!.start)} → ${_formatDate(_dateRange!.end)}',
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _pickDateRange,
+                  ),
+                ],
+              ),
+              _buildSectionCard(
+                icon: Icons.route_outlined,
+                title: '路线设定',
+                subtitle: '规划起终点与集合点',
+                children: [
+                  TextFormField(
+                    controller: _startLocationCtrl,
+                    decoration: _inputDecoration('起点', '如：Milan Duomo 或地标'),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '请输入起点' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _endLocationCtrl,
+                    decoration: _inputDecoration('终点', '如：La Spezia 或景点'),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '请输入终点' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _meetingLocationCtrl,
+                    decoration: _inputDecoration('集合地点', '如：停车场、地铁口'),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '请输入集合地点' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '路线类型',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SegmentedButton<TripRouteType>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(
+                        value: TripRouteType.roundTrip,
+                        label: Text('往返路线'),
+                        icon: Icon(Icons.autorenew),
                       ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: _pickDateRange,
-                    ),
-                  ],
-                ),
-                _buildSectionCard(
-                  icon: Icons.route_outlined,
-                  title: '路线设定',
-                  subtitle: '规划起终点与集合点',
-                  children: [
-                    TextFormField(
-                      controller: _startLocationCtrl,
-                      decoration:
-                          _inputDecoration('起点', '如：Milan Duomo 或地标'),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? '请输入起点'
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _endLocationCtrl,
-                      decoration:
-                          _inputDecoration('终点', '如：La Spezia 或景点'),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? '请输入终点'
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _meetingLocationCtrl,
-                      decoration: _inputDecoration('集合地点', '如：停车场、地铁口'),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? '请输入集合地点'
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '路线类型',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                      ButtonSegment(
+                        value: TripRouteType.oneWay,
+                        label: Text('单程路线'),
+                        icon: Icon(Icons.route_outlined),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    SegmentedButton<TripRouteType>(
-                      showSelectedIcon: false,
-                      segments: const [
-                        ButtonSegment(
-                          value: TripRouteType.roundTrip,
-                          label: Text('往返路线'),
-                          icon: Icon(Icons.autorenew),
+                    ],
+                    selected: {_routeType},
+                    onSelectionChanged: (value) {
+                      setState(() => _routeType = value.first);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      FilledButton.icon(
+                        onPressed: _addWaypointDialog,
+                        icon: const Icon(Icons.add_road),
+                        label: const Text('添加途经点'),
+                      ),
+                      const SizedBox(width: 12),
+                      if (_waypoints.isNotEmpty)
+                        Text(
+                          '共 ${_waypoints.length} 个',
+                          style: theme.textTheme.bodyMedium,
                         ),
-                        ButtonSegment(
-                          value: TripRouteType.oneWay,
-                          label: Text('单程路线'),
-                          icon: Icon(Icons.route_outlined),
-                        ),
-                      ],
-                      selected: {_routeType},
-                      onSelectionChanged: (value) {
-                        setState(() => _routeType = value.first);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        FilledButton.icon(
-                          onPressed: _addWaypointDialog,
-                          icon: const Icon(Icons.add_road),
-                          label: const Text('添加途经点'),
-                        ),
-                        const SizedBox(width: 12),
-                        if (_waypoints.isNotEmpty)
-                          Text('共 ${_waypoints.length} 个',
-                              style: theme.textTheme.bodyMedium),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: _waypoints
-                          .asMap()
-                          .entries
-                          .map(
-                            (e) => Chip(
-                              label: Text('${e.key + 1}. ${e.value}'),
-                              onDeleted: () =>
-                                  setState(() => _waypoints.removeAt(e.key)),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-                ),
-                _buildSectionCard(
-                  icon: Icons.groups_3_outlined,
-                  title: '团队配置',
-                  subtitle: '人数限制与费用模式',
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _maxParticipantsCtrl,
-                            decoration: _inputDecoration('人数上限', '例如 4'),
-                            keyboardType: TextInputType.number,
-                            validator: (v) {
-                              final n = int.tryParse(v ?? '');
-                              if (n == null || n < 1) {
-                                return '请输入≥1的整数';
-                              }
-                              return null;
-                            },
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: _waypoints
+                        .asMap()
+                        .entries
+                        .map(
+                          (e) => Chip(
+                            label: Text('${e.key + 1}. ${e.value}'),
+                            onDeleted: () =>
+                                setState(() => _waypoints.removeAt(e.key)),
                           ),
+                        )
+                        .toList(),
+                  ),
+                ],
+              ),
+              _buildSectionCard(
+                icon: Icons.groups_3_outlined,
+                title: '团队配置',
+                subtitle: '人数限制与费用模式',
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _maxParticipantsCtrl,
+                          decoration: _inputDecoration('人数上限', '例如 4'),
+                          keyboardType: TextInputType.number,
+                          validator: (v) {
+                            final n = int.tryParse(v ?? '');
+                            if (n == null || n < 1) {
+                              return '请输入≥1的整数';
+                            }
+                            return null;
+                          },
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _priceCtrl,
-                            decoration: _inputDecoration(
-                              '人均费用 (€)',
-                              _pricingType == PricingType.free
-                                  ? '免费活动'
-                                  : '例如 29.5',
-                            ),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            enabled: _pricingType == PricingType.paid,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _priceCtrl,
+                          decoration: _inputDecoration(
+                            '人均费用 (€)',
+                            _pricingType == PricingType.free
+                                ? '免费活动'
+                                : '例如 29.5',
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    SegmentedButton<PricingType>(
-                      showSelectedIcon: false,
-                      segments: const [
-                        ButtonSegment(
-                          value: PricingType.free,
-                          label: Text('免费'),
-                          icon: Icon(Icons.favorite_outline),
-                        ),
-                        ButtonSegment(
-                          value: PricingType.paid,
-                          label: Text('收费'),
-                          icon: Icon(Icons.payments_outlined),
-                        ),
-                      ],
-                      selected: {_pricingType},
-                      onSelectionChanged: (value) {
-                        setState(() {
-                          _pricingType = value.first;
-                          if (_pricingType == PricingType.free) {
-                            _priceCtrl.clear();
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                _buildSectionCard(
-                  icon: Icons.tune,
-                  title: '个性设置',
-                  subtitle: '车辆与标签',
-                  children: [
-                    DropdownButtonFormField<String>(
-                      value: _carType,
-                      decoration: _inputDecoration('车辆类型（可选）', null),
-                      items: const [
-                        DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
-                        DropdownMenuItem(value: 'SUV', child: Text('SUV')),
-                        DropdownMenuItem(value: 'Hatchback', child: Text('Hatchback')),
-                        DropdownMenuItem(value: 'Van', child: Text('Van')),
-                      ],
-                      onChanged: (v) => setState(() => _carType = v),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _tagInputCtrl,
-                      decoration: _inputDecoration('添加标签', '回车或点击 + 添加')
-                          .copyWith(
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: _addTagFromInput,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          enabled: _pricingType == PricingType.paid,
                         ),
                       ),
-                      onSubmitted: (_) => _addTagFromInput(),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: _tags
-                          .map(
-                            (t) => Chip(
-                              label: Text('#$t'),
-                              deleteIcon: const Icon(Icons.close),
-                              onDeleted: () => setState(() => _tags.remove(t)),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-                ),
-                _buildSectionCard(
-                  icon: Icons.photo_library_outlined,
-                  title: '旅程影像',
-                  subtitle: '可选择多张，首张默认为封面',
-                  children: [
-                    _GalleryGrid(
-                      items: _galleryItems,
-                      onRemove: _removeGalleryItem,
-                      onSetCover: _setCover,
-                    ),
-                    const SizedBox(height: 12),
-                    FilledButton.icon(
-                      onPressed: _pickImages,
-                      icon: const Icon(Icons.collections_outlined),
-                      label: Text(
-                        _galleryItems.isEmpty ? '选择图片' : '追加图片',
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SegmentedButton<PricingType>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(
+                        value: PricingType.free,
+                        label: Text('免费'),
+                        icon: Icon(Icons.favorite_outline),
+                      ),
+                      ButtonSegment(
+                        value: PricingType.paid,
+                        label: Text('收费'),
+                        icon: Icon(Icons.payments_outlined),
+                      ),
+                    ],
+                    selected: {_pricingType},
+                    onSelectionChanged: (value) {
+                      setState(() {
+                        _pricingType = value.first;
+                        if (_pricingType == PricingType.free) {
+                          _priceCtrl.clear();
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ),
+              _buildSectionCard(
+                icon: Icons.tune,
+                title: '个性设置',
+                subtitle: '车辆与标签',
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: _carType,
+                    decoration: _inputDecoration('车辆类型（可选）', null),
+                    items: const [
+                      DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
+                      DropdownMenuItem(value: 'SUV', child: Text('SUV')),
+                      DropdownMenuItem(
+                        value: 'Hatchback',
+                        child: Text('Hatchback'),
+                      ),
+                      DropdownMenuItem(value: 'Van', child: Text('Van')),
+                    ],
+                    onChanged: (v) => setState(() => _carType = v),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _tagInputCtrl,
+                    decoration: _inputDecoration('添加标签', '回车或点击 + 添加').copyWith(
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.add_circle_outline),
+                        onPressed: _addTagFromInput,
                       ),
                     ),
-                  ],
-                ),
-                _buildSectionCard(
-                  icon: Icons.description_outlined,
-                  title: '活动亮点',
-                  subtitle: '告诉伙伴们为什么要来',
-                  children: [
-                    TextFormField(
-                      controller: _descriptionCtrl,
-                      decoration: _inputDecoration('详细描述', '路线亮点、注意事项、装备建议…'),
-                      maxLines: 6,
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? '请输入描述'
-                          : null,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                FilledButton.icon(
-                  onPressed: _submit,
-                  icon: const Icon(Icons.check_circle_outline),
-                  label: Text(widget.isEditing ? '保存活动' : '创建活动'),
-                ),
-              ],
-            ),
+                    onSubmitted: (_) => _addTagFromInput(),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: _tags
+                        .map(
+                          (t) => Chip(
+                            label: Text('#$t'),
+                            deleteIcon: const Icon(Icons.close),
+                            onDeleted: () => setState(() => _tags.remove(t)),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ],
+              ),
+              _buildSectionCard(
+                icon: Icons.photo_library_outlined,
+                title: '旅程影像',
+                subtitle: '可选择多张，首张默认为封面',
+                children: [
+                  _GalleryGrid(
+                    items: _galleryItems,
+                    onRemove: _removeGalleryItem,
+                    onSetCover: _setCover,
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _pickImages,
+                    icon: const Icon(Icons.collections_outlined),
+                    label: Text(_galleryItems.isEmpty ? '选择图片' : '追加图片'),
+                  ),
+                ],
+              ),
+              _buildSectionCard(
+                icon: Icons.description_outlined,
+                title: '活动亮点',
+                subtitle: '告诉伙伴们为什么要来',
+                children: [
+                  TextFormField(
+                    controller: _descriptionCtrl,
+                    decoration: _inputDecoration('详细描述', '路线亮点、注意事项、装备建议…'),
+                    maxLines: 6,
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '请输入描述' : null,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: _submit,
+                icon: const Icon(Icons.check_circle_outline),
+                label: Text(widget.isEditing ? '保存活动' : '创建活动'),
+              ),
+            ],
           ),
         ),
       ),
@@ -786,22 +776,15 @@ class _GalleryTile extends StatelessWidget {
             child: Container(
               color: colorScheme.surfaceVariant,
               child: item.isFile
-                  ? Image.file(
-                      item.file!,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.network(
-                      item.url!,
-                      fit: BoxFit.cover,
-                    ),
+                  ? Image.file(item.file!, fit: BoxFit.cover)
+                  : Image.network(item.url!, fit: BoxFit.cover),
             ),
           ),
           Positioned(
             top: 8,
             left: 8,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: index == 0
                     ? colorScheme.primaryContainer

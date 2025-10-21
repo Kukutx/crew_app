@@ -17,7 +17,11 @@ class _QrScannerPageState extends State<QrScannerPage> {
   @override
   void initState() {
     super.initState();
-    _controller = MobileScannerController();
+    _controller = MobileScannerController(
+      // 可按需配置：facing: CameraFacing.back,
+      // detectionSpeed: DetectionSpeed.normal,
+      // formats: [BarcodeFormat.qrCode],
+    );
   }
 
   @override
@@ -45,6 +49,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
           Positioned.fill(
             child: MobileScanner(
               controller: _controller,
+              // onDetect: (capture) { ... } // 如需回调在此处理
             ),
           ),
           Positioned.fill(
@@ -55,7 +60,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
                 return CustomPaint(
                   painter: _ScannerOverlayPainter(
                     boxSize: cutOut,
-                    overlayColor: Colors.black.withOpacity(0.55),
+                    overlayColor: Colors.black.withValues(alpha: 0.55),
                     borderColor: Colors.white,
                   ),
                 );
@@ -123,7 +128,8 @@ class _TorchHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final background = Colors.black.withOpacity(0.6);
+    final background = Colors.black.withValues(alpha: 0.6);
+
     return Center(
       child: GestureDetector(
         onTap: () => controller.toggleTorch(),
@@ -137,10 +143,11 @@ class _TorchHint extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ValueListenableBuilder<TorchState>(
-                  valueListenable: controller.torchState,
+                // 监听 controller（而非 controller.torchState）
+                ValueListenableBuilder<MobileScannerState>(
+                  valueListenable: controller,
                   builder: (context, state, _) {
-                    final torchOn = state == TorchState.on;
+                    final torchOn = state.torchState == TorchState.on;
                     return Icon(
                       torchOn ? Icons.flash_on : Icons.flash_off,
                       color: Colors.white,
@@ -186,7 +193,7 @@ class _BottomActionButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Colors.white.withOpacity(0.08),
+          backgroundColor: Colors.white.withValues(alpha: 0.08),
         ),
         onPressed: onTap,
         child: Column(
@@ -229,6 +236,7 @@ class _ScannerOverlayPainter extends CustomPainter {
       24,
     );
 
+    // 蒙层
     final overlayPath = Path()..addRect(Offset.zero & size);
     canvas.saveLayer(Offset.zero & size, Paint());
     canvas.drawPath(
@@ -241,13 +249,14 @@ class _ScannerOverlayPainter extends CustomPainter {
     );
     canvas.restore();
 
+    // 边角
     final borderPaint = Paint()
       ..color = borderColor
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    final double cornerLength = 28;
+    const double cornerLength = 28;
 
     final left = center.dx - half;
     final right = center.dx + half;

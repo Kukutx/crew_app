@@ -1637,13 +1637,13 @@ abstract class AppLocalizations {
   /// No description provided for @settings_app_version.
   ///
   /// In en, this message translates to:
-  /// **'App version'**
+  /// **'About Crew'**
   String get settings_app_version;
 
   /// No description provided for @settings_app_version_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'View release notes and build info'**
+  /// **'View Crew version details and legal documents'**
   String get settings_app_version_subtitle;
 
   /// No description provided for @settings_subscription_current_plan.

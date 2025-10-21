@@ -5,6 +5,7 @@ import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 @immutable
@@ -126,6 +127,49 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
 
   void clearNearbyPlacesCache() {
     _nearbyPlacesCache.clear();
+  }
+
+  Future<String?> reverseGeocode(LatLng latlng) async {
+    try {
+      final list = await placemarkFromCoordinates(
+        latlng.latitude,
+        latlng.longitude,
+      ).timeout(const Duration(seconds: 5));
+      if (list.isEmpty) {
+        return null;
+      }
+      return _formatPlacemark(list.first);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? _formatPlacemark(Placemark place) {
+    final parts = [
+      place.name,
+      place.street,
+      place.subLocality,
+      place.locality,
+      place.subAdministrativeArea,
+      place.administrativeArea,
+      place.country,
+    ];
+    final buffer = <String>[];
+    final seen = <String>{};
+    for (final part in parts) {
+      if (part == null) {
+        continue;
+      }
+      final trimmed = part.trim();
+      if (trimmed.isEmpty || !seen.add(trimmed)) {
+        continue;
+      }
+      buffer.add(trimmed);
+    }
+    if (buffer.isEmpty) {
+      return null;
+    }
+    return buffer.join(', ');
   }
 
   String _cacheKey(LatLng position) {

@@ -136,7 +136,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
                         ],
                       )
                     : Container(
-                        color: colorScheme.surfaceVariant,
+                        color: colorScheme.surfaceContainerHighest,
                         alignment: Alignment.center,
                         child: Icon(
                           Icons.photo_outlined,
@@ -181,7 +181,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
                       ),
                     );
                   },
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  separatorBuilder: (_, _) => const SizedBox(width: 12),
                   itemCount: mediaAssets.length,
                 ),
               ),
@@ -317,7 +317,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
         );
         return SafeArea(
           child: SizedBox(
-            height: maxHeight,
+            height: maxHeight.toDouble(),
             child: Column(
               children: [
                 Container(

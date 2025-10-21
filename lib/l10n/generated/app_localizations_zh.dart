@@ -815,10 +815,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_help_feedback_subtitle => 'FAQ，联系支持';
 
   @override
-  String get settings_app_version => '应用版本信息';
+  String get settings_app_version => '关于 Crew';
 
   @override
-  String get settings_app_version_subtitle => '查看版本和构建信息';
+  String get settings_app_version_subtitle => '查看 Crew 的版本详情与相关协议';
 
   @override
   String get settings_subscription_current_plan => '当前订阅计划';

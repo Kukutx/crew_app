@@ -1,4 +1,5 @@
 import 'package:crew_app/core/state/app_update/state/app_update_providers.dart';
+import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,93 +14,64 @@ class AboutPage extends ConsumerWidget {
     final packageInfoAsync = ref.watch(packageInfoProvider);
     final updateStateAsync = ref.watch(appUpdateStateProvider);
 
-    Widget buildVersionSection() {
-      return packageInfoAsync.when(
-        data: (info) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${loc.about_current_version}: ${info.version}',
-              style: theme.textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${loc.about_build_number}: ${info.buildNumber}',
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
-        ),
-        loading: () => const SizedBox(
-          height: 72,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-        error: (error, _) => Text(
-          loc.load_failed,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.error,
-          ),
-        ),
-      );
+    String resolveUpdateStatus(AppUpdateState? state) {
+      if (state == null) {
+        return loc.about_update_status_unknown;
+      }
+
+      final info = state.info;
+      final resolvedVersion = () {
+        if (info.latestVersion.isNotEmpty) {
+          return info.latestVersion;
+        }
+        if (info.minSupportedVersion.isNotEmpty) {
+          return info.minSupportedVersion;
+        }
+        return state.currentVersion;
+      }();
+
+      if (state.requiresForceUpdate) {
+        return loc.about_update_status_required(resolvedVersion);
+      }
+      if (state.hasOptionalUpdate) {
+        return loc.about_update_status_optional(resolvedVersion);
+      }
+      return loc.about_update_status_up_to_date;
     }
 
-    Widget buildUpdateSection() {
+    Widget buildUpdateSubtitle() {
       return updateStateAsync.when(
         data: (state) {
-          final info = state?.info;
-          final resolvedVersion = () {
-            if (info == null) {
-              return null;
-            }
-            if (info.latestVersion.isNotEmpty) {
-              return info.latestVersion;
-            }
-            if (info.minSupportedVersion.isNotEmpty) {
-              return info.minSupportedVersion;
-            }
-            return null;
-          }();
+          final message = state?.info.message;
+          final children = <Widget>[
+            Text(
+              resolveUpdateStatus(state),
+              style: theme.textTheme.bodyMedium,
+            ),
+          ];
 
-          final versionLabel = resolvedVersion ?? loc.unknown;
-          final statusText = () {
-            if (state == null) {
-              return loc.about_update_status_unknown;
-            }
-            if (state.requiresForceUpdate) {
-              final target = resolvedVersion ?? state.currentVersion;
-              return loc.about_update_status_required(target);
-            }
-            if (state.hasOptionalUpdate) {
-              final target = resolvedVersion ?? state.currentVersion;
-              return loc.about_update_status_optional(target);
-            }
-            return loc.about_update_status_up_to_date;
-          }();
+          if (message != null && message.isNotEmpty) {
+            children.addAll([
+              const SizedBox(height: 4),
+              Text(
+                message,
+                style: theme.textTheme.bodySmall,
+              ),
+            ]);
+          }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                versionLabel,
-                style: theme.textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                statusText,
-                style: theme.textTheme.bodyMedium,
-              ),
-              if (info?.message?.isNotEmpty == true) ...[
-                const SizedBox(height: 8),
-                Text(
-                  info!.message!,
-                  style: theme.textTheme.bodyMedium,
-                ),
-              ],
-            ],
+            children: children,
           );
         },
-        loading: () => const SizedBox(
-          height: 72,
-          child: Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.symmetric(vertical: 4),
+          child: SizedBox(
+            height: 16,
+            width: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
         ),
         error: (error, _) => Text(
           loc.load_failed,
@@ -111,50 +83,85 @@ class AboutPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(loc.about)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            Text(
-              loc.about_section_version_details,
-              style: theme.textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: buildVersionSection(),
+      appBar: AppBar(title: Text(loc.settings_app_version)),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/crew.png',
+                height: 96,
+                width: 96,
               ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 16),
+              Text(
+                'Crew',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              packageInfoAsync.when(
+                data: (info) => Column(
                   children: [
                     Text(
-                      loc.about_latest_version,
-                      style: theme.textTheme.titleSmall,
+                      '${loc.about_current_version}: ${info.version}',
+                      style: theme.textTheme.bodyMedium,
                     ),
-                    const SizedBox(height: 8),
-                    buildUpdateSection(),
-                    const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () => ref.refresh(appUpdateStateProvider),
-                        icon: const Icon(Icons.refresh),
-                        label: Text(loc.about_check_updates),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${loc.about_build_number}: ${info.buildNumber}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                       ),
                     ),
                   ],
                 ),
+                loading: () => const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: CircularProgressIndicator(),
+                ),
+                error: (error, _) => Text(
+                  loc.load_failed,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
               ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.system_update_outlined),
+                  title: Text(loc.about_check_updates),
+                  subtitle: buildUpdateSubtitle(),
+                  trailing: const Icon(Icons.refresh),
+                  onTap: () => ref.refresh(appUpdateStateProvider),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.privacy_tip_outlined),
+                  title: Text(loc.settings_privacy_documents),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacyDocumentsPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

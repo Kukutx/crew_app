@@ -337,8 +337,8 @@
   "settings_section_developer": "Developer tools",
   "settings_help_feedback": "Help & feedback",
   "settings_help_feedback_subtitle": "FAQ, contact support",
-  "settings_app_version": "App version",
-  "settings_app_version_subtitle": "View release notes and build info",
+  "settings_app_version": "About Crew",
+  "settings_app_version_subtitle": "View Crew version details and legal documents",
   "settings_subscription_current_plan": "Current plan",
   "settings_subscription_current_plan_value": "{plan} plan",
   "@settings_subscription_current_plan_value": {

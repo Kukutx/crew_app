@@ -10,8 +10,8 @@
   "settings_section_developer": "开发者工具",
   "settings_help_feedback": "帮助与反馈",
   "settings_help_feedback_subtitle": "FAQ，联系支持",
-  "settings_app_version": "应用版本信息",
-  "settings_app_version_subtitle": "查看版本和构建信息",
+  "settings_app_version": "关于 Crew",
+  "settings_app_version_subtitle": "查看 Crew 的版本详情与相关协议",
   "settings_subscription_current_plan": "当前订阅计划",
   "settings_subscription_current_plan_value": "{plan} 计划",
   "@settings_subscription_current_plan_value": {

@@ -18,6 +18,7 @@ import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/edit_create_road_trip_page.dart';
+import 'package:crew_app/features/events/presentation/pages/quick/quick_actions_page.dart';
 
 import '../../../data/event.dart';
 import '../../../../../core/error/api_exception.dart';
@@ -43,6 +44,7 @@ class EventsMapPage extends ConsumerStatefulWidget {
 }
 
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   GoogleMapController? _map;
   bool _mapReady = false;
   bool _movedToSelected = false;
@@ -197,13 +199,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     return Scaffold(
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
+      key: _scaffoldKey,
+      drawer: MapQuickActionsPage(
+        onClose: () => Navigator.of(context).pop(),
+      ),
+      onDrawerChanged: (isOpened) {
+        _updateBottomNavigation(!isOpened && !_isEventCardVisible);
+      },
       appBar: SearchEventAppBar(
         controller: _searchController,
         focusNode: _searchFocusNode,
         onSearch: _onSearchSubmitted,
         onChanged: _onQueryChanged,
         onClear: _onSearchClear,
-        // onQuickActionsTap: _onQuickActionsTap,
+        onQuickActionsTap: _openQuickActionsDrawer,
         onAvatarTap: _onAvatarTap,
         onResultTap: _onSearchResultTap,
         showResults: searchState.showResults,
@@ -322,6 +331,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       _carouselEvents = const <Event>[];
     });
     _updateBottomNavigation(true);
+  }
+
+  void _openQuickActionsDrawer() {
+    if (_searchFocusNode.hasFocus) {
+      _searchFocusNode.unfocus();
+    }
+    final searchController =
+        ref.read(eventsMapSearchControllerProvider.notifier);
+    searchController.hideResults();
+    _scaffoldKey.currentState?.openDrawer();
   }
 
   void _updateBottomNavigation(bool visible) {

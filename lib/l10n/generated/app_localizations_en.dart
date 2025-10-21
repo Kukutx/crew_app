@@ -1268,6 +1268,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'We\'ll add shortcuts here as soon as they\'re ready.';
 
   @override
+  String get map_quick_actions_bottom_scan => 'Scan';
+
+  @override
+  String get map_quick_actions_bottom_support => 'Help & support';
+
+  @override
+  String get map_quick_actions_bottom_settings => 'Settings';
+
+  @override
   String get map_quick_trip_select_start_tip =>
       'Long press on the map to pick a starting point.';
 

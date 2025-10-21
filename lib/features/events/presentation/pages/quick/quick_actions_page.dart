@@ -45,13 +45,15 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
         color: colorScheme.secondary,
         onTap: () {
           widget.onClose();
-          navigator.push(
-            MaterialPageRoute(
-              builder: (routeContext) => EditOrCreateRoadTripPage(
-                onClose: () => Navigator.of(routeContext).maybePop(),
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.push(
+              MaterialPageRoute(
+                builder: (routeContext) => EditOrCreateRoadTripPage(
+                  onClose: () => Navigator.of(routeContext).maybePop(),
+                ),
               ),
-            ),
-          );
+            );
+          });
         },
       ),
       _QuickActionDefinition(
@@ -66,48 +68,88 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
       ),
     ];
 
-    Widget buildBody() {
-      if (actions.isEmpty) {
-        return _QuickActionsEmptyState(
-          title: loc.map_quick_actions_empty_title,
-          message: loc.map_quick_actions_empty_message,
-        );
-      }
+    final bottomActions = <_BottomActionDefinition>[
+      _BottomActionDefinition(
+        icon: Icons.qr_code_scanner_outlined,
+        label: loc.map_quick_actions_bottom_scan,
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(loc.feature_not_ready)),
+          );
+          widget.onClose();
+        },
+      ),
+      _BottomActionDefinition(
+        icon: Icons.support_agent_outlined,
+        label: loc.map_quick_actions_bottom_support,
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(loc.feature_not_ready)),
+          );
+          widget.onClose();
+        },
+      ),
+      _BottomActionDefinition(
+        icon: Icons.settings_outlined,
+        label: loc.map_quick_actions_bottom_settings,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/settings');
+          });
+        },
+      ),
+    ];
 
-      final tiles = <Widget>[
-        Text(
-          loc.map_quick_actions_subtitle,
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ),
-        const SizedBox(height: 16),
-      ];
-
-      for (var i = 0; i < actions.length; i++) {
-        tiles.add(_MapQuickActionTile(definition: actions[i]));
-        if (i != actions.length - 1) {
-          tiles.add(const SizedBox(height: 12));
-        }
-      }
-
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-        primary: false,
-        shrinkWrap: true,
-        children: tiles,
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(loc.map_quick_actions_title),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: widget.onClose,
+    final drawerBackground = theme.colorScheme.surface;
+    return Drawer(
+      backgroundColor: drawerBackground,
+      child: SafeArea(
+        child: Column(
+          children: [
+            if (actions.isEmpty)
+              Expanded(
+                child: _QuickActionsEmptyState(
+                  title: loc.map_quick_actions_empty_title,
+                  message: loc.map_quick_actions_empty_message,
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                  itemBuilder: (context, index) =>
+                      _MapQuickActionTile(definition: actions[index]),
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemCount: actions.length,
+                ),
+              ),
+            const Divider(height: 1),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                16,
+                20,
+                20 + MediaQuery.of(context).viewPadding.bottom,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (var i = 0; i < bottomActions.length; i++) ...[
+                    Expanded(
+                      child: _DrawerBottomAction(
+                        definition: bottomActions[i],
+                      ),
+                    ),
+                    if (i != bottomActions.length - 1)
+                      const SizedBox(width: 16),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      body: buildBody(),
     );
   }
 }
@@ -128,6 +170,18 @@ class _QuickActionDefinition {
   final VoidCallback onTap;
 }
 
+class _BottomActionDefinition {
+  const _BottomActionDefinition({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+}
+
 class _MapQuickActionTile extends StatelessWidget {
   const _MapQuickActionTile({
     required this.definition,
@@ -139,16 +193,20 @@ class _MapQuickActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    final borderColor = colorScheme.outlineVariant;
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         onTap: definition.onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: borderColor.withValues(alpha: 0.4)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 48,
@@ -157,7 +215,7 @@ class _MapQuickActionTile extends StatelessWidget {
                   color: definition.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(definition.icon, color: definition.color, size: 24),
+                child: Icon(definition.icon, color: definition.color, size: 26),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -166,7 +224,9 @@ class _MapQuickActionTile extends StatelessWidget {
                   children: [
                     Text(
                       definition.title,
-                      style: theme.textTheme.titleMedium,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -178,8 +238,56 @@ class _MapQuickActionTile extends StatelessWidget {
                   ],
                 ),
               ),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerBottomAction extends StatelessWidget {
+  const _DrawerBottomAction({required this.definition});
+
+  final _BottomActionDefinition definition;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: definition.onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Icon(
+                definition.icon,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              definition.label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );

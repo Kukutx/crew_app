@@ -2396,6 +2396,24 @@ abstract class AppLocalizations {
   /// **'We\'ll add shortcuts here as soon as they\'re ready.'**
   String get map_quick_actions_empty_message;
 
+  /// No description provided for @map_quick_actions_bottom_scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get map_quick_actions_bottom_scan;
+
+  /// No description provided for @map_quick_actions_bottom_support.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & support'**
+  String get map_quick_actions_bottom_support;
+
+  /// No description provided for @map_quick_actions_bottom_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get map_quick_actions_bottom_settings;
+
   /// No description provided for @map_quick_trip_select_start_tip.
   ///
   /// In en, this message translates to:

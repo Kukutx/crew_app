@@ -120,7 +120,7 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                   itemBuilder: (context, index) =>
                       _MapQuickActionTile(definition: actions[index]),
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemCount: actions.length,
                 ),
               ),
@@ -271,7 +271,7 @@ class _DrawerBottomAction extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: colorScheme.surfaceVariant,
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Icon(

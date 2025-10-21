@@ -714,8 +714,8 @@ class _GalleryGrid extends StatelessWidget {
         height: 160,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
-          color: colorScheme.surfaceVariant,
+          border: Border.all(color: colorScheme.outline.withValues(alpha: .2)),
+          color: colorScheme.surfaceContainerHighest,
         ),
         child: Center(
           child: Text(
@@ -829,7 +829,7 @@ class _GalleryTile extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceTint.withOpacity(0.6),
+                  color: colorScheme.surfaceTint.withValues(alpha: .6),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

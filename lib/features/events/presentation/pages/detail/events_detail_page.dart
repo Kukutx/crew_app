@@ -285,7 +285,6 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                     pricePerPerson: event.isFree ? null : event.price,
                     carType: null,
                     tags: event.tags,
-                    privacy: 'public',
                     description: event.description,
                     existingImageUrls: event.imageUrls,
                   );

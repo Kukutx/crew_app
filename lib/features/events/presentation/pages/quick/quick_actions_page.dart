@@ -101,40 +101,12 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
       ),
     ];
 
+    final drawerBackground = theme.colorScheme.surface;
     return Drawer(
+      backgroundColor: drawerBackground,
+      child: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          loc.map_quick_actions_title,
-                          style: theme.textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          loc.map_quick_actions_subtitle,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: widget.onClose,
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-            ),
             if (actions.isEmpty)
               Expanded(
                 child: _QuickActionsEmptyState(
@@ -145,7 +117,7 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
             else
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                   itemBuilder: (context, index) =>
                       _MapQuickActionTile(definition: actions[index]),
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -155,10 +127,10 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
             const Divider(height: 1),
             Padding(
               padding: EdgeInsets.fromLTRB(
+                20,
                 16,
-                16,
-                16,
-                16 + MediaQuery.of(context).viewPadding.bottom,
+                20,
+                20 + MediaQuery.of(context).viewPadding.bottom,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,13 +142,14 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
                       ),
                     ),
                     if (i != bottomActions.length - 1)
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                   ],
                 ],
               ),
             ),
           ],
         ),
+      ),
     );
   }
 }
@@ -220,16 +193,20 @@ class _MapQuickActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    final borderColor = colorScheme.outlineVariant;
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         onTap: definition.onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: borderColor.withValues(alpha: 0.4)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 48,
@@ -238,7 +215,7 @@ class _MapQuickActionTile extends StatelessWidget {
                   color: definition.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(definition.icon, color: definition.color, size: 24),
+                child: Icon(definition.icon, color: definition.color, size: 26),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -247,7 +224,9 @@ class _MapQuickActionTile extends StatelessWidget {
                   children: [
                     Text(
                       definition.title,
-                      style: theme.textTheme.titleMedium,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -258,6 +237,10 @@ class _MapQuickActionTile extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
               ),
             ],
           ),
@@ -280,27 +263,27 @@ class _DrawerBottomAction extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       onTap: definition.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
+                color: colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(18),
               ),
               child: Icon(
                 definition.icon,
-                color: colorScheme.primary,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               definition.label,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),

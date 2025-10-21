@@ -6,7 +6,7 @@ import 'package:crew_app/features/events/presentation/pages/map/sheets/map_momen
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/playground/quick/quick_actions_page.dart';
+import 'package:crew_app/shared/playground/my_test_page.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -192,7 +192,7 @@ class _AppState extends ConsumerState<App> {
               children: [
                 ScrollActivityListener(
                   onScrollActivityChanged: _handleScrollActivity,
-                  child: MapQuickActionsPageTest(
+                  child: MyTestPage(
                     onClose: () {
                       ref.read(appOverlayIndexProvider.notifier).state = 1;
                     },

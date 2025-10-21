@@ -4,17 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-class MapQuickActionsPageTest extends ConsumerStatefulWidget {
-  const MapQuickActionsPageTest({super.key, required this.onClose});
+class MyTestPage extends ConsumerStatefulWidget {
+  const MyTestPage({super.key, required this.onClose});
 
   final VoidCallback onClose;
 
   @override
-  ConsumerState<MapQuickActionsPageTest> createState() =>
-      _MapQuickActionsPageTestState();
+  ConsumerState<MyTestPage> createState() =>
+      _MyTestPageState();
 }
 
-class _MapQuickActionsPageTestState extends ConsumerState<MapQuickActionsPageTest> {
+class _MyTestPageState extends ConsumerState<MyTestPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;

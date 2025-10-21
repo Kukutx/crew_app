@@ -1,6 +1,7 @@
-import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../widgets/plaza_post_card.dart';
 
@@ -26,9 +27,9 @@ class _EditMomentPageState extends State<EditMomentPage> {
   late final Set<String> _selectedTags;
   late final PageController _pageController;
 
-  late List<String> _mediaAssets;
-  late List<String> _availableMediaAssets;
+  late List<_MomentImage> _mediaAssets;
   int _currentImageIndex = 0;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -36,15 +37,9 @@ class _EditMomentPageState extends State<EditMomentPage> {
     _contentController = TextEditingController(text: widget.post.content);
     _locationController = TextEditingController(text: widget.post.location);
     _selectedTags = widget.post.tags.toSet();
-    _mediaAssets = widget.post.mediaAssets.toList();
-    _availableMediaAssets = {
-      ...widget.post.mediaAssets,
-      'assets/images/crew.png',
-      'assets/images/Image_20250917233011_307_216.png',
-      'assets/images/icons/app_icon.png',
-      'assets/images/icons/logo.png',
-    }.toList()
-      ..sort();
+    _mediaAssets = widget.post.mediaAssets
+        .map((asset) => _MomentImage.asset(asset))
+        .toList();
     _pageController = PageController();
     _tagSuggestions = {
       ...widget.post.tags,
@@ -105,8 +100,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
                             itemCount: mediaAssets.length,
                             itemBuilder: (context, index) {
                               final asset = mediaAssets[index];
-                              return Image.asset(
-                                asset,
+                              return asset.build(
                                 fit: BoxFit.cover,
                               );
                             },
@@ -174,8 +168,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
                           ),
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: Image.asset(
-                          asset,
+                        child: asset.build(
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -297,100 +290,32 @@ class _EditMomentPageState extends State<EditMomentPage> {
   }
 
   Future<void> _openImagePicker() async {
-    final options = _availableMediaAssets;
-    final hasNewImage =
-        options.any((asset) => !_mediaAssets.contains(asset));
-    if (!hasNewImage) {
-      _showPreviewMessage('暂无更多可选图片');
+    final pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles.isEmpty) {
+      _showPreviewMessage('未选择任何图片');
       return;
     }
-    final selected = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        final maxHeight = math.min(
-          MediaQuery.of(context).size.height * 0.6,
-          160 + options.length * 92,
-        );
-        return SafeArea(
-          child: SizedBox(
-            height: maxHeight.toDouble(),
-            child: Column(
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '选择图片',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: options.length,
-                    itemBuilder: (context, index) {
-                      final asset = options[index];
-                      final alreadyAdded = _mediaAssets.contains(asset);
-                      return ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 8),
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            asset,
-                            width: 56,
-                            height: 56,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        title: Text(asset.split('/').last),
-                        trailing: alreadyAdded
-                            ? const Icon(Icons.check, color: Colors.green)
-                            : null,
-                        enabled: !alreadyAdded,
-                        onTap: alreadyAdded
-                            ? null
-                            : () {
-                                Navigator.of(context).pop(asset);
-                              },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
 
-    if (!mounted || selected == null) {
+    final newImages = <_MomentImage>[];
+    for (final file in pickedFiles) {
+      final bytes = await file.readAsBytes();
+      newImages.add(
+        _MomentImage.memory(
+          bytes: bytes,
+          name: file.name,
+        ),
+      );
+    }
+
+    if (newImages.isEmpty || !mounted) {
       return;
     }
-    if (_mediaAssets.contains(selected)) {
-      _showPreviewMessage('该图片已添加');
-      return;
-    }
+
     setState(() {
-      _mediaAssets.add(selected);
+      _mediaAssets.addAll(newImages);
       _currentImageIndex = _mediaAssets.length - 1;
     });
+
     await Future<void>.delayed(Duration.zero);
     if (_pageController.hasClients) {
       _pageController.animateToPage(
@@ -399,7 +324,8 @@ class _EditMomentPageState extends State<EditMomentPage> {
         curve: Curves.easeOut,
       );
     }
-    _showPreviewMessage('已添加新的图片');
+
+    _showPreviewMessage('已添加${newImages.length}张图片');
   }
 
   void _setCurrentImageAsCover() {
@@ -441,7 +367,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
         curve: Curves.easeOut,
       );
     }
-    _showPreviewMessage('已移除图片：${removedAsset.split('/').last}');
+    _showPreviewMessage('已移除图片：${removedAsset.displayName}');
   }
 
   void _showPreviewMessage(String message) {
@@ -451,5 +377,42 @@ class _EditMomentPageState extends State<EditMomentPage> {
       ..showSnackBar(
         SnackBar(content: Text(message)),
       );
+  }
+}
+
+class _MomentImage {
+  const _MomentImage._({this.assetPath, this.bytes, required this.name});
+
+  factory _MomentImage.asset(String assetPath) {
+    return _MomentImage._(
+      assetPath: assetPath,
+      name: assetPath.split('/').last,
+    );
+  }
+
+  factory _MomentImage.memory({required Uint8List bytes, required String name}) {
+    return _MomentImage._(
+      bytes: bytes,
+      name: name,
+    );
+  }
+
+  final String? assetPath;
+  final Uint8List? bytes;
+  final String name;
+
+  String get displayName => name;
+
+  Widget build({BoxFit fit = BoxFit.cover}) {
+    if (assetPath != null) {
+      return Image.asset(
+        assetPath!,
+        fit: fit,
+      );
+    }
+    return Image.memory(
+      bytes!,
+      fit: fit,
+    );
   }
 }

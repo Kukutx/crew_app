@@ -2,7 +2,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// 假设有一个历史记录 Provider
+// 假设有一个浏览记录 Provider
 final historyProvider = Provider<List<String>>((ref) => [
       "Item 1",
       "Item 2",

@@ -329,7 +329,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
               TextField(
                 controller: _tagInputCtrl,
                 decoration: InputDecoration(
-                  labelText: '添加标签（回车确认）',
+                  labelText: '添加标签',
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: _addTagFromInput,

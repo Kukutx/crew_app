@@ -66,6 +66,66 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
           widget.onClose();
         },
       ),
+      _QuickActionDefinition(
+        icon: Icons.history_outlined,
+        title: loc.map_quick_actions_browse_history,
+        description: loc.map_quick_actions_browse_history_desc,
+        color: colorScheme.primary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/history');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.auto_awesome_outlined,
+        title: loc.map_quick_actions_my_moments,
+        description: loc.map_quick_actions_my_moments_desc,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/moments');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.drafts_outlined,
+        title: loc.map_quick_actions_my_drafts,
+        description: loc.map_quick_actions_my_drafts_desc,
+        color: colorScheme.tertiary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/drafts');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.person_add_alt_1_outlined,
+        title: loc.map_quick_actions_add_friend,
+        description: loc.map_quick_actions_add_friend_desc,
+        color: colorScheme.primary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/add_friend');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.account_balance_wallet_outlined,
+        title: loc.map_quick_actions_wallet,
+        description: loc.map_quick_actions_wallet_desc,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/wallet');
+          });
+        },
+      ),
     ];
 
     final bottomActions = <_BottomActionDefinition>[

@@ -5,6 +5,9 @@ import 'package:crew_app/features/expenses/expenses_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/history/history_page.dart';
 import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
+import 'package:crew_app/features/user/presentation/pages/drafts/my_drafts_page.dart';
+import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
+import 'package:crew_app/features/user/presentation/pages/moments/my_moments_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/settings_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/state/settings_providers.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
@@ -42,6 +45,9 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/messages_chat': (context) => const ChatSheet(),
   '/expenses': (context) => const ExpensesPage(),
   '/wallet': (context) => const WalletPage(),
+  '/moments': (context) => const MyMomentsPage(),
+  '/drafts': (context) => const MyDraftsPage(),
+  '/add_friend': (context) => const AddFriendPage(),
   '/profile': (context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     final uid = args is String ? args : null;

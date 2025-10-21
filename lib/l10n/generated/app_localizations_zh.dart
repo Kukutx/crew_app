@@ -305,10 +305,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get favorites_title => '收藏';
 
   @override
-  String get history_empty => '暂无历史记录~';
+  String get history_empty => '暂无浏览记录~';
 
   @override
-  String get history_title => '历史记录';
+  String get history_title => '浏览记录';
 
   @override
   String get industry_label_optional => '行业（选填）';
@@ -1210,6 +1210,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_create_moment_desc => '向社区发布照片或动态。';
 
   @override
+  String get map_quick_actions_browse_history => '浏览记录';
+
+  @override
+  String get map_quick_actions_browse_history_desc => '查看最近浏览过的活动与地点。';
+
+  @override
+  String get map_quick_actions_my_moments => '我的瞬间';
+
+  @override
+  String get map_quick_actions_my_moments_desc => '管理你发布的全部瞬间。';
+
+  @override
+  String get map_quick_actions_my_drafts => '我的草稿';
+
+  @override
+  String get map_quick_actions_my_drafts_desc => '查看并继续编辑未发布的草稿。';
+
+  @override
+  String get map_quick_actions_add_friend => '添加好友';
+
+  @override
+  String get map_quick_actions_add_friend_desc => '通过二维码或搜索添加好友。';
+
+  @override
+  String get map_quick_actions_wallet => '我的钱包';
+
+  @override
+  String get map_quick_actions_wallet_desc => '快速访问钱包资产与交易。';
+
+  @override
   String get map_quick_actions_empty_title => '暂无快捷操作';
 
   @override
@@ -1256,6 +1286,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_select_location_create_trip => '创建快速行程';
+
+  @override
+  String get my_moments_title => '我的瞬间';
+
+  @override
+  String get my_drafts_title => '我的草稿';
+
+  @override
+  String get add_friend_title => '添加好友';
 
   @override
   String get wallet_title => '我的钱包';

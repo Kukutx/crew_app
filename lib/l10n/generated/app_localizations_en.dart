@@ -312,10 +312,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favorites_title => 'Favorites';
 
   @override
-  String get history_empty => 'No history yet~';
+  String get history_empty => 'No browsing history yet~';
 
   @override
-  String get history_title => 'History';
+  String get history_title => 'Browse history';
 
   @override
   String get industry_label_optional => 'Industry (optional)';
@@ -1261,6 +1261,41 @@ class AppLocalizationsEn extends AppLocalizations {
       'Post photos or updates to the community.';
 
   @override
+  String get map_quick_actions_browse_history => 'Browse history';
+
+  @override
+  String get map_quick_actions_browse_history_desc =>
+      'Revisit places and events you\'ve explored.';
+
+  @override
+  String get map_quick_actions_my_moments => 'My moments';
+
+  @override
+  String get map_quick_actions_my_moments_desc =>
+      'Manage everything you\'ve shared.';
+
+  @override
+  String get map_quick_actions_my_drafts => 'My drafts';
+
+  @override
+  String get map_quick_actions_my_drafts_desc =>
+      'Continue working on saved drafts.';
+
+  @override
+  String get map_quick_actions_add_friend => 'Add friends';
+
+  @override
+  String get map_quick_actions_add_friend_desc =>
+      'Invite people via QR code or search.';
+
+  @override
+  String get map_quick_actions_wallet => 'My wallet';
+
+  @override
+  String get map_quick_actions_wallet_desc =>
+      'Check balances and recent activity instantly.';
+
+  @override
   String get map_quick_actions_empty_title => 'Nothing to show yet';
 
   @override
@@ -1311,6 +1346,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_select_location_create_trip => 'Create quick trip';
+
+  @override
+  String get my_moments_title => 'My moments';
+
+  @override
+  String get my_drafts_title => 'My drafts';
+
+  @override
+  String get add_friend_title => 'Add friends';
 
   @override
   String get wallet_title => 'Wallet';

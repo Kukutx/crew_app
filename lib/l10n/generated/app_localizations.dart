@@ -677,13 +677,13 @@ abstract class AppLocalizations {
   /// No description provided for @history_empty.
   ///
   /// In en, this message translates to:
-  /// **'No history yet~'**
+  /// **'No browsing history yet~'**
   String get history_empty;
 
   /// No description provided for @history_title.
   ///
   /// In en, this message translates to:
-  /// **'History'**
+  /// **'Browse history'**
   String get history_title;
 
   /// No description provided for @industry_label_optional.
@@ -2384,6 +2384,66 @@ abstract class AppLocalizations {
   /// **'Post photos or updates to the community.'**
   String get map_quick_actions_create_moment_desc;
 
+  /// No description provided for @map_quick_actions_browse_history.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse history'**
+  String get map_quick_actions_browse_history;
+
+  /// No description provided for @map_quick_actions_browse_history_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Revisit places and events you\'ve explored.'**
+  String get map_quick_actions_browse_history_desc;
+
+  /// No description provided for @map_quick_actions_my_moments.
+  ///
+  /// In en, this message translates to:
+  /// **'My moments'**
+  String get map_quick_actions_my_moments;
+
+  /// No description provided for @map_quick_actions_my_moments_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage everything you\'ve shared.'**
+  String get map_quick_actions_my_moments_desc;
+
+  /// No description provided for @map_quick_actions_my_drafts.
+  ///
+  /// In en, this message translates to:
+  /// **'My drafts'**
+  String get map_quick_actions_my_drafts;
+
+  /// No description provided for @map_quick_actions_my_drafts_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue working on saved drafts.'**
+  String get map_quick_actions_my_drafts_desc;
+
+  /// No description provided for @map_quick_actions_add_friend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friends'**
+  String get map_quick_actions_add_friend;
+
+  /// No description provided for @map_quick_actions_add_friend_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite people via QR code or search.'**
+  String get map_quick_actions_add_friend_desc;
+
+  /// No description provided for @map_quick_actions_wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'My wallet'**
+  String get map_quick_actions_wallet;
+
+  /// No description provided for @map_quick_actions_wallet_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Check balances and recent activity instantly.'**
+  String get map_quick_actions_wallet_desc;
+
   /// No description provided for @map_quick_actions_empty_title.
   ///
   /// In en, this message translates to:
@@ -2479,6 +2539,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create quick trip'**
   String get map_select_location_create_trip;
+
+  /// No description provided for @my_moments_title.
+  ///
+  /// In en, this message translates to:
+  /// **'My moments'**
+  String get my_moments_title;
+
+  /// No description provided for @my_drafts_title.
+  ///
+  /// In en, this message translates to:
+  /// **'My drafts'**
+  String get my_drafts_title;
+
+  /// No description provided for @add_friend_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friends'**
+  String get add_friend_title;
 
   /// No description provided for @wallet_title.
   ///

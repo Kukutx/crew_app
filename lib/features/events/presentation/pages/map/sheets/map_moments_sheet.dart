@@ -321,11 +321,53 @@ class _MapEventsPlazaFeed extends StatelessWidget {
           onAuthorTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const UserProfilePage()),
           ),
+          onEditTap: () => _onEditMoment(context),
+          onDeleteTap: () => _onDeleteMoment(context),
         );
       },
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemCount: posts.length,
     );
+  }
+
+  void _onEditMoment(BuildContext context) {
+    _showMomentActionSnackBar(context, '编辑功能即将上线');
+  }
+
+  Future<void> _onDeleteMoment(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('删除动态'),
+            content: const Text('确定要删除这条动态吗？'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('取消'),
+              ),
+              FilledButton.tonal(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('删除'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!context.mounted || !confirmed) {
+      return;
+    }
+
+    _showMomentActionSnackBar(context, '已删除动态');
+  }
+
+  void _showMomentActionSnackBar(BuildContext context, String message) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message)),
+      );
   }
 }
 

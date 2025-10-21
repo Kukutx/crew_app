@@ -1,6 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/plaza/plaza_post_detail_page.dart';
+import 'package:crew_app/features/events/presentation/pages/plaza/widgets/plaza_post_detail_screen.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
@@ -19,8 +19,7 @@ class MapMomentsSheet extends ConsumerStatefulWidget {
   const MapMomentsSheet({super.key});
 
   @override
-  ConsumerState<MapMomentsSheet> createState() =>
-      _MapEventsExploreSheetState();
+  ConsumerState<MapMomentsSheet> createState() => _MapEventsExploreSheetState();
 }
 
 class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
@@ -106,10 +105,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
       comments: 7,
       accentColor: Color(0xFF377D71),
       previewLabel: '河畔清风局',
-      mediaAssets: [
-        'assets/images/crew.png',
-        'assets/images/crew.png',
-      ],
+      mediaAssets: ['assets/images/crew.png', 'assets/images/crew.png'],
       commentItems: [
         PlazaComment(
           author: '晨跑小队',
@@ -315,12 +311,13 @@ class _MapEventsPlazaFeed extends StatelessWidget {
         final post = posts[index];
         return PlazaPostCard(
           post: post,
-          onTap: () => Navigator.of(context)
-              .push(PlazaPostDetailPage.route(post: post)),
+          onTap: () => Navigator.of(
+            context,
+          ).push(PlazaPostDetailScreen.route(post: post)),
           onCommentTap: () => showPlazaPostCommentsSheet(context, post),
-          onAuthorTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const UserProfilePage()),
-          ),
+          onAuthorTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const UserProfilePage())),
         );
       },
       separatorBuilder: (_, _) => const SizedBox(height: 12),

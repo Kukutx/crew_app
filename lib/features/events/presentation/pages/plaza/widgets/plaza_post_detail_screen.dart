@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 
-import 'edit_moment_page.dart';
+import '../edit_moment_page.dart';
 
-import 'sheets/plaza_post_comments_sheet.dart';
+import '../sheets/plaza_post_comments_sheet.dart';
 
-class PlazaPostDetailPage extends StatefulWidget {
-  const PlazaPostDetailPage({
+class PlazaPostDetailScreen extends StatefulWidget {
+  const PlazaPostDetailScreen({
     super.key,
     required this.post,
     this.initialPage = 0,
@@ -27,7 +27,7 @@ class PlazaPostDetailPage extends StatefulWidget {
     return PageRouteBuilder<int>(
       pageBuilder: (_, animation, _) => FadeTransition(
         opacity: animation,
-        child: PlazaPostDetailPage(
+        child: PlazaPostDetailScreen(
           post: post,
           initialPage: initialPage,
           heroTag: heroTag,
@@ -39,10 +39,10 @@ class PlazaPostDetailPage extends StatefulWidget {
   }
 
   @override
-  State<PlazaPostDetailPage> createState() => _PlazaPostDetailPageState();
+  State<PlazaPostDetailScreen> createState() => _PlazaPostDetailPageState();
 }
 
-class _PlazaPostDetailPageState extends State<PlazaPostDetailPage> {
+class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
   late final List<String> _mediaAssets;
   late final PageController _pageController;
   int _currentPage = 0;

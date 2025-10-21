@@ -147,7 +147,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
         pageBuilder: (_, animation, _) {
           return FadeTransition(
             opacity: animation,
-            child: EventMediaFullscreenPage(
+            child: EventMediaFullscreenScreen(
               event: widget.event,
               initialPage: _lastReportedPage,
               heroTag: widget.heroTag,

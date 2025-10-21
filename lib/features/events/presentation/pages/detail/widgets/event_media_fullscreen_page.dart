@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
-class EventMediaFullscreenPage extends StatefulWidget {
-  const EventMediaFullscreenPage({
+class EventMediaFullscreenScreen extends StatefulWidget {
+  const EventMediaFullscreenScreen({
     super.key,
     required this.event,
     required this.initialPage,
@@ -20,11 +20,11 @@ class EventMediaFullscreenPage extends StatefulWidget {
   final String heroTag;
 
   @override
-  State<EventMediaFullscreenPage> createState() =>
-      _EventMediaFullscreenPageState();
+  State<EventMediaFullscreenScreen> createState() =>
+      _EventMediaFullscreenScreenState();
 }
 
-class _EventMediaFullscreenPageState extends State<EventMediaFullscreenPage>
+class _EventMediaFullscreenScreenState extends State<EventMediaFullscreenScreen>
     with TickerProviderStateMixin {
   late final List<_FullscreenMediaItem> _items;
   late final PageController _pageController;

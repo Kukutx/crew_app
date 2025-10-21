@@ -203,7 +203,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onSearch: _onSearchSubmitted,
         onChanged: _onQueryChanged,
         onClear: _onSearchClear,
-        onQuickActionsTap: _onQuickActionsTap,
+        // onQuickActionsTap: _onQuickActionsTap,
         onAvatarTap: _onAvatarTap,
         onResultTap: _onSearchResultTap,
         showResults: searchState.showResults,
@@ -841,13 +841,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _showSnackBar(loc.map_quick_trip_select_start_tip);
   }
 
-  void _onQuickActionsTap() {
-    if (_searchFocusNode.hasFocus) {
-      _searchFocusNode.unfocus();
-    }
-    ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-    ref.read(appOverlayIndexProvider.notifier).state = 0;
-  }
+  // void _onQuickActionsTap() {
+  //   if (_searchFocusNode.hasFocus) {
+  //     _searchFocusNode.unfocus();
+  //   }
+  //   ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
+  //   ref.read(appOverlayIndexProvider.notifier).state = 0;
+  // }
 
   void _onAvatarTap(bool authed) {
     if (_searchFocusNode.hasFocus) {

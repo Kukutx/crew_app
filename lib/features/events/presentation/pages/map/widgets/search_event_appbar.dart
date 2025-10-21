@@ -12,7 +12,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onSearch,
     required this.onChanged,
     required this.onClear,
-    required this.onQuickActionsTap,
+    // required this.onQuickActionsTap,
     required this.onAvatarTap,
     required this.onResultTap,
     required this.showResults,
@@ -28,7 +28,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   final void Function(String keyword) onSearch;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
-  final VoidCallback onQuickActionsTap;
+  // final VoidCallback onQuickActionsTap;
   final void Function(bool authed) onAvatarTap;
   final void Function(Event event) onResultTap;
   final bool showResults;
@@ -121,10 +121,10 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: IconButton(
-                              icon: const Icon(Icons.my_location),
-                              onPressed: onQuickActionsTap,
-                            ),
+                            // prefixIcon: IconButton(
+                            //   icon: const Icon(Icons.my_location),
+                            //   onPressed: onQuickActionsTap,
+                            // ),
                             suffixIconConstraints: const BoxConstraints(
                               minWidth: 96,
                               minHeight: 44,

@@ -5,6 +5,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_share_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -258,6 +259,53 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text('编辑活动'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  final event = widget.event;
+                  final start = event.startTime ?? DateTime.now();
+                  final end = event.endTime != null && event.endTime!.isAfter(start)
+                      ? event.endTime!
+                      : start.add(const Duration(hours: 4));
+                  final draft = CreateRoadTripInput(
+                    id: event.id,
+                    title: event.title,
+                    dateRange: DateTimeRange(start: start, end: end),
+                    startLocation: event.location,
+                    endLocation: event.waypoints.isNotEmpty
+                        ? event.waypoints.last
+                        : event.location,
+                    meetingPoint: event.address ?? event.location,
+                    isRoundTrip: event.isRoundTrip ?? true,
+                    waypoints: event.waypoints,
+                    maxParticipants: event.maxParticipants ?? 4,
+                    isFree: event.isFree,
+                    pricePerPerson: event.isFree ? null : event.price,
+                    carType: null,
+                    tags: event.tags,
+                    privacy: 'public',
+                    description: event.description,
+                    existingImageUrls: event.imageUrls,
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (routeContext) => CreateRoadTripPage(
+                        onClose: () => Navigator.of(routeContext).pop(),
+                        initialValue: draft,
+                        onSubmit: (input) async {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('活动编辑提交暂未接入后端')),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(height: 0),
               ListTile(
                 leading: const Icon(Icons.flag_outlined),
                 title: Text(loc.report_issue),

@@ -59,8 +59,6 @@ class PlazaPostCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onCommentTap;
   final VoidCallback? onAuthorTap;
-  final VoidCallback? onEditTap;
-  final VoidCallback? onDeleteTap;
 
   const PlazaPostCard({
     super.key,
@@ -69,8 +67,6 @@ class PlazaPostCard extends StatelessWidget {
     this.onTap,
     this.onCommentTap,
     this.onAuthorTap,
-    this.onEditTap,
-    this.onDeleteTap,
   });
 
   @override
@@ -80,9 +76,7 @@ class PlazaPostCard extends StatelessWidget {
 
     return Card(
       margin: margin ?? EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -98,8 +92,7 @@ class PlazaPostCard extends StatelessWidget {
                     onTap: onAuthorTap,
                     customBorder: const CircleBorder(),
                     child: CircleAvatar(
-                      backgroundColor:
-                          post.accentColor.withValues(alpha: 0.15),
+                      backgroundColor: post.accentColor.withValues(alpha: 0.15),
                       child: Text(
                         post.authorInitials,
                         style: TextStyle(
@@ -130,155 +123,104 @@ class PlazaPostCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  PopupMenuButton<_PlazaPostMenuAction>(
-                    icon: Icon(
-                      Icons.more_horiz,
-                      color: colorScheme.onSurfaceVariant,
+                  Icon(Icons.more_horiz, color: colorScheme.onSurfaceVariant),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                post.content,
+                style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+              ),
+              if (post.mediaAssets.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
+                    height: 148,
+                    width: double.infinity,
+                    child: _PlazaPostMediaPreview(
+                      mediaAssets: post.mediaAssets,
+                      accentColor: post.accentColor,
                     ),
-                    onSelected: (action) {
-                      switch (action) {
-                        case _PlazaPostMenuAction.edit:
-                          if (onEditTap != null) {
-                            onEditTap!();
-                          } else {
-                            _showDefaultActionMessage(
-                              context,
-                              '编辑功能暂不可用',
-                            );
-                          }
-                          break;
-                        case _PlazaPostMenuAction.delete:
-                          if (onDeleteTap != null) {
-                            onDeleteTap!();
-                          } else {
-                            _showDefaultActionMessage(
-                              context,
-                              '删除功能暂不可用',
-                            );
-                          }
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem<_PlazaPostMenuAction>(
-                        value: _PlazaPostMenuAction.edit,
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, size: 18),
-                            SizedBox(width: 12),
-                            Text('编辑'),
-                          ],
-                        ),
+                  ),
+                ),
+              ] else if (post.previewLabel != null) ...[
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    height: 148,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          post.accentColor.withValues(alpha: .85),
+                          post.accentColor.withValues(alpha: 0.55),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      PopupMenuItem<_PlazaPostMenuAction>(
-                        value: _PlazaPostMenuAction.delete,
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_outline, size: 18),
-                            SizedBox(width: 12),
-                            Text('删除'),
-                          ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      post.previewLabel!,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              if (post.location.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 18,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        post.location,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              post.content,
-              style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
-            ),
-            if (post.mediaAssets.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: SizedBox(
-                  height: 148,
-                  width: double.infinity,
-                  child: _PlazaPostMediaPreview(
-                    mediaAssets: post.mediaAssets,
-                    accentColor: post.accentColor,
-                  ),
-                ),
-              ),
-            ] else if (post.previewLabel != null) ...[
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  height: 148,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        post.accentColor.withValues(alpha: .85),
-                        post.accentColor.withValues(alpha: 0.55),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    post.previewLabel!,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-            if (post.location.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      size: 18,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      post.location,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _PlazaPostAction(
-                  icon: Icons.favorite_border,
-                  label: post.likes.toCompactString(),
-                ),
-                const SizedBox(width: 16),
-                _PlazaPostAction(
-                  icon: Icons.chat_bubble_outline,
-                  label: post.comments.toCompactString(),
-                  onTap: onCommentTap,
                 ),
               ],
-            ),
-          ],
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _PlazaPostAction(
+                    icon: Icons.favorite_border,
+                    label: post.likes.toCompactString(),
+                  ),
+                  const SizedBox(width: 16),
+                  _PlazaPostAction(
+                    icon: Icons.chat_bubble_outline,
+                    label: post.comments.toCompactString(),
+                    onTap: onCommentTap,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -303,9 +245,7 @@ class _PlazaPostMediaPreview extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         DecoratedBox(
-          decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.08),
-          ),
+          decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.08)),
           child: Image.asset(
             firstAsset,
             fit: BoxFit.cover,
@@ -347,11 +287,7 @@ class _PlazaPostAction extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
 
-  const _PlazaPostAction({
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
+  const _PlazaPostAction({required this.icon, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -368,11 +304,7 @@ class _PlazaPostAction extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 18,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(icon, size: 18, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -398,7 +330,5 @@ void _showDefaultActionMessage(BuildContext context, String message) {
   }
   messenger
     ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ..showSnackBar(SnackBar(content: Text(message)));
 }

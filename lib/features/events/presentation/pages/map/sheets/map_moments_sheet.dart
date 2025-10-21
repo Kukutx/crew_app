@@ -1,7 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/plaza_post_detail_page.dart';
-import 'package:crew_app/features/events/presentation/pages/plaza/edit_moment_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
@@ -322,59 +321,11 @@ class _MapEventsPlazaFeed extends StatelessWidget {
           onAuthorTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const UserProfilePage()),
           ),
-          onEditTap: () => _onEditMoment(context, post),
-          onDeleteTap: () => _onDeleteMoment(context, post),
         );
       },
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemCount: posts.length,
     );
-  }
-
-  Future<void> _onEditMoment(BuildContext context, PlazaPost post) async {
-    final updated = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => EditMomentPage(post: post)),
-    );
-
-    if (updated == true && context.mounted) {
-      _showMomentActionSnackBar(context, '瞬间已更新');
-    }
-  }
-
-  Future<void> _onDeleteMoment(BuildContext context, PlazaPost _) async {
-    final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (dialogContext) => AlertDialog(
-            title: const Text('删除瞬间'),
-            content: const Text('确定要删除这条瞬间吗？'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: const Text('取消'),
-              ),
-              FilledButton.tonal(
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: const Text('删除'),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-
-    if (!context.mounted || !confirmed) {
-      return;
-    }
-
-    _showMomentActionSnackBar(context, '瞬间已删除');
-  }
-
-  void _showMomentActionSnackBar(BuildContext context, String message) {
-    final messenger = ScaffoldMessenger.of(context);
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(message)),
-      );
   }
 }
 

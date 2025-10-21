@@ -19,7 +19,6 @@ class CreateRoadTripInput {
   final double? pricePerPerson;
   final String? carType;
   final List<String> tags;
-  final String? privacy; // "public" | "private"
   final String description;
   final List<File> galleryImages;
   final List<String> existingImageUrls;
@@ -38,7 +37,6 @@ class CreateRoadTripInput {
     this.pricePerPerson,
     this.carType,
     required this.tags,
-    this.privacy,
     required this.description,
     this.galleryImages = const <File>[],
     this.existingImageUrls = const <String>[],
@@ -92,7 +90,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
 
   DateTimeRange? _dateRange;
   String? _carType;
-  String? _privacy = 'public';
   late TripRouteType _routeType;
   late PricingType _pricingType;
 
@@ -121,7 +118,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
       }
       _descriptionCtrl.text = initial.description;
       _carType = initial.carType;
-      _privacy = initial.privacy ?? 'public';
       _routeType = initial.isRoundTrip
           ? TripRouteType.roundTrip
           : TripRouteType.oneWay;
@@ -270,7 +266,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
           : double.tryParse(_priceCtrl.text.trim()),
       carType: _carType,
       tags: List.of(_tags),
-      privacy: _privacy,
       description: _descriptionCtrl.text.trim(),
       galleryImages: _galleryItems
           .where((item) => item.file != null)
@@ -308,37 +303,26 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final titleStyle = theme.textTheme.headlineMedium?.copyWith(
-      color: Colors.white,
+    final titleStyle = theme.textTheme.headlineSmall?.copyWith(
       fontWeight: FontWeight.w700,
-      letterSpacing: 1.2,
+      letterSpacing: 0.3,
     );
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFF111322),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         title: Text(widget.isEditing ? '编辑自驾游活动' : '创建自驾游活动'),
         leading: IconButton(
           icon: const Icon(Icons.chevron_left_rounded),
           onPressed: widget.onClose,
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2F1BEE), Color(0xFF6A11CB), Color(0xFF2575FC)],
-          ),
-        ),
-        child: SafeArea(
+      body: SafeArea(
           child: Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 120),
               children: [
                 Text(
                   widget.isEditing ? '更新旅程，焕新体验' : '让灵感变成下一次旅程',
@@ -348,7 +332,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                 Text(
                   '完成关卡式表单，召集伙伴一起上路！',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -360,17 +344,21 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                     TextFormField(
                       controller: _titleCtrl,
                       decoration: _inputDecoration('旅程标题', '如：五渔村海岸线一日自驾'),
-                      style: const TextStyle(color: Colors.white),
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? '请输入标题' : null,
                     ),
                     const SizedBox(height: 16),
-                    _GradientTile(
-                      icon: Icons.calendar_month,
-                      title: '活动日期',
-                      value: _dateRange == null
-                          ? '点击选择日期范围'
-                          : '${_formatDate(_dateRange!.start)} → ${_formatDate(_dateRange!.end)}',
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading:
+                          Icon(Icons.calendar_month, color: theme.colorScheme.primary),
+                      title: const Text('活动日期'),
+                      subtitle: Text(
+                        _dateRange == null
+                            ? '点击选择日期范围'
+                            : '${_formatDate(_dateRange!.start)} → ${_formatDate(_dateRange!.end)}',
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
                       onTap: _pickDateRange,
                     ),
                   ],
@@ -384,7 +372,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                       controller: _startLocationCtrl,
                       decoration:
                           _inputDecoration('起点', '如：Milan Duomo 或地标'),
-                      style: const TextStyle(color: Colors.white),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? '请输入起点'
                           : null,
@@ -394,7 +381,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                       controller: _endLocationCtrl,
                       decoration:
                           _inputDecoration('终点', '如：La Spezia 或景点'),
-                      style: const TextStyle(color: Colors.white),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? '请输入终点'
                           : null,
@@ -403,7 +389,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                     TextFormField(
                       controller: _meetingLocationCtrl,
                       decoration: _inputDecoration('集合地点', '如：停车场、地铁口'),
-                      style: const TextStyle(color: Colors.white),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? '请输入集合地点'
                           : null,
@@ -412,21 +397,12 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                     Text(
                       '路线类型',
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 8),
                     SegmentedButton<TripRouteType>(
                       showSelectedIcon: false,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.resolveWith(
-                          (states) => states.contains(MaterialState.selected)
-                              ? Colors.white.withOpacity(0.15)
-                              : Colors.white.withOpacity(0.05),
-                        ),
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
-                      ),
                       segments: const [
                         ButtonSegment(
                           value: TripRouteType.roundTrip,
@@ -445,32 +421,33 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                       },
                     ),
                     const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        FilledButton.icon(
+                          onPressed: _addWaypointDialog,
+                          icon: const Icon(Icons.add_road),
+                          label: const Text('添加途经点'),
+                        ),
+                        const SizedBox(width: 12),
+                        if (_waypoints.isNotEmpty)
+                          Text('共 ${_waypoints.length} 个',
+                              style: theme.textTheme.bodyMedium),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ActionChip(
-                          avatar: const Icon(Icons.add_road_outlined,
-                              color: Colors.white, size: 18),
-                          label: const Text('添加途经点'),
-                          backgroundColor: Colors.white.withOpacity(0.08),
-                          labelStyle: const TextStyle(color: Colors.white),
-                          onPressed: _addWaypointDialog,
-                        ),
-                        ..._waypoints.asMap().entries.map(
-                              (e) => InputChip(
-                                label: Text('${e.key + 1}. ${e.value}'),
-                                labelStyle:
-                                    const TextStyle(color: Colors.white),
-                                backgroundColor:
-                                    Colors.white.withOpacity(0.08),
-                                onDeleted: () => setState(
-                                  () => _waypoints.removeAt(e.key),
-                                ),
-                                deleteIconColor: Colors.white70,
-                              ),
+                      children: _waypoints
+                          .asMap()
+                          .entries
+                          .map(
+                            (e) => Chip(
+                              label: Text('${e.key + 1}. ${e.value}'),
+                              onDeleted: () =>
+                                  setState(() => _waypoints.removeAt(e.key)),
                             ),
-                      ],
+                          )
+                          .toList(),
                     ),
                   ],
                 ),
@@ -485,7 +462,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                           child: TextFormField(
                             controller: _maxParticipantsCtrl,
                             decoration: _inputDecoration('人数上限', '例如 4'),
-                            style: const TextStyle(color: Colors.white),
                             keyboardType: TextInputType.number,
                             validator: (v) {
                               final n = int.tryParse(v ?? '');
@@ -506,7 +482,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                                   ? '免费活动'
                                   : '例如 29.5',
                             ),
-                            style: const TextStyle(color: Colors.white),
                             keyboardType:
                                 const TextInputType.numberWithOptions(
                               decimal: true,
@@ -519,14 +494,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                     const SizedBox(height: 12),
                     SegmentedButton<PricingType>(
                       showSelectedIcon: false,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.resolveWith(
-                          (states) => states.contains(MaterialState.selected)
-                              ? Colors.white.withOpacity(0.15)
-                              : Colors.white.withOpacity(0.05),
-                        ),
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
-                      ),
                       segments: const [
                         ButtonSegment(
                           value: PricingType.free,
@@ -554,68 +521,26 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                 _buildSectionCard(
                   icon: Icons.tune,
                   title: '个性设置',
-                  subtitle: '车辆、隐私与标签',
+                  subtitle: '车辆与标签',
                   children: [
                     DropdownButtonFormField<String>(
-                      dropdownColor: const Color(0xFF1E1F3B),
                       value: _carType,
-                      style: const TextStyle(color: Colors.white),
-                      iconEnabledColor: Colors.white,
                       decoration: _inputDecoration('车辆类型（可选）', null),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'Sedan',
-                          child: Text('Sedan',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        DropdownMenuItem(
-                          value: 'SUV',
-                          child: Text('SUV',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Hatchback',
-                          child: Text('Hatchback',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Van',
-                          child: Text('Van',
-                              style: TextStyle(color: Colors.white)),
-                        ),
+                      items: const [
+                        DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
+                        DropdownMenuItem(value: 'SUV', child: Text('SUV')),
+                        DropdownMenuItem(value: 'Hatchback', child: Text('Hatchback')),
+                        DropdownMenuItem(value: 'Van', child: Text('Van')),
                       ],
                       onChanged: (v) => setState(() => _carType = v),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      dropdownColor: const Color(0xFF1E1F3B),
-                      value: _privacy,
-                      style: const TextStyle(color: Colors.white),
-                      iconEnabledColor: Colors.white,
-                      decoration: _inputDecoration('可见性', null),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'public',
-                          child: Text('公开',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        DropdownMenuItem(
-                          value: 'private',
-                          child: Text('私密（仅邀请）',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                      onChanged: (v) => setState(() => _privacy = v),
-                    ),
-                    const SizedBox(height: 12),
                     TextField(
                       controller: _tagInputCtrl,
-                      style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration('添加标签', '回车或点击 + 添加')
                           .copyWith(
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.add_circle_outline,
-                              color: Colors.white70),
+                          icon: const Icon(Icons.add_circle_outline),
                           onPressed: _addTagFromInput,
                         ),
                       ),
@@ -628,11 +553,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                           .map(
                             (t) => Chip(
                               label: Text('#$t'),
-                              labelStyle:
-                                  const TextStyle(color: Colors.white),
-                              backgroundColor:
-                                  Colors.white.withOpacity(0.08),
-                              deleteIconColor: Colors.white70,
+                              deleteIcon: const Icon(Icons.close),
                               onDeleted: () => setState(() => _tags.remove(t)),
                             ),
                           )
@@ -668,7 +589,6 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                     TextFormField(
                       controller: _descriptionCtrl,
                       decoration: _inputDecoration('详细描述', '路线亮点、注意事项、装备建议…'),
-                      style: const TextStyle(color: Colors.white),
                       maxLines: 6,
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? '请输入描述'
@@ -691,20 +611,20 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
   }
 
   InputDecoration _inputDecoration(String label, String? hint) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      labelStyle: const TextStyle(color: Colors.white70),
-      hintStyle: const TextStyle(color: Colors.white38),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.06),
+      fillColor: colorScheme.surfaceVariant.withOpacity(0.4),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white54, width: 1.2),
+        borderSide: BorderSide(color: colorScheme.primary, width: 1.2),
       ),
     );
   }
@@ -715,135 +635,62 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
     String? subtitle,
     required List<Widget> children,
   }) {
-    return Container(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Card(
+      elevation: 0,
       margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 18,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF80FFEA), Color(0xFF8A4FFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      color: colorScheme.surfaceVariant.withOpacity(0.7),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  child: Icon(icon, color: colorScheme.onPrimaryContainer),
                 ),
-                child: Icon(icon, color: const Color(0xFF0B0D1B)),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    if (subtitle != null)
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        subtitle,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                  ],
+                      if (subtitle != null)
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ...children,
-        ],
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
       ),
     );
   }
 
   String _formatDate(DateTime date) {
     return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
-  }
-}
-
-class _GradientTile extends StatelessWidget {
-  const _GradientTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          gradient: const LinearGradient(
-            colors: [Color(0x33258CF9), Color(0x336A11CB)],
-          ),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white70),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.white54),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -870,18 +717,22 @@ class _GalleryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     if (items.isEmpty) {
       return Container(
         height: 160,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
-          color: Colors.white.withOpacity(0.04),
+          border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+          color: colorScheme.surfaceVariant,
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             '还没有选择图片，点击下方按钮添加',
-            style: TextStyle(color: Colors.white54),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       );
@@ -924,6 +775,8 @@ class _GalleryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return GestureDetector(
       onTap: onSetCover,
       child: Stack(
@@ -931,7 +784,7 @@ class _GalleryTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: Container(
-              color: Colors.white.withOpacity(0.08),
+              color: colorScheme.surfaceVariant,
               child: item.isFile
                   ? Image.file(
                       item.file!,
@@ -951,15 +804,16 @@ class _GalleryTile extends StatelessWidget {
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: index == 0
-                    ? Colors.amberAccent
-                    : Colors.black54,
+                    ? colorScheme.primaryContainer
+                    : colorScheme.surfaceTint.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 index == 0 ? '封面' : '第 ${index + 1} 张',
-                style: TextStyle(
-                  color: index == 0 ? Colors.black : Colors.white,
-                  fontSize: 11,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: index == 0
+                      ? colorScheme.onPrimaryContainer
+                      : colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -974,12 +828,12 @@ class _GalleryTile extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: colorScheme.surfaceTint.withOpacity(0.6),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.close,
-                  color: Colors.white,
+                  color: colorScheme.onSurface,
                   size: 18,
                 ),
               ),
@@ -992,12 +846,14 @@ class _GalleryTile extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black45,
+                  color: colorScheme.surfaceTint.withOpacity(0.6),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
+                child: Text(
                   '设为封面',
-                  style: TextStyle(color: Colors.white, fontSize: 11),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                 ),
               ),
             ),

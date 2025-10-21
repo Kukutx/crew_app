@@ -145,43 +145,75 @@ class EventInfoCard extends StatelessWidget {
         ),
       );
 
-  Widget _waypointsRow(List<String> waypoints, AppLocalizations loc) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.alt_route, size: 20, color: Colors.orange),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(loc.event_waypoints_title, style: const TextStyle(fontSize: 14)),
-                  const SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: waypoints
-                          .map(
-                            (point) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: Chip(
-                                label: Text(point),
-                                backgroundColor: Colors.orange.shade50,
-                                labelStyle:
-                                    const TextStyle(fontSize: 13, color: Colors.black87),
-                              ),
-                            ),
-                          )
-                          .toList(growable: false),
+  Widget _waypointsRow(List<String> waypoints, AppLocalizations loc) {
+    final showDropdown = waypoints.length > 3;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.alt_route, size: 20, color: Colors.orange),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(loc.event_waypoints_title, style: const TextStyle(fontSize: 14)),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: waypoints
+                              .map(
+                                (point) => Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: Chip(
+                                    label: Text(point),
+                                    backgroundColor: Colors.orange.shade50,
+                                    labelStyle: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(growable: false),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    if (showDropdown) ...[
+                      const SizedBox(width: 8),
+                      PopupMenuButton<String>(
+                        tooltip: loc.event_waypoints_title,
+                        icon: const Icon(
+                          Icons.arrow_drop_down_circle_outlined,
+                          color: Colors.orange,
+                        ),
+                        itemBuilder: (context) => waypoints
+                            .map(
+                              (point) => PopupMenuItem<String>(
+                                value: point,
+                                child: Text(point),
+                              ),
+                            )
+                            .toList(growable: false),
+                        onSelected: (_) {},
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
+  }
 
   String _formatTime() {
     final start = event.startTime;

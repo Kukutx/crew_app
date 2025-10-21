@@ -1312,6 +1312,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_bottom_settings => 'Settings';
 
   @override
+  String get my_moments_title => 'My moments';
+
+  @override
+  String get my_drafts_title => 'My drafts';
+
+  @override
+  String get add_friend_title => 'Add friends';
+
+  @override
   String get map_quick_trip_select_start_tip =>
       'Long press on the map to pick a starting point.';
 
@@ -1346,15 +1355,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_select_location_create_trip => 'Create quick trip';
-
-  @override
-  String get my_moments_title => 'My moments';
-
-  @override
-  String get my_drafts_title => 'My drafts';
-
-  @override
-  String get add_friend_title => 'Add friends';
 
   @override
   String get wallet_title => 'Wallet';

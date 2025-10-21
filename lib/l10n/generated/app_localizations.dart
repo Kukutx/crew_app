@@ -2474,6 +2474,24 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get map_quick_actions_bottom_settings;
 
+  /// No description provided for @my_moments_title.
+  ///
+  /// In en, this message translates to:
+  /// **'My moments'**
+  String get my_moments_title;
+
+  /// No description provided for @my_drafts_title.
+  ///
+  /// In en, this message translates to:
+  /// **'My drafts'**
+  String get my_drafts_title;
+
+  /// No description provided for @add_friend_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friends'**
+  String get add_friend_title;
+
   /// No description provided for @map_quick_trip_select_start_tip.
   ///
   /// In en, this message translates to:
@@ -2539,24 +2557,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create quick trip'**
   String get map_select_location_create_trip;
-
-  /// No description provided for @my_moments_title.
-  ///
-  /// In en, this message translates to:
-  /// **'My moments'**
-  String get my_moments_title;
-
-  /// No description provided for @my_drafts_title.
-  ///
-  /// In en, this message translates to:
-  /// **'My drafts'**
-  String get my_drafts_title;
-
-  /// No description provided for @add_friend_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Add friends'**
-  String get add_friend_title;
 
   /// No description provided for @wallet_title.
   ///

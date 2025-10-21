@@ -1255,6 +1255,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_bottom_settings => '设置';
 
   @override
+  String get my_moments_title => '我的瞬间';
+
+  @override
+  String get my_drafts_title => '我的草稿';
+
+  @override
+  String get add_friend_title => '添加好友';
+
+  @override
   String get map_quick_trip_select_start_tip => '在地图上长按选择起点。';
 
   @override
@@ -1286,15 +1295,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_select_location_create_trip => '创建快速行程';
-
-  @override
-  String get my_moments_title => '我的瞬间';
-
-  @override
-  String get my_drafts_title => '我的草稿';
-
-  @override
-  String get add_friend_title => '添加好友';
 
   @override
   String get wallet_title => '我的钱包';

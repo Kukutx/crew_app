@@ -1,3 +1,4 @@
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 
 class PlazaPost {
@@ -213,12 +214,12 @@ class PlazaPostCard extends StatelessWidget {
               children: [
                 _PlazaPostAction(
                   icon: Icons.favorite_border,
-                  label: post.likes.toString(),
+                  label: post.likes.toCompactString(),
                 ),
                 const SizedBox(width: 16),
                 _PlazaPostAction(
                   icon: Icons.chat_bubble_outline,
-                  label: post.comments.toString(),
+                  label: post.comments.toCompactString(),
                   onTap: onCommentTap,
                 ),
               ],

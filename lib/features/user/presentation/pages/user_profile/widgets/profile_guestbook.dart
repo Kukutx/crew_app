@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/profile_guestbook_provider.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 
 class ProfileGuestbook extends ConsumerWidget {
   const ProfileGuestbook({super.key});
@@ -154,7 +155,7 @@ class _GuestbookStat extends StatelessWidget {
         Icon(icon, size: 18, color: Theme.of(context).hintColor),
         const SizedBox(width: 4),
         Text(
-          '$count',
+          count.toCompactString(),
           style: Theme.of(context)
               .textTheme
               .bodySmall

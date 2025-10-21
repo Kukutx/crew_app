@@ -35,6 +35,25 @@ extension IntExt on int {
 
   /// 转换为 Duration
   Duration get seconds => Duration(seconds: this);
+
+  /// 将较大的数字格式化为更紧凑的展示形式，例如 1.2k
+  String toCompactString() {
+    final absValue = abs();
+    if (absValue < 1000) {
+      return toString();
+    }
+
+    final sign = this < 0 ? '-' : '';
+    final valueInThousands = absValue / 1000;
+    final bool showDecimal = absValue < 10000 && absValue % 1000 != 0;
+    final formatted = showDecimal
+        ? valueInThousands.toStringAsFixed(1)
+        : valueInThousands.floor().toString();
+    final sanitized = formatted.endsWith('.0')
+        ? formatted.substring(0, formatted.length - 2)
+        : formatted;
+    return '$sign$sanitizedk';
+  }
 }
 
 /// 🔹 Widget 扩展

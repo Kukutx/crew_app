@@ -211,6 +211,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_route_type_one_way => '单程路线';
 
   @override
+  String get event_route_manage_button => '管理路线';
+
+  @override
+  String get event_waypoint_editor_title => '途径点与路线';
+
+  @override
+  String get event_waypoint_editor_empty => '暂无途径点';
+
+  @override
+  String get event_waypoint_editor_swipe_hint => '向左滑动标签即可删除。';
+
+  @override
+  String get event_waypoint_editor_add_button => '添加途径点';
+
+  @override
+  String get event_waypoint_picker_title => '选择途径点';
+
+  @override
+  String get event_waypoint_picker_tip => '在地图上长按以选择途径点。';
+
+  @override
+  String get event_waypoint_picker_confirm_title => '添加该途径点？';
+
+  @override
+  String get event_waypoint_picker_confirm_button => '添加途径点';
+
+  @override
   String get event_distance_title => '总里程';
 
   @override

@@ -217,6 +217,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_route_type_one_way => 'One-way';
 
   @override
+  String get event_route_manage_button => 'Manage route';
+
+  @override
+  String get event_waypoint_editor_title => 'Waypoints & route';
+
+  @override
+  String get event_waypoint_editor_empty => 'No waypoints yet';
+
+  @override
+  String get event_waypoint_editor_swipe_hint =>
+      'Swipe left on a tag to delete it.';
+
+  @override
+  String get event_waypoint_editor_add_button => 'Add waypoint';
+
+  @override
+  String get event_waypoint_picker_title => 'Pick waypoint';
+
+  @override
+  String get event_waypoint_picker_tip =>
+      'Long press on the map to pick a waypoint.';
+
+  @override
+  String get event_waypoint_picker_confirm_title => 'Add this waypoint?';
+
+  @override
+  String get event_waypoint_picker_confirm_button => 'Add waypoint';
+
+  @override
   String get event_distance_title => 'Distance';
 
   @override

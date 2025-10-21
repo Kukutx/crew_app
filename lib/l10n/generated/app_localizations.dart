@@ -494,6 +494,60 @@ abstract class AppLocalizations {
   /// **'One-way'**
   String get event_route_type_one_way;
 
+  /// No description provided for @event_route_manage_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage route'**
+  String get event_route_manage_button;
+
+  /// No description provided for @event_waypoint_editor_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoints & route'**
+  String get event_waypoint_editor_title;
+
+  /// No description provided for @event_waypoint_editor_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No waypoints yet'**
+  String get event_waypoint_editor_empty;
+
+  /// No description provided for @event_waypoint_editor_swipe_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe left on a tag to delete it.'**
+  String get event_waypoint_editor_swipe_hint;
+
+  /// No description provided for @event_waypoint_editor_add_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add waypoint'**
+  String get event_waypoint_editor_add_button;
+
+  /// No description provided for @event_waypoint_picker_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick waypoint'**
+  String get event_waypoint_picker_title;
+
+  /// No description provided for @event_waypoint_picker_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press on the map to pick a waypoint.'**
+  String get event_waypoint_picker_tip;
+
+  /// No description provided for @event_waypoint_picker_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add this waypoint?'**
+  String get event_waypoint_picker_confirm_title;
+
+  /// No description provided for @event_waypoint_picker_confirm_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add waypoint'**
+  String get event_waypoint_picker_confirm_button;
+
   /// No description provided for @event_distance_title.
   ///
   /// In en, this message translates to:

@@ -304,7 +304,7 @@ class _EditOrCreateRoadTripPageState extends ConsumerState<EditOrCreateRoadTripP
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF111322),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(widget.isEditing ? '编辑自驾游活动' : '创建自驾游活动'),
         leading: IconButton(

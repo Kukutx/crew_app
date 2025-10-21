@@ -4,7 +4,7 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/edit_create_road_trip_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/sheets/event_share_sheet.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
@@ -291,7 +291,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (routeContext) => CreateRoadTripPage(
+                      builder: (routeContext) => EditOrCreateRoadTripPage(
                         onClose: () => Navigator.of(routeContext).pop(),
                         initialValue: draft,
                         onSubmit: (input) async {

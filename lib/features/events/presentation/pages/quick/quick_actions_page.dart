@@ -1,5 +1,5 @@
 import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/edit_create_road_trip_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,7 +47,7 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
           widget.onClose();
           navigator.push(
             MaterialPageRoute(
-              builder: (routeContext) => CreateRoadTripPage(
+              builder: (routeContext) => EditOrCreateRoadTripPage(
                 onClose: () => Navigator.of(routeContext).maybePop(),
               ),
             ),

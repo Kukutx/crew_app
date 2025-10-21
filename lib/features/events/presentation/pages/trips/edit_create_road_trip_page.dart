@@ -58,8 +58,8 @@ class EventsApi {
 }
 
 /// --- Page -----------------------------------------------------------------
-class CreateRoadTripPage extends ConsumerStatefulWidget {
-  const CreateRoadTripPage({
+class EditOrCreateRoadTripPage extends ConsumerStatefulWidget {
+  const EditOrCreateRoadTripPage({
     super.key,
     required this.onClose,
     this.initialValue,
@@ -72,10 +72,10 @@ class CreateRoadTripPage extends ConsumerStatefulWidget {
   bool get isEditing => initialValue != null;
 
   @override
-  ConsumerState<CreateRoadTripPage> createState() => _CreateRoadTripPageState();
+  ConsumerState<EditOrCreateRoadTripPage> createState() => _EditOrCreateRoadTripPageState();
 }
 
-class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
+class _EditOrCreateRoadTripPageState extends ConsumerState<EditOrCreateRoadTripPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _titleCtrl = TextEditingController();
@@ -516,7 +516,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
                 subtitle: '车辆与标签',
                 children: [
                   DropdownButtonFormField<String>(
-                    value: _carType,
+                    initialValue: _carType,
                     decoration: _inputDecoration('车辆类型（可选）', null),
                     items: const [
                       DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
@@ -607,7 +607,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
       labelText: label,
       hintText: hint,
       filled: true,
-      fillColor: colorScheme.surfaceVariant.withOpacity(0.4),
+      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
@@ -631,7 +631,7 @@ class _CreateRoadTripPageState extends ConsumerState<CreateRoadTripPage> {
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      color: colorScheme.surfaceVariant.withOpacity(0.7),
+      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -774,7 +774,7 @@ class _GalleryTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: Container(
-              color: colorScheme.surfaceVariant,
+              color: colorScheme.surfaceContainerHighest,
               child: item.isFile
                   ? Image.file(item.file!, fit: BoxFit.cover)
                   : Image.network(item.url!, fit: BoxFit.cover),
@@ -788,7 +788,7 @@ class _GalleryTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: index == 0
                     ? colorScheme.primaryContainer
-                    : colorScheme.surfaceTint.withOpacity(0.6),
+                    : colorScheme.surfaceTint.withValues(alpha:  0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -811,7 +811,7 @@ class _GalleryTile extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceTint.withOpacity(0.6),
+                  color: colorScheme.surfaceTint.withValues(alpha:  0.6),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(

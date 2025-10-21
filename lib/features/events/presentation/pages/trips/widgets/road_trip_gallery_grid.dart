@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../road_trip_editor_models.dart';
+import '../data/road_trip_editor_models.dart';
 
 class RoadTripGalleryGrid extends StatelessWidget {
   const RoadTripGalleryGrid({

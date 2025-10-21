@@ -1,7 +1,7 @@
 import 'package:crew_app/features/expenses/data/sample_data.dart';
-import 'package:crew_app/features/expenses/models/participant.dart';
-import 'package:crew_app/features/expenses/utils/formatted_date.dart';
-import 'package:crew_app/features/expenses/utils/number_format_helper.dart';
+import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/shared/utils/formatted_date.dart';
+import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:crew_app/features/expenses/widgets/add_expense_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/dialog_row.dart';
 import 'package:crew_app/features/expenses/widgets/member_details_sheet.dart';

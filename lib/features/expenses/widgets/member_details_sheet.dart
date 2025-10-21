@@ -1,5 +1,5 @@
-import 'package:crew_app/features/expenses/models/participant.dart';
-import 'package:crew_app/features/expenses/utils/number_format_helper.dart';
+import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:crew_app/features/expenses/widgets/avatar.dart';
 import 'package:crew_app/features/expenses/widgets/expense_list_tile.dart';
 import 'package:crew_app/features/expenses/widgets/summary_row.dart';

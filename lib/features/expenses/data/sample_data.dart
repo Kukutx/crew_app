@@ -1,4 +1,4 @@
-import 'package:crew_app/features/expenses/models/participant.dart';
+import 'package:crew_app/features/expenses/data/participant.dart';
 
 final List<Participant> sampleParticipants = [
   Participant(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../road_trip_editor_models.dart';
+import '../data/road_trip_editor_models.dart';
 import 'road_trip_form_decorations.dart';
 import 'road_trip_section_card.dart';
 

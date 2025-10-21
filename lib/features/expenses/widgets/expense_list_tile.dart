@@ -1,6 +1,6 @@
-import 'package:crew_app/features/expenses/models/participant.dart';
-import 'package:crew_app/features/expenses/utils/formatted_date.dart';
-import 'package:crew_app/features/expenses/utils/number_format_helper.dart';
+import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/shared/utils/formatted_date.dart';
+import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseListTile extends StatelessWidget {

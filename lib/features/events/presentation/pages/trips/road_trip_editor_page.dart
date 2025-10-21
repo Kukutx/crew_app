@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-export 'editor/road_trip_editor_models.dart';
+export 'data/road_trip_editor_models.dart';
 
-import 'editor/road_trip_editor_models.dart';
+import 'data/road_trip_editor_models.dart';
 import 'editor/widgets/road_trip_basic_section.dart';
 import 'editor/widgets/road_trip_gallery_section.dart';
 import 'editor/widgets/road_trip_preferences_section.dart';

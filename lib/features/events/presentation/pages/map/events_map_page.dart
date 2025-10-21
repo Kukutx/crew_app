@@ -17,6 +17,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
+import 'package:crew_app/features/events/presentation/pages/quick/widgets/map_quick_actions_content.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/create_road_trip_page.dart';
 
 import '../../../data/event.dart';
@@ -43,6 +44,7 @@ class EventsMapPage extends ConsumerStatefulWidget {
 }
 
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   GoogleMapController? _map;
   bool _mapReady = false;
   bool _movedToSelected = false;
@@ -196,7 +198,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     });
 
     return Scaffold(
+      key: _scaffoldKey,
       extendBodyBehindAppBar: true, // 关键：让地图顶到状态栏
+      drawer: _buildQuickActionsDrawer(context),
       appBar: SearchEventAppBar(
         controller: _searchController,
         focusNode: _searchFocusNode,
@@ -841,12 +845,60 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     _showSnackBar(loc.map_quick_trip_select_start_tip);
   }
 
+  Drawer _buildQuickActionsDrawer(BuildContext pageContext) {
+    void closeDrawer() {
+      _scaffoldKey.currentState?.closeDrawer();
+    }
+
+    void schedule(VoidCallback callback) {
+      Future.microtask(() {
+        if (!mounted) {
+          return;
+        }
+        callback();
+      });
+    }
+
+    return Drawer(
+      child: SafeArea(
+        child: MapQuickActionsContent(
+          onStartQuickTrip: () {
+            closeDrawer();
+            schedule(() {
+              ref.read(mapQuickActionProvider.notifier).state =
+                  MapQuickAction.startQuickTrip;
+            });
+          },
+          onOpenFullTrip: () {
+            closeDrawer();
+            schedule(() {
+              Navigator.of(pageContext).push(
+                MaterialPageRoute(
+                  builder: (routeContext) => CreateRoadTripPage(
+                    onClose: () => Navigator.of(routeContext).maybePop(),
+                  ),
+                ),
+              );
+            });
+          },
+          onCreateMoment: () {
+            closeDrawer();
+            schedule(() {
+              ref.read(mapQuickActionProvider.notifier).state =
+                  MapQuickAction.showMomentSheet;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   void _onQuickActionsTap() {
     if (_searchFocusNode.hasFocus) {
       _searchFocusNode.unfocus();
     }
     ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-    ref.read(appOverlayIndexProvider.notifier).state = 0;
+    _scaffoldKey.currentState?.openDrawer();
   }
 
   void _onAvatarTap(bool authed) {

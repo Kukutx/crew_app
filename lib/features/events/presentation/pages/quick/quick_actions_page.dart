@@ -107,9 +107,7 @@ class _MapQuickActionsPageState extends ConsumerState<MapQuickActionsPage> {
           onPressed: widget.onClose,
         ),
       ),
-      body: SafeArea(
-        child: buildBody(),
-      ),
+      body: buildBody(),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/core/config/environment.dart';
+import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/presentation/widgets/disclaimer_sheet.dart';
 import 'package:crew_app/shared/widgets/sheets/legal_sheet/state/disclaimer_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

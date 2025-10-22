@@ -128,7 +128,6 @@ class PlazaPostCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(Icons.more_horiz, color: colorScheme.onSurfaceVariant),
                 ],
               ),
               const SizedBox(height: 12),

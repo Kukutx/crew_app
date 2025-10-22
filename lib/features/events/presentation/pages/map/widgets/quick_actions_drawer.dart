@@ -141,58 +141,61 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
     final drawerBackground = theme.colorScheme.surface;
     return Drawer(
       backgroundColor: drawerBackground,
-      child: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: actionGroups.expand((group) => group.actions).isEmpty
-                  ? _QuickActionsEmptyState(
-                      title: loc.map_quick_actions_empty_title,
-                      message: loc.map_quick_actions_empty_message,
-                    )
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            loc.map_quick_actions_section_connect,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+      child: Column(
+        children: [
+          Expanded(
+            child: actionGroups.expand((group) => group.actions).isEmpty
+                ? _QuickActionsEmptyState(
+                    title: loc.map_quick_actions_empty_title,
+                    message: loc.map_quick_actions_empty_message,
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.map_quick_actions_section_connect,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(height: 12),
-                          _FeaturedQuickActionCard(definition: featuredAction),
+                        ),
+                        const SizedBox(height: 12),
+                        _FeaturedQuickActionCard(definition: featuredAction),
+                        const SizedBox(height: 28),
+                        for (final group in actionGroups) ...[
+                          _QuickActionSection(group: group),
                           const SizedBox(height: 28),
-                          for (final group in actionGroups) ...[
-                            _QuickActionSection(group: group),
-                            const SizedBox(height: 28),
-                          ],
                         ],
-                      ),
+                      ],
                     ),
-            ),
-            const Divider(height: 1),
-            SafeArea(
-              top: false,
-              minimum: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  for (var i = 0; i < bottomActions.length; i++) ...[
-                    Expanded(
-                      child: _DrawerBottomAction(
-                        definition: bottomActions[i],
+                  ),
+          ),
+          const Divider(height: 1),
+          Builder(
+            builder: (context) {
+              // iOS 底部 Home 指示条、Android 手势导航等的安全距离
+              final bottomSafe = MediaQuery.of(context).viewPadding.bottom;
+              return Padding(
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + bottomSafe),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    for (var i = 0; i < bottomActions.length; i++) ...[
+                      Expanded(
+                        child: _DrawerBottomAction(
+                          definition: bottomActions[i],
+                        ),
                       ),
-                    ),
-                    if (i != bottomActions.length - 1)
-                      const SizedBox(width: 16),
+                      if (i != bottomActions.length - 1)
+                        const SizedBox(width: 16),
+                    ],
                   ],
-                ],
-              ),
-            ),
-          ],
-        ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -239,10 +242,7 @@ class _FeaturedQuickActionCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             gradient: LinearGradient(
-              colors: [
-                definition.color.withOpacity(0.18),
-                colorScheme.surface,
-              ],
+              colors: [definition.color.withOpacity(0.18), colorScheme.surface],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -267,11 +267,7 @@ class _FeaturedQuickActionCard extends StatelessWidget {
                   color: definition.color.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(
-                  definition.icon,
-                  color: definition.color,
-                  size: 32,
-                ),
+                child: Icon(definition.icon, color: definition.color, size: 32),
               ),
               const SizedBox(width: 20),
               Expanded(
@@ -297,10 +293,7 @@ class _FeaturedQuickActionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
             ],
           ),
         ),
@@ -333,8 +326,7 @@ class _QuickActionSection extends StatelessWidget {
           children: [
             for (var i = 0; i < group.actions.length; i++) ...[
               _MapQuickActionTile(definition: group.actions[i]),
-              if (i != group.actions.length - 1)
-                const SizedBox(height: 12),
+              if (i != group.actions.length - 1) const SizedBox(height: 12),
             ],
           ],
         ),
@@ -356,9 +348,7 @@ class _BottomActionDefinition {
 }
 
 class _MapQuickActionTile extends StatelessWidget {
-  const _MapQuickActionTile({
-    required this.definition,
-  });
+  const _MapQuickActionTile({required this.definition});
 
   final _QuickActionDefinition definition;
 
@@ -376,10 +366,7 @@ class _MapQuickActionTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
-              colors: [
-                definition.color.withOpacity(0.10),
-                colorScheme.surface,
-              ],
+              colors: [definition.color.withOpacity(0.10), colorScheme.surface],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -430,10 +417,7 @@ class _MapQuickActionTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
             ],
           ),
         ),
@@ -466,10 +450,7 @@ class _DrawerBottomAction extends StatelessWidget {
                 color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Icon(
-                definition.icon,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              child: Icon(definition.icon, color: colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 8),
             Text(
@@ -487,10 +468,7 @@ class _DrawerBottomAction extends StatelessWidget {
 }
 
 class _QuickActionsEmptyState extends StatelessWidget {
-  const _QuickActionsEmptyState({
-    required this.title,
-    required this.message,
-  });
+  const _QuickActionsEmptyState({required this.title, required this.message});
 
   final String title;
   final String message;
@@ -506,8 +484,11 @@ class _QuickActionsEmptyState extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.upcoming_outlined,
-                size: 48, color: colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.upcoming_outlined,
+              size: 48,
+              color: colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(height: 16),
             Text(
               title,
@@ -517,8 +498,9 @@ class _QuickActionsEmptyState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               message,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

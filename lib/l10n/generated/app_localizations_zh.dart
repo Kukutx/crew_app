@@ -361,6 +361,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get login_title => '欢迎来到 Crew';
 
   @override
+  String get login_other_options => '其他登录方式';
+
+  @override
+  String get login_other_options_hide => '收起其他方式';
+
+  @override
+  String get login_other_options_title => '选择登录方式';
+
+  @override
+  String get login_other_options_description => '请选择下方任意第三方服务继续';
+
+  @override
+  String get login_agreement_prefix => '我已阅读并同意';
+
+  @override
+  String get login_agreement_terms => '《用户协议》';
+
+  @override
+  String get login_agreement_privacy => '《隐私政策》';
+
+  @override
+  String get login_agreement_children => '《未成年人个人信息保护规则》';
+
+  @override
   String get logout_success => '已退出登录';
 
   @override

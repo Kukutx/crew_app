@@ -31,14 +31,10 @@ class EventInfoCard extends StatelessWidget {
         waypoints.isNotEmpty ? waypoints : _defaultWaypoints;
     final routeType = event.isRoundTrip;
     final displayRouteType = routeType ?? _defaultIsRoundTrip;
-    final distanceKm = event.distanceKm ?? 0;
     final localeTag = Localizations.localeOf(context).toString();
     final feeText = _formatFee(localeTag);
     final addressText =
         event.address?.isNotEmpty == true ? event.address! : event.location;
-    final distanceText = loc.event_distance_value(
-            _formatDistance(distanceKm, localeTag),
-          );
     final linkColor = Theme.of(context).colorScheme.primary;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -98,11 +94,6 @@ class EventInfoCard extends StatelessWidget {
               displayRouteType
                   ? loc.event_route_type_round
                   : loc.event_route_type_one_way,
-            ),
-            _detailRow(
-              Icons.straighten,
-              loc.event_distance_title,
-              distanceText,
             ),
           ],
         ),
@@ -209,8 +200,4 @@ class EventInfoCard extends StatelessWidget {
     return formatter.format(price);
   }
 
-  String _formatDistance(double kilometers, String localeTag) {
-    final formatter = NumberFormat('#,##0.0', localeTag);
-    return formatter.format(kilometers);
-  }
 }

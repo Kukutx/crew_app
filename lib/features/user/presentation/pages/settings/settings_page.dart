@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }
 
@@ -276,6 +277,25 @@ class SettingsPage extends ConsumerWidget {
                         builder: (context) => const StripeTestPage(),
                       ),
                     );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.help_outline),
+                  title: Text("Crashlytics 模块"),
+                  subtitle: Text(loc.settings_help_feedback_subtitle),
+                  onTap: () async {
+                    final feedbackService = ref.read(feedbackServiceProvider);
+                    final submitted = await feedbackService.collectFeedback(
+                      context,
+                    );
+                    if (!context.mounted) {
+                      return;
+                    }
+                    if (submitted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(loc.feedback_thanks)),
+                      );
+                    }
                   },
                 ),
                 ListTile(

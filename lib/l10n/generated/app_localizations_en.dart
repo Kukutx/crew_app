@@ -86,7 +86,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_retry => 'Retry';
 
   @override
-  @override
   String get chinese => 'Chinese';
 
   @override
@@ -336,8 +335,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get favorites_title => 'Favorites';
 
-  @override
-  @override
   @override
   String get industry_label_optional => 'Industry (optional)';
 

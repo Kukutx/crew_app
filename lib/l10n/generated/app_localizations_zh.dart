@@ -85,7 +85,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_retry => '重试';
 
   @override
-  @override
   String get chinese => '中文';
 
   @override
@@ -326,8 +325,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get favorites_title => '收藏';
 
-  @override
-  @override
   @override
   String get industry_label_optional => '行业（选填）';
 

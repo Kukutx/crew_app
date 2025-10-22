@@ -1,21 +1,17 @@
-import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-class MapQuickActionsDrawer extends ConsumerStatefulWidget {
+class MapQuickActionsDrawer extends StatefulWidget {
   const MapQuickActionsDrawer({super.key, required this.onClose});
 
   final VoidCallback onClose;
 
   @override
-  ConsumerState<MapQuickActionsDrawer> createState() =>
-      _MapQuickActionsDrawerState();
+  State<MapQuickActionsDrawer> createState() => _MapQuickActionsDrawerState();
 }
 
-class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
+class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -23,55 +19,10 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
     final colorScheme = theme.colorScheme;
     final navigator = Navigator.of(context);
 
-    void triggerAction(MapQuickAction action) {
-      ref.read(mapQuickActionProvider.notifier).state = action;
-    }
-
     final actions = <_QuickActionDefinition>[
-      _QuickActionDefinition(
-        icon: Icons.alt_route,
-        title: loc.map_quick_actions_quick_trip,
-        description: loc.map_quick_actions_quick_trip_desc,
-        color: colorScheme.primary,
-        onTap: () {
-          triggerAction(MapQuickAction.startQuickTrip);
-          widget.onClose();
-        },
-      ),
-      _QuickActionDefinition(
-        icon: Icons.edit_calendar_outlined,
-        title: loc.map_quick_actions_full_trip,
-        description: loc.map_quick_actions_full_trip_desc,
-        color: colorScheme.secondary,
-        onTap: () {
-          widget.onClose();
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            navigator.push(
-              MaterialPageRoute(
-                builder: (routeContext) => RoadTripEditorPage(
-                  onClose: () => Navigator.of(routeContext).maybePop(),
-                ),
-              ),
-            );
-          });
-        },
-      ),
-      _QuickActionDefinition(
-        icon: Icons.history_outlined,
-        title: loc.map_quick_actions_browse_history,
-        description: loc.map_quick_actions_browse_history_desc,
-        color: colorScheme.primary,
-        onTap: () {
-          widget.onClose();
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            navigator.pushNamed('/history');
-          });
-        },
-      ),
       _QuickActionDefinition(
         icon: Icons.auto_awesome_outlined,
         title: loc.map_quick_actions_my_moments,
-        description: loc.map_quick_actions_my_moments_desc,
         color: colorScheme.secondary,
         onTap: () {
           widget.onClose();
@@ -83,7 +34,6 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
       _QuickActionDefinition(
         icon: Icons.drafts_outlined,
         title: loc.map_quick_actions_my_drafts,
-        description: loc.map_quick_actions_my_drafts_desc,
         color: colorScheme.tertiary,
         onTap: () {
           widget.onClose();
@@ -95,7 +45,6 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
       _QuickActionDefinition(
         icon: Icons.person_add_alt_1_outlined,
         title: loc.map_quick_actions_add_friend,
-        description: loc.map_quick_actions_add_friend_desc,
         color: colorScheme.primary,
         onTap: () {
           widget.onClose();
@@ -107,7 +56,6 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
       _QuickActionDefinition(
         icon: Icons.account_balance_wallet_outlined,
         title: loc.map_quick_actions_wallet,
-        description: loc.map_quick_actions_wallet_desc,
         color: colorScheme.secondary,
         onTap: () {
           widget.onClose();
@@ -154,8 +102,8 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
     final drawerBackground = theme.colorScheme.surface;
     return Drawer(
       backgroundColor: drawerBackground,
-      child:Column(
-          children: [
+      child: Column(
+        children: [
             if (actions.isEmpty)
               Expanded(
                 child: _QuickActionsEmptyState(
@@ -206,14 +154,12 @@ class _QuickActionDefinition {
   const _QuickActionDefinition({
     required this.icon,
     required this.title,
-    required this.description,
     required this.color,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
-  final String description;
   final Color color;
   final VoidCallback onTap;
 }
@@ -267,23 +213,11 @@ class _MapQuickActionTile extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      definition.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      definition.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  definition.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Icon(

@@ -1,39 +1,67 @@
-import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-class MyTestPage extends ConsumerStatefulWidget {
+class MyTestPage extends StatefulWidget {
   const MyTestPage({super.key, required this.onClose});
 
   final VoidCallback onClose;
 
   @override
-  ConsumerState<MyTestPage> createState() =>
-      _MyTestPageState();
+  State<MyTestPage> createState() => _MyTestPageState();
 }
 
-class _MyTestPageState extends ConsumerState<MyTestPage> {
+class _MyTestPageState extends State<MyTestPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    void triggerAction(MapQuickAction action) {
-      ref.read(mapQuickActionProvider.notifier).state = action;
-    }
+    final navigator = Navigator.of(context);
 
     final actions = <_QuickActionDefinition>[
       _QuickActionDefinition(
-        icon: Icons.alt_route,
-        title: loc.map_quick_actions_quick_trip,
-        description: loc.map_quick_actions_quick_trip_desc,
+        icon: Icons.auto_awesome_outlined,
+        title: loc.map_quick_actions_my_moments,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/moments');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.drafts_outlined,
+        title: loc.map_quick_actions_my_drafts,
+        color: colorScheme.tertiary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/drafts');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.person_add_alt_1_outlined,
+        title: loc.map_quick_actions_add_friend,
         color: colorScheme.primary,
         onTap: () {
-          triggerAction(MapQuickAction.startQuickTrip);
           widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/add_friend');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.account_balance_wallet_outlined,
+        title: loc.map_quick_actions_wallet,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/wallet');
+          });
         },
       ),
     ];
@@ -88,14 +116,12 @@ class _QuickActionDefinition {
   const _QuickActionDefinition({
     required this.icon,
     required this.title,
-    required this.description,
     required this.color,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
-  final String description;
   final Color color;
   final VoidCallback onTap;
 }
@@ -120,7 +146,7 @@ class _MapQuickActionTile extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 48,
@@ -133,21 +159,9 @@ class _MapQuickActionTile extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      definition.title,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      definition.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  definition.title,
+                  style: theme.textTheme.titleMedium,
                 ),
               ),
             ],
@@ -199,13 +213,3 @@ class _QuickActionsEmptyState extends StatelessWidget {
     );
   }
 }
-
-
-// 用来使用的
-  // void _onQuickActionsTap() {
-  //   if (_searchFocusNode.hasFocus) {
-  //     _searchFocusNode.unfocus();
-  //   }
-  //   ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-  //   ref.read(appOverlayIndexProvider.notifier).state = 0;
-  // }

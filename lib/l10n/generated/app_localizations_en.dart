@@ -1321,13 +1321,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_my_moments => 'My moments';
 
   @override
+  String get map_quick_actions_my_moments_subtitle =>
+      'Keep up with likes and comments';
+
+  @override
   String get map_quick_actions_my_drafts => 'My drafts';
+
+  @override
+  String get map_quick_actions_my_drafts_subtitle => 'Pick up where you left off';
 
   @override
   String get map_quick_actions_add_friend => 'Add friends';
 
   @override
+  String get map_quick_actions_add_friend_subtitle =>
+      'Invite friends to explore events with you';
+
+  @override
+  String get map_quick_actions_my_activities => 'My activities';
+
+  @override
+  String get map_quick_actions_my_activities_subtitle =>
+      'See everything I\'m joining or hosting';
+
+  @override
+  String get map_quick_actions_my_ledger => 'My ledger';
+
+  @override
+  String get map_quick_actions_my_ledger_subtitle => 'Log expenses in seconds';
+
+  @override
   String get map_quick_actions_wallet => 'My wallet';
+
+  @override
+  String get map_quick_actions_wallet_subtitle => 'Manage balance and cards';
+
+  @override
+  String get map_quick_actions_section_connect => 'Connect';
+
+  @override
+  String get map_quick_actions_section_personal => 'My space';
+
+  @override
+  String get map_quick_actions_section_workspace => 'Workspace';
 
   @override
   String get map_quick_actions_empty_title => 'Nothing to show yet';
@@ -1369,6 +1405,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get add_friend_title => 'Add friends';
+
+  @override
+  String get my_activities_title => 'My activities';
+
+  @override
+  String get my_activities_joining_title => 'Currently joining';
+
+  @override
+  String get my_activities_joining_subtitle => 'Events I\'m counting down to';
+
+  @override
+  String get my_activities_hosting_title => 'Recruiting now';
+
+  @override
+  String get my_activities_hosting_subtitle => 'Activities I\'m organizing';
+
+  @override
+  String get my_activities_status_registered => 'Registered';
+
+  @override
+  String get my_activities_status_hosting => 'Hosting';
+
+  @override
+  String my_activities_card_participants(Object count) {
+    return '$count joined';
+  }
+
+  @override
+  String get my_activities_sample_yoga_title => 'Sunrise yoga flow';
+
+  @override
+  String get my_activities_sample_yoga_details =>
+      'Apr 22 · 7:00 AM · Riverside Studio';
+
+  @override
+  String get my_activities_sample_market_title => 'Weekend creative market';
+
+  @override
+  String get my_activities_sample_market_details =>
+      'Apr 27 · 1:30 PM · Old Town Plaza';
+
+  @override
+  String get my_activities_sample_cleanup_title => 'Lakeside cleanup crew';
+
+  @override
+  String get my_activities_sample_cleanup_details =>
+      'Apr 20 · 9:00 AM · West Lake Pier';
+
+  @override
+  String get my_activities_sample_bake_title => 'Community bake night';
+
+  @override
+  String get my_activities_sample_bake_details =>
+      'Apr 24 · 6:30 PM · Maple Street Hub';
 
   @override
   String get map_quick_trip_select_start_tip =>

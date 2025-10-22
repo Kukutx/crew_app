@@ -1267,13 +1267,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_my_moments => '我的瞬间';
 
   @override
+  String get map_quick_actions_my_moments_subtitle => '及时掌握点赞与评论';
+
+  @override
   String get map_quick_actions_my_drafts => '我的草稿';
+
+  @override
+  String get map_quick_actions_my_drafts_subtitle => '随时继续编辑';
 
   @override
   String get map_quick_actions_add_friend => '添加好友';
 
   @override
+  String get map_quick_actions_add_friend_subtitle => '邀请好友一起探索精彩活动';
+
+  @override
+  String get map_quick_actions_my_activities => '我的活动';
+
+  @override
+  String get map_quick_actions_my_activities_subtitle => '查看我报名或招募的活动';
+
+  @override
+  String get map_quick_actions_my_ledger => '我的账本';
+
+  @override
+  String get map_quick_actions_my_ledger_subtitle => '随手快速记账';
+
+  @override
   String get map_quick_actions_wallet => '我的钱包';
+
+  @override
+  String get map_quick_actions_wallet_subtitle => '管理余额和卡片';
+
+  @override
+  String get map_quick_actions_section_connect => '好友';
+
+  @override
+  String get map_quick_actions_section_personal => '我的天地';
+
+  @override
+  String get map_quick_actions_section_workspace => '创作工作台';
 
   @override
   String get map_quick_actions_empty_title => '暂无快捷操作';
@@ -1313,6 +1346,56 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get add_friend_title => '添加好友';
+
+  @override
+  String get my_activities_title => '我的活动';
+
+  @override
+  String get my_activities_joining_title => '我正在参加';
+
+  @override
+  String get my_activities_joining_subtitle => '正在倒计时的活动';
+
+  @override
+  String get my_activities_hosting_title => '我正在招募';
+
+  @override
+  String get my_activities_hosting_subtitle => '由我发起的活动';
+
+  @override
+  String get my_activities_status_registered => '已报名';
+
+  @override
+  String get my_activities_status_hosting => '主办中';
+
+  @override
+  String my_activities_card_participants(Object count) {
+    return '已有$count人参加';
+  }
+
+  @override
+  String get my_activities_sample_yoga_title => '日出瑜伽课';
+
+  @override
+  String get my_activities_sample_yoga_details => '4月22日 · 07:00 · 江畔瑜伽馆';
+
+  @override
+  String get my_activities_sample_market_title => '周末创意市集';
+
+  @override
+  String get my_activities_sample_market_details => '4月27日 · 13:30 · 老城广场';
+
+  @override
+  String get my_activities_sample_cleanup_title => '湖畔环保行动';
+
+  @override
+  String get my_activities_sample_cleanup_details => '4月20日 · 09:00 · 西湖码头';
+
+  @override
+  String get my_activities_sample_bake_title => '社区烘焙夜';
+
+  @override
+  String get my_activities_sample_bake_details => '4月24日 · 18:30 · 枫叶街社群中心';
 
   @override
   String get map_quick_trip_select_start_tip => '在地图上长按选择起点。';

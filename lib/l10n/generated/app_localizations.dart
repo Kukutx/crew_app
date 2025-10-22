@@ -2498,11 +2498,23 @@ abstract class AppLocalizations {
   /// **'My moments'**
   String get map_quick_actions_my_moments;
 
+  /// No description provided for @map_quick_actions_my_moments_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep up with likes and comments'**
+  String get map_quick_actions_my_moments_subtitle;
+
   /// No description provided for @map_quick_actions_my_drafts.
   ///
   /// In en, this message translates to:
   /// **'My drafts'**
   String get map_quick_actions_my_drafts;
+
+  /// No description provided for @map_quick_actions_my_drafts_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up where you left off'**
+  String get map_quick_actions_my_drafts_subtitle;
 
   /// No description provided for @map_quick_actions_add_friend.
   ///
@@ -2510,11 +2522,65 @@ abstract class AppLocalizations {
   /// **'Add friends'**
   String get map_quick_actions_add_friend;
 
+  /// No description provided for @map_quick_actions_add_friend_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite friends to explore events with you'**
+  String get map_quick_actions_add_friend_subtitle;
+
+  /// No description provided for @map_quick_actions_my_activities.
+  ///
+  /// In en, this message translates to:
+  /// **'My activities'**
+  String get map_quick_actions_my_activities;
+
+  /// No description provided for @map_quick_actions_my_activities_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See everything I'm joining or hosting'**
+  String get map_quick_actions_my_activities_subtitle;
+
+  /// No description provided for @map_quick_actions_my_ledger.
+  ///
+  /// In en, this message translates to:
+  /// **'My ledger'**
+  String get map_quick_actions_my_ledger;
+
+  /// No description provided for @map_quick_actions_my_ledger_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log expenses in seconds'**
+  String get map_quick_actions_my_ledger_subtitle;
+
   /// No description provided for @map_quick_actions_wallet.
   ///
   /// In en, this message translates to:
   /// **'My wallet'**
   String get map_quick_actions_wallet;
+
+  /// No description provided for @map_quick_actions_wallet_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage balance and cards'**
+  String get map_quick_actions_wallet_subtitle;
+
+  /// No description provided for @map_quick_actions_section_connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get map_quick_actions_section_connect;
+
+  /// No description provided for @map_quick_actions_section_personal.
+  ///
+  /// In en, this message translates to:
+  /// **'My space'**
+  String get map_quick_actions_section_personal;
+
+  /// No description provided for @map_quick_actions_section_workspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get map_quick_actions_section_workspace;
 
   /// No description provided for @map_quick_actions_empty_title.
   ///
@@ -2593,6 +2659,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add friends'**
   String get add_friend_title;
+
+  /// No description provided for @my_activities_title.
+  ///
+  /// In en, this message translates to:
+  /// **'My activities'**
+  String get my_activities_title;
+
+  /// No description provided for @my_activities_joining_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently joining'**
+  String get my_activities_joining_title;
+
+  /// No description provided for @my_activities_joining_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Events I'm counting down to'**
+  String get my_activities_joining_subtitle;
+
+  /// No description provided for @my_activities_hosting_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recruiting now'**
+  String get my_activities_hosting_title;
+
+  /// No description provided for @my_activities_hosting_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities I'm organizing'**
+  String get my_activities_hosting_subtitle;
+
+  /// No description provided for @my_activities_status_registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get my_activities_status_registered;
+
+  /// No description provided for @my_activities_status_hosting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hosting'**
+  String get my_activities_status_hosting;
+
+  /// No description provided for @my_activities_card_participants.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} joined'**
+  String my_activities_card_participants(String count);
+
+  /// No description provided for @my_activities_sample_yoga_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise yoga flow'**
+  String get my_activities_sample_yoga_title;
+
+  /// No description provided for @my_activities_sample_yoga_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Apr 22 · 7:00 AM · Riverside Studio'**
+  String get my_activities_sample_yoga_details;
+
+  /// No description provided for @my_activities_sample_market_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend creative market'**
+  String get my_activities_sample_market_title;
+
+  /// No description provided for @my_activities_sample_market_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Apr 27 · 1:30 PM · Old Town Plaza'**
+  String get my_activities_sample_market_details;
+
+  /// No description provided for @my_activities_sample_cleanup_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Lakeside cleanup crew'**
+  String get my_activities_sample_cleanup_title;
+
+  /// No description provided for @my_activities_sample_cleanup_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Apr 20 · 9:00 AM · West Lake Pier'**
+  String get my_activities_sample_cleanup_details;
+
+  /// No description provided for @my_activities_sample_bake_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Community bake night'**
+  String get my_activities_sample_bake_title;
+
+  /// No description provided for @my_activities_sample_bake_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Apr 24 · 6:30 PM · Maple Street Hub'**
+  String get my_activities_sample_bake_details;
 
   /// No description provided for @map_quick_trip_select_start_tip.
   ///

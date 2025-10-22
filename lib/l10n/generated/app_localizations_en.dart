@@ -357,6 +357,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_title => 'Welcome to Crew';
 
   @override
+  String get login_other_options => 'Other sign-in options';
+
+  @override
+  String get login_other_options_hide => 'Hide additional options';
+
+  @override
+  String get login_other_options_title => 'Choose a sign-in method';
+
+  @override
+  String get login_other_options_description =>
+      'Select a provider below to continue.';
+
+  @override
+  String get login_agreement_prefix => 'I have read and agree to';
+
+  @override
+  String get login_agreement_terms => 'Terms of Service';
+
+  @override
+  String get login_agreement_privacy => 'Privacy Policy';
+
+  @override
+  String get login_agreement_children => "Children's Privacy Guidelines";
+
+  @override
   String get logout_success => 'Signed out successfully.';
 
   @override

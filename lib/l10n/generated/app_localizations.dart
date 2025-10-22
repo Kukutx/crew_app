@@ -752,6 +752,54 @@ abstract class AppLocalizations {
   /// **'Welcome to Crew'**
   String get login_title;
 
+  /// No description provided for @login_other_options.
+  ///
+  /// In en, this message translates to:
+  /// **'Other sign-in options'**
+  String get login_other_options;
+
+  /// No description provided for @login_other_options_hide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide additional options'**
+  String get login_other_options_hide;
+
+  /// No description provided for @login_other_options_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a sign-in method'**
+  String get login_other_options_title;
+
+  /// No description provided for @login_other_options_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a provider below to continue.'**
+  String get login_other_options_description;
+
+  /// No description provided for @login_agreement_prefix.
+  ///
+  /// In en, this message translates to:
+  /// **'I have read and agree to'**
+  String get login_agreement_prefix;
+
+  /// No description provided for @login_agreement_terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get login_agreement_terms;
+
+  /// No description provided for @login_agreement_privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get login_agreement_privacy;
+
+  /// No description provided for @login_agreement_children.
+  ///
+  /// In en, this message translates to:
+  /// **"Children's Privacy Guidelines"**
+  String get login_agreement_children;
+
   /// No description provided for @logout_success.
   ///
   /// In en, this message translates to:

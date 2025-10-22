@@ -306,6 +306,17 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
               ),
               const Divider(height: 0),
               ListTile(
+                leading: const Icon(Icons.delete_outline),
+                title: const Text('删除活动'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('活动删除暂未接入后端')),
+                  );
+                },
+              ),
+              const Divider(height: 0),
+              ListTile(
                 leading: const Icon(Icons.flag_outlined),
                 title: Text(loc.report_issue),
                 onTap: () {

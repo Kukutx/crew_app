@@ -45,6 +45,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
       likes: 36,
       comments: 12,
       accentColor: Color(0xFF6750A4),
+      momentType: PlazaMomentType.event,
       previewLabel: '日落草坪局',
       mediaAssets: [
         'assets/images/crew.png',
@@ -75,6 +76,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
       likes: 52,
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
+      momentType: PlazaMomentType.instant,
       previewLabel: '街角手冲香',
       mediaAssets: [
         'assets/images/crew.png',
@@ -104,6 +106,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
       likes: 21,
       comments: 7,
       accentColor: Color(0xFF377D71),
+      momentType: PlazaMomentType.instant,
       previewLabel: '河畔清风局',
       mediaAssets: ['assets/images/crew.png', 'assets/images/crew.png'],
       commentItems: [

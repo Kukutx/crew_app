@@ -24,6 +24,7 @@ class EventPlazaCard extends StatelessWidget {
       likes: 36,
       comments: 12,
       accentColor: Color(0xFF6750A4),
+      momentType: PlazaMomentType.event,
       previewLabel: '日落草坪局',
       mediaAssets: [
         'assets/images/crew.png',
@@ -54,6 +55,7 @@ class EventPlazaCard extends StatelessWidget {
       likes: 52,
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
+      momentType: PlazaMomentType.event,
       previewLabel: '街角手冲香',
       mediaAssets: [
         'assets/images/crew.png',
@@ -83,6 +85,7 @@ class EventPlazaCard extends StatelessWidget {
       likes: 21,
       comments: 7,
       accentColor: Color(0xFF377D71),
+      momentType: PlazaMomentType.event,
       previewLabel: '河畔清风局',
       mediaAssets: [
         'assets/images/crew.png',

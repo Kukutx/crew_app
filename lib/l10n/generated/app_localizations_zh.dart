@@ -252,6 +252,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get create_moment_add_location => '添加地点';
 
   @override
+  String get create_moment_type_section_title => '选择瞬间类型';
+
+  @override
+  String get create_moment_type_section_description => '决定是随手记录，还是关联当前活动一起分享。';
+
+  @override
+  String get create_moment_type_instant => '即时瞬间';
+
+  @override
+  String get create_moment_type_instant_desc => '独立发布，不与任何活动关联。';
+
+  @override
+  String get create_moment_type_event => '活动瞬间';
+
+  @override
+  String get create_moment_type_event_desc => '默认关联正在进行的自驾游活动，让队友及时掌握动态。';
+
+  @override
+  String get create_moment_event_link_label => '已关联活动';
+
+  @override
+  String get create_moment_event_link_value => '自驾游 · 活动进行中';
+
+  @override
   String get create_moment_submit_button => '发布';
 
   @override

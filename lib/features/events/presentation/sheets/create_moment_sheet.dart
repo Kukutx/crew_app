@@ -27,6 +27,7 @@ class _CreateMomentSheet extends StatefulWidget {
 
 class _CreateMomentSheetState extends State<_CreateMomentSheet> {
   late final TextEditingController _textController;
+  _MomentType _selectedType = _MomentType.event;
 
   @override
   void initState() {
@@ -44,6 +45,8 @@ class _CreateMomentSheetState extends State<_CreateMomentSheet> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final selectedType = _selectedType;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 200),
@@ -91,6 +94,34 @@ class _CreateMomentSheetState extends State<_CreateMomentSheet> {
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 16),
+              Text(
+                loc.create_moment_type_section_title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                loc.create_moment_type_section_description,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _MomentTypeSelector(
+                loc: loc,
+                selectedType: selectedType,
+                onChanged: (type) {
+                  setState(() {
+                    _selectedType = type;
+                  });
+                },
+              ),
+              if (selectedType == _MomentType.event) ...[
+                const SizedBox(height: 12),
+                _LinkedActivityBanner(loc: loc),
+              ],
+              const SizedBox(height: 20),
               TextField(
                 controller: _textController,
                 minLines: 4,
@@ -196,3 +227,195 @@ class _CreateMomentActionButton extends StatelessWidget {
     );
   }
 }
+
+class _MomentTypeSelector extends StatelessWidget {
+  const _MomentTypeSelector({
+    required this.loc,
+    required this.selectedType,
+    required this.onChanged,
+  });
+
+  final AppLocalizations loc;
+  final _MomentType selectedType;
+  final ValueChanged<_MomentType> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _MomentTypeCard(
+            title: loc.create_moment_type_instant,
+            description: loc.create_moment_type_instant_desc,
+            icon: Icons.flash_on_outlined,
+            accentColor: const Color(0xFFE8457C),
+            backgroundColor: const Color(0xFFFFEDF3),
+            selected: selectedType == _MomentType.instant,
+            onTap: () => onChanged(_MomentType.instant),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _MomentTypeCard(
+            title: loc.create_moment_type_event,
+            description: loc.create_moment_type_event_desc,
+            icon: Icons.event_outlined,
+            accentColor: const Color(0xFF3D6FE0),
+            backgroundColor: const Color(0xFFE7F1FF),
+            selected: selectedType == _MomentType.event,
+            onTap: () => onChanged(_MomentType.event),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MomentTypeCard extends StatelessWidget {
+  const _MomentTypeCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.accentColor,
+    required this.backgroundColor,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color accentColor;
+  final Color backgroundColor;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final effectiveBackground =
+        selected ? backgroundColor : colorScheme.surfaceContainerHighest;
+    final borderColor =
+        selected ? accentColor : colorScheme.outlineVariant.withValues(alpha: 0.4);
+    final titleStyle = theme.textTheme.titleSmall?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
+    final descriptionStyle = theme.textTheme.bodySmall?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+      height: 1.4,
+    );
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: effectiveBackground,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: borderColor,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                color: accentColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(title, style: titleStyle),
+            const SizedBox(height: 6),
+            Text(description, style: descriptionStyle),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LinkedActivityBanner extends StatelessWidget {
+  const _LinkedActivityBanner({required this.loc});
+
+  final AppLocalizations loc;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF5FF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.primary.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.route_outlined,
+              color: colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  loc.create_moment_event_link_label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  loc.create_moment_event_link_value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  loc.create_moment_type_event_desc,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _MomentType { instant, event }

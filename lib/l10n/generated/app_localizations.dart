@@ -572,6 +572,54 @@ abstract class AppLocalizations {
   /// **'Add location'**
   String get create_moment_add_location;
 
+  /// No description provided for @create_moment_type_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Moment type'**
+  String get create_moment_type_section_title;
+
+  /// No description provided for @create_moment_type_section_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Decide whether to publish a quick inspiration or tie it to your current activity.'**
+  String get create_moment_type_section_description;
+
+  /// No description provided for @create_moment_type_instant.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant moment'**
+  String get create_moment_type_instant;
+
+  /// No description provided for @create_moment_type_instant_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Share freely without linking to any activity.'**
+  String get create_moment_type_instant_desc;
+
+  /// No description provided for @create_moment_type_event.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity moment'**
+  String get create_moment_type_event;
+
+  /// No description provided for @create_moment_type_event_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Link to your ongoing road trip so the crew stays in sync.'**
+  String get create_moment_type_event_desc;
+
+  /// No description provided for @create_moment_event_link_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked activity'**
+  String get create_moment_event_link_label;
+
+  /// No description provided for @create_moment_event_link_value.
+  ///
+  /// In en, this message translates to:
+  /// **'Road trip · Happening now'**
+  String get create_moment_event_link_value;
+
   /// No description provided for @create_moment_submit_button.
   ///
   /// In en, this message translates to:

@@ -259,6 +259,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get create_moment_add_location => 'Add location';
 
   @override
+  String get create_moment_type_section_title => 'Moment type';
+
+  @override
+  String get create_moment_type_section_description =>
+      'Decide whether to publish a quick inspiration or tie it to your current activity.';
+
+  @override
+  String get create_moment_type_instant => 'Instant moment';
+
+  @override
+  String get create_moment_type_instant_desc =>
+      'Share freely without linking to any activity.';
+
+  @override
+  String get create_moment_type_event => 'Activity moment';
+
+  @override
+  String get create_moment_type_event_desc =>
+      'Link to your ongoing road trip so the crew stays in sync.';
+
+  @override
+  String get create_moment_event_link_label => 'Linked activity';
+
+  @override
+  String get create_moment_event_link_value => 'Road trip · Happening now';
+
+  @override
   String get create_moment_submit_button => 'Post';
 
   @override

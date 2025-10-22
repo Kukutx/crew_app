@@ -500,7 +500,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat_attachment_files => '快速附件';
 
   @override
-  String get chat_attachment_media => '图片与视频';
+  String get chat_attachment_image => '图片';
 
   @override
   String get chat_attachment_live_location => '实时位置共享';

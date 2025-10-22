@@ -214,7 +214,7 @@
   },
   "chat_attachment_more": "More actions",
   "chat_attachment_files": "Quick attachment",
-  "chat_attachment_media": "Photos & videos",
+  "chat_attachment_image": "Photos",
   "chat_attachment_live_location": "Share live location",
   "chat_composer_emoji_tooltip": "Emojis",
   "chat_composer_attach_tooltip": "Files",

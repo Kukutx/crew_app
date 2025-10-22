@@ -2,10 +2,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class ChatAttachmentSheet extends StatelessWidget {
-  const ChatAttachmentSheet({
-    super.key,
-    required this.onOptionSelected,
-  });
+  const ChatAttachmentSheet({super.key, required this.onOptionSelected});
 
   final ValueChanged<String> onOptionSelected;
 
@@ -22,7 +19,7 @@ class ChatAttachmentSheet extends StatelessWidget {
       ),
       _AttachmentOption(
         icon: Icons.photo_library_outlined,
-        label: loc.chat_attachment_media,
+        label: loc.chat_attachment_image,
         color: colorScheme.secondary,
       ),
       _AttachmentOption(
@@ -53,10 +50,9 @@ class ChatAttachmentSheet extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               loc.chat_attachment_more,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
             ...options.map(

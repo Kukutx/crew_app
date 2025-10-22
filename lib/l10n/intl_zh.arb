@@ -315,7 +315,7 @@
   },
   "chat_attachment_more": "更多功能",
   "chat_attachment_files": "快速附件",
-  "chat_attachment_media": "图片与视频",
+  "chat_attachment_image": "图片",
   "chat_attachment_live_location": "实时位置共享",
   "chat_composer_emoji_tooltip": "表情",
   "chat_composer_attach_tooltip": "文件",

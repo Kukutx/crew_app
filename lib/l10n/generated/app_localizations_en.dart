@@ -515,7 +515,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat_attachment_files => 'Quick attachment';
 
   @override
-  String get chat_attachment_media => 'Photos & videos';
+  String get chat_attachment_image => 'Photos';
 
   @override
   String get chat_attachment_live_location => 'Share live location';

@@ -1022,11 +1022,11 @@ abstract class AppLocalizations {
   /// **'Quick attachment'**
   String get chat_attachment_files;
 
-  /// No description provided for @chat_attachment_media.
+  /// No description provided for @chat_attachment_image.
   ///
   /// In en, this message translates to:
   /// **'Photos & videos'**
-  String get chat_attachment_media;
+  String get chat_attachment_image;
 
   /// No description provided for @chat_attachment_live_location.
   ///

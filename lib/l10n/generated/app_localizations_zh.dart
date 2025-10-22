@@ -85,8 +85,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_retry => '重试';
 
   @override
-  String get browsing_history => '浏览记录';
-
   @override
   String get chinese => '中文';
 
@@ -329,11 +327,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get favorites_title => '收藏';
 
   @override
-  String get history_empty => '暂无浏览记录~';
-
   @override
-  String get history_title => '浏览记录';
-
   @override
   String get industry_label_optional => '行业（选填）';
 
@@ -937,9 +931,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get subscription_plan_pro_feature_insights => '详细数据洞察';
 
   @override
-  String get subscription_plan_pro_feature_history => '无限制活动记录';
-
-  @override
   String get settings_subscription_payment_methods => '支付方式管理';
 
   @override
@@ -1249,52 +1240,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_subtitle => '选择你想要进行的操作。';
 
   @override
-  String get map_quick_actions_quick_trip => '快速自驾';
-
-  @override
-  String get map_quick_actions_quick_trip_desc => '在地图上直接选择起点和终点。';
-
-  @override
-  String get map_quick_actions_full_trip => '完整自驾活动';
-
-  @override
-  String get map_quick_actions_full_trip_desc => '打开完整表单规划详细行程。';
-
-  @override
   String get map_quick_actions_create_moment => '分享瞬间';
-
-  @override
-  String get map_quick_actions_create_moment_desc => '向社区发布照片或动态。';
-
-  @override
-  String get map_quick_actions_browse_history => '浏览记录';
-
-  @override
-  String get map_quick_actions_browse_history_desc => '查看最近浏览过的活动与地点。';
 
   @override
   String get map_quick_actions_my_moments => '我的瞬间';
 
   @override
-  String get map_quick_actions_my_moments_desc => '管理你发布的全部瞬间。';
-
-  @override
   String get map_quick_actions_my_drafts => '我的草稿';
-
-  @override
-  String get map_quick_actions_my_drafts_desc => '查看并继续编辑未发布的草稿。';
 
   @override
   String get map_quick_actions_add_friend => '添加好友';
 
   @override
-  String get map_quick_actions_add_friend_desc => '通过二维码或搜索添加好友。';
-
-  @override
   String get map_quick_actions_wallet => '我的钱包';
-
-  @override
-  String get map_quick_actions_wallet_desc => '快速访问钱包资产与交易。';
 
   @override
   String get map_quick_actions_empty_title => '暂无快捷操作';

@@ -86,8 +86,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_retry => 'Retry';
 
   @override
-  String get browsing_history => 'Browsing history';
-
   @override
   String get chinese => 'Chinese';
 
@@ -339,11 +337,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favorites_title => 'Favorites';
 
   @override
-  String get history_empty => 'No browsing history yet~';
-
   @override
-  String get history_title => 'Browse history';
-
   @override
   String get industry_label_optional => 'Industry (optional)';
 
@@ -976,10 +970,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Detailed performance insights';
 
   @override
-  String get subscription_plan_pro_feature_history =>
-      'Unlimited activity history';
-
-  @override
   String get settings_subscription_payment_methods => 'Manage payment methods';
 
   @override
@@ -1303,60 +1293,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_subtitle => 'Pick what you\'d like to do next.';
 
   @override
-  String get map_quick_actions_quick_trip => 'Quick trip';
-
-  @override
-  String get map_quick_actions_quick_trip_desc =>
-      'Choose start and destination directly on the map.';
-
-  @override
-  String get map_quick_actions_full_trip => 'Full road trip';
-
-  @override
-  String get map_quick_actions_full_trip_desc =>
-      'Open the complete form to plan a detailed journey.';
-
-  @override
   String get map_quick_actions_create_moment => 'Share a moment';
-
-  @override
-  String get map_quick_actions_create_moment_desc =>
-      'Post photos or updates to the community.';
-
-  @override
-  String get map_quick_actions_browse_history => 'Browse history';
-
-  @override
-  String get map_quick_actions_browse_history_desc =>
-      'Revisit places and events you\'ve explored.';
 
   @override
   String get map_quick_actions_my_moments => 'My moments';
 
   @override
-  String get map_quick_actions_my_moments_desc =>
-      'Manage everything you\'ve shared.';
-
-  @override
   String get map_quick_actions_my_drafts => 'My drafts';
-
-  @override
-  String get map_quick_actions_my_drafts_desc =>
-      'Continue working on saved drafts.';
 
   @override
   String get map_quick_actions_add_friend => 'Add friends';
 
   @override
-  String get map_quick_actions_add_friend_desc =>
-      'Invite people via QR code or search.';
-
-  @override
   String get map_quick_actions_wallet => 'My wallet';
-
-  @override
-  String get map_quick_actions_wallet_desc =>
-      'Check balances and recent activity instantly.';
 
   @override
   String get map_quick_actions_empty_title => 'Nothing to show yet';

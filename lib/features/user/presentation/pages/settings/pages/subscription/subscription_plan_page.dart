@@ -49,7 +49,6 @@ class SubscriptionPlanPage extends ConsumerWidget {
         features: [
           loc.subscription_plan_pro_feature_collaboration,
           loc.subscription_plan_pro_feature_insights,
-          loc.subscription_plan_pro_feature_history,
         ],
         gradient: [
           colorScheme.secondary.withValues(alpha: .18),

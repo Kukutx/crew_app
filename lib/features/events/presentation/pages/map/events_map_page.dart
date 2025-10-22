@@ -15,7 +15,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
-import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_quick_actions_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/quick_actions_drawer.dart';
@@ -87,11 +86,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         switch (action) {
           case MapQuickAction.startQuickTrip:
             unawaited(_startQuickTripFromQuickActions());
-            break;
-          case MapQuickAction.showMomentSheet:
-            if (mounted) {
-              unawaited(showCreateMomentSheet(context));
-            }
             break;
         }
         ref.read(mapQuickActionProvider.notifier).state = null;

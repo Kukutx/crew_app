@@ -338,23 +338,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get location_unavailable => 'Unable to get location';
 
   @override
-  String get login_footer =>
-      'By continuing, you agree to our Terms of Service and Privacy Policy.';
-
-  @override
-  String get login_prompt =>
-      'Tap the button above to sign in and explore more features.';
-
-  @override
-  String get login_side_info =>
-      'Discover nearby events · Host quickly · Subscribe for advanced features';
-
-  @override
-  String get login_subtitle =>
-      'Organize events by location and join your crew with one tap.';
-
-  @override
   String get login_title => 'Welcome to Crew';
+
+  @override
+  String get login_agreement_prefix => 'I have read and agree to';
+
+  @override
+  String get login_agreement_terms => 'Terms of Service';
+
+  @override
+  String get login_agreement_privacy => 'Privacy Policy';
+
+  @override
+  String get login_agreement_children => "Children's Privacy Guidelines";
 
   @override
   String get logout_success => 'Signed out successfully.';

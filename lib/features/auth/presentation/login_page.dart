@@ -4,114 +4,206 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
+import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as fui;
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
-import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
+import 'package:firebase_ui_oauth_facebook/firebase_ui_oauth_facebook.dart';
+import 'package:firebase_ui_oauth_twitter/firebase_ui_oauth_twitter.dart';
 
 /// 登录完成后跳转的路由名
 const String kHomeRoute = '/';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final loc = AppLocalizations.of(context)!;
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  bool _agreedToTerms = false;
+
+  List<fui.AuthProvider> _buildProviders(BuildContext context) {
     final providers = <fui.AuthProvider>[
-      // 1) 邮箱密码
-      fui.EmailAuthProvider(),
-      // 2) Phone（如需）
-      // fui.PhoneAuthProvider(), // ← 使用 firebase_ui_auth 的 PhoneAuthProvider
-      // 3) Google（clientId 请替换成你自己的）
       GoogleProvider(
         clientId:
             '417490407531-111poe29m187rdr8d43mp93v9fq92of1.apps.googleusercontent.com',
       ),
-      // 4) Apple（iOS 必须提供 Sign in with Apple，如果你启用了其他第三方登录）
-      if (Theme.of(context).platform == TargetPlatform.iOS) AppleProvider(),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          loc.login_title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true, // 标题居中
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.of(context).pop(); // 关闭页面
-          },
-        ),
-        elevation: 0,
+    providers.addAll([
+      FacebookProvider(
+        clientId: 'YOUR_FACEBOOK_APP_ID',
+        redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
       ),
-      body: fui.SignInScreen(
-        providers: providers,
-        headerBuilder: (context, constraints, _) => Column(
-          children: const [
-            SizedBox(height: 32),
-            Icon(
-              Icons.nightlight_round, // 这里可以换成你自己的 logo 图片
-              size: 80,
-              color: Colors.blueAccent,
-            ),
-            SizedBox(height: 16),
-          ],
-        ),
-        subtitleBuilder: (context, action) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(loc.login_subtitle),
-        ),
-        footerBuilder: (context, action) => Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Text(loc.login_footer),
-        ),
-        actions: [
-          fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
-            final messenger = ScaffoldMessenger.of(context);
-            try {
-              await ref
-                  .read(authServiceProvider)
-                  .getIdToken(forceRefresh: true);
+      TwitterProvider(
+        apiKey: 'YOUR_TWITTER_API_KEY',
+        apiSecretKey: 'YOUR_TWITTER_API_SECRET',
+        redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
+      ),
+    ]);
 
-              final profile = await ref
-                  .read(authenticatedUserProvider.notifier)
-                  .refreshProfile();
+    return providers;
+  }
 
-              if (profile != null) {
-                debugPrint('Authenticated user: ${profile.email}');
-              } else {
-                debugPrint('Authenticated user profile not available.');
-              }
-            } on ApiException catch (error) {
-              messenger.showSnackBar(SnackBar(content: Text(error.message)));
-            } catch (error, stackTrace) {
-              debugPrint('Failed to sync user: $error\n$stackTrace');
-              messenger.showSnackBar(
-                const SnackBar(
-                  content: Text('Failed to sync user information.'),
-                ),
-              );
-            }
-            if (!context.mounted) return;
-            Navigator.of(context).pushReplacementNamed(kHomeRoute);
-          }),
-          fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
-            Navigator.of(context).pushReplacementNamed(kHomeRoute);
-          }),
-          fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
-            Navigator.of(context).pushReplacementNamed(kHomeRoute);
-          }),
-        ],
-        sideBuilder: (context, constraints) => Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            loc.login_side_info,
-            style: const TextStyle(fontSize: 16),
+  void _openPrivacyDocuments(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => const PrivacyDocumentsPage(),
+      ),
+    );
+  }
+
+  Widget _buildAgreementLink(BuildContext context, String label) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+      child: GestureDetector(
+        onTap: () => _openPrivacyDocuments(context),
+        child: Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.primary,
+            decoration: TextDecoration.underline,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAgreementSection(
+    BuildContext context,
+    AppLocalizations loc,
+  ) {
+    final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context);
+    final separator = locale.languageCode == 'zh' ? '、' : ', ';
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Checkbox(
+          value: _agreedToTerms,
+          onChanged: (value) {
+            setState(() {
+              _agreedToTerms = value ?? false;
+            });
+          },
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                loc.login_agreement_prefix,
+                style: theme.textTheme.bodySmall,
+              ),
+              _buildAgreementLink(context, loc.login_agreement_terms),
+              Text(
+                separator,
+                style: theme.textTheme.bodySmall,
+              ),
+              _buildAgreementLink(context, loc.login_agreement_privacy),
+              Text(
+                separator,
+                style: theme.textTheme.bodySmall,
+              ),
+              _buildAgreementLink(context, loc.login_agreement_children),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final providers = _buildProviders(context);
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: fui.SignInScreen(
+                providers: providers,
+                showAuthActionSwitch: false,
+                showPasswordVisibilityToggle: false,
+                headerBuilder: (context, constraints, _) => Column(
+                  children: [
+                    const SizedBox(height: 48),
+                    Image.asset(
+                      'assets/images/crew.png',
+                      height: 80,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      loc.login_title,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+                footerBuilder: (context, action) => Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildAgreementSection(context, loc),
+                    ],
+                  ),
+                ),
+                actions: [
+                  fui.AuthStateChangeAction<fui.SignedIn>((context, state) async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    try {
+                      await ref
+                          .read(authServiceProvider)
+                          .getIdToken(forceRefresh: true);
+
+                      final profile = await ref
+                          .read(authenticatedUserProvider.notifier)
+                          .refreshProfile();
+
+                      if (profile != null) {
+                        debugPrint('Authenticated user: ${profile.email}');
+                      } else {
+                        debugPrint('Authenticated user profile not available.');
+                      }
+                    } on ApiException catch (error) {
+                      messenger
+                          .showSnackBar(SnackBar(content: Text(error.message)));
+                    } catch (error, stackTrace) {
+                      debugPrint('Failed to sync user: $error\n$stackTrace');
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to sync user information.'),
+                        ),
+                      );
+                    }
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushReplacementNamed(kHomeRoute);
+                  }),
+                  fui.AuthStateChangeAction<fui.UserCreated>((context, state) {
+                    Navigator.of(context).pushReplacementNamed(kHomeRoute);
+                  }),
+                  fui.AuthStateChangeAction<fui.CredentialLinked>((context, state) {
+                    Navigator.of(context).pushReplacementNamed(kHomeRoute);
+                  }),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

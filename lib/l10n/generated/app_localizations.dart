@@ -722,35 +722,35 @@ abstract class AppLocalizations {
   /// **'Unable to get location'**
   String get location_unavailable;
 
-  /// No description provided for @login_footer.
-  ///
-  /// In en, this message translates to:
-  /// **'By continuing, you agree to our Terms of Service and Privacy Policy.'**
-  String get login_footer;
-
-  /// No description provided for @login_prompt.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap the button above to sign in and explore more features.'**
-  String get login_prompt;
-
-  /// No description provided for @login_side_info.
-  ///
-  /// In en, this message translates to:
-  /// **'Discover nearby events · Host quickly · Subscribe for advanced features'**
-  String get login_side_info;
-
-  /// No description provided for @login_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Organize events by location and join your crew with one tap.'**
-  String get login_subtitle;
-
   /// No description provided for @login_title.
   ///
   /// In en, this message translates to:
   /// **'Welcome to Crew'**
   String get login_title;
+
+  /// No description provided for @login_agreement_prefix.
+  ///
+  /// In en, this message translates to:
+  /// **'I have read and agree to'**
+  String get login_agreement_prefix;
+
+  /// No description provided for @login_agreement_terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get login_agreement_terms;
+
+  /// No description provided for @login_agreement_privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get login_agreement_privacy;
+
+  /// No description provided for @login_agreement_children.
+  ///
+  /// In en, this message translates to:
+  /// **"Children's Privacy Guidelines"**
+  String get login_agreement_children;
 
   /// No description provided for @logout_success.
   ///

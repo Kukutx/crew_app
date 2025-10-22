@@ -46,7 +46,8 @@ dependencies:
   firebase_auth: ^6.0.1
   firebase_ui_auth: ^3.0.0
   firebase_ui_oauth_google: ^2.0.0
-  firebase_ui_oauth_apple: ^2.0.0   # 仅 iOS/macOS 用得到
+  firebase_ui_oauth_facebook: ^2.0.0
+  firebase_ui_oauth_twitter: ^2.0.0
   firebase_remote_config: ^6.0.2
   firebase_crashlytics: ^5.0.1
   feedback: ^3.2.0

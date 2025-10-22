@@ -331,19 +331,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get location_unavailable => '无法获取定位';
 
   @override
-  String get login_footer => '继续即表示同意我们的服务条款与隐私政策';
-
-  @override
-  String get login_prompt => '点击上方按钮登录体验更多功能';
-
-  @override
-  String get login_side_info => '发现周边活动 · 快速组局 · 订阅解锁高级玩法';
-
-  @override
-  String get login_subtitle => '基于地理位置组织活动，一键加入你的 Crew';
-
   @override
   String get login_title => '欢迎来到 Crew';
+
+  @override
+  String get login_agreement_prefix => '我已阅读并同意';
+
+  @override
+  String get login_agreement_terms => '《用户协议》';
+
+  @override
+  String get login_agreement_privacy => '《隐私政策》';
+
+  @override
+  String get login_agreement_children => '《未成年人个人信息保护规则》';
 
   @override
   String get logout_success => '已退出登录';

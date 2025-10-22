@@ -14,6 +14,7 @@ class PlazaPost {
   final String? previewLabel;
   final List<String> mediaAssets;
   final List<PlazaComment> commentItems;
+  final PlazaMomentType momentType;
 
   const PlazaPost({
     required this.author,
@@ -28,6 +29,7 @@ class PlazaPost {
     this.previewLabel,
     this.mediaAssets = const [],
     this.commentItems = const [],
+    this.momentType = PlazaMomentType.event,
   });
 }
 
@@ -73,11 +75,16 @@ class PlazaPostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final backgroundColor = switch (post.momentType) {
+      PlazaMomentType.instant => const Color(0xFFFFEEF4),
+      PlazaMomentType.event => const Color(0xFFE7F0FF),
+    };
 
     return Card(
       margin: margin ?? EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
+      color: backgroundColor,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -225,6 +232,8 @@ class PlazaPostCard extends StatelessWidget {
     );
   }
 }
+
+enum PlazaMomentType { instant, event }
 
 class _PlazaPostMediaPreview extends StatelessWidget {
   final List<String> mediaAssets;

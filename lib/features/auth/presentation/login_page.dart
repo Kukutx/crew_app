@@ -11,7 +11,6 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart' as fui;
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
 import 'package:firebase_ui_oauth_facebook/firebase_ui_oauth_facebook.dart';
-import 'package:firebase_ui_oauth_github/firebase_ui_oauth_github.dart';
 import 'package:firebase_ui_oauth_twitter/firebase_ui_oauth_twitter.dart';
 
 /// 登录完成后跳转的路由名
@@ -41,10 +40,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         FacebookProvider(
           clientId: 'YOUR_FACEBOOK_APP_ID',
           redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
-        ),
-        GithubProvider(
-          clientId: 'YOUR_GITHUB_CLIENT_ID',
-          clientSecret: 'YOUR_GITHUB_CLIENT_SECRET',
         ),
         TwitterProvider(
           apiKey: 'YOUR_TWITTER_API_KEY',

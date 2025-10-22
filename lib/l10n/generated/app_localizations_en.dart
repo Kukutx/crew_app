@@ -397,7 +397,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_agreement_privacy => 'Privacy Policy';
 
   @override
-  String get login_agreement_children => "Children's Privacy Guidelines";
+  String get login_agreement_children => 'Children\'s Privacy Guidelines';
 
   @override
   String get logout_success => 'Signed out successfully.';

@@ -827,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @login_agreement_children.
   ///
   /// In en, this message translates to:
-  /// **"Children's Privacy Guidelines"**
+  /// **'Children\'s Privacy Guidelines'**
   String get login_agreement_children;
 
   /// No description provided for @logout_success.

@@ -314,7 +314,7 @@ class _MapEventsPlazaFeed extends StatelessWidget {
         final post = posts[index];
         return PlazaPostCard(
           post: post,
-          onTap: () => Navigator.of(
+          onMediaTap: () => Navigator.of(
             context,
           ).push(PlazaPostDetailScreen.route(post: post)),
           onCommentTap: () => showPlazaPostCommentsSheet(context, post),

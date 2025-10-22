@@ -58,7 +58,7 @@ class PlazaComment {
 class PlazaPostCard extends StatelessWidget {
   final PlazaPost post;
   final EdgeInsetsGeometry? margin;
-  final VoidCallback? onTap;
+  final VoidCallback? onMediaTap;
   final VoidCallback? onCommentTap;
   final VoidCallback? onAuthorTap;
 
@@ -66,7 +66,7 @@ class PlazaPostCard extends StatelessWidget {
     super.key,
     required this.post,
     this.margin,
-    this.onTap,
+    this.onMediaTap,
     this.onCommentTap,
     this.onAuthorTap,
   });
@@ -85,13 +85,11 @@ class PlazaPostCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       color: backgroundColor,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -140,16 +138,10 @@ class PlazaPostCard extends StatelessWidget {
               ),
               if (post.mediaAssets.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: SizedBox(
-                    height: 148,
-                    width: double.infinity,
-                    child: _PlazaPostMediaPreview(
-                      mediaAssets: post.mediaAssets,
-                      accentColor: post.accentColor,
-                    ),
-                  ),
+                _PlazaPostMedia(
+                  mediaAssets: post.mediaAssets,
+                  accentColor: post.accentColor,
+                  onTap: onMediaTap,
                 ),
               ] else if (post.previewLabel != null) ...[
                 const SizedBox(height: 12),
@@ -234,6 +226,45 @@ class PlazaPostCard extends StatelessWidget {
 }
 
 enum PlazaMomentType { instant, event }
+
+class _PlazaPostMedia extends StatelessWidget {
+  final List<String> mediaAssets;
+  final Color accentColor;
+  final VoidCallback? onTap;
+
+  const _PlazaPostMedia({
+    required this.mediaAssets,
+    required this.accentColor,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final borderRadius = BorderRadius.circular(16);
+
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: Ink(
+          decoration: ShapeDecoration(
+            shape: RoundedRectangleBorder(borderRadius: borderRadius),
+          ),
+          height: 148,
+          width: double.infinity,
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: _PlazaPostMediaPreview(
+              mediaAssets: mediaAssets,
+              accentColor: accentColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _PlazaPostMediaPreview extends StatelessWidget {
   final List<String> mediaAssets;

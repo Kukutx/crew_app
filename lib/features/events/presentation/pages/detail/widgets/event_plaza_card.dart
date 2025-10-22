@@ -137,7 +137,7 @@ class EventPlazaCard extends StatelessWidget {
           PlazaPostCard(
             post: _posts[i],
             margin: EdgeInsets.fromLTRB(16, i == 0 ? 0 : 12, 16, 0),
-            onTap: () => _openPostDetail(context, _posts[i]),
+            onMediaTap: () => _openPostDetail(context, _posts[i]),
             onCommentTap: () => showPlazaPostCommentsSheet(context, _posts[i]),
             onAuthorTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const UserProfilePage()),

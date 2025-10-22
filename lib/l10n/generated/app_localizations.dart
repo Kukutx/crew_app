@@ -1073,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @chat_attachment_image.
   ///
   /// In en, this message translates to:
-  /// **'Photos & videos'**
+  /// **'Photos'**
   String get chat_attachment_image;
 
   /// No description provided for @chat_attachment_live_location.

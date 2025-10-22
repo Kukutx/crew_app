@@ -12,50 +12,48 @@ class MyActivitiesPage extends StatelessWidget {
 
     final joiningActivities = <_ActivityCardData>[
       _ActivityCardData(
-        title: loc.myActivitiesSampleYogaTitle,
-        description: loc.myActivitiesSampleYogaDetails,
-        participantsLabel: loc.myActivitiesCardParticipants('18'),
-        statusLabel: loc.myActivitiesStatusRegistered,
+        title: loc.my_activities_sample_yoga_title,
+        description: loc.my_activities_sample_yoga_details,
+        participantsLabel: loc.my_activities_card_participants('18'),
+        statusLabel: loc.my_activities_status_registered,
         color: colorScheme.primary,
       ),
       _ActivityCardData(
-        title: loc.myActivitiesSampleMarketTitle,
-        description: loc.myActivitiesSampleMarketDetails,
-        participantsLabel: loc.myActivitiesCardParticipants('42'),
-        statusLabel: loc.myActivitiesStatusRegistered,
+        title: loc.my_activities_sample_market_title,
+        description: loc.my_activities_sample_market_details,
+        participantsLabel: loc.my_activities_card_participants('42'),
+        statusLabel: loc.my_activities_status_registered,
         color: colorScheme.secondary,
       ),
     ];
 
     final hostingActivities = <_ActivityCardData>[
       _ActivityCardData(
-        title: loc.myActivitiesSampleCleanupTitle,
-        description: loc.myActivitiesSampleCleanupDetails,
-        participantsLabel: loc.myActivitiesCardParticipants('25'),
-        statusLabel: loc.myActivitiesStatusHosting,
+        title: loc.my_activities_sample_cleanup_title,
+        description: loc.my_activities_sample_cleanup_details,
+        participantsLabel: loc.my_activities_card_participants('25'),
+        statusLabel: loc.my_activities_status_hosting,
         color: colorScheme.tertiary,
       ),
       _ActivityCardData(
-        title: loc.myActivitiesSampleBakeTitle,
-        description: loc.myActivitiesSampleBakeDetails,
-        participantsLabel: loc.myActivitiesCardParticipants('11'),
-        statusLabel: loc.myActivitiesStatusHosting,
+        title: loc.my_activities_sample_bake_title,
+        description: loc.my_activities_sample_bake_details,
+        participantsLabel: loc.my_activities_card_participants('11'),
+        statusLabel: loc.my_activities_status_hosting,
         color: colorScheme.primary,
       ),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.myActivitiesTitle),
-      ),
+      appBar: AppBar(title: Text(loc.my_activities_title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionHeader(
-              title: loc.myActivitiesJoiningTitle,
-              subtitle: loc.myActivitiesJoiningSubtitle,
+              title: loc.my_activities_joining_title,
+              subtitle: loc.my_activities_joining_subtitle,
             ),
             const SizedBox(height: 12),
             for (final activity in joiningActivities) ...[
@@ -64,8 +62,8 @@ class MyActivitiesPage extends StatelessWidget {
             ],
             const SizedBox(height: 12),
             _SectionHeader(
-              title: loc.myActivitiesHostingTitle,
-              subtitle: loc.myActivitiesHostingSubtitle,
+              title: loc.my_activities_hosting_title,
+              subtitle: loc.my_activities_hosting_subtitle,
             ),
             const SizedBox(height: 12),
             for (final activity in hostingActivities) ...[
@@ -139,16 +137,11 @@ class _ActivityCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
-          colors: [
-            data.color.withOpacity(0.12),
-            colorScheme.surface,
-          ],
+          colors: [data.color.withOpacity(0.12), colorScheme.surface],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.4),
-        ),
+        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -164,7 +157,10 @@ class _ActivityCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: data.color.withOpacity(0.16),
                   borderRadius: BorderRadius.circular(16),

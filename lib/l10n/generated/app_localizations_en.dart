@@ -1321,14 +1321,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_my_moments => 'My moments';
 
   @override
-  String get map_quick_actions_my_moments_subtitle =>
-      'Keep up with likes and comments';
-
-  @override
   String get map_quick_actions_my_drafts => 'My drafts';
-
-  @override
-  String get map_quick_actions_my_drafts_subtitle => 'Pick up where you left off';
 
   @override
   String get map_quick_actions_add_friend => 'Add friends';
@@ -1345,6 +1338,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'See everything I\'m joining or hosting';
 
   @override
+  String get map_quick_actions_my_moments_subtitle =>
+      'Keep up with likes and comments';
+
+  @override
   String get map_quick_actions_my_ledger => 'My ledger';
 
   @override
@@ -1355,6 +1352,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_quick_actions_wallet_subtitle => 'Manage balance and cards';
+
+  @override
+  String get map_quick_actions_my_drafts_subtitle =>
+      'Pick up where you left off';
 
   @override
   String get map_quick_actions_section_connect => 'Connect';

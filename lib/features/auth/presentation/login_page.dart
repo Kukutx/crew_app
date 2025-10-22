@@ -9,9 +9,9 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as fui;
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
-import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
-import 'package:firebase_ui_oauth_facebook/firebase_ui_oauth_facebook.dart';
-import 'package:firebase_ui_oauth_twitter/firebase_ui_oauth_twitter.dart';
+// import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
+// import 'package:firebase_ui_oauth_facebook/firebase_ui_oauth_facebook.dart';
+// import 'package:firebase_ui_oauth_twitter/firebase_ui_oauth_twitter.dart';
 
 /// 登录完成后跳转的路由名
 const String kHomeRoute = '/';
@@ -35,23 +35,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ),
     ];
 
-    if (_showMoreOptions) {
-      providers.addAll([
-        FacebookProvider(
-          clientId: 'YOUR_FACEBOOK_APP_ID',
-          redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
-        ),
-        TwitterProvider(
-          apiKey: 'YOUR_TWITTER_API_KEY',
-          apiSecretKey: 'YOUR_TWITTER_API_SECRET',
-          redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
-        ),
-      ]);
+  //   if (_showMoreOptions) {
+  //     providers.addAll([
+  //       FacebookProvider(
+  //         clientId: 'YOUR_FACEBOOK_APP_ID',
+  //         redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
+  //       ),
+  //       TwitterProvider(
+  //         apiKey: 'YOUR_TWITTER_API_KEY',
+  //         apiSecretKey: 'YOUR_TWITTER_API_SECRET',
+  //         redirectUri: 'https://YOUR_FIREBASE_PROJECT.firebaseapp.com/__/auth/handler',
+  //       ),
+  //     ]);
 
-      if (Theme.of(context).platform == TargetPlatform.iOS) {
-        providers.add(AppleProvider());
-      }
-    }
+  //     if (Theme.of(context).platform == TargetPlatform.iOS) {
+  //       providers.add(AppleProvider());
+  //     }
+  //   }
 
     return providers;
   }

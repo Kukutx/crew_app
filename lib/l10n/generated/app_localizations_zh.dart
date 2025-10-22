@@ -1267,13 +1267,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_my_moments => '我的瞬间';
 
   @override
-  String get map_quick_actions_my_moments_subtitle => '及时掌握点赞与评论';
-
-  @override
   String get map_quick_actions_my_drafts => '我的草稿';
-
-  @override
-  String get map_quick_actions_my_drafts_subtitle => '随时继续编辑';
 
   @override
   String get map_quick_actions_add_friend => '添加好友';
@@ -1288,6 +1282,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_my_activities_subtitle => '查看我报名或招募的活动';
 
   @override
+  String get map_quick_actions_my_moments_subtitle => '及时掌握点赞与评论';
+
+  @override
   String get map_quick_actions_my_ledger => '我的账本';
 
   @override
@@ -1298,6 +1295,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_quick_actions_wallet_subtitle => '管理余额和卡片';
+
+  @override
+  String get map_quick_actions_my_drafts_subtitle => '随时继续编辑';
 
   @override
   String get map_quick_actions_section_connect => '好友';

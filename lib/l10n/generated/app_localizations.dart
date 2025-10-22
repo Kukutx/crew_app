@@ -2498,23 +2498,11 @@ abstract class AppLocalizations {
   /// **'My moments'**
   String get map_quick_actions_my_moments;
 
-  /// No description provided for @map_quick_actions_my_moments_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Keep up with likes and comments'**
-  String get map_quick_actions_my_moments_subtitle;
-
   /// No description provided for @map_quick_actions_my_drafts.
   ///
   /// In en, this message translates to:
   /// **'My drafts'**
   String get map_quick_actions_my_drafts;
-
-  /// No description provided for @map_quick_actions_my_drafts_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick up where you left off'**
-  String get map_quick_actions_my_drafts_subtitle;
 
   /// No description provided for @map_quick_actions_add_friend.
   ///
@@ -2537,8 +2525,14 @@ abstract class AppLocalizations {
   /// No description provided for @map_quick_actions_my_activities_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'See everything I'm joining or hosting'**
+  /// **'See everything I\'m joining or hosting'**
   String get map_quick_actions_my_activities_subtitle;
+
+  /// No description provided for @map_quick_actions_my_moments_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep up with likes and comments'**
+  String get map_quick_actions_my_moments_subtitle;
 
   /// No description provided for @map_quick_actions_my_ledger.
   ///
@@ -2563,6 +2557,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage balance and cards'**
   String get map_quick_actions_wallet_subtitle;
+
+  /// No description provided for @map_quick_actions_my_drafts_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up where you left off'**
+  String get map_quick_actions_my_drafts_subtitle;
 
   /// No description provided for @map_quick_actions_section_connect.
   ///
@@ -2675,7 +2675,7 @@ abstract class AppLocalizations {
   /// No description provided for @my_activities_joining_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Events I'm counting down to'**
+  /// **'Events I\'m counting down to'**
   String get my_activities_joining_subtitle;
 
   /// No description provided for @my_activities_hosting_title.
@@ -2687,7 +2687,7 @@ abstract class AppLocalizations {
   /// No description provided for @my_activities_hosting_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Activities I'm organizing'**
+  /// **'Activities I\'m organizing'**
   String get my_activities_hosting_subtitle;
 
   /// No description provided for @my_activities_status_registered.
@@ -2706,7 +2706,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} joined'**
-  String my_activities_card_participants(String count);
+  String my_activities_card_participants(Object count);
 
   /// No description provided for @my_activities_sample_yoga_title.
   ///

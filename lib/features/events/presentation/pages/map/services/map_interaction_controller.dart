@@ -3,6 +3,7 @@ import 'package:crew_app/features/events/presentation/pages/map/services/map_sel
 import 'package:crew_app/features/events/presentation/pages/map/services/quick_trip_guard.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/destination_selection_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_place_details_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/events_map_ui_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';

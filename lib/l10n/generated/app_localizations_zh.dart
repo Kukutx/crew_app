@@ -1110,6 +1110,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feedback_thanks => '感谢你的反馈！';
 
   @override
+  String get support_feedback_title => '意见反馈';
+
+  @override
+  String get support_feedback_description_label => '反馈描述';
+
+  @override
+  String get support_feedback_description_hint => '请详细描述您的问题与建议';
+
+  @override
+  String get support_feedback_media_label => '图片与视频';
+
+  @override
+  String get support_feedback_phone_label => '手机号码';
+
+  @override
+  String get support_feedback_phone_hint => '请输入手机号';
+
+  @override
+  String get support_feedback_submit => '提交反馈';
+
+  @override
+  String get support_feedback_description_required => '请填写反馈描述。';
+
+  @override
+  String get support_feedback_max_attachments => '最多可上传4个附件。';
+
+  @override
+  String get support_feedback_add_photo => '选择图片';
+
+  @override
+  String get support_feedback_add_video => '选择视频';
+
+  @override
   String get student_verification => '学生认证';
 
   @override

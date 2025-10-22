@@ -1157,6 +1157,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedback_thanks => 'Thanks for your feedback!';
 
   @override
+  String get support_feedback_title => 'Feedback';
+
+  @override
+  String get support_feedback_description_label => 'Feedback description';
+
+  @override
+  String get support_feedback_description_hint =>
+      'Please describe your issue or suggestion in detail.';
+
+  @override
+  String get support_feedback_media_label => 'Images & videos';
+
+  @override
+  String get support_feedback_phone_label => 'Phone number';
+
+  @override
+  String get support_feedback_phone_hint => 'Enter your mobile number';
+
+  @override
+  String get support_feedback_submit => 'Submit feedback';
+
+  @override
+  String get support_feedback_description_required =>
+      'Please enter a feedback description.';
+
+  @override
+  String get support_feedback_max_attachments =>
+      'You can attach up to 4 files.';
+
+  @override
+  String get support_feedback_add_photo => 'Choose photo';
+
+  @override
+  String get support_feedback_add_video => 'Choose video';
+
+  @override
   String get student_verification => 'Student verification';
 
   @override

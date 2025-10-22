@@ -2192,6 +2192,72 @@ abstract class AppLocalizations {
   /// **'Thanks for your feedback!'**
   String get feedback_thanks;
 
+  /// No description provided for @support_feedback_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get support_feedback_title;
+
+  /// No description provided for @support_feedback_description_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback description'**
+  String get support_feedback_description_label;
+
+  /// No description provided for @support_feedback_description_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please describe your issue or suggestion in detail.'**
+  String get support_feedback_description_hint;
+
+  /// No description provided for @support_feedback_media_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Images & videos'**
+  String get support_feedback_media_label;
+
+  /// No description provided for @support_feedback_phone_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get support_feedback_phone_label;
+
+  /// No description provided for @support_feedback_phone_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your mobile number'**
+  String get support_feedback_phone_hint;
+
+  /// No description provided for @support_feedback_submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit feedback'**
+  String get support_feedback_submit;
+
+  /// No description provided for @support_feedback_description_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a feedback description.'**
+  String get support_feedback_description_required;
+
+  /// No description provided for @support_feedback_max_attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'You can attach up to 4 files.'**
+  String get support_feedback_max_attachments;
+
+  /// No description provided for @support_feedback_add_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photo'**
+  String get support_feedback_add_photo;
+
+  /// No description provided for @support_feedback_add_video.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose video'**
+  String get support_feedback_add_video;
+
   /// No description provided for @student_verification.
   ///
   /// In en, this message translates to:

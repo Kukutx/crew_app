@@ -133,10 +133,10 @@ class _MapQuickActionsDrawerState extends ConsumerState<MapQuickActionsDrawer> {
         icon: Icons.support_agent_outlined,
         label: loc.map_quick_actions_bottom_support,
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(loc.feature_not_ready)),
-          );
           widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/support');
+          });
         },
       ),
       _BottomActionDefinition(

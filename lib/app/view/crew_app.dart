@@ -13,6 +13,7 @@ import 'package:crew_app/features/user/presentation/pages/settings/settings_page
 import 'package:crew_app/features/user/presentation/pages/settings/state/settings_providers.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/wallet_page.dart';
+import 'package:crew_app/features/support/presentation/pages/support_feedback_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,6 +47,7 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/messages_chat': (context) => const ChatSheet(),
   '/expenses': (context) => const ExpensesPage(),
   '/wallet': (context) => const WalletPage(),
+  '/support': (context) => const SupportFeedbackPage(),
   '/moments': (context) => const MyMomentsPage(),
   '/drafts': (context) => const MyDraftsPage(),
   '/add_friend': (context) => const AddFriendPage(),

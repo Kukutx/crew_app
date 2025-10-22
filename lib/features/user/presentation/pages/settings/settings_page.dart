@@ -9,13 +9,13 @@ import 'package:crew_app/features/user/presentation/pages/settings/pages/develop
 import 'package:crew_app/features/user/presentation/pages/settings/pages/subscription/subscription_plan_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/state/subscription_plan.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
+import 'package:crew_app/features/support/presentation/pages/support_feedback_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }
 
@@ -202,6 +202,20 @@ class SettingsPage extends ConsumerWidget {
             title: loc.settings_section_support,
             children: [
               ListTile(
+                leading: const Icon(Icons.support_agent_outlined),
+                title: Text(loc.settings_help_feedback),
+                subtitle: Text(loc.settings_help_feedback_subtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SupportFeedbackPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: Text(loc.settings_app_version),
                 subtitle: Text(loc.settings_app_version_subtitle),
@@ -262,25 +276,6 @@ class SettingsPage extends ConsumerWidget {
                         builder: (context) => const StripeTestPage(),
                       ),
                     );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.help_outline),
-                  title: Text(loc.settings_help_feedback),
-                  subtitle: Text(loc.settings_help_feedback_subtitle),
-                  onTap: () async {
-                    final feedbackService = ref.read(feedbackServiceProvider);
-                    final submitted = await feedbackService.collectFeedback(
-                      context,
-                    );
-                    if (!context.mounted) {
-                      return;
-                    }
-                    if (submitted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(loc.feedback_thanks)),
-                      );
-                    }
                   },
                 ),
                 ListTile(

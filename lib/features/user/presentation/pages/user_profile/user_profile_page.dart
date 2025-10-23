@@ -101,7 +101,18 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       builder: (sheetContext) {
         final actions = <Widget>[];
 
-        if (!isViewingSelf) {
+        if (isViewingSelf) {
+          actions.add(
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text('编辑主页'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                _openEditProfile();
+              },
+            ),
+          );
+        } else {
           actions.addAll([
             ListTile(
               leading: const Icon(Icons.block),
@@ -323,7 +334,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                             _startPrivateMessage(context, profile),
                         onGuestbookPressed: _openGuestbookPage,
                         showUserActions: !isViewingSelf,
-                        onEditProfile: isViewingSelf ? _openEditProfile : null,
                       ),
                     ),
                   ),

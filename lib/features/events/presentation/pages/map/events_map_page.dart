@@ -36,6 +36,8 @@ class EventsMapPage extends ConsumerStatefulWidget {
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ProviderSubscription<Event?>? _mapFocusSubscription;
+  ProviderSubscription<EventCarouselManager>? _carouselSubscription;
+  bool _isDrawerOpen = false;
 
   @override
   void initState() {
@@ -54,6 +56,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       carouselManager.showEventCard(event);
       ref.read(mapFocusEventProvider.notifier).state = null;
     });
+    _carouselSubscription = ref.listenManual(
+      eventCarouselManagerProvider,
+      (_, manager) {
+        if (!mounted) {
+          return;
+        }
+        _updateBottomNavigation(!_isDrawerOpen && !manager.isVisible);
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -65,6 +76,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   @override
   void dispose() {
     _mapFocusSubscription?.close();
+    _carouselSubscription?.close();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
       if (controller.state) {
@@ -161,6 +173,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onClose: () => Navigator.of(context).pop(),
       ),
       onDrawerChanged: (isOpened) {
+        _isDrawerOpen = isOpened;
         _updateBottomNavigation(!isOpened && !carouselManager.isVisible);
       },
       appBar: SearchEventAppBar(
@@ -190,8 +203,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               initialCenter: startCenter,
               onMapCreated: mapController.onMapCreated,
               onMapReady: mapController.onMapReady,
-              onTap: (pos) => unawaited(locationSelectionManager.onMapTap(pos, context)),
-              onLongPress: (pos) => unawaited(locationSelectionManager.onMapLongPress(pos, context)),
+              onTap: (pos) {
+                carouselManager.hideEventCard();
+                unawaited(locationSelectionManager.onMapTap(pos, context));
+              },
+              onLongPress: (pos) {
+                carouselManager.hideEventCard();
+                unawaited(locationSelectionManager.onMapLongPress(pos, context));
+              },
               markers: markers,
               showUserLocation: true,
               showMyLocationButton: true,

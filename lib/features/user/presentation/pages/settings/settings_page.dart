@@ -45,7 +45,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Theme.of(context);
+    final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final loc = AppLocalizations.of(context)!;
     final selectedLanguage = settings.locale.languageCode == 'zh' ? 'zh' : 'en';
@@ -64,6 +64,8 @@ class SettingsPage extends ConsumerWidget {
     final uid = firebaseUser != null
         ? _resolveUid(firebaseUser, backendUser)
         : null;
+    final secondaryTextStyle =
+        theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: .7));
 
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),
@@ -111,19 +113,25 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.account_balance_wallet_outlined),
                 title: Text(loc.wallet_title),
-                subtitle: Text(loc.wallet_overview_subtitle),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.of(context).pushNamed('/wallet'),
               ),
               ListTile(
                 leading: const Icon(Icons.workspace_premium_outlined),
                 title: Text(loc.settings_subscription_current_plan),
-                subtitle: Text(
-                  loc.settings_subscription_current_plan_value(
-                    currentPlan.label(loc),
-                  ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      loc.settings_subscription_current_plan_value(
+                        currentPlan.label(loc),
+                      ),
+                      style: secondaryTextStyle,
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.chevron_right),
+                  ],
                 ),
-                trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -162,7 +170,6 @@ class SettingsPage extends ConsumerWidget {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 secondary: const Icon(Icons.notifications_active_outlined),
                 title: Text(loc.settings_notifications_push),
-                subtitle: Text(loc.settings_notifications_push_subtitle),
                 value: pushNotificationEnabled,
                 onChanged: (value) {
                   ref.read(pushNotificationProvider.notifier).state = value;
@@ -177,8 +184,17 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.location_on_outlined),
                 title: Text(loc.settings_location_permission),
-                subtitle: Text(currentPermission.label(loc)),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      currentPermission.label(loc),
+                      style: secondaryTextStyle,
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
                 onTap: () => _showLocationPermissionSheet(
                   context,
                   ref,
@@ -205,7 +221,6 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.support_agent_outlined),
                 title: Text(loc.settings_help_feedback),
-                subtitle: Text(loc.settings_help_feedback_subtitle),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -219,7 +234,6 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: Text(loc.settings_app_version),
-                subtitle: Text(loc.settings_app_version_subtitle),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -235,17 +249,34 @@ class SettingsPage extends ConsumerWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.person_outline),
-                title: Text(loc.settings_account_info),
-                subtitle: firebaseUser != null
+                title: firebaseUser != null
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(loc.settings_account_info),
+                          const SizedBox(height: 4),
                           if (email != null)
-                            Text('${loc.settings_account_email_label}: $email'),
-                          Text('${loc.settings_account_uid_label}: $uid'),
+                            Text(
+                              '${loc.settings_account_email_label}: $email',
+                              style: secondaryTextStyle,
+                            ),
+                          Text(
+                            '${loc.settings_account_uid_label}: $uid',
+                            style: secondaryTextStyle,
+                          ),
                         ],
                       )
-                    : Text(loc.login_prompt),
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(loc.settings_account_info),
+                          const SizedBox(height: 4),
+                          Text(
+                            loc.login_prompt,
+                            style: secondaryTextStyle,
+                          ),
+                        ],
+                      ),
               ),
               ListTile(
                 leading: const Icon(Icons.logout),
@@ -268,7 +299,6 @@ class SettingsPage extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.credit_card_outlined),
                   title: Text(loc.settings_developer_stripe_test),
-                  subtitle: Text(loc.settings_developer_stripe_test_subtitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
@@ -282,7 +312,6 @@ class SettingsPage extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.help_outline),
                   title: Text("Crashlytics 模块"),
-                  subtitle: Text(loc.settings_help_feedback_subtitle),
                   onTap: () async {
                     final feedbackService = ref.read(feedbackServiceProvider);
                     final submitted = await feedbackService.collectFeedback(

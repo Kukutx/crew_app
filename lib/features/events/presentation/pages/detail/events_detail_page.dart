@@ -372,7 +372,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       bottomNavigationBar: EventDetailBottomBar(
         loc: loc,
         isFavorite: event.isFavorite,
-        favoriteCount: event.likes,
+        favoriteCount: event.favoriteCount,
         onFavorite: () => _showFeatureNotReadyMessage(loc),
         onRegister: () {
           ScaffoldMessenger.of(context).showSnackBar(

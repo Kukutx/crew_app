@@ -87,9 +87,7 @@ class EventGridCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(6),
                       child: Icon(
-                        event.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
+                        event.isFavorite ? Icons.star : Icons.star_border,
                         size: 20,
                         color: Colors.white,
                       ),

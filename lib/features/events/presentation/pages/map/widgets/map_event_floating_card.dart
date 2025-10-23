@@ -103,8 +103,8 @@ class MapEventFloatingCard extends StatelessWidget {
                               visualDensity: VisualDensity.compact,
                               icon: Icon(
                                 event.isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
+                                    ? Icons.star
+                                    : Icons.star_border,
                               ),
                             ),
                             IconButton(

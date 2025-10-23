@@ -23,10 +23,10 @@ class EventDetailBottomBar extends StatelessWidget {
     final localeTag = Localizations.localeOf(context).toString();
     final sanitizedCount = favoriteCount < 0 ? 0 : favoriteCount;
     final countLabel = NumberFormat.compact(locale: localeTag).format(sanitizedCount);
-    final favoriteColor = isFavorite ? Colors.redAccent : Colors.orange;
+    final favoriteColor = isFavorite ? Colors.amber : Colors.amber.shade600;
     final favoriteBackgroundColor = isFavorite
-        ? const Color(0xFFFFEBEE)
-        : const Color(0xFFFFF4E6);
+        ? const Color(0xFFFFF7D1)
+        : const Color(0xFFFFFAE6);
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -46,7 +46,7 @@ class EventDetailBottomBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    isFavorite ? Icons.star : Icons.star_border,
                     color: favoriteColor,
                   ),
                   const SizedBox(width: 6),

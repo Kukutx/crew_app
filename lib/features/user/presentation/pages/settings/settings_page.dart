@@ -64,8 +64,9 @@ class SettingsPage extends ConsumerWidget {
     final uid = firebaseUser != null
         ? _resolveUid(firebaseUser, backendUser)
         : null;
-    final secondaryTextStyle =
-        theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: .7));
+    final secondaryTextStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: .7),
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),
@@ -119,19 +120,7 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.workspace_premium_outlined),
                 title: Text(loc.settings_subscription_current_plan),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      loc.settings_subscription_current_plan_value(
-                        currentPlan.label(loc),
-                      ),
-                      style: secondaryTextStyle,
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.chevron_right),
-                  ],
-                ),
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -184,17 +173,7 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Icons.location_on_outlined),
                 title: Text(loc.settings_location_permission),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      currentPermission.label(loc),
-                      style: secondaryTextStyle,
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.chevron_right),
-                  ],
-                ),
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showLocationPermissionSheet(
                   context,
                   ref,
@@ -249,34 +228,17 @@ class SettingsPage extends ConsumerWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.person_outline),
-                title: firebaseUser != null
+                title: Text(loc.settings_account_info),
+                subtitle: firebaseUser != null
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(loc.settings_account_info),
-                          const SizedBox(height: 4),
                           if (email != null)
-                            Text(
-                              '${loc.settings_account_email_label}: $email',
-                              style: secondaryTextStyle,
-                            ),
-                          Text(
-                            '${loc.settings_account_uid_label}: $uid',
-                            style: secondaryTextStyle,
-                          ),
+                            Text('${loc.settings_account_email_label}: $email'),
+                          Text('${loc.settings_account_uid_label}: $uid'),
                         ],
                       )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(loc.settings_account_info),
-                          const SizedBox(height: 4),
-                          Text(
-                            loc.login_prompt,
-                            style: secondaryTextStyle,
-                          ),
-                        ],
-                      ),
+                    : Text(loc.login_prompt),
               ),
               ListTile(
                 leading: const Icon(Icons.logout),

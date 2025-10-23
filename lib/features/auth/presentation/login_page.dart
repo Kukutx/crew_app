@@ -1,5 +1,4 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,7 +41,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
         credential = await FirebaseAuth.instance.signInWithPopup(provider);
       } else {
         final googleSignIn = GoogleSignIn(
-          clientId: Platform.isIOS
+          clientId: defaultTargetPlatform == TargetPlatform.iOS
               ? '417490407531-111poe29m187rdr8d43mp93v9fq92of1.apps.googleusercontent.com'
               : null,
         );
@@ -317,28 +316,28 @@ class _GoogleWobbleButtonState extends State<GoogleWobbleButton> with SingleTick
           borderRadius: BorderRadius.circular(999),
           child: Ink(
             decoration: BoxDecoration(
-  color: Colors.white,
-  borderRadius: BorderRadius.circular(4),
-  border: Border.all(color: const Color(0xFFDADCE0)),
-),
-child: Center(
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const SizedBox(width: 12),
-      SvgPicture.asset(widget.svgAssetPath, width: 18, height: 18),
-      const SizedBox(width: 12),
-      Text(
-        widget.label,
-        style: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w500,
-          color: const Color(0xFF3C4043),
-        ),
-      ),
-      const SizedBox(width: 12),
-    ],
-  ),
-),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: const Color(0xFFDADCE0)),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(width: 12),
+                  SvgPicture.asset(widget.svgAssetPath, width: 18, height: 18),
+                  const SizedBox(width: 12),
+                  Text(
+                    widget.label,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF3C4043),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+              ),
+            ),
           ),
         ),
       ),

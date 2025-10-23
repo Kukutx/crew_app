@@ -8,6 +8,7 @@ import 'location_selection_sheets.dart';
 /// 目标位置选择Sheet
 class DestinationSelectionSheet extends StatefulWidget {
   const DestinationSelectionSheet({
+    super.key, 
     required this.startPositionListenable,
     required this.destinationListenable,
     required this.reverseGeocode,

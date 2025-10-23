@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
@@ -79,6 +80,7 @@ class EventCarouselManager extends ChangeNotifier {
   }
 
   /// 清理资源
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();

@@ -289,7 +289,6 @@ class _GoogleWobbleButtonState extends State<GoogleWobbleButton> with SingleTick
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cs = theme.colorScheme;
 
     // 视觉“启用/未启用”反馈；注意依然允许点击以触发验证动画
     final bool enabledVisual = widget.canProceed && !widget.loading;

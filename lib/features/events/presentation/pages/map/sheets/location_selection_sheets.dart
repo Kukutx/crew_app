@@ -6,6 +6,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 /// 可折叠Sheet路由内容
 class CollapsibleSheetRouteContent<T> extends StatelessWidget {
   const CollapsibleSheetRouteContent({
+    super.key,
     required this.animation,
     required this.collapsedNotifier,
     required this.builder,
@@ -105,11 +106,13 @@ class CollapsibleSheetRouteContent<T> extends StatelessWidget {
 
 /// Sheet手柄
 class SheetHandle extends StatelessWidget {
-  const SheetHandle();
+  const SheetHandle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.onSurface.withValues(alpha: .12);
+    final color = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: .12);
     return Center(
       child: Container(
         width: 36,
@@ -125,7 +128,7 @@ class SheetHandle extends StatelessWidget {
 
 /// 位置Sheet行
 class LocationSheetRow extends StatelessWidget {
-  const LocationSheetRow({required this.icon, required this.child});
+  const LocationSheetRow({super.key, required this.icon, required this.child});
 
   final Icon icon;
   final Widget child;
@@ -202,7 +205,7 @@ class NearbyPlacesPreview extends StatelessWidget {
 
 /// 附近地点瓦片
 class NearbyPlaceTile extends StatelessWidget {
-  const NearbyPlaceTile({required this.place});
+  const NearbyPlaceTile({super.key, required this.place});
 
   final NearbyPlace place;
 
@@ -220,10 +223,7 @@ class NearbyPlaceTile extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          Icons.place_outlined,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(Icons.place_outlined, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
         Expanded(
           child: Column(

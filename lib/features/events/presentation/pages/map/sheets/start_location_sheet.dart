@@ -8,6 +8,7 @@ import 'location_selection_sheets.dart';
 /// 起始位置选择Sheet
 class StartLocationSheet extends StatelessWidget {
   const StartLocationSheet({
+    super.key, 
     required this.positionListenable,
     required this.onConfirm,
     required this.onCancel,

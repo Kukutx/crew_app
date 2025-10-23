@@ -7,7 +7,6 @@ import 'package:crew_app/features/user/presentation/pages/settings/pages/blockli
 import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/crash_test_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/stripe_test_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/subscription/subscription_plan_page.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/state/subscription_plan.dart';
 import 'package:crew_app/features/user/data/authenticated_user_dto.dart';
 import 'package:crew_app/features/user/presentation/pages/support/support_feedback_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

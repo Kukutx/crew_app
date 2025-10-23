@@ -62,7 +62,7 @@ class RoadTripDraft {
     this.carType,
     required this.tags,
     required this.description,
-    this.initiatorDisclaimer = '',
+    this.hostDisclaimer = '',
     this.galleryImages = const <File>[],
     this.existingImageUrls = const <String>[],
   });
@@ -81,7 +81,7 @@ class RoadTripDraft {
   final String? carType;
   final List<String> tags;
   final String description;
-  final String initiatorDisclaimer;
+  final String hostDisclaimer;
   final List<File> galleryImages;
   final List<String> existingImageUrls;
 

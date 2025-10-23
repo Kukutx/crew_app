@@ -2,9 +2,11 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
@@ -25,39 +27,8 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
   bool _agreed = false;
   bool _loading = false;
 
-  late final AnimationController _shakeCtrl = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 450),
-  );
-
-  // 一个“抖动”曲线：左右快速小幅位移
-  late final Animation<double> _shakeAnim = TweenSequence<double>([
-    TweenSequenceItem(tween: Tween(begin: 0, end: -12), weight: 1),
-    TweenSequenceItem(tween: Tween(begin: -12, end: 12), weight: 2),
-    TweenSequenceItem(tween: Tween(begin: 12, end: -8), weight: 2),
-    TweenSequenceItem(tween: Tween(begin: -8, end: 6), weight: 2),
-    TweenSequenceItem(tween: Tween(begin: 6, end: 0), weight: 1),
-  ]).animate(CurvedAnimation(parent: _shakeCtrl, curve: Curves.easeOutCubic));
-
-  void _triggerShake() {
-    if (_shakeCtrl.isAnimating) return;
-    _shakeCtrl.forward(from: 0);
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text("Please agree to the terms before continuing."),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1400),
-      ),
-    );
-  }
-
   Future<void> _signInWithGoogle() async {
-    if (!_agreed) {
-      _triggerShake();
-      return;
-    }
+    // 这里不再做“是否勾选”的校验，交给按钮自身处理动画与提示
     if (_loading) return;
 
     setState(() => _loading = true);
@@ -68,11 +39,9 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
 
       if (kIsWeb) {
         final provider = GoogleAuthProvider();
-        // 如果需要：provider.setCustomParameters({'prompt': 'select_account'});
         credential = await FirebaseAuth.instance.signInWithPopup(provider);
       } else {
         final googleSignIn = GoogleSignIn(
-          // iOS 可指定 clientId（可选）；Android 一般不需要
           clientId: Platform.isIOS
               ? '417490407531-111poe29m187rdr8d43mp93v9fq92of1.apps.googleusercontent.com'
               : null,
@@ -113,21 +82,10 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
   }
 
   @override
-  void dispose() {
-    _shakeCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-
-    // —— 小红书风格要点 —— 
-    // 1) 顶部大 Logo / 品牌字样，留白充足
-    // 2) 居中一个主按钮（Google 登录），圆角胶囊、轻描边
-    // 3) 底部协议区：未勾选时按钮抖动并提示；勾选后按钮变为主态
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -142,7 +100,6 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // 可换为你的 App 图标
                     Container(
                       width: 72,
                       height: 72,
@@ -155,14 +112,14 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      loc.login_title, // 例如：欢迎来到 Crew
+                      loc.login_title,
                       style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28),
                       child: Text(
-                        loc.login_subtitle, // 一句简短 slogan/价值主张
+                        loc.login_subtitle,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                       ),
@@ -172,25 +129,24 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
               ),
             ),
 
-            // 中央登录按钮
+            // 中央登录按钮（自身完成“未勾选时轻摇+SnackBar”）
             Align(
               alignment: Alignment.center,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut,
-                child: SizedBox(
-                  width: 320,
-                  height: 56,
-                  child: _GoogleLikeButton(
-                    enabled: _agreed && !_loading,
-                    loading: _loading,
-                    onTap: _signInWithGoogle,
-                  ),
+              child: SizedBox(
+                width: 320,
+                height: 56,
+                child: GoogleWobbleButton(
+                  loading: _loading,
+                  canProceed: _agreed, // 是否允许继续；未勾选时按钮自己抖动并提示
+                  invalidMessage: "Please agree to the terms before continuing.",
+                  label: 'Continue with Google',
+                  svgAssetPath: 'assets/images/icons/google_g.svg',
+                  onProceed: _signInWithGoogle,
                 ),
               ),
             ),
 
-            // 底部协议区 + 辅助文案（带抖动）
+            // 底部协议区
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -198,68 +154,59 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    AnimatedBuilder(
-                      animation: _shakeAnim,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(_shakeAnim.value, 0),
-                          child: child,
-                        );
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            value: _agreed,
-                            onChanged: (v) => setState(() => _agreed = v ?? false),
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: _agreed,
+                          onChanged: (v) => setState(() => _agreed = v ?? false),
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Wrap(
+                            spacing: 4,
+                            runSpacing: 2,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(loc.login_agreement_prefix, style: theme.textTheme.bodySmall),
+                              GestureDetector(
+                                onTap: _openPrivacy,
+                                child: Text(
+                                  loc.login_agreement_terms,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.primary,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                              Text('、', style: theme.textTheme.bodySmall),
+                              GestureDetector(
+                                onTap: _openPrivacy,
+                                child: Text(
+                                  loc.login_agreement_privacy,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.primary,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                              Text('、', style: theme.textTheme.bodySmall),
+                              GestureDetector(
+                                onTap: _openPrivacy,
+                                child: Text(
+                                  loc.login_agreement_children,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.primary,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Wrap(
-                              spacing: 4,
-                              runSpacing: 2,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(loc.login_agreement_prefix, style: theme.textTheme.bodySmall),
-                                GestureDetector(
-                                  onTap: _openPrivacy,
-                                  child: Text(
-                                    loc.login_agreement_terms,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: cs.primary,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                                Text('、', style: theme.textTheme.bodySmall),
-                                GestureDetector(
-                                  onTap: _openPrivacy,
-                                  child: Text(
-                                    loc.login_agreement_privacy,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: cs.primary,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                                Text('、', style: theme.textTheme.bodySmall),
-                                GestureDetector(
-                                  onTap: _openPrivacy,
-                                  child: Text(
-                                    loc.login_agreement_children,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: cs.primary,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -278,59 +225,121 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
   }
 }
 
-/// 仿小红书的主按钮：灰白底、描边、圆角胶囊；未启用时降低不透明度，点击触发 onTap（外部决定是否抖动）
-class _GoogleLikeButton extends StatelessWidget {
-  const _GoogleLikeButton({
-    required this.enabled,
+/// 带“轻摇”验证动画的 Google 按钮：
+/// - 未满足 canProceed 时：左右轻摇 + SnackBar 提示；
+/// - 使用 flutter_svg 显示 Google “G” 图标；
+/// - 外观遵循“浅底、描边、圆角胶囊”风格；
+class GoogleWobbleButton extends StatefulWidget {
+  const GoogleWobbleButton({
+    super.key,
     required this.loading,
-    required this.onTap,
+    required this.canProceed,
+    required this.onProceed,
+    required this.label,
+    required this.svgAssetPath,
+    this.invalidMessage,
   });
 
-  final bool enabled;
   final bool loading;
-  final VoidCallback onTap;
+  final bool canProceed;
+  final VoidCallback onProceed;
+  final String label;
+  final String svgAssetPath;
+  final String? invalidMessage;
+
+  @override
+  State<GoogleWobbleButton> createState() => _GoogleWobbleButtonState();
+}
+
+class _GoogleWobbleButtonState extends State<GoogleWobbleButton> with SingleTickerProviderStateMixin {
+  late final AnimationController _shakeCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 450),
+  );
+
+  late final Animation<double> _shakeAnim = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 0, end: -12), weight: 1),
+    TweenSequenceItem(tween: Tween(begin: -12, end: 12), weight: 2),
+    TweenSequenceItem(tween: Tween(begin: 12, end: -8), weight: 2),
+    TweenSequenceItem(tween: Tween(begin: -8, end: 6), weight: 2),
+    TweenSequenceItem(tween: Tween(begin: 6, end: 0), weight: 1),
+  ]).animate(CurvedAnimation(parent: _shakeCtrl, curve: Curves.easeOutCubic));
+
+  void _triggerInvalidFeedback() {
+    if (!_shakeCtrl.isAnimating) {
+      _shakeCtrl.forward(from: 0);
+    }
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(widget.invalidMessage ?? 'Please complete the required steps.'),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(milliseconds: 1400),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shakeCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    return InkWell(
-      onTap: enabled && !loading ? onTap : null,
-      borderRadius: BorderRadius.circular(999),
-      child: Ink(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+    // 视觉“启用/未启用”反馈；注意依然允许点击以触发验证动画
+    final bool enabledVisual = widget.canProceed && !widget.loading;
+
+    return AnimatedBuilder(
+      animation: _shakeAnim,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(_shakeAnim.value, 0),
+          child: child,
+        );
+      },
+      child: Opacity(
+        opacity: enabledVisual ? 1 : 0.65,
+        child: InkWell(
+          onTap: widget.loading
+              ? null
+              : () {
+                  if (!widget.canProceed) {
+                    _triggerInvalidFeedback();
+                    return;
+                  }
+                  widget.onProceed();
+                },
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: enabled ? cs.outlineVariant : cs.outlineVariant.withOpacity(0.6),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          child: Ink(
+            decoration: BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(4),
+  border: Border.all(color: const Color(0xFFDADCE0)),
+),
+child: Center(
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const SizedBox(width: 12),
+      SvgPicture.asset(widget.svgAssetPath, width: 18, height: 18),
+      const SizedBox(width: 12),
+      Text(
+        widget.label,
+        style: theme.textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF3C4043),
         ),
-        child: Center(
-          child: loading
-              ? const SizedBox(
-                  width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4))
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 建议放置你的 Google “G” 图标资源（24x24）
-                    // Image.asset('assets/icons/google_g.png', width: 20, height: 20),
-                    Icon(Icons.login, size: 20), // 占位；换为你的图标
-                    const SizedBox(width: 10),
-                    Text(
-                      // 文案尽量简短
-                      'Continue with Google',
-                      style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
+      ),
+      const SizedBox(width: 12),
+    ],
+  ),
+),
+          ),
         ),
       ),
     );

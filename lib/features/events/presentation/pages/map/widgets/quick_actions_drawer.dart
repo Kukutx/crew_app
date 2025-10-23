@@ -19,83 +19,61 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
     final colorScheme = theme.colorScheme;
     final navigator = Navigator.of(context);
 
-    final featuredAction = _QuickActionDefinition(
-      icon: Icons.person_add_alt_1_outlined,
-      title: loc.map_quick_actions_add_friend,
-      color: colorScheme.primary,
-      onTap: () {
-        widget.onClose();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          navigator.pushNamed('/add_friend');
-        });
-      },
-    );
-
-    final actionGroups = <_QuickActionGroup>[
-      _QuickActionGroup(
-        label: loc.map_quick_actions_section_personal,
-        actions: [
-          _QuickActionDefinition(
-            icon: Icons.event_available_outlined,
-            title: loc.map_quick_actions_my_activities,
-            color: colorScheme.primary,
-            onTap: () {
-              widget.onClose();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/my_activities');
-              });
-            },
-          ),
-          _QuickActionDefinition(
-            icon: Icons.auto_awesome_outlined,
-            title: loc.map_quick_actions_my_moments,
-            color: colorScheme.secondary,
-            onTap: () {
-              widget.onClose();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/moments');
-              });
-            },
-          ),
-          _QuickActionDefinition(
-            icon: Icons.receipt_long_outlined,
-            title: loc.map_quick_actions_my_ledger,
-            color: colorScheme.tertiary,
-            onTap: () {
-              widget.onClose();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/expenses');
-              });
-            },
-          ),
-          _QuickActionDefinition(
-            icon: Icons.account_balance_wallet_outlined,
-            title: loc.map_quick_actions_wallet,
-            color: colorScheme.secondary,
-            onTap: () {
-              widget.onClose();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/wallet');
-              });
-            },
-          ),
-        ],
+    final quickActions = <_QuickActionDefinition>[
+      _QuickActionDefinition(
+        icon: Icons.event_available_outlined,
+        title: loc.map_quick_actions_my_activities,
+        color: colorScheme.primary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/my_activities');
+          });
+        },
       ),
-      _QuickActionGroup(
-        label: loc.map_quick_actions_section_workspace,
-        actions: [
-          _QuickActionDefinition(
-            icon: Icons.drafts_outlined,
-            title: loc.map_quick_actions_my_drafts,
-            color: colorScheme.secondary,
-            onTap: () {
-              widget.onClose();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/drafts');
-              });
-            },
-          ),
-        ],
+      _QuickActionDefinition(
+        icon: Icons.auto_awesome_outlined,
+        title: loc.map_quick_actions_my_moments,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/moments');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.receipt_long_outlined,
+        title: loc.map_quick_actions_my_ledger,
+        color: colorScheme.tertiary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/expenses');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.account_balance_wallet_outlined,
+        title: loc.map_quick_actions_wallet,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/wallet');
+          });
+        },
+      ),
+      _QuickActionDefinition(
+        icon: Icons.drafts_outlined,
+        title: loc.map_quick_actions_my_drafts,
+        color: colorScheme.secondary,
+        onTap: () {
+          widget.onClose();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navigator.pushNamed('/drafts');
+          });
+        },
       ),
     ];
 
@@ -138,7 +116,7 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
       child: Column(
         children: [
           Expanded(
-            child: actionGroups.expand((group) => group.actions).isEmpty
+            child: quickActions.isEmpty
                 ? _QuickActionsEmptyState(
                     title: loc.map_quick_actions_empty_title,
                     message: loc.map_quick_actions_empty_message,
@@ -146,20 +124,11 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
                 : SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          loc.map_quick_actions_section_connect,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _FeaturedQuickActionCard(definition: featuredAction),
-                        const SizedBox(height: 28),
-                        for (final group in actionGroups) ...[
-                          _QuickActionSection(group: group),
-                          const SizedBox(height: 28),
+                        for (var i = 0; i < quickActions.length; i++) ...[
+                          _MapQuickActionTile(definition: quickActions[i]),
+                          if (i != quickActions.length - 1)
+                            const SizedBox(height: 16),
                         ],
                       ],
                     ),
@@ -207,116 +176,6 @@ class _QuickActionDefinition {
   final String title;
   final Color color;
   final VoidCallback onTap;
-}
-
-class _QuickActionGroup {
-  const _QuickActionGroup({required this.label, required this.actions});
-
-  final String label;
-  final List<_QuickActionDefinition> actions;
-}
-
-class _FeaturedQuickActionCard extends StatelessWidget {
-  const _FeaturedQuickActionCard({required this.definition});
-
-  final _QuickActionDefinition definition;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: definition.onTap,
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(
-              colors: [definition.color.withOpacity(0.18), colorScheme.surface],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.4),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: definition.color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(definition.icon, color: definition.color, size: 32),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      definition.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _QuickActionSection extends StatelessWidget {
-  const _QuickActionSection({required this.group});
-
-  final _QuickActionGroup group;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          group.label,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 14),
-        Column(
-          children: [
-            for (var i = 0; i < group.actions.length; i++) ...[
-              _MapQuickActionTile(definition: group.actions[i]),
-              if (i != group.actions.length - 1) const SizedBox(height: 12),
-            ],
-          ],
-        ),
-      ],
-    );
-  }
 }
 
 class _BottomActionDefinition {

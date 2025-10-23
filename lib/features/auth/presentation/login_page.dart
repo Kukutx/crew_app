@@ -141,6 +141,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                   invalidMessage: "Please agree to the terms before continuing.",
                   label: 'Continue with Google',
                   svgAssetPath: 'assets/images/icons/google_g.svg',
+                  scaffoldMessenger: ScaffoldMessenger.of(context),
                   onProceed: _signInWithGoogle,
                 ),
               ),
@@ -237,6 +238,7 @@ class GoogleWobbleButton extends StatefulWidget {
     required this.onProceed,
     required this.label,
     required this.svgAssetPath,
+    required this.scaffoldMessenger,
     this.invalidMessage,
   });
 
@@ -246,6 +248,7 @@ class GoogleWobbleButton extends StatefulWidget {
   final String label;
   final String svgAssetPath;
   final String? invalidMessage;
+  final ScaffoldMessengerState scaffoldMessenger;
 
   @override
   State<GoogleWobbleButton> createState() => _GoogleWobbleButtonState();
@@ -269,7 +272,7 @@ class _GoogleWobbleButtonState extends State<GoogleWobbleButton> with SingleTick
     if (!_shakeCtrl.isAnimating) {
       _shakeCtrl.forward(from: 0);
     }
-    final messenger = ScaffoldMessenger.of(context);
+    final messenger = widget.scaffoldMessenger;
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
@@ -317,28 +320,28 @@ class _GoogleWobbleButtonState extends State<GoogleWobbleButton> with SingleTick
           borderRadius: BorderRadius.circular(999),
           child: Ink(
             decoration: BoxDecoration(
-  color: Colors.white,
-  borderRadius: BorderRadius.circular(4),
-  border: Border.all(color: const Color(0xFFDADCE0)),
-),
-child: Center(
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const SizedBox(width: 12),
-      SvgPicture.asset(widget.svgAssetPath, width: 18, height: 18),
-      const SizedBox(width: 12),
-      Text(
-        widget.label,
-        style: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w500,
-          color: const Color(0xFF3C4043),
-        ),
-      ),
-      const SizedBox(width: 12),
-    ],
-  ),
-),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: const Color(0xFFDADCE0)),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(width: 12),
+                  SvgPicture.asset(widget.svgAssetPath, width: 18, height: 18),
+                  const SizedBox(width: 12),
+                  Text(
+                    widget.label,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF3C4043),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+              ),
+            ),
           ),
         ),
       ),

@@ -22,7 +22,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
     final featuredAction = _QuickActionDefinition(
       icon: Icons.person_add_alt_1_outlined,
       title: loc.map_quick_actions_add_friend,
-      subtitle: loc.map_quick_actions_add_friend_subtitle,
       color: colorScheme.primary,
       onTap: () {
         widget.onClose();
@@ -39,7 +38,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           _QuickActionDefinition(
             icon: Icons.event_available_outlined,
             title: loc.map_quick_actions_my_activities,
-            subtitle: loc.map_quick_actions_my_activities_subtitle,
             color: colorScheme.primary,
             onTap: () {
               widget.onClose();
@@ -51,7 +49,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           _QuickActionDefinition(
             icon: Icons.auto_awesome_outlined,
             title: loc.map_quick_actions_my_moments,
-            subtitle: loc.map_quick_actions_my_moments_subtitle,
             color: colorScheme.secondary,
             onTap: () {
               widget.onClose();
@@ -63,7 +60,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           _QuickActionDefinition(
             icon: Icons.receipt_long_outlined,
             title: loc.map_quick_actions_my_ledger,
-            subtitle: loc.map_quick_actions_my_ledger_subtitle,
             color: colorScheme.tertiary,
             onTap: () {
               widget.onClose();
@@ -75,7 +71,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           _QuickActionDefinition(
             icon: Icons.account_balance_wallet_outlined,
             title: loc.map_quick_actions_wallet,
-            subtitle: loc.map_quick_actions_wallet_subtitle,
             color: colorScheme.secondary,
             onTap: () {
               widget.onClose();
@@ -92,7 +87,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           _QuickActionDefinition(
             icon: Icons.drafts_outlined,
             title: loc.map_quick_actions_my_drafts,
-            subtitle: loc.map_quick_actions_my_drafts_subtitle,
             color: colorScheme.secondary,
             onTap: () {
               widget.onClose();
@@ -207,14 +201,12 @@ class _QuickActionDefinition {
     required this.title,
     required this.color,
     required this.onTap,
-    this.subtitle,
   });
 
   final IconData icon;
   final String title;
   final Color color;
   final VoidCallback onTap;
-  final String? subtitle;
 }
 
 class _QuickActionGroup {
@@ -274,6 +266,7 @@ class _FeaturedQuickActionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       definition.title,
@@ -281,15 +274,6 @@ class _FeaturedQuickActionCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    if (definition.subtitle != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        definition.subtitle!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -396,6 +380,7 @@ class _MapQuickActionTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       definition.title,
@@ -403,16 +388,6 @@ class _MapQuickActionTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (definition.subtitle != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        definition.subtitle!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),

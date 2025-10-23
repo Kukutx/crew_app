@@ -45,12 +45,10 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final loc = AppLocalizations.of(context)!;
     final selectedLanguage = settings.locale.languageCode == 'zh' ? 'zh' : 'en';
     final currentPermission = ref.watch(locationPermissionProvider);
-    final currentPlan = ref.watch(subscriptionPlanProvider);
     final activityReminderEnabled = ref.watch(eventReminderProvider);
     final followingUpdatesEnabled = ref.watch(followingUpdatesProvider);
     final pushNotificationEnabled = ref.watch(pushNotificationProvider);
@@ -64,9 +62,6 @@ class SettingsPage extends ConsumerWidget {
     final uid = firebaseUser != null
         ? _resolveUid(firebaseUser, backendUser)
         : null;
-    final secondaryTextStyle = theme.textTheme.bodyMedium?.copyWith(
-      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: .7),
-    );
 
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),

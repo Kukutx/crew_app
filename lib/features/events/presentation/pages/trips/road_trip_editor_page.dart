@@ -52,6 +52,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   final _maxParticipantsCtrl = TextEditingController(text: '4');
   final _priceCtrl = TextEditingController();
   final _descriptionCtrl = TextEditingController();
+  final _initiatorDisclaimerCtrl = TextEditingController();
   final _tagInputCtrl = TextEditingController();
 
   RoadTripEditorState _state = const RoadTripEditorState();
@@ -72,6 +73,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         _priceCtrl.text = initial.pricePerPerson!.toString();
       }
       _descriptionCtrl.text = initial.description;
+      _initiatorDisclaimerCtrl.text = initial.initiatorDisclaimer;
 
       final initialState = RoadTripEditorState(
         dateRange: initial.dateRange,
@@ -99,6 +101,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     _maxParticipantsCtrl.dispose();
     _priceCtrl.dispose();
     _descriptionCtrl.dispose();
+    _initiatorDisclaimerCtrl.dispose();
     _tagInputCtrl.dispose();
     super.dispose();
   }
@@ -222,6 +225,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       carType: _state.carType,
       tags: List.of(_state.tags),
       description: _descriptionCtrl.text.trim(),
+      initiatorDisclaimer: _initiatorDisclaimerCtrl.text.trim(),
       galleryImages: _state.galleryItems
           .where((item) => item.file != null)
           .map((item) => item.file!)
@@ -342,6 +346,18 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 onSetCover: _setCover,
               ),
               RoadTripStorySection(descriptionController: _descriptionCtrl),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _initiatorDisclaimerCtrl,
+                minLines: 3,
+                maxLines: 5,
+                textInputAction: TextInputAction.newline,
+                decoration: const InputDecoration(
+                  labelText: '发起者免责声明',
+                  alignLabelWithHint: true,
+                  hintText: '例如风险提示、特殊说明等',
+                ),
+              ),
               const SizedBox(height: 12),
               FilledButton.icon(
                 onPressed: _submit,

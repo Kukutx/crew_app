@@ -7,11 +7,12 @@ import 'package:crew_app/features/events/presentation/pages/map/controllers/map_
 import 'package:crew_app/features/events/presentation/pages/detail/events_detail_page.dart';
 
 /// 事件轮播管理器
-class EventCarouselManager {
-  EventCarouselManager(this.ref);
+class EventCarouselManager extends ChangeNotifier {
+  EventCarouselManager(this.ref)
+      : _pageController = PageController();
 
   final Ref ref;
-  late final PageController _pageController;
+  final PageController _pageController;
   bool _isVisible = false;
   List<Event> _events = const <Event>[];
 
@@ -19,11 +20,6 @@ class EventCarouselManager {
   PageController get pageController => _pageController;
   bool get isVisible => _isVisible;
   List<Event> get events => _events;
-
-  /// 初始化轮播管理器
-  void initialize() {
-    _pageController = PageController();
-  }
 
   /// 显示事件卡片
   void showEventCard(Event event) {
@@ -51,12 +47,14 @@ class EventCarouselManager {
         }
       });
     }
+    notifyListeners();
   }
 
   /// 隐藏事件卡片
   void hideEventCard() {
     _isVisible = false;
     _events = const <Event>[];
+    notifyListeners();
   }
 
   /// 处理页面变化
@@ -83,12 +81,14 @@ class EventCarouselManager {
   /// 清理资源
   void dispose() {
     _pageController.dispose();
+    super.dispose();
   }
 }
 
 /// EventCarouselManager的Provider
-final eventCarouselManagerProvider = Provider<EventCarouselManager>((ref) {
+final eventCarouselManagerProvider =
+    ChangeNotifierProvider<EventCarouselManager>((ref) {
   final manager = EventCarouselManager(ref);
-  manager.initialize();
+  ref.onDispose(manager.dispose);
   return manager;
 });

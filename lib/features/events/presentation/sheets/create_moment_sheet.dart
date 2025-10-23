@@ -100,13 +100,6 @@ class _CreateMomentSheetState extends State<_CreateMomentSheet> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                loc.create_moment_type_section_description,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
               const SizedBox(height: 12),
               _MomentTypeSelector(
                 loc: loc,
@@ -246,7 +239,6 @@ class _MomentTypeSelector extends StatelessWidget {
         Expanded(
           child: _MomentTypeCard(
             title: loc.create_moment_type_instant,
-            description: loc.create_moment_type_instant_desc,
             icon: Icons.flash_on_outlined,
             accentColor: const Color(0xFFE8457C),
             backgroundColor: const Color(0xFFFFEDF3),
@@ -258,7 +250,6 @@ class _MomentTypeSelector extends StatelessWidget {
         Expanded(
           child: _MomentTypeCard(
             title: loc.create_moment_type_event,
-            description: loc.create_moment_type_event_desc,
             icon: Icons.event_outlined,
             accentColor: const Color(0xFF3D6FE0),
             backgroundColor: const Color(0xFFE7F1FF),
@@ -274,7 +265,6 @@ class _MomentTypeSelector extends StatelessWidget {
 class _MomentTypeCard extends StatelessWidget {
   const _MomentTypeCard({
     required this.title,
-    required this.description,
     required this.icon,
     required this.accentColor,
     required this.backgroundColor,
@@ -283,7 +273,6 @@ class _MomentTypeCard extends StatelessWidget {
   });
 
   final String title;
-  final String description;
   final IconData icon;
   final Color accentColor;
   final Color backgroundColor;
@@ -300,10 +289,6 @@ class _MomentTypeCard extends StatelessWidget {
         selected ? accentColor : colorScheme.outlineVariant.withValues(alpha: 0.4);
     final titleStyle = theme.textTheme.titleSmall?.copyWith(
       fontWeight: FontWeight.w600,
-    );
-    final descriptionStyle = theme.textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant,
-      height: 1.4,
     );
 
     return InkWell(
@@ -338,8 +323,6 @@ class _MomentTypeCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(title, style: titleStyle),
-            const SizedBox(height: 6),
-            Text(description, style: descriptionStyle),
           ],
         ),
       ),
@@ -399,14 +382,6 @@ class _LinkedActivityBanner extends StatelessWidget {
                   loc.create_moment_event_link_value,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  loc.create_moment_type_event_desc,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.4,
                   ),
                 ),
               ],

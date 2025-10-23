@@ -2516,17 +2516,17 @@ abstract class AppLocalizations {
   /// **'Invite friends to explore events with you'**
   String get map_quick_actions_add_friend_subtitle;
 
-  /// No description provided for @map_quick_actions_my_activities.
+  /// No description provided for @map_quick_actions_my_event.
   ///
   /// In en, this message translates to:
   /// **'My activities'**
-  String get map_quick_actions_my_activities;
+  String get map_quick_actions_my_event;
 
-  /// No description provided for @map_quick_actions_my_activities_subtitle.
+  /// No description provided for @map_quick_actions_my_event_subtitle.
   ///
   /// In en, this message translates to:
   /// **'See everything I\'m joining or hosting'**
-  String get map_quick_actions_my_activities_subtitle;
+  String get map_quick_actions_my_event_subtitle;
 
   /// No description provided for @map_quick_actions_my_moments_subtitle.
   ///

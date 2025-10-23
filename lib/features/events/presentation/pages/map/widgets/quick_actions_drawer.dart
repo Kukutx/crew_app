@@ -19,31 +19,30 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
     final colorScheme = theme.colorScheme;
     final navigator = Navigator.of(context);
 
-    final featuredAction = _QuickActionDefinition(
-      icon: Icons.person_add_alt_1_outlined,
-      title: loc.map_quick_actions_add_friend,
-      color: colorScheme.primary,
-      onTap: () {
-        widget.onClose();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          navigator.pushNamed('/add_friend');
-        });
-      },
-    );
-
     final actionGroups = <_QuickActionGroup>[
       _QuickActionGroup(
-        label: loc.map_quick_actions_section_personal,
         actions: [
           _QuickActionDefinition(
-            icon: Icons.event_available_outlined,
-            title: loc.map_quick_actions_my_activities,
+            icon: Icons.person_add_alt_1_outlined,
+            title: loc.map_quick_actions_add_friend,
             color: colorScheme.primary,
             onTap: () {
               widget.onClose();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/my_activities');
+                navigator.pushNamed('/add_friend');
               });
+            },
+          ),
+        ],
+      ),
+      _QuickActionGroup(
+        actions: [
+          _QuickActionDefinition(
+            icon: Icons.event_available_outlined,
+            title: loc.map_quick_actions_my_event,
+            color: colorScheme.primary,
+            onTap: () {
+              widget.onClose();
             },
           ),
           _QuickActionDefinition(
@@ -82,7 +81,6 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
         ],
       ),
       _QuickActionGroup(
-        label: loc.map_quick_actions_section_workspace,
         actions: [
           _QuickActionDefinition(
             icon: Icons.drafts_outlined,
@@ -138,33 +136,24 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
       child: Column(
         children: [
           Expanded(
-            child: actionGroups.expand((group) => group.actions).isEmpty
-                ? _QuickActionsEmptyState(
-                    title: loc.map_quick_actions_empty_title,
-                    message: loc.map_quick_actions_empty_message,
-                  )
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          loc.map_quick_actions_section_connect,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _FeaturedQuickActionCard(definition: featuredAction),
-                        const SizedBox(height: 28),
-                        for (final group in actionGroups) ...[
-                          _QuickActionSection(group: group),
-                          const SizedBox(height: 28),
-                        ],
-                      ],
-                    ),
-                  ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    for (final group in actionGroups) ...[
+                      _QuickActionSection(group: group),
+                      const SizedBox(height: 28),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ),
+
           const Divider(height: 1),
           Builder(
             builder: (context) {
@@ -210,111 +199,73 @@ class _QuickActionDefinition {
 }
 
 class _QuickActionGroup {
-  const _QuickActionGroup({required this.label, required this.actions});
+  const _QuickActionGroup({required this.actions});
 
-  final String label;
   final List<_QuickActionDefinition> actions;
 }
 
-class _FeaturedQuickActionCard extends StatelessWidget {
-  const _FeaturedQuickActionCard({required this.definition});
-
-  final _QuickActionDefinition definition;
+class _QuickActionSection extends StatelessWidget {
+  const _QuickActionSection({required this.group});
+  final _QuickActionGroup group;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
+
     return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: definition.onTap,
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(
-              colors: [definition.color.withOpacity(0.18), colorScheme.surface],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.4),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
+      color: cs.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < group.actions.length; i++) ...[
+            _MinimalTile(definition: group.actions[i]),
+            if (i != group.actions.length - 1)
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                color: cs.outlineVariant.withOpacity(0.35),
               ),
-            ],
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: definition.color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(definition.icon, color: definition.color, size: 32),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      definition.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
-            ],
-          ),
-        ),
+          ],
+        ],
       ),
     );
   }
 }
 
-class _QuickActionSection extends StatelessWidget {
-  const _QuickActionSection({required this.group});
-
-  final _QuickActionGroup group;
+class _MinimalTile extends StatelessWidget {
+  const _MinimalTile({required this.definition});
+  final _QuickActionDefinition definition;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          group.label,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 14),
-        Column(
+    final cs = theme.colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: definition.onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        child: Row(
           children: [
-            for (var i = 0; i < group.actions.length; i++) ...[
-              _MapQuickActionTile(definition: group.actions[i]),
-              if (i != group.actions.length - 1) const SizedBox(height: 12),
-            ],
+            Icon(definition.icon, size: 22, color: cs.onSurface),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                definition.title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
           ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -329,76 +280,6 @@ class _BottomActionDefinition {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-}
-
-class _MapQuickActionTile extends StatelessWidget {
-  const _MapQuickActionTile({required this.definition});
-
-  final _QuickActionDefinition definition;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final borderColor = colorScheme.outlineVariant.withOpacity(0.35);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: definition.onTap,
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              colors: [definition.color.withOpacity(0.10), colorScheme.surface],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          child: Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: definition.color.withOpacity(0.14),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Icon(definition.icon, color: definition.color, size: 26),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      definition.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _DrawerBottomAction extends StatelessWidget {

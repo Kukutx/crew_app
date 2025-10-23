@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
@@ -68,6 +68,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
 
       if (kIsWeb) {
         final provider = GoogleAuthProvider();
+        // 如果需要：provider.setCustomParameters({'prompt': 'select_account'});
         credential = await FirebaseAuth.instance.signInWithPopup(provider);
       } else {
         final googleSignIn = GoogleSignIn(

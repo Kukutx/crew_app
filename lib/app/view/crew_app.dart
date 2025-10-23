@@ -7,7 +7,6 @@ import 'package:crew_app/shared/widgets/qr_scanner/qr_scanner_screen.dart';
 import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
 import 'package:crew_app/features/user/presentation/pages/drafts/my_drafts_page.dart';
 import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
-import 'package:crew_app/features/user/presentation/pages/activities/my_activities_page.dart';
 import 'package:crew_app/features/user/presentation/pages/moments/my_moments_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/settings_page.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/state/settings_providers.dart';
@@ -51,7 +50,6 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   '/moments': (context) => const MyMomentsPage(),
   '/drafts': (context) => const MyDraftsPage(),
   '/add_friend': (context) => const AddFriendPage(),
-  '/my_activities': (context) => const MyActivitiesPage(),
   '/qr-scanner': (context) => const QrScannerScreen(),
   '/profile': (context) {
     final args = ModalRoute.of(context)?.settings.arguments;

@@ -1276,10 +1276,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_add_friend_subtitle => '邀请好友一起探索精彩活动';
 
   @override
-  String get map_quick_actions_my_activities => '我的活动';
+  String get map_quick_actions_my_event => '我的活动';
 
   @override
-  String get map_quick_actions_my_activities_subtitle => '查看我报名或招募的活动';
+  String get map_quick_actions_my_event_subtitle => '查看我报名或招募的活动';
 
   @override
   String get map_quick_actions_my_moments_subtitle => '及时掌握点赞与评论';

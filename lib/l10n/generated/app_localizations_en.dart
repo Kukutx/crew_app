@@ -1331,10 +1331,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invite friends to explore events with you';
 
   @override
-  String get map_quick_actions_my_activities => 'My activities';
+  String get map_quick_actions_my_event => 'My activities';
 
   @override
-  String get map_quick_actions_my_activities_subtitle =>
+  String get map_quick_actions_my_event_subtitle =>
       'See everything I\'m joining or hosting';
 
   @override

@@ -36,6 +36,7 @@ class EventsMapPage extends ConsumerStatefulWidget {
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ProviderSubscription<Event?>? _mapFocusSubscription;
+  bool _isDrawerOpen = false;
 
   @override
   void initState() {
@@ -86,6 +87,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final locationSelectionManager = ref.watch(locationSelectionManagerProvider);
     
     final cardVisible = carouselManager.isVisible && carouselManager.events.isNotEmpty;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _updateBottomNavigation(!_isDrawerOpen && !cardVisible);
+    });
     final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
     final searchState = ref.watch(eventsMapSearchControllerProvider);
     final loc = AppLocalizations.of(context)!;
@@ -161,6 +168,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         onClose: () => Navigator.of(context).pop(),
       ),
       onDrawerChanged: (isOpened) {
+        _isDrawerOpen = isOpened;
         _updateBottomNavigation(!isOpened && !carouselManager.isVisible);
       },
       appBar: SearchEventAppBar(
@@ -190,7 +198,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               initialCenter: startCenter,
               onMapCreated: mapController.onMapCreated,
               onMapReady: mapController.onMapReady,
-              onTap: (pos) => unawaited(locationSelectionManager.onMapTap(pos, context)),
+              onTap: (pos) {
+                if (!selectionState.isSelectingDestination && carouselManager.isVisible) {
+                  carouselManager.hideEventCard();
+                  return;
+                }
+                unawaited(locationSelectionManager.onMapTap(pos, context));
+              },
               onLongPress: (pos) => unawaited(locationSelectionManager.onMapLongPress(pos, context)),
               markers: markers,
               showUserLocation: true,

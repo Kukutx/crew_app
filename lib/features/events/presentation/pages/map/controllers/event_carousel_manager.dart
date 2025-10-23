@@ -7,7 +7,7 @@ import 'package:crew_app/features/events/presentation/pages/map/controllers/map_
 import 'package:crew_app/features/events/presentation/pages/detail/events_detail_page.dart';
 
 /// 事件轮播管理器
-class EventCarouselManager {
+class EventCarouselManager extends ChangeNotifier {
   EventCarouselManager(this.ref);
 
   final Ref ref;
@@ -51,12 +51,14 @@ class EventCarouselManager {
         }
       });
     }
+    notifyListeners();
   }
 
   /// 隐藏事件卡片
   void hideEventCard() {
     _isVisible = false;
     _events = const <Event>[];
+    notifyListeners();
   }
 
   /// 处理页面变化
@@ -81,13 +83,15 @@ class EventCarouselManager {
   }
 
   /// 清理资源
+  @override
   void dispose() {
     _pageController.dispose();
+    super.dispose();
   }
 }
 
 /// EventCarouselManager的Provider
-final eventCarouselManagerProvider = Provider<EventCarouselManager>((ref) {
+final eventCarouselManagerProvider = ChangeNotifierProvider<EventCarouselManager>((ref) {
   final manager = EventCarouselManager(ref);
   manager.initialize();
   return manager;

@@ -25,13 +25,36 @@ class EventPlazaCard extends StatelessWidget {
       comments: 12,
       accentColor: Color(0xFF6750A4),
       momentType: PlazaMomentType.event,
-      previewLabel: '日落草坪局',
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
         'assets/images/crew.png',
         'assets/images/crew.png',
       ],
+      commentItems: [
+        PlazaComment(
+          author: 'Lydia',
+          message: '带上我最爱的野餐布和小蛋糕，一起享受日落吧～',
+          timeLabel: '10分钟前',
+        ),
+        PlazaComment(
+          author: '橙子汽水',
+          message: '天气不错的话我可以带飞盘，顺便拍点照片。',
+          timeLabel: '刚刚',
+        ),
+      ],
+    ),
+    PlazaPost(
+      author: '阿黑',
+      authorInitials: 'AL',
+      timeLabel: '15分钟前',
+      content: '周末准备在城北绿地举办一次自由野餐。大家可以带上自己的拿手菜和户外桌游，一起分享～',
+      location: '城北城市绿地',
+      tags: ['野餐', '城市漫游'],
+      likes: 36,
+      comments: 12,
+      accentColor: Color(0xFF6750A4),
+      momentType: PlazaMomentType.event,
       commentItems: [
         PlazaComment(
           author: 'Lydia',
@@ -56,7 +79,6 @@ class EventPlazaCard extends StatelessWidget {
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
       momentType: PlazaMomentType.event,
-      previewLabel: '街角手冲香',
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
@@ -86,7 +108,6 @@ class EventPlazaCard extends StatelessWidget {
       comments: 7,
       accentColor: Color(0xFF377D71),
       momentType: PlazaMomentType.event,
-      previewLabel: '河畔清风局',
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',

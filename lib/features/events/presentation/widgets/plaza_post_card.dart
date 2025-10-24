@@ -11,7 +11,6 @@ class PlazaPost {
   final int likes;
   final int comments;
   final Color accentColor;
-  final String? previewLabel;
   final List<String> mediaAssets;
   final List<PlazaComment> commentItems;
   final PlazaMomentType momentType;
@@ -26,7 +25,6 @@ class PlazaPost {
     required this.likes,
     required this.comments,
     required this.accentColor,
-    this.previewLabel,
     this.mediaAssets = const [],
     this.commentItems = const [],
     this.momentType = PlazaMomentType.event,
@@ -141,33 +139,6 @@ class PlazaPostCard extends StatelessWidget {
                   mediaAssets: post.mediaAssets,
                   accentColor: post.accentColor,
                   onTap: onMediaTap,
-                ),
-              ] else if (post.previewLabel != null) ...[
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    height: 148,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          post.accentColor.withValues(alpha: .85),
-                          post.accentColor.withValues(alpha: 0.55),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      post.previewLabel!,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
                 ),
               ],
               if (post.location.isNotEmpty) ...[

@@ -317,7 +317,7 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        widget.post.previewLabel ?? widget.post.content,
+                        widget.post.content,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
@@ -413,7 +413,7 @@ class _EmptyPlazaMediaPlaceholder extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Text(
-          post.previewLabel ?? post.content,
+          post.content,
           textAlign: TextAlign.center,
           style: theme.textTheme.headlineSmall?.copyWith(
             color: colorScheme.onPrimary,

@@ -11,58 +11,34 @@ class MapEventFloatingCard extends StatelessWidget {
     this.title,
     this.timeLabel,
     this.location,
-    this.participantSummary,
-    this.badgeLabel,
     this.imageUrl,
-    this.leading,
-    this.metadataRows,
-    this.footer,
-    this.trailingActions,
     this.primaryAction,
+    this.isFavorite,
     this.onClose,
     this.onTap,
     this.onFavorite,
     this.onRegister,
-    this.isFavorite,
-    this.padding = const EdgeInsets.all(14),
-    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
-    this.elevation = 12,
-  }) : assert(
-          event != null || title != null,
-          'Either an event or a custom title must be provided.',
-        );
+  });
 
   final Event? event;
   final String? title;
   final String? timeLabel;
   final String? location;
-  final String? participantSummary;
-  final String? badgeLabel;
   final String? imageUrl;
-  final Widget? leading;
-  final List<Widget>? metadataRows;
-  final Widget? footer;
-  final List<Widget>? trailingActions;
   final Widget? primaryAction;
+  final bool? isFavorite;
   final VoidCallback? onClose;
   final VoidCallback? onTap;
   final VoidCallback? onFavorite;
   final VoidCallback? onRegister;
-  final bool? isFavorite;
-  final EdgeInsetsGeometry padding;
-  final BorderRadiusGeometry borderRadius;
-  final double elevation;
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final loc = AppLocalizations.of(context)!;
     final event = this.event;
     final imageUrl = this.imageUrl ?? event?.firstAvailableImageUrl;
-    final participantSummary = this.participantSummary ??
-        event?.participantSummary ??
-        (event != null ? loc.to_be_announced : null);
     final startTime = event?.startTime;
     final resolvedTimeLabel = timeLabel ??
         (startTime != null
@@ -70,43 +46,11 @@ class MapEventFloatingCard extends StatelessWidget {
             : (event != null ? loc.to_be_announced : null));
     final resolvedTitle = title ?? event?.title ?? '';
     final resolvedLocation = location ?? event?.location;
-    final resolvedBadgeLabel = badgeLabel ??
-        (event != null ? loc.registration_open : null);
     final resolvedIsFavorite = isFavorite ?? event?.isFavorite ?? false;
+    final participantSummary = event?.participantSummary ?? loc.to_be_announced;
 
-    final resolvedMetadataRows = metadataRows ?? [
-      if (resolvedTimeLabel != null)
-        Text(
-          resolvedTimeLabel,
-          style: theme.textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-      if (resolvedLocation != null && resolvedLocation.isNotEmpty)
-        Row(
-          children: [
-            Icon(
-              Icons.place,
-              size: 16,
-              color: colorScheme.outline,
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(
-                resolvedLocation,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
-              ),
-            ),
-          ],
-        ),
-    ];
-
-    final defaultPrimaryAction = primaryAction ??
-        (onRegister != null
+    final actionButton = primaryAction ??
+        (event != null && onRegister != null
             ? FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.orange,
@@ -130,7 +74,7 @@ class MapEventFloatingCard extends StatelessWidget {
               )
             : null);
 
-    final defaultTrailingActions = trailingActions ?? [
+    final trailingActions = [
       if (onFavorite != null)
         IconButton(
           onPressed: onFavorite,
@@ -147,50 +91,46 @@ class MapEventFloatingCard extends StatelessWidget {
         ),
     ];
 
-    final resolvedFooter = footer ??
-        (resolvedBadgeLabel == null &&
-                participantSummary == null &&
-                defaultPrimaryAction == null
-            ? null
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (resolvedBadgeLabel != null) ...[
-                    _smallChip(context, resolvedBadgeLabel),
-                    if (participantSummary != null) const SizedBox(width: 6),
-                  ],
-                  if (participantSummary != null) ...[
-                    Icon(
-                      Icons.groups,
-                      size: 16,
-                      color: colorScheme.outline,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        participantSummary,
-                        style: theme.textTheme.bodyMedium
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                    ),
-                  ] else if (defaultPrimaryAction != null)
-                    const Spacer(),
-                  if (defaultPrimaryAction != null) ...[
-                    const SizedBox(width: 8),
-                    defaultPrimaryAction,
-                  ],
-                ],
-              ));
+    Widget? footer;
+    if (event != null) {
+      footer = Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _smallChip(context, loc.registration_open),
+          const SizedBox(width: 6),
+          const Icon(Icons.groups, size: 16, color: Colors.grey),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              participantSummary,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: Colors.black54),
+            ),
+          ),
+          if (actionButton != null) ...[
+            const SizedBox(width: 8),
+            actionButton,
+          ],
+        ],
+      );
+    } else if (actionButton != null) {
+      footer = Row(
+        children: [
+          const Spacer(),
+          actionButton,
+        ],
+      );
+    }
 
     return Material(
-      elevation: elevation,
-      borderRadius: borderRadius,
+      elevation: 12,
+      borderRadius: BorderRadius.circular(20),
       clipBehavior: Clip.antiAlias,
       color: colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: padding,
+          padding: const EdgeInsets.all(14),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,39 +138,38 @@ class MapEventFloatingCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  leading ??
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: SizedBox(
-                          width: 96,
-                          height: 96,
-                          child: imageUrl != null
-                              ? CachedNetworkImage(
-                                  imageUrl: imageUrl,
-                                  fit: BoxFit.cover,
-                                  placeholder: (_, _) => const Center(
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    ),
-                                  ),
-                                  errorWidget: (_, _, _) => const ColoredBox(
-                                    color: Colors.black12,
-                                    child: Center(child: Icon(Icons.error)),
-                                  ),
-                                )
-                              : const ColoredBox(
-                                  color: Colors.black12,
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.image_not_supported,
-                                      color: Colors.black45,
-                                    ),
-                                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      width: 96,
+                      height: 96,
+                      child: imageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (_, _) => const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
-                        ),
-                      ),
+                              ),
+                              errorWidget: (_, _, _) => const ColoredBox(
+                                color: Colors.black12,
+                                child: Center(child: Icon(Icons.error)),
+                              ),
+                            )
+                          : const ColoredBox(
+                              color: Colors.black12,
+                              child: Center(
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.black45,
+                                ),
+                              ),
+                            ),
+                    ),
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -248,20 +187,46 @@ class MapEventFloatingCard extends StatelessWidget {
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ),
-                            ...defaultTrailingActions,
+                            ...trailingActions,
                           ],
                         ),
-                        ...[
-                          for (var i = 0; i < resolvedMetadataRows.length; i++) ...[
-                            resolvedMetadataRows[i],
-                            if (i != resolvedMetadataRows.length - 1)
-                              const SizedBox(height: 6),
-                          ],
-                        ],
-                        if (resolvedFooter != null &&
-                            resolvedMetadataRows.isNotEmpty)
+                        if (resolvedTimeLabel != null) ...[
                           const SizedBox(height: 6),
-                        if (resolvedFooter != null) resolvedFooter,
+                          Text(
+                            resolvedTimeLabel,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                        if (resolvedLocation != null &&
+                            resolvedLocation.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.place,
+                                size: 16,
+                                color: colorScheme.outline,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  resolvedLocation,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        if (footer != null)
+                          const SizedBox(height: 6),
+                        if (footer != null) footer,
                       ],
                     ),
                   ),

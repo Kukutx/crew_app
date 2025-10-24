@@ -131,6 +131,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_time_title => 'Event time';
 
   @override
+  String get event_start_time_label => 'Start time';
+
+  @override
+  String get event_end_time_label => 'End time';
+
+  @override
   String get event_fee_title => 'Registration fee';
 
   @override

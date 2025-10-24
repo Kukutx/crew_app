@@ -149,6 +149,8 @@
   "event_copy_address_success": "地址已复制",
   "event_participants_title": "参与人数",
   "event_time_title": "活动时间",
+  "event_start_time_label": "开始时间",
+  "event_end_time_label": "结束时间",
   "event_fee_title": "报名费用",
   "event_fee_free": "免费",
   "event_cost_calculator_title": "费用计算器",

@@ -11,6 +11,8 @@ class EventInfoCard extends StatelessWidget {
     '波茨坦广场',
   ];
   static const bool _defaultIsRoundTrip = true;
+  static const TextStyle _valueTextStyle =
+      TextStyle(fontSize: 14, color: Colors.black54);
 
   final Event event;
   final AppLocalizations loc;
@@ -24,7 +26,8 @@ class EventInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeText = _formatTime();
+    final startTimeText = _formatStartTime();
+    final endTimeText = _formatEndTime();
     final participantText = event.participantSummary ?? loc.to_be_announced;
     final waypoints = event.waypoints;
     final displayWaypoints =
@@ -53,7 +56,7 @@ class EventInfoCard extends StatelessWidget {
             ),
             const Divider(height: 20),
             const SizedBox(height: 12),
-            _detailRow(Icons.calendar_today, loc.event_time_title, timeText),
+            _timeRow(startTimeText, endTimeText),
             _detailRow(Icons.payments, loc.event_fee_title, feeText),
             _detailRow(Icons.people, loc.event_participants_title, participantText),
             InkWell(
@@ -121,8 +124,7 @@ class EventInfoCard extends StatelessWidget {
                 value,
                 textAlign: TextAlign.right,
                 overflow: TextOverflow.ellipsis,
-                style: valueStyle ??
-                    const TextStyle(fontSize: 14, color: Colors.black54),
+                style: valueStyle ?? _valueTextStyle,
               ),
             ),
             if (trailing != null) ...[
@@ -171,18 +173,58 @@ class EventInfoCard extends StatelessWidget {
         ),
       );
 
-  String _formatTime() {
+  Widget _timeRow(String startText, String endText) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.calendar_today, size: 20, color: Colors.orange),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(loc.event_time_title, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${loc.event_start_time_label}: $startText',
+                    style: _valueTextStyle,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${loc.event_end_time_label}: $endText',
+                    style: _valueTextStyle,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  String _formatStartTime() {
     final start = event.startTime;
-    final end = event.endTime;
     if (start == null) {
       return loc.to_be_announced;
     }
-    final startFmt = DateFormat('MM.dd HH:mm').format(start.toLocal());
+    return DateFormat('MM.dd HH:mm').format(start.toLocal());
+  }
+
+  String _formatEndTime() {
+    final end = event.endTime;
     if (end == null) {
-      return startFmt;
+      return loc.to_be_announced;
     }
-    final endFmt = DateFormat('HH:mm').format(end.toLocal());
-    return '$startFmt - $endFmt';
+    final endLocal = end.toLocal();
+    final startLocal = event.startTime?.toLocal();
+    final sameDay = startLocal != null &&
+        startLocal.year == endLocal.year &&
+        startLocal.month == endLocal.month &&
+        startLocal.day == endLocal.day;
+    if (sameDay) {
+      return DateFormat('HH:mm').format(endLocal);
+    }
+    return DateFormat('MM.dd HH:mm').format(endLocal);
   }
 
   String _formatFee(String localeTag) {

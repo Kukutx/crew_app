@@ -1,26 +1,26 @@
 // widgets/markers_layer.dart
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'event_cluster_item.dart';
 
 class MarkersLayer {
-  final Set<Marker> markers;
-  const MarkersLayer({required this.markers});
+  final List<EventClusterItem> clusterItems;
+  const MarkersLayer({required this.clusterItems});
+
+  const MarkersLayer.empty() : clusterItems = const [];
 
   factory MarkersLayer.fromEvents({
     required List<Event> events,
     required void Function(Event) onEventTap,
   }) {
-    final markers = <Marker>{
+    final items = <EventClusterItem>[
       for (final ev in events)
-        Marker(
-          markerId: MarkerId('event_${ev.id}'),
-          position: LatLng(ev.latitude, ev.longitude),
-          infoWindow: InfoWindow(title: ev.title, snippet: ev.location),
-          consumeTapEvents: true,           // 先暂时不显示 InfoWindow，因为点击老是会切换地图信息
+        EventClusterItem(
+          event: ev,
           onTap: () => onEventTap(ev),
         ),
-    };
+    ];
 
-    return MarkersLayer(markers: markers);
+    return MarkersLayer(clusterItems: items);
   }
 }

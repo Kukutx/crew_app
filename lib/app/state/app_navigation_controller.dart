@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import 'app_overlay_provider.dart';
 
@@ -145,6 +146,6 @@ class AppNavigationController extends ChangeNotifier {
 }
 
 final appNavigationControllerProvider =
-    AutoDisposeChangeNotifierProvider<AppNavigationController>(
+    ChangeNotifierProvider.autoDispose<AppNavigationController>(
   AppNavigationController.new,
 );

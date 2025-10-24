@@ -27,24 +27,26 @@ class EventDetailBottomBar extends StatelessWidget {
     final localeTag = Localizations.localeOf(context).toString();
     final sanitizedCount = favoriteCount < 0 ? 0 : favoriteCount;
     final countLabel = NumberFormat.compact(locale: localeTag).format(sanitizedCount);
-    final favoriteColor = isFavorite ? Colors.amber : Colors.amber.shade600;
-    final favoriteBackgroundColor = isFavorite
-        ? const Color(0xFFFFF7D1)
-        : const Color(0xFFFFFAE6);
+    final favoriteColor = isFavorite ? Colors.black : Colors.black54;
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        decoration: const BoxDecoration(color: Colors.white),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Colors.grey.shade200),
+          ),
+        ),
         child: Row(
           children: [
             TextButton(
               onPressed: onFavorite,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                backgroundColor: favoriteBackgroundColor,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                foregroundColor: favoriteColor,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -52,13 +54,14 @@ class EventDetailBottomBar extends StatelessWidget {
                   Icon(
                     isFavorite ? Icons.star : Icons.star_border,
                     color: favoriteColor,
+                    size: 20,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     countLabel,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: favoriteColor,
                     ),
                   ),
@@ -87,13 +90,17 @@ class EventDetailBottomBar extends StatelessWidget {
             Expanded(
               child: SizedBox(
                 height: 48,
-                child: ElevatedButton(
+                child: FilledButton(
                   onPressed: onRegister,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   child: Text(loc.action_register),
@@ -120,35 +127,33 @@ class _EventDetailQuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0xFFF2F4F7),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: const Color(0xFF3C4B64),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF3C4B64),
-                ),
-              ),
-            ],
-          ),
+    return TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
+        textStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 20,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
@@ -24,6 +27,7 @@ import 'controllers/map_controller.dart';
 import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import 'controllers/location_selection_manager.dart';
+import 'utils/event_clusterer.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -38,10 +42,21 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   ProviderSubscription<Event?>? _mapFocusSubscription;
   ProviderSubscription<EventCarouselManager>? _carouselSubscription;
   bool _isDrawerOpen = false;
+  double _currentZoom = 5;
+  late final BitmapDescriptor _clusterPlaceholderIcon;
+  final Map<int, BitmapDescriptor> _clusterIcons = <int, BitmapDescriptor>{};
+  final Set<int> _clusterIconRequests = <int>{};
+  final EventClusterer _clusterer = const EventClusterer();
+  Color? _clusterPrimaryColor;
+  Color? _clusterOnPrimaryColor;
+  Color? _clusterBorderColor;
 
   @override
   void initState() {
     super.initState();
+    _clusterPlaceholderIcon = BitmapDescriptor.defaultMarkerWithHue(
+      BitmapDescriptor.hueAzure,
+    );
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -106,6 +121,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final startCenter = mapController.getInitialCenter();
     final selectionState = ref.watch(mapSelectionControllerProvider);
 
+    _updateClusterTheme(theme);
+
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
       error: (_, _) => const MarkersLayer(markers: <Marker>{}),
@@ -115,6 +132,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           mapController.focusOnEvent(event);
           carouselManager.showEventCard(event);
         },
+        zoom: _currentZoom,
+        clusterIconProvider: (count) => _clusterIconFor(count, theme),
+        onClusterTap: (position) => _onClusterTap(position, mapController),
+        clusterer: _clusterer,
       ),
     );
 
@@ -203,6 +224,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               initialCenter: startCenter,
               onMapCreated: mapController.onMapCreated,
               onMapReady: mapController.onMapReady,
+              onCameraMove: _handleCameraMove,
               onTap: (pos) {
                 carouselManager.hideEventCard();
                 unawaited(locationSelectionManager.onMapTap(pos, context));
@@ -298,5 +320,124 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
     ref.read(appOverlayIndexProvider.notifier).state = 2;
   }
+
+  void _handleCameraMove(CameraPosition position) {
+    final newZoom = position.zoom;
+    if ((newZoom - _currentZoom).abs() < 0.01) {
+      return;
+    }
+    setState(() {
+      _currentZoom = newZoom;
+    });
+  }
+
+  BitmapDescriptor _clusterIconFor(int count, ThemeData theme) {
+    final key = _clusterIconKey(count);
+    final icon = _clusterIcons[key];
+    if (icon != null) {
+      return icon;
+    }
+
+    _scheduleClusterIcon(key, _clusterIconLabel(count), theme);
+    return _clusterPlaceholderIcon;
+  }
+
+  void _scheduleClusterIcon(int key, String label, ThemeData theme) {
+    if (_clusterIconRequests.contains(key)) {
+      return;
+    }
+    _clusterIconRequests.add(key);
+    unawaited(_generateClusterIcon(key, label, theme));
+  }
+
+  Future<void> _generateClusterIcon(int key, String label, ThemeData theme) async {
+    final icon = await _createClusterIcon(
+      label: label,
+      backgroundColor: _clusterPrimaryColor ?? theme.colorScheme.primary,
+      textColor: _clusterOnPrimaryColor ?? theme.colorScheme.onPrimary,
+      borderColor: _clusterBorderColor ?? theme.colorScheme.surface,
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _clusterIcons[key] = icon;
+      _clusterIconRequests.remove(key);
+    });
+  }
+
+  Future<BitmapDescriptor> _createClusterIcon({
+    required String label,
+    required Color backgroundColor,
+    required Color textColor,
+    required Color borderColor,
+  }) async {
+    const size = 144.0;
+    final recorder = ui.PictureRecorder();
+    final canvas = ui.Canvas(recorder);
+    final center = ui.Offset(size / 2, size / 2);
+
+    final fillPaint = ui.Paint()..color = backgroundColor;
+    canvas.drawCircle(center, size / 2, fillPaint);
+
+    final borderPaint = ui.Paint()
+      ..color = borderColor.withOpacity(0.9)
+      ..style = ui.PaintingStyle.stroke
+      ..strokeWidth = size * 0.08;
+    canvas.drawCircle(center, size / 2 - borderPaint.strokeWidth / 2, borderPaint);
+
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: TextStyle(
+          color: textColor,
+          fontSize: size * 0.4,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    )
+      ..layout();
+
+    final textOffset = ui.Offset(
+      center.dx - textPainter.width / 2,
+      center.dy - textPainter.height / 2,
+    );
+    textPainter.paint(canvas, textOffset);
+
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(size.toInt(), size.toInt());
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) {
+      return _clusterPlaceholderIcon;
+    }
+    return BitmapDescriptor.fromBytes(byteData.buffer.asUint8List());
+  }
+
+  void _onClusterTap(LatLng position, MapController mapController) {
+    final targetZoom = math.min(_currentZoom + 2, 20);
+    unawaited(mapController.moveCamera(position, zoom: targetZoom));
+  }
+
+  void _updateClusterTheme(ThemeData theme) {
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+    final border = theme.colorScheme.surface;
+    if (primary == _clusterPrimaryColor &&
+        onPrimary == _clusterOnPrimaryColor &&
+        border == _clusterBorderColor) {
+      return;
+    }
+    _clusterPrimaryColor = primary;
+    _clusterOnPrimaryColor = onPrimary;
+    _clusterBorderColor = border;
+    _clusterIcons.clear();
+    _clusterIconRequests.clear();
+  }
+
+  int _clusterIconKey(int count) => count >= 100 ? 100 : count;
+
+  String _clusterIconLabel(int count) => count >= 100 ? '99+' : '$count';
 }
 

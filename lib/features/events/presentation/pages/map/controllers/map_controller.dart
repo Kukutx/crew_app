@@ -87,20 +87,6 @@ class MapController {
     return userLoc ?? const LatLng(48.8566, 2.3522);
   }
 
-  /// 获取事件标记
-  Set<Marker> getEventMarkers() {
-    final events = ref.read(eventsProvider);
-    return events.maybeWhen(
-      data: (eventList) => eventList.map((event) => Marker(
-        markerId: MarkerId(event.id),
-        position: LatLng(event.latitude, event.longitude),
-        infoWindow: InfoWindow(title: event.title),
-        onTap: () => focusOnEvent(event),
-      )).toSet(),
-      orElse: () => <Marker>{},
-    );
-  }
-
   /// 清理资源
   void dispose() {
     _mapController?.dispose();

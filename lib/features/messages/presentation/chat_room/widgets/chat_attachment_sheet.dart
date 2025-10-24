@@ -1,4 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ChatAttachmentSheet extends StatelessWidget {
@@ -59,9 +60,11 @@ class ChatAttachmentSheet extends StatelessWidget {
               (option) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: ListTile(
-                  leading: CircleAvatar(
+                  leading: CrewAvatar(
+                    radius: 20,
                     backgroundColor: option.color.withValues(alpha: .12),
-                    child: Icon(option.icon, color: option.color),
+                    foregroundColor: option.color,
+                    child: Icon(option.icon),
                   ),
                   title: Text(option.label),
                   onTap: () => onOptionSelected(option.label),

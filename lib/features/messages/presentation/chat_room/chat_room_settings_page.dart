@@ -2,6 +2,7 @@ import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/chat_shared_media_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/report_sheet.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -338,9 +339,10 @@ class _ChatSettingsHeader extends StatelessWidget {
 
     return Column(
       children: [
-        CircleAvatar(
+        CrewAvatar(
           radius: 44,
           backgroundColor: primary.withValues(alpha: .12),
+          foregroundColor: primary,
           child: avatarChild,
         ),
         const SizedBox(height: 16),
@@ -391,12 +393,13 @@ class _ChatParticipantTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
-        leading: CircleAvatar(
+        leading: CrewAvatar(
+          radius: 20,
           backgroundColor: avatarColor.withValues(alpha: .12),
+          foregroundColor: avatarColor,
           child: Text(
             initials,
-            style: TextStyle(
-              color: avatarColor,
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
             ),
           ),

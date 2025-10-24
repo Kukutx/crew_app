@@ -13,6 +13,7 @@ import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_r
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 enum ChatConversationType { group, direct }
@@ -374,16 +375,16 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       title: Row(
         children: [
           InkWell(
-            customBorder: const CircleBorder(),
+            borderRadius: BorderRadius.circular(18),
             onTap: () => _openUserProfile(partner),
-            child: CircleAvatar(
+            child: CrewAvatar(
               radius: 22,
               backgroundColor: avatarColor.withValues(alpha: .15),
+              foregroundColor: avatarColor,
               child: Text(
                 partnerInitials,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: avatarColor,
                 ),
               ),
             ),

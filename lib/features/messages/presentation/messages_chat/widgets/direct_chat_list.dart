@@ -1,4 +1,5 @@
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class DirectChatList extends StatelessWidget {
@@ -181,27 +182,26 @@ class _DirectChatTile extends StatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   InkWell(
-                    customBorder: const CircleBorder(),
+                    borderRadius: BorderRadius.circular(isSystem ? 16 : 18),
                     onTap: effectiveOnAvatarTap,
-                    child: CircleAvatar(
+                    child: CrewAvatar(
                       radius: isSystem ? 22 : 24,
                       backgroundColor: isSystem
                           ? colorScheme.secondaryContainer
                           : avatarColor.withValues(alpha: .12),
+                      foregroundColor: isSystem
+                          ? colorScheme.onSecondaryContainer
+                          : avatarColor,
                       child: isSystem
-                          ? Icon(
-                              Icons.notifications_none_outlined,
-                              color: colorScheme.onSecondaryContainer,
-                            )
+                          ? const Icon(Icons.notifications_none_outlined)
                           : Text(
                               (conversation.initials ?? conversation.displayName)
                                   .characters
                                   .take(2)
                                   .toString()
                                   .toUpperCase(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: avatarColor,
                               ),
                             ),
                     ),

@@ -1,5 +1,6 @@
 import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/models/wallet_transaction.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class WalletTransactionsCard extends StatelessWidget {
@@ -48,14 +49,12 @@ class WalletTransactionsCard extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final transaction = transactions[index];
                   return ListTile(
-                    leading: CircleAvatar(
+                    leading: CrewAvatar(
                       radius: 24,
                       backgroundColor:
                           transaction.iconColor.withValues(alpha: .12),
-                      child: Icon(
-                        transaction.icon,
-                        color: transaction.iconColor,
-                      ),
+                      foregroundColor: transaction.iconColor,
+                      child: Icon(transaction.icon),
                     ),
                     title: Text(transaction.title),
                     subtitle: Text(transaction.subtitle),

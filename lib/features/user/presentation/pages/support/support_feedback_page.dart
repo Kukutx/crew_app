@@ -1,4 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -178,11 +179,13 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
                                 Positioned(
                                   top: 4, right: 4,
                                   child: GestureDetector(
-                                    onTap: () => setState(() => _attachments.removeAt(i)),
-                                    child: CircleAvatar(
+                                    onTap: () =>
+                                        setState(() => _attachments.removeAt(i)),
+                                    child: CrewAvatar(
                                       radius: 12,
-                                      backgroundColor:
-                                          theme.colorScheme.surface.withValues(alpha: 0.9),
+                                      backgroundColor: theme.colorScheme.surface
+                                          .withValues(alpha: 0.9),
+                                      foregroundColor: theme.colorScheme.onSurface,
                                       child: const Icon(Icons.close, size: 16),
                                     ),
                                   ),

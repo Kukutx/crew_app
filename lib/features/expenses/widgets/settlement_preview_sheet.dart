@@ -1,6 +1,7 @@
 import 'package:crew_app/features/expenses/data/participant.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:crew_app/features/expenses/widgets/avatar.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class SettlementPreviewSheet extends StatelessWidget {
@@ -73,13 +74,14 @@ class SettlementPreviewSheet extends StatelessWidget {
             children: entries.map((entry) {
               final isPositive = entry.difference >= 0;
               return Chip(
-                avatar: CircleAvatar(
+                avatar: CrewAvatar(
+                  radius: 16,
                   backgroundColor:
                       isPositive ? const Color(0xFF1B8A5C) : Colors.redAccent,
+                  foregroundColor: Colors.white,
                   child: Icon(
                     isPositive ? Icons.arrow_downward : Icons.arrow_upward,
                     size: 16,
-                    color: Colors.white,
                   ),
                 ),
                 backgroundColor: const Color(0xFFE8F8F0),

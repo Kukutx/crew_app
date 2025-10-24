@@ -225,11 +225,11 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
   }
 }
 
-/// 带“轻摇”验证动画的 Google 按钮：
-/// - 未满足 canProceed 时：左右轻摇 + SnackBar 提示；
-/// - 使用 flutter_svg 显示 Google “G” 图标；
+/// 使用 flutter_svg 显示 Google “G” 图标的登录按钮。
+///
+/// - 当 [canProceed] 为 `false` 或 [loading] 为 `true` 时按钮呈禁用态并阻止点击；
 /// - 外观遵循“浅底、描边、圆角胶囊”风格；
-class GoogleWobbleButton extends StatefulWidget {
+class GoogleWobbleButton extends StatelessWidget {
   const GoogleWobbleButton({
     super.key,
     required this.loading,
@@ -248,96 +248,40 @@ class GoogleWobbleButton extends StatefulWidget {
   final String? invalidMessage;
 
   @override
-  State<GoogleWobbleButton> createState() => _GoogleWobbleButtonState();
-}
-
-class _GoogleWobbleButtonState extends State<GoogleWobbleButton> with SingleTickerProviderStateMixin {
-  late final AnimationController _shakeCtrl = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 450),
-  );
-
-  late final Animation<double> _shakeAnim = TweenSequence<double>([
-    TweenSequenceItem(tween: Tween(begin: 0, end: -12), weight: 1),
-    TweenSequenceItem(tween: Tween(begin: -12, end: 12), weight: 2),
-    TweenSequenceItem(tween: Tween(begin: 12, end: -8), weight: 2),
-    TweenSequenceItem(tween: Tween(begin: -8, end: 6), weight: 2),
-    TweenSequenceItem(tween: Tween(begin: 6, end: 0), weight: 1),
-  ]).animate(CurvedAnimation(parent: _shakeCtrl, curve: Curves.easeOutCubic));
-
-  void _triggerInvalidFeedback() {
-    if (!_shakeCtrl.isAnimating) {
-      _shakeCtrl.forward(from: 0);
-    }
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(widget.invalidMessage ?? 'Please complete the required steps.'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1400),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _shakeCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // 视觉“启用/未启用”反馈；注意依然允许点击以触发验证动画
-    final bool enabledVisual = widget.canProceed && !widget.loading;
+    // 视觉“启用/未启用”反馈；
+    final bool enabledVisual = canProceed && !loading;
 
-    return AnimatedBuilder(
-      animation: _shakeAnim,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(_shakeAnim.value, 0),
-          child: child,
-        );
-      },
-      child: Opacity(
-        opacity: enabledVisual ? 1 : 0.65,
-        child: InkWell(
-          onTap: widget.loading
-              ? null
-              : () {
-                  if (!widget.canProceed) {
-                    _triggerInvalidFeedback();
-                    return;
-                  }
-                  widget.onProceed();
-                },
-          borderRadius: BorderRadius.circular(999),
-          child: Ink(
-            decoration: BoxDecoration(
-  color: Colors.white,
-  borderRadius: BorderRadius.circular(4),
-  border: Border.all(color: const Color(0xFFDADCE0)),
-),
-child: Center(
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const SizedBox(width: 12),
-      SvgPicture.asset(widget.svgAssetPath, width: 18, height: 18),
-      const SizedBox(width: 12),
-      Text(
-        widget.label,
-        style: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w500,
-          color: const Color(0xFF3C4043),
-        ),
-      ),
-      const SizedBox(width: 12),
-    ],
-  ),
-),
+    return Opacity(
+      opacity: enabledVisual ? 1 : 0.65,
+      child: InkWell(
+        onTap: (!canProceed || loading) ? null : onProceed,
+        borderRadius: BorderRadius.circular(999),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color(0xFFDADCE0)),
+          ),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(width: 12),
+                SvgPicture.asset(svgAssetPath, width: 18, height: 18),
+                const SizedBox(width: 12),
+                Text(
+                  label,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF3C4043),
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+            ),
           ),
         ),
       ),

@@ -9,9 +9,7 @@ class MyDraftsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.my_drafts_title),
-      ),
+      appBar: AppBar(title: Text(loc.my_drafts_title)),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -25,7 +23,7 @@ class MyDraftsPage extends StatelessWidget {
                   childAspectRatio: 0.72,
                 ),
                 delegate: SliverChildBuilderDelegate(
-                  _DraftCardSkeleton.build,
+                  (context, index) => const _DraftCardSkeleton(),
                   childCount: 8,
                 ),
               ),
@@ -39,10 +37,6 @@ class MyDraftsPage extends StatelessWidget {
 
 class _DraftCardSkeleton extends StatelessWidget {
   const _DraftCardSkeleton();
-
-  static Widget build(BuildContext context, int index) {
-    return const _DraftCardSkeleton();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +52,7 @@ class _DraftCardSkeleton extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               child: const SkeletonBox(borderRadius: BorderRadius.zero),
             ),
           ),

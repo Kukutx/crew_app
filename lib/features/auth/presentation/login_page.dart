@@ -256,31 +256,32 @@ class GoogleWobbleButton extends StatelessWidget {
 
     return Opacity(
       opacity: enabledVisual ? 1 : 0.65,
-      child: InkWell(
-        onTap: (!canProceed || loading) ? null : onProceed,
-        borderRadius: BorderRadius.circular(999),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color(0xFFDADCE0)),
-          ),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(width: 12),
-                SvgPicture.asset(svgAssetPath, width: 18, height: 18),
-                const SizedBox(width: 12),
-                Text(
-                  label,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF3C4043),
+      child: Material(
+        color: theme.colorScheme.surface,
+        shape: const StadiumBorder(
+          side: BorderSide(color: Color(0xFFDADCE0)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: (!canProceed || loading) ? null : onProceed,
+          borderRadius: BorderRadius.circular(999),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(svgAssetPath, width: 18, height: 18),
+                  const SizedBox(width: 12),
+                  Text(
+                    label,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF3C4043),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-              ],
+                ],
+              ),
             ),
           ),
         ),

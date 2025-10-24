@@ -494,6 +494,24 @@ abstract class AppLocalizations {
   /// **'One-way'**
   String get event_route_type_one_way;
 
+  /// No description provided for @event_host_disclaimer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Host disclaimer'**
+  String get event_host_disclaimer_title;
+
+  /// No description provided for @event_host_disclaimer_link.
+  ///
+  /// In en, this message translates to:
+  /// **'View disclaimer'**
+  String get event_host_disclaimer_link;
+
+  /// No description provided for @event_host_disclaimer_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No disclaimer provided'**
+  String get event_host_disclaimer_empty;
+
   /// No description provided for @event_distance_title.
   ///
   /// In en, this message translates to:

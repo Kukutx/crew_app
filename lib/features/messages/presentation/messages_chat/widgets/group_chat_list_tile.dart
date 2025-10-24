@@ -1,4 +1,5 @@
 import 'package:crew_app/features/messages/data/group_chat_preview.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class GroupChatListTile extends StatelessWidget {
@@ -38,13 +39,11 @@ class GroupChatListTile extends StatelessWidget {
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        CircleAvatar(
+                        CrewAvatar(
                           radius: 26,
                           backgroundColor: accentColor.withValues(alpha: .12),
-                          child: Icon(
-                            Icons.forum_outlined,
-                            color: accentColor,
-                          ),
+                          foregroundColor: accentColor,
+                          child: const Icon(Icons.forum_outlined),
                         ),
                         if (preview.unreadCount > 0)
                           Positioned(

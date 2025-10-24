@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:crew_app/features/user/data/user.dart';
@@ -13,7 +14,7 @@ class CollapsedProfileAvatar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.85),
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
@@ -27,9 +28,10 @@ class CollapsedProfileAvatar extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            CircleAvatar(
+            CrewAvatar(
               radius: 20,
               backgroundImage: CachedNetworkImageProvider(user.avatar),
+              borderRadius: BorderRadius.circular(18),
             ),
             if (user.countryFlag != null)
               Positioned(

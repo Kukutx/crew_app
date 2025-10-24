@@ -1,4 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class WalletQuickActions extends StatelessWidget {
@@ -86,10 +87,11 @@ class _WalletQuickAction extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircleAvatar(
+            CrewAvatar(
               radius: 22,
               backgroundColor: background,
-              child: Icon(icon, color: color),
+              foregroundColor: color,
+              child: Icon(icon),
             ),
             const SizedBox(height: 12),
             Text(

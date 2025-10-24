@@ -1,3 +1,4 @@
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class AddFriendPage extends StatelessWidget {
@@ -113,13 +114,13 @@ class _ContactTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        CircleAvatar(
+        CrewAvatar(
           radius: 24,
           backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+          foregroundColor: colorScheme.primary,
           child: Text(
             contact.initials,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
                 ),
           ),

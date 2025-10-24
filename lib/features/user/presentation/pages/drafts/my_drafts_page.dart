@@ -1,3 +1,4 @@
+import 'package:crew_app/features/events/presentation/pages/map/widgets/map_event_floating_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -148,19 +149,16 @@ class _DraftsContent extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: drafts.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.72,
-          ),
-          itemBuilder: (context, index) {
-            return _DraftCard(draft: drafts[index], colorScheme: colorScheme);
-          },
+        Column(
+          children: [
+            for (var i = 0; i < drafts.length; i++) ...[
+              _DraftCard(
+                draft: drafts[i],
+                colorScheme: colorScheme,
+              ),
+              if (i != drafts.length - 1) const SizedBox(height: 16),
+            ],
+          ],
         ),
       ],
     );
@@ -175,88 +173,89 @@ class _DraftCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: colorScheme.surfaceContainerLow,
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: Container(
-                decoration: BoxDecoration(gradient: draft.gradient),
-                padding: const EdgeInsets.all(16),
-                alignment: Alignment.bottomLeft,
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: draft.tags
-                      .map(
-                        (tag) => Chip(
-                          label: Text(tag),
-                          visualDensity: VisualDensity.compact,
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          labelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                          shape: StadiumBorder(
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
+    final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
+
+    final metadata = [
+      Text(
+        draft.schedule,
+        style: theme.textTheme.titleSmall?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
             ),
-          ),
+      ),
+      Row(
+        children: [
+          Icon(Icons.place, size: 16, color: colorScheme.outline),
+          const SizedBox(width: 4),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    draft.title,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+            child: Text(
+              draft.location,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${draft.schedule} · ${draft.location}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Spacer(),
-                  Text(
-                    draft.lastEdited,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton.tonal(
-                    onPressed: () {},
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(36),
-                    ),
-                    child: Text(AppLocalizations.of(context)!.my_drafts_resume_button),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
       ),
+      Text(
+        draft.lastEdited,
+        style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+      ),
+    ];
+
+    final tagChips = draft.tags
+        .map(
+          (tag) => Chip(
+            label: Text(tag),
+            visualDensity: VisualDensity.compact,
+            backgroundColor: colorScheme.surfaceContainerHigh,
+            labelStyle: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+            shape: StadiumBorder(
+              side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+            ),
+          ),
+        )
+        .toList(growable: false);
+
+    return MapEventFloatingCard(
+      title: draft.title,
+      timeLabel: draft.schedule,
+      location: draft.location,
+      participantSummary: null,
+      badgeLabel: null,
+      leading: _DraftCover(gradient: draft.gradient, tags: draft.tags),
+      metadataRows: metadata,
+      footer: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: tagChips,
+            ),
+          ),
+          const SizedBox(width: 8),
+          FilledButton.tonal(
+            onPressed: () {},
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(0, 36),
+            ),
+            child: Text(loc.my_drafts_resume_button),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(24),
+      elevation: 4,
     );
   }
 }
@@ -283,4 +282,49 @@ String _localizedText(BuildContext context,
     {required String en, required String zh}) {
   final locale = Localizations.localeOf(context);
   return locale.languageCode == 'zh' ? zh : en;
+}
+
+class _DraftCover extends StatelessWidget {
+  const _DraftCover({required this.gradient, required this.tags});
+
+  final Gradient gradient;
+  final List<String> tags;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textStyle = theme.textTheme.labelSmall?.copyWith(
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+    );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 96,
+        height: 96,
+        decoration: BoxDecoration(gradient: gradient),
+        padding: const EdgeInsets.all(12),
+        alignment: Alignment.bottomLeft,
+        child: Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: tags
+              .take(2)
+              .map(
+                (tag) => Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(tag, style: textStyle),
+                ),
+              )
+              .toList(growable: false),
+        ),
+      ),
+    );
+  }
 }

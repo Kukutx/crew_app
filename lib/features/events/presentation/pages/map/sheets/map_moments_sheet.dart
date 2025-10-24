@@ -27,11 +27,12 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
   String? _selectedCountry;
 
   static const _countries = ['附近', '中国', '日本', '美国', '英国', '法国', '德国'];
+  static const _defaultCountry = _countries.first;
 
   @override
   void initState() {
     super.initState();
-    _selectedCountry = _countries.first;
+    _selectedCountry = _defaultCountry;
   }
 
   static const List<PlazaPost> _plazaPosts = [
@@ -180,39 +181,61 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                   final theme = Theme.of(context);
                   final buttonColor = theme.colorScheme.surfaceContainerHighest;
 
+                  final selectedCountry = _selectedCountry ?? _defaultCountry;
+
                   return Padding(
                     padding: const EdgeInsets.only(left: 16),
-                    child: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        setState(() {
-                          _selectedCountry = value;
-                        });
-                      },
-                      itemBuilder: (context) => [
-                        for (final country in _countries)
-                          PopupMenuItem<String>(
-                            value: country,
-                            child: Text(country),
-                          ),
-                      ],
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: buttonColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(_selectedCountry ?? '附近'),
-                            const SizedBox(width: 4),
-                            const Icon(Icons.keyboard_arrow_down, size: 18),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PopupMenuButton<String>(
+                          onSelected: (value) {
+                            setState(() {
+                              _selectedCountry = value;
+                            });
+                          },
+                          itemBuilder: (context) => [
+                            for (final country in _countries)
+                              PopupMenuItem<String>(
+                                value: country,
+                                child: Text(country),
+                              ),
                           ],
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: buttonColor,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(selectedCountry),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.keyboard_arrow_down, size: 18),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                        if (selectedCountry != _defaultCountry) ...[
+                          const SizedBox(width: 4),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            iconSize: 18,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              setState(() {
+                                _selectedCountry = _defaultCountry;
+                              });
+                            },
+                          ),
+                        ],
+                      ],
                     ),
                   );
                 },

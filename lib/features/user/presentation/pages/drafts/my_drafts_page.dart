@@ -1,4 +1,5 @@
 import 'package:crew_app/features/events/presentation/pages/map/widgets/map_event_floating_card.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -73,7 +74,15 @@ class _DraftsContent extends StatelessWidget {
                 timeLabel: _drafts[i].timeLabel,
                 location: _drafts[i].location,
                 primaryAction: FilledButton.tonal(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (routeContext) => RoadTripEditorPage(
+                          onClose: () => Navigator.of(routeContext).pop(),
+                        ),
+                      ),
+                    );
+                  },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(0, 36),
                   ),

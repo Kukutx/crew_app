@@ -97,9 +97,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dark_mode => '深色模式';
 
   @override
-  String get email_unbound => '未绑定邮箱';
-
-  @override
   String get user_display_name_fallback => '用户';
 
   @override
@@ -1024,9 +1021,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_account_info => '账号信息';
-
-  @override
-  String get settings_account_email_label => '邮箱';
 
   @override
   String get settings_account_uid_label => 'UID';

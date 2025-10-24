@@ -55,9 +55,6 @@ class SettingsPage extends ConsumerWidget {
     final firebaseUser = authState.value ?? ref.watch(currentUserProvider);
     final profileState = ref.watch(authenticatedUserProvider);
     final backendUser = profileState.asData?.value;
-    final email = firebaseUser != null
-        ? _resolveEmail(firebaseUser, backendUser, loc)
-        : null;
     final uid = firebaseUser != null
         ? _resolveUid(firebaseUser, backendUser)
         : null;
@@ -227,8 +224,6 @@ class SettingsPage extends ConsumerWidget {
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (email != null)
-                            Text('${loc.settings_account_email_label}: $email'),
                           Text('${loc.settings_account_uid_label}: $uid'),
                         ],
                       )
@@ -406,23 +401,6 @@ class _SettingsSection extends StatelessWidget {
   }
 }
 
-String _resolveEmail(
-  fa.User user,
-  AuthenticatedUserDto? backendUser,
-  AppLocalizations loc,
-) {
-  final backendEmail = backendUser?.email.trim();
-  if (backendEmail != null && backendEmail.isNotEmpty) {
-    return backendEmail;
-  }
-
-  final firebaseEmail = user.email?.trim();
-  if (firebaseEmail != null && firebaseEmail.isNotEmpty) {
-    return firebaseEmail;
-  }
-
-  return loc.email_unbound;
-}
 
 String _resolveUid(fa.User user, AuthenticatedUserDto? backendUser) {
   final backendId = backendUser?.uid.trim();

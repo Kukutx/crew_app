@@ -266,12 +266,6 @@ abstract class AppLocalizations {
   /// **'Dark Mode'**
   String get dark_mode;
 
-  /// No description provided for @email_unbound.
-  ///
-  /// In en, this message translates to:
-  /// **'Email not linked'**
-  String get email_unbound;
-
   /// No description provided for @user_display_name_fallback.
   ///
   /// In en, this message translates to:
@@ -2023,12 +2017,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account details'**
   String get settings_account_info;
-
-  /// No description provided for @settings_account_email_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Email'**
-  String get settings_account_email_label;
 
   /// No description provided for @settings_account_uid_label.
   ///

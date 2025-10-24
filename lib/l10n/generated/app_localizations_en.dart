@@ -98,9 +98,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dark_mode => 'Dark Mode';
 
   @override
-  String get email_unbound => 'Email not linked';
-
-  @override
   String get user_display_name_fallback => 'User';
 
   @override
@@ -1065,9 +1062,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_account_info => 'Account details';
-
-  @override
-  String get settings_account_email_label => 'Email';
 
   @override
   String get settings_account_uid_label => 'UID';

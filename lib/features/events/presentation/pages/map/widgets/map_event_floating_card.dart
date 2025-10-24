@@ -6,40 +6,191 @@ import 'package:intl/intl.dart';
 
 class MapEventFloatingCard extends StatelessWidget {
   const MapEventFloatingCard({
-    required this.event,
-    required this.onClose,
-    required this.onTap,
-    required this.onRegister,
-    required this.onFavorite,
     super.key,
-  });
+    this.event,
+    this.title,
+    this.timeLabel,
+    this.location,
+    this.participantSummary,
+    this.badgeLabel,
+    this.imageUrl,
+    this.leading,
+    this.metadataRows,
+    this.footer,
+    this.trailingActions,
+    this.primaryAction,
+    this.onClose,
+    this.onTap,
+    this.onFavorite,
+    this.onRegister,
+    this.isFavorite,
+    this.padding = const EdgeInsets.all(14),
+    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.elevation = 12,
+  }) : assert(
+          event != null || title != null,
+          'Either an event or a custom title must be provided.',
+        );
 
-  final Event event;
-  final VoidCallback onClose;
-  final VoidCallback onTap;
-  final VoidCallback onRegister;
-  final VoidCallback onFavorite;
+  final Event? event;
+  final String? title;
+  final String? timeLabel;
+  final String? location;
+  final String? participantSummary;
+  final String? badgeLabel;
+  final String? imageUrl;
+  final Widget? leading;
+  final List<Widget>? metadataRows;
+  final Widget? footer;
+  final List<Widget>? trailingActions;
+  final Widget? primaryAction;
+  final VoidCallback? onClose;
+  final VoidCallback? onTap;
+  final VoidCallback? onFavorite;
+  final VoidCallback? onRegister;
+  final bool? isFavorite;
+  final EdgeInsetsGeometry padding;
+  final BorderRadiusGeometry borderRadius;
+  final double elevation;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final loc = AppLocalizations.of(context)!;
-    final imageUrl = event.firstAvailableImageUrl;
-    final participantSummary =
-        event.participantSummary ?? loc.to_be_announced;
-    final startTime = event.startTime;
-    final timeLabel = startTime != null
-        ? DateFormat('MM.dd HH:mm').format(startTime.toLocal())
-        : loc.to_be_announced;
+    final event = this.event;
+    final imageUrl = this.imageUrl ?? event?.firstAvailableImageUrl;
+    final participantSummary = this.participantSummary ??
+        event?.participantSummary ??
+        (event != null ? loc.to_be_announced : null);
+    final startTime = event?.startTime;
+    final resolvedTimeLabel = timeLabel ??
+        (startTime != null
+            ? DateFormat('MM.dd HH:mm').format(startTime.toLocal())
+            : (event != null ? loc.to_be_announced : null));
+    final resolvedTitle = title ?? event?.title ?? '';
+    final resolvedLocation = location ?? event?.location;
+    final resolvedBadgeLabel = badgeLabel ??
+        (event != null ? loc.registration_open : null);
+    final resolvedIsFavorite = isFavorite ?? event?.isFavorite ?? false;
+
+    final resolvedMetadataRows = metadataRows ?? [
+      if (resolvedTimeLabel != null)
+        Text(
+          resolvedTimeLabel,
+          style: theme.textTheme.titleSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      if (resolvedLocation != null && resolvedLocation.isNotEmpty)
+        Row(
+          children: [
+            Icon(
+              Icons.place,
+              size: 16,
+              color: colorScheme.outline,
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                resolvedLocation,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
+              ),
+            ),
+          ],
+        ),
+    ];
+
+    final defaultPrimaryAction = primaryAction ??
+        (onRegister != null
+            ? FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  minimumSize: const Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: onRegister,
+                child: Text(
+                  loc.action_register_now,
+                  style: theme.textTheme.labelLarge
+                      ?.copyWith(color: Colors.white),
+                ),
+              )
+            : null);
+
+    final defaultTrailingActions = trailingActions ?? [
+      if (onFavorite != null)
+        IconButton(
+          onPressed: onFavorite,
+          visualDensity: VisualDensity.compact,
+          icon: Icon(
+            resolvedIsFavorite ? Icons.star : Icons.star_border,
+          ),
+        ),
+      if (onClose != null)
+        IconButton(
+          onPressed: onClose,
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.close),
+        ),
+    ];
+
+    final resolvedFooter = footer ??
+        (resolvedBadgeLabel == null &&
+                participantSummary == null &&
+                defaultPrimaryAction == null
+            ? null
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (resolvedBadgeLabel != null) ...[
+                    _smallChip(context, resolvedBadgeLabel),
+                    if (participantSummary != null) const SizedBox(width: 6),
+                  ],
+                  if (participantSummary != null) ...[
+                    Icon(
+                      Icons.groups,
+                      size: 16,
+                      color: colorScheme.outline,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        participantSummary,
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: colorScheme.onSurfaceVariant),
+                      ),
+                    ),
+                  ] else if (defaultPrimaryAction != null)
+                    const Spacer(),
+                  if (defaultPrimaryAction != null) ...[
+                    const SizedBox(width: 8),
+                    defaultPrimaryAction,
+                  ],
+                ],
+              ));
 
     return Material(
-      elevation: 12,
-      borderRadius: BorderRadius.circular(20),
+      elevation: elevation,
+      borderRadius: borderRadius,
       clipBehavior: Clip.antiAlias,
-      color: Theme.of(context).colorScheme.surface,
+      color: colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: padding,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,38 +198,39 @@ class MapEventFloatingCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: SizedBox(
-                      width: 96,
-                      height: 96,
-                      child: imageUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              fit: BoxFit.cover,
-                              placeholder: (_, _) => const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                  leading ??
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: SizedBox(
+                          width: 96,
+                          height: 96,
+                          child: imageUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, _) => const Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                  ),
+                                  errorWidget: (_, _, _) => const ColoredBox(
+                                    color: Colors.black12,
+                                    child: Center(child: Icon(Icons.error)),
+                                  ),
+                                )
+                              : const ColoredBox(
+                                  color: Colors.black12,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.black45,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              errorWidget: (_, _, _) => const ColoredBox(
-                                color: Colors.black12,
-                                child: Center(child: Icon(Icons.error)),
-                              ),
-                            )
-                          : const ColoredBox(
-                              color: Colors.black12,
-                              child: Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  color: Colors.black45,
-                                ),
-                              ),
-                            ),
-                    ),
-                  ),
+                        ),
+                      ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -89,97 +241,27 @@ class MapEventFloatingCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                event.title,
+                                resolvedTitle,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
+                                style: theme.textTheme.titleMedium
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ),
-                            IconButton(
-                              onPressed: onFavorite,
-                              visualDensity: VisualDensity.compact,
-                              icon: Icon(
-                                event.isFavorite
-                                    ? Icons.star
-                                    : Icons.star_border,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: onClose,
-                              visualDensity: VisualDensity.compact,
-                              icon: const Icon(Icons.close),
-                            ),
+                            ...defaultTrailingActions,
                           ],
                         ),
-                        Text(
-                          timeLabel,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.place, size: 16, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                event.location,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: Colors.black54),
-                              ),
-                            ),
+                        ...[
+                          for (var i = 0; i < resolvedMetadataRows.length; i++) ...[
+                            resolvedMetadataRows[i],
+                            if (i != resolvedMetadataRows.length - 1)
+                              const SizedBox(height: 6),
                           ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            _smallChip(context, loc.registration_open),
-                            const SizedBox(width: 6),
-                            const Icon(Icons.groups, size: 16, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                participantSummary,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: Colors.black54),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                minimumSize: const Size(0, 0),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: onRegister,
-                              child: Text(
-                                loc.action_register_now,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.copyWith(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
+                        if (resolvedFooter != null &&
+                            resolvedMetadataRows.isNotEmpty)
+                          const SizedBox(height: 6),
+                        if (resolvedFooter != null) resolvedFooter,
                       ],
                     ),
                   ),

@@ -195,9 +195,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                 firstIcon: Icons.campaign,
                 secondIcon: Icons.public,
                 onChanged: (value) => setState(() => _tab = value),
-                leadingBuilder: (context, selectedIndex) {
-                  if (selectedIndex != 1) return null;
-
+                leadingBuilder: (context, _) {
                   final theme = Theme.of(context);
                   final buttonColor = theme.colorScheme.surfaceContainerHighest;
 
@@ -237,9 +235,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                     ),
                   );
                 },
-                trailingBuilder: (context, selectedIndex) {
-                  if (selectedIndex != 1) return null;
-
+                trailingBuilder: (context, _) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: IconButton(

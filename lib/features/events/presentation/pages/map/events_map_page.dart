@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
@@ -17,6 +20,8 @@ import 'package:crew_app/features/events/state/events_providers.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
+import 'widgets/cluster_icon_builder.dart';
+import 'widgets/event_cluster_item.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
@@ -38,10 +43,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   ProviderSubscription<Event?>? _mapFocusSubscription;
   ProviderSubscription<EventCarouselManager>? _carouselSubscription;
   bool _isDrawerOpen = false;
+  ClusterManager<EventClusterItem>? _clusterManager;
+  Set<Marker> _clusterMarkers = const <Marker>{};
+  List<String> _clusterItemSignatures = const [];
+  late final ClusterIconBuilder _clusterIconBuilder;
 
   @override
   void initState() {
     super.initState();
+    _clusterIconBuilder = ClusterIconBuilder();
+    _clusterManager = ClusterManager<EventClusterItem>(
+      const [],
+      _onClusterMarkersUpdated,
+      markerBuilder: _buildClusterMarker,
+    );
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -75,6 +90,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   @override
   void dispose() {
+    _clusterManager?.dispose();
     _mapFocusSubscription?.close();
     _carouselSubscription?.close();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -107,8 +123,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final selectionState = ref.watch(mapSelectionControllerProvider);
 
     final markersLayer = events.when(
-      loading: () => const MarkersLayer(markers: <Marker>{}),
-      error: (_, _) => const MarkersLayer(markers: <Marker>{}),
+      loading: () => const MarkersLayer.empty(),
+      error: (_, _) => const MarkersLayer.empty(),
       data: (list) => MarkersLayer.fromEvents(
         events: list,
         onEventTap: (event) {
@@ -118,10 +134,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       ),
     );
 
+    _updateClusterItems(markersLayer.clusterItems);
+
     final shouldHideEventMarkers =
         selectionState.selectedLatLng != null || selectionState.isSelectingDestination;
     final markers = <Marker>{
-      if (!shouldHideEventMarkers) ...markersLayer.markers,
+      if (!shouldHideEventMarkers) ..._clusterMarkers,
     };
     final selected = selectionState.selectedLatLng;
     if (selected != null) {
@@ -211,6 +229,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 carouselManager.hideEventCard();
                 unawaited(locationSelectionManager.onMapLongPress(pos, context));
               },
+              onCameraMove: (position) {
+                _clusterManager?.onCameraMove(position);
+              },
+              onCameraIdle: () {
+                _clusterManager?.updateMap();
+              },
               markers: markers,
               showUserLocation: true,
               showMyLocationButton: true,
@@ -258,6 +282,73 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ),
         ],
       ),
+    );
+  }
+
+
+  void _updateClusterItems(List<EventClusterItem> items) {
+    final signatures = items
+        .map(
+          (item) =>
+              '${item.event.id}_${item.event.latitude}_${item.event.longitude}',
+        )
+        .toList();
+    if (listEquals(signatures, _clusterItemSignatures)) {
+      return;
+    }
+    _clusterItemSignatures = signatures;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _clusterManager?.setItems(items);
+      _clusterManager?.updateMap();
+    });
+  }
+
+  void _onClusterMarkersUpdated(Set<Marker> markers) {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _clusterMarkers = markers;
+    });
+  }
+
+  Future<Marker> _buildClusterMarker(Cluster<EventClusterItem> cluster) async {
+    if (cluster.isCluster) {
+      final colorScheme = Theme.of(context).colorScheme;
+      final icon = await _clusterIconBuilder.build(
+        count: cluster.count,
+        backgroundColor: colorScheme.primary,
+        textColor: colorScheme.onPrimary,
+      );
+      return Marker(
+        markerId: MarkerId('cluster_${cluster.getId()}'),
+        position: cluster.location,
+        icon: icon,
+        onTap: () async {
+          final controller = ref.read(mapControllerProvider).mapController;
+          if (controller == null) {
+            return;
+          }
+          final currentZoom = await controller.getZoomLevel();
+          final targetZoom = math.min(currentZoom + 1.5, 18);
+          await controller.animateCamera(
+            CameraUpdate.newLatLngZoom(cluster.location, targetZoom),
+          );
+        },
+      );
+    }
+
+    final item = cluster.items.first;
+    final event = item.event;
+    return Marker(
+      markerId: MarkerId('event_${event.id}'),
+      position: LatLng(event.latitude, event.longitude),
+      infoWindow: InfoWindow(title: event.title, snippet: event.location),
+      consumeTapEvents: true,
+      onTap: item.triggerTap,
     );
   }
 

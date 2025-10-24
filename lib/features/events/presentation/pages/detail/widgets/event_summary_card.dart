@@ -17,8 +17,7 @@ class EventSummaryCard extends StatefulWidget {
   State<EventSummaryCard> createState() => _EventSummaryCardState();
 }
 
-class _EventSummaryCardState extends State<EventSummaryCard>
-    with SingleTickerProviderStateMixin {
+class _EventSummaryCardState extends State<EventSummaryCard> {
   static const _collapsedMaxLines = 5;
 
   bool _isExpanded = false;
@@ -118,7 +117,6 @@ class _EventSummaryCardState extends State<EventSummaryCard>
                       duration: const Duration(milliseconds: 220),
                       curve: Curves.easeOut,
                       alignment: Alignment.topCenter,
-                      vsync: this,
                       child: Text(
                         description,
                         style: theme.textTheme.bodyMedium?.copyWith(

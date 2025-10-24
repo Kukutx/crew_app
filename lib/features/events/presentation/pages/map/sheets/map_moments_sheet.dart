@@ -4,6 +4,7 @@ import 'package:crew_app/features/events/presentation/pages/plaza/widgets/plaza_
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -195,9 +196,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                 firstIcon: Icons.campaign,
                 secondIcon: Icons.public,
                 onChanged: (value) => setState(() => _tab = value),
-                leadingBuilder: (context, selectedIndex) {
-                  if (selectedIndex != 1) return null;
-
+                leadingBuilder: (context, _) {
                   final theme = Theme.of(context);
                   final buttonColor = theme.colorScheme.surfaceContainerHighest;
 
@@ -238,13 +237,23 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                   );
                 },
                 trailingBuilder: (context, selectedIndex) {
-                  if (selectedIndex != 1) return null;
-
+                  final isInvitesTab = selectedIndex == 0;
+                  final onPressed = isInvitesTab
+                      ? () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (routeContext) => RoadTripEditorPage(
+                                onClose: () => Navigator.of(routeContext).pop(),
+                              ),
+                            ),
+                          );
+                        }
+                      : () => showCreateMomentSheet(context);
                   return Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: () => showCreateMomentSheet(context),
+                      onPressed: onPressed,
                     ),
                   );
                 },

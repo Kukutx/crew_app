@@ -1,3 +1,4 @@
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
@@ -52,14 +53,14 @@ Future<void> showPlazaPostCommentsSheet(
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
+                                CrewAvatar(
                                   radius: 20,
-                                  backgroundColor: post.accentColor
-                                      .withValues(alpha: 0.12),
+                                  backgroundColor:
+                                      post.accentColor.withValues(alpha: 0.12),
+                                  foregroundColor: post.accentColor,
                                   child: Text(
                                     comment.initials,
-                                    style: TextStyle(
-                                      color: post.accentColor,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),

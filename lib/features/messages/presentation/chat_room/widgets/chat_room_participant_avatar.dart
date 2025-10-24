@@ -1,5 +1,6 @@
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomParticipantAvatar extends StatelessWidget {
@@ -28,26 +29,27 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
 
     return InkWell(
       onTap: canTap ? () => onTap!(participant) : null,
-      borderRadius: BorderRadius.circular(32),
+      borderRadius: BorderRadius.circular(18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: borderColor,
                 width: participant.isCurrentUser ? 2 : 1,
               ),
             ),
-            child: CircleAvatar(
+            child: CrewAvatar(
               radius: 20,
               backgroundColor: avatarColor.withValues(alpha: .12),
+              foregroundColor: avatarColor,
+              borderRadius: BorderRadius.circular(18),
               child: Text(
                 initials,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: avatarColor,
                 ),
               ),
             ),

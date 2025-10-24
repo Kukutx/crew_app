@@ -1,3 +1,4 @@
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget {
@@ -15,10 +16,11 @@ class Avatar extends StatelessWidget {
     final initials = name.isEmpty
         ? ''
         : name.trim().split(RegExp(r'\s+')).map((part) => part[0]).take(2).join();
-    return CircleAvatar(
+    return CrewAvatar(
       radius: isPrimary ? 32 : 24,
       backgroundColor:
           isPrimary ? Colors.white.withValues(alpha: .24) : const Color(0xFF1B8A5C),
+      foregroundColor: Colors.white,
       child: Text(
         initials,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(

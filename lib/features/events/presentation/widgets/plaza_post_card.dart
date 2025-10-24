@@ -1,4 +1,5 @@
 import 'package:crew_app/shared/extensions/common_extensions.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class PlazaPost {
@@ -93,13 +94,15 @@ class PlazaPostCard extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: onAuthorTap,
-                    customBorder: const CircleBorder(),
-                    child: CircleAvatar(
-                      backgroundColor: post.accentColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    child: CrewAvatar(
+                      radius: 20,
+                      backgroundColor:
+                          post.accentColor.withValues(alpha: 0.15),
+                      foregroundColor: post.accentColor,
                       child: Text(
                         post.authorInitials,
-                        style: TextStyle(
-                          color: post.accentColor,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
                       ),

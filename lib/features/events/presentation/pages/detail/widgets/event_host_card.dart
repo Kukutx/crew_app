@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class EventHostCard extends StatelessWidget {
@@ -39,14 +40,15 @@ class EventHostCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              CircleAvatar(
+              CrewAvatar(
                 radius: 28,
                 backgroundImage: (avatar != null && avatar.isNotEmpty)
                     ? CachedNetworkImageProvider(avatar)
                     : null,
                 backgroundColor: Colors.orange.shade50,
+                foregroundColor: Colors.orange.shade400,
                 child: (avatar == null || avatar.isEmpty)
-                    ? Icon(Icons.person, color: Colors.orange.shade400)
+                    ? const Icon(Icons.person)
                     : null,
               ),
               const SizedBox(width: 12),

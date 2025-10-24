@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -120,10 +121,11 @@ class ProfilePreviewSection extends StatelessWidget {
                         label: loc.preferences_avatar_action,
                         child: GestureDetector(
                           onTap: onEditAvatar,
-                          child: CircleAvatar(
+                          child: CrewAvatar(
                             radius: 40,
                             backgroundImage:
                                 CachedNetworkImageProvider(avatarUrl),
+                            borderRadius: BorderRadius.circular(28),
                           ),
                         ),
                       ),

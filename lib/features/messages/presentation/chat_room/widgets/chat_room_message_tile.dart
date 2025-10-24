@@ -1,5 +1,6 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomMessageTile extends StatelessWidget {
@@ -65,14 +66,14 @@ class ChatRoomMessageTile extends StatelessWidget {
                         onTap: onAvatarTap == null
                             ? null
                             : () => onAvatarTap!(message.sender),
-                        child: CircleAvatar(
+                        child: CrewAvatar(
                           radius: 18,
                           backgroundColor: senderColor.withValues(alpha: .15),
+                          foregroundColor: senderColor,
                           child: Text(
                             senderInitials,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: senderColor,
                             ),
                           ),
                         ),

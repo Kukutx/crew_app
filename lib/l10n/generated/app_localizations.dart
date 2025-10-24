@@ -2654,11 +2654,113 @@ abstract class AppLocalizations {
   /// **'My drafts'**
   String get my_drafts_title;
 
+  /// No description provided for @my_drafts_section_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved drafts'**
+  String get my_drafts_section_saved;
+
+  /// No description provided for @my_drafts_last_edited.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited {time}'**
+  String my_drafts_last_edited(Object time);
+
+  /// No description provided for @my_drafts_resume_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue editing'**
+  String get my_drafts_resume_button;
+
   /// No description provided for @add_friend_title.
   ///
   /// In en, this message translates to:
   /// **'Add friends'**
   String get add_friend_title;
+
+  /// No description provided for @add_friend_search_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or Crew ID'**
+  String get add_friend_search_hint;
+
+  /// No description provided for @add_friend_quick_action_scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get add_friend_quick_action_scan;
+
+  /// No description provided for @add_friend_quick_action_scan_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Quickly add someone nearby'**
+  String get add_friend_quick_action_scan_description;
+
+  /// No description provided for @add_friend_quick_action_invite.
+  ///
+  /// In en, this message translates to:
+  /// **'Share invite link'**
+  String get add_friend_quick_action_invite;
+
+  /// No description provided for @add_friend_quick_action_invite_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a Crew invite link'**
+  String get add_friend_quick_action_invite_description;
+
+  /// No description provided for @add_friend_quick_action_import_contacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Find from contacts'**
+  String get add_friend_quick_action_import_contacts;
+
+  /// No description provided for @add_friend_quick_action_import_contacts_description.
+  ///
+  /// In en, this message translates to:
+  /// **'See who is already on Crew'**
+  String get add_friend_quick_action_import_contacts_description;
+
+  /// No description provided for @add_friend_interest_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular interests'**
+  String get add_friend_interest_section_title;
+
+  /// No description provided for @add_friend_suggestions_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'People you may know'**
+  String get add_friend_suggestions_section_title;
+
+  /// No description provided for @add_friend_contacts_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'From your contacts'**
+  String get add_friend_contacts_section_title;
+
+  /// No description provided for @add_friend_mutual_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} mutual friends'**
+  String add_friend_mutual_count(Object count);
+
+  /// No description provided for @add_friend_invite_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get add_friend_invite_button;
+
+  /// No description provided for @add_friend_contact_status_joined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {time}'**
+  String add_friend_contact_status_joined(Object time);
+
+  /// No description provided for @add_friend_contact_status_pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite pending'**
+  String get add_friend_contact_status_pending;
 
   /// No description provided for @my_activities_title.
   ///

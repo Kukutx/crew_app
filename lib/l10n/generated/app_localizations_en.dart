@@ -1405,7 +1405,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get my_drafts_title => 'My drafts';
 
   @override
+  String get my_drafts_section_saved => 'Saved drafts';
+
+  @override
+  String my_drafts_last_edited(Object time) {
+    return 'Edited $time';
+  }
+
+  @override
+  String get my_drafts_resume_button => 'Continue editing';
+
+  @override
   String get add_friend_title => 'Add friends';
+
+  @override
+  String get add_friend_search_hint => 'Search by name or Crew ID';
+
+  @override
+  String get add_friend_quick_action_scan => 'Scan QR code';
+
+  @override
+  String get add_friend_quick_action_scan_description => 'Quickly add someone nearby';
+
+  @override
+  String get add_friend_quick_action_invite => 'Share invite link';
+
+  @override
+  String get add_friend_quick_action_invite_description => 'Send a Crew invite link';
+
+  @override
+  String get add_friend_quick_action_import_contacts => 'Find from contacts';
+
+  @override
+  String get add_friend_quick_action_import_contacts_description => 'See who is already on Crew';
+
+  @override
+  String get add_friend_interest_section_title => 'Popular interests';
+
+  @override
+  String get add_friend_suggestions_section_title => 'People you may know';
+
+  @override
+  String get add_friend_contacts_section_title => 'From your contacts';
+
+  @override
+  String add_friend_mutual_count(Object count) {
+    return '$count mutual friends';
+  }
+
+  @override
+  String get add_friend_invite_button => 'Add friend';
+
+  @override
+  String add_friend_contact_status_joined(Object time) {
+    return 'Joined $time';
+  }
+
+  @override
+  String get add_friend_contact_status_pending => 'Invite pending';
 
   @override
   String get my_activities_title => 'My activities';

@@ -217,6 +217,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_route_type_one_way => 'One-way';
 
   @override
+  String get event_host_disclaimer_title => 'Host disclaimer';
+
+  @override
+  String get event_host_disclaimer_link => 'View disclaimer';
+
+  @override
+  String get event_host_disclaimer_empty => 'No disclaimer provided';
+
+  @override
   String get event_distance_title => 'Distance';
 
   @override

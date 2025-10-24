@@ -39,6 +39,10 @@ class EventInfoCard extends StatelessWidget {
     final addressText =
         event.address?.isNotEmpty == true ? event.address! : event.location;
     final linkColor = Theme.of(context).colorScheme.primary;
+    final hostDisclaimer = event.hostDisclaimer;
+    final hasHostDisclaimer =
+        hostDisclaimer != null && hostDisclaimer.trim().isNotEmpty;
+    final tooltipMessage = hasHostDisclaimer ? hostDisclaimer!.trim() : null;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
@@ -98,6 +102,31 @@ class EventInfoCard extends StatelessWidget {
                   ? loc.event_route_type_round
                   : loc.event_route_type_one_way,
             ),
+            _detailRow(
+              Icons.shield_outlined,
+              loc.event_host_disclaimer_title,
+              hasHostDisclaimer
+                  ? loc.event_host_disclaimer_link
+                  : loc.event_host_disclaimer_empty,
+              valueStyle:
+                  hasHostDisclaimer ? null : _valueTextStyle,
+              valueWidget: hasHostDisclaimer
+                  ? Tooltip(
+                      message: tooltipMessage!,
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: Text(
+                        loc.event_host_disclaimer_link,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: linkColor,
+                          decoration: TextDecoration.underline,
+                          decorationColor: linkColor,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
           ],
         ),
       ),
@@ -110,6 +139,7 @@ class EventInfoCard extends StatelessWidget {
     String value, {
     TextStyle? valueStyle,
     Widget? trailing,
+    Widget? valueWidget,
   }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -120,12 +150,13 @@ class EventInfoCard extends StatelessWidget {
             Text(title, style: const TextStyle(fontSize: 14)),
             const Spacer(),
             Flexible(
-              child: Text(
-                value,
-                textAlign: TextAlign.right,
-                overflow: TextOverflow.ellipsis,
-                style: valueStyle ?? _valueTextStyle,
-              ),
+              child: valueWidget ??
+                  Text(
+                    value,
+                    textAlign: TextAlign.right,
+                    overflow: TextOverflow.ellipsis,
+                    style: valueStyle ?? _valueTextStyle,
+                  ),
             ),
             if (trailing != null) ...[
               const SizedBox(width: 4),

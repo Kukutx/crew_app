@@ -176,6 +176,9 @@
   "event_route_type_title": "路线类型",
   "event_route_type_round": "往返路线",
   "event_route_type_one_way": "单程路线",
+  "event_host_disclaimer_title": "发起人的免责声明",
+  "event_host_disclaimer_link": "查看免责声明",
+  "event_host_disclaimer_empty": "暂无免责声明",
   "event_distance_title": "总里程",
   "event_distance_value": "{kilometers} 公里",
   "@event_distance_value": {

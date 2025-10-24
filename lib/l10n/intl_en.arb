@@ -76,6 +76,9 @@
   "event_route_type_title": "Route type",
   "event_route_type_round": "Round trip",
   "event_route_type_one_way": "One-way",
+  "event_host_disclaimer_title": "Host disclaimer",
+  "event_host_disclaimer_link": "View disclaimer",
+  "event_host_disclaimer_empty": "No disclaimer provided",
   "event_distance_title": "Distance",
   "event_distance_value": "{kilometers} km",
   "@event_distance_value": {

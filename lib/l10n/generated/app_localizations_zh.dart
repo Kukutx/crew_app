@@ -211,6 +211,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_route_type_one_way => '单程路线';
 
   @override
+  String get event_host_disclaimer_title => '发起人的免责声明';
+
+  @override
+  String get event_host_disclaimer_link => '查看免责声明';
+
+  @override
+  String get event_host_disclaimer_empty => '暂无免责声明';
+
+  @override
   String get event_distance_title => '总里程';
 
   @override

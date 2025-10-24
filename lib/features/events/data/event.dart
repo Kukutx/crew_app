@@ -83,6 +83,7 @@ class Event {
   final bool? isRoundTrip;
   final double? distanceKm;
   final EventOrganizer? organizer;
+  final String? hostDisclaimer;
 
   const Event({
     required this.id,
@@ -111,6 +112,7 @@ class Event {
     this.isRoundTrip,
     this.distanceKm,
     this.organizer,
+    this.hostDisclaimer,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -300,6 +302,19 @@ class Event {
           json['routeLength'],
     );
 
+    final parsedHostDisclaimer = parseString(
+      json['hostDisclaimer'] ??
+          json['host_disclaimer'] ??
+          json['organizerDisclaimer'] ??
+          organizerJson?['hostDisclaimer'] ??
+          organizerJson?['disclaimer'],
+    )
+        ?.trim();
+    final hostDisclaimer =
+        parsedHostDisclaimer != null && parsedHostDisclaimer.isNotEmpty
+            ? parsedHostDisclaimer
+            : null;
+
     return Event(
       id: parseString(json['id'] ?? json['eventId']) ?? '',
       title: parseString(json['title'] ?? json['name']) ?? '',
@@ -347,6 +362,7 @@ class Event {
                   avatarUrl: parseString(json['organizerAvatar']),
                 )
               : null,
+      hostDisclaimer: hostDisclaimer,
     );
   }
 
@@ -377,6 +393,8 @@ class Event {
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
         if (distanceKm != null) 'distanceKm': distanceKm,
         if (organizer != null) 'organizer': organizer!.toJson(),
+        if (hostDisclaimer != null && hostDisclaimer!.isNotEmpty)
+          'hostDisclaimer': hostDisclaimer,
       };
 
   /// Returns the first non-empty image URL among [imageUrls] and

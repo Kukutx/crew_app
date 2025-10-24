@@ -332,6 +332,18 @@ abstract class AppLocalizations {
   /// **'Event time'**
   String get event_time_title;
 
+  /// No description provided for @event_start_time_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start time'**
+  String get event_start_time_label;
+
+  /// No description provided for @event_end_time_label.
+  ///
+  /// In en, this message translates to:
+  /// **'End time'**
+  String get event_end_time_label;
+
   /// No description provided for @event_fee_title.
   ///
   /// In en, this message translates to:

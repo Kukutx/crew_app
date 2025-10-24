@@ -130,6 +130,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_time_title => '活动时间';
 
   @override
+  String get event_start_time_label => '开始时间';
+
+  @override
+  String get event_end_time_label => '结束时间';
+
+  @override
   String get event_fee_title => '报名费用';
 
   @override

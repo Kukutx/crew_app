@@ -49,6 +49,8 @@
   "event_copy_address_success": "Address copied to clipboard",
   "event_participants_title": "Participants",
   "event_time_title": "Event time",
+  "event_start_time_label": "Start time",
+  "event_end_time_label": "End time",
   "event_fee_title": "Registration fee",
   "event_fee_free": "Free",
   "event_cost_calculator_title": "Cost calculator",

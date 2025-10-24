@@ -9,6 +9,7 @@ class DirectChatPreview {
     this.isActive = false,
     this.hasUnread = false,
     this.subtitleColorValue,
+    this.isSystem = false,
   });
 
   final String id;
@@ -20,4 +21,5 @@ class DirectChatPreview {
   final bool isActive;
   final bool hasUnread;
   final int? subtitleColorValue;
+  final bool isSystem;
 }

@@ -27,6 +27,13 @@ class _ChatSheetState extends State<ChatSheet> {
 
   late final List<DirectChatPreview> _samplePrivateConversations = const [
     DirectChatPreview(
+      id: 'direct-system',
+      displayName: '系统通知',
+      lastMessagePreview: '查看最新公告，不错过任何重要提醒',
+      lastMessageTimeLabel: '刚刚',
+      isSystem: true,
+    ),
+    DirectChatPreview(
       id: 'direct-1',
       displayName: '李想',
       lastMessagePreview: '要不要晚上一起吃饭？',
@@ -63,6 +70,11 @@ class _ChatSheetState extends State<ChatSheet> {
     ),
   ];
 
+  late final List<DirectChatPreview> _nonSystemPrivateConversations =
+      _samplePrivateConversations
+          .where((conversation) => !conversation.isSystem)
+          .toList(growable: false);
+
   late final ChatParticipant _currentUser = const ChatParticipant(
     id: 'user-me',
     displayName: '我',
@@ -71,8 +83,8 @@ class _ChatSheetState extends State<ChatSheet> {
     isCurrentUser: true,
   );
 
-  late final List<ChatParticipant> _privateContacts = _samplePrivateConversations
-      .map(
+  late final List<ChatParticipant> _privateContacts =
+      _nonSystemPrivateConversations.map(
         (conversation) => ChatParticipant(
           id: 'direct-participant-${conversation.id}',
           displayName: conversation.displayName,
@@ -88,7 +100,7 @@ class _ChatSheetState extends State<ChatSheet> {
 
   late final Map<String, ChatParticipant> _privateContactsByConversationId =
       Map.fromIterables(
-    _samplePrivateConversations.map((conversation) => conversation.id),
+    _nonSystemPrivateConversations.map((conversation) => conversation.id),
     _privateContacts,
   );
 
@@ -362,7 +374,11 @@ class _ChatSheetState extends State<ChatSheet> {
   }
 
   void _openPrivateChat(DirectChatPreview conversation) {
-    final index = _samplePrivateConversations.indexOf(conversation);
+    if (conversation.isSystem) {
+      return;
+    }
+
+    final index = _nonSystemPrivateConversations.indexOf(conversation);
     if (index < 0 || index >= _samplePrivateMessages.length) {
       return;
     }

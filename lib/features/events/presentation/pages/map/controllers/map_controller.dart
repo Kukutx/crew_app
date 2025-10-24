@@ -13,11 +13,15 @@ class MapController {
   GoogleMapController? _mapController;
   bool _mapReady = false;
   bool _movedToSelected = false;
+  bool _isCameraAnimating = false;
+  double _currentZoom = 14;
 
   // Getters
   GoogleMapController? get mapController => _mapController;
   bool get mapReady => _mapReady;
   bool get movedToSelected => _movedToSelected;
+  bool get isCameraAnimating => _isCameraAnimating;
+  double get currentZoom => _currentZoom;
 
   /// 初始化地图控制器
   void initialize() {
@@ -48,28 +52,36 @@ class MapController {
   }
 
   /// 移动相机到指定位置
-  Future<void> moveCamera(LatLng target, {double zoom = 14}) async {
+  Future<void> moveCamera(LatLng target, {double? zoom}) async {
     final controller = _mapController;
     if (controller == null) return;
 
+    final targetZoom = zoom ?? _currentZoom;
+    _isCameraAnimating = true;
     try {
       await controller.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: target, zoom: zoom, bearing: 0, tilt: 0),
+          CameraPosition(target: target, zoom: targetZoom, bearing: 0, tilt: 0),
         ),
       );
     } catch (_) {
       await controller.moveCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: target, zoom: zoom, bearing: 0, tilt: 0),
+          CameraPosition(target: target, zoom: targetZoom, bearing: 0, tilt: 0),
         ),
       );
     }
+    _currentZoom = targetZoom;
+    _isCameraAnimating = false;
   }
 
   /// 聚焦到指定事件
   Future<void> focusOnEvent(Event event, {bool showEventCard = true}) async {
-    await moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
+    final desiredZoom = _currentZoom < 14 ? 14 : _currentZoom;
+    await moveCamera(
+      LatLng(event.latitude, event.longitude),
+      zoom: desiredZoom,
+    );
     _movedToSelected = true;
   }
 
@@ -79,6 +91,14 @@ class MapController {
     if (loc != null) {
       await moveCamera(loc, zoom: 14);
     }
+  }
+
+  void onCameraMove(CameraPosition position) {
+    _currentZoom = position.zoom;
+  }
+
+  void onCameraIdle() {
+    _isCameraAnimating = false;
   }
 
   /// 获取初始中心点

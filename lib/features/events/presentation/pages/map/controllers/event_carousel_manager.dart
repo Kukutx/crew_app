@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/events_detail_page.dart';
 
@@ -24,30 +23,35 @@ class EventCarouselManager extends ChangeNotifier {
 
   /// 显示事件卡片
   void showEventCard(Event event) {
-    final asyncEvents = ref.read(eventsProvider);
-    final list = asyncEvents.maybeWhen(
-      data: (events) => events,
-      orElse: () => const <Event>[],
-    );
-    
-    final selectedIndex = list.indexWhere((e) => e.id == event.id);
-    if (selectedIndex == -1) {
-      _events = <Event>[event];
-      _isVisible = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_pageController.hasClients) {
-          _pageController.jumpToPage(0);
-        }
-      });
-    } else {
-      _events = list;
-      _isVisible = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_pageController.hasClients) {
-          _pageController.jumpToPage(selectedIndex);
-        }
-      });
+    showEvents(<Event>[event]);
+  }
+
+  /// 显示一组事件卡片
+  void showEvents(List<Event> events, {Event? selectedEvent}) {
+    if (events.isEmpty) {
+      return;
     }
+
+    _events = events;
+    _isVisible = true;
+
+    final targetIndex = selectedEvent != null
+        ? events.indexWhere((event) => event.id == selectedEvent.id)
+        : 0;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_pageController.hasClients) {
+        return;
+      }
+      if (targetIndex <= 0) {
+        _pageController.jumpToPage(0);
+      } else if (targetIndex < events.length) {
+        _pageController.jumpToPage(targetIndex);
+      } else {
+        _pageController.jumpToPage(0);
+      }
+    });
+
     notifyListeners();
   }
 
@@ -63,7 +67,7 @@ class EventCarouselManager extends ChangeNotifier {
     if (index < 0 || index >= _events.length) return;
     final event = _events[index];
     final mapController = ref.read(mapControllerProvider);
-    mapController.moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);
+    mapController.moveCamera(LatLng(event.latitude, event.longitude));
   }
 
   /// 打开事件详情

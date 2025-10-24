@@ -2,9 +2,15 @@ import 'dart:async';
 
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/events_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
+  final client = ref.watch(apiClientProvider);
+  return EventsRepository(client);
+});
 
 final eventsProvider =
     AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);
@@ -14,10 +20,11 @@ final mapFocusEventProvider = StateProvider<Event?>((ref) => null);
 class EventsCtrl extends AsyncNotifier<List<Event>> {
   Timer? _pollingTimer;
 
+  EventsRepository get _repository => ref.read(eventsRepositoryProvider);
+
   @override
   Future<List<Event>> build() async {
-    final api = ref.read(apiServiceProvider);
-    final events = await api.getEvents();
+    final events = await _repository.fetchEvents();
     state = AsyncData(events);
     _startPolling();
     return events;
@@ -29,13 +36,12 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
     required LatLng pos,
     required String locationName,
   }) async {
-    final api = ref.read(apiServiceProvider);
-    final newEv = await api.createEvent(
-      title,
-      locationName,
-      description,
-      pos.latitude,
-      pos.longitude,
+    final newEv = await _repository.createEvent(
+      title: title,
+      description: description,
+      latitude: pos.latitude,
+      longitude: pos.longitude,
+      location: locationName,
     );
     await _refreshEvents();
     return newEv;
@@ -55,7 +61,6 @@ class EventsCtrl extends AsyncNotifier<List<Event>> {
   }
 
   Future<void> _refreshEvents() async {
-    final api = ref.read(apiServiceProvider);
-    state = await AsyncValue.guard(() => api.getEvents());
+    state = await AsyncValue.guard(_repository.fetchEvents);
   }
 }

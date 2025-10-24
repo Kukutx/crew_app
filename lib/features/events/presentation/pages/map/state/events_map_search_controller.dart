@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/core/error/api_exception.dart';
-import 'package:crew_app/core/network/api_service.dart';
-import 'package:crew_app/core/state/di/providers.dart';
+import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/events_repository.dart';
+import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class EventsMapSearchState {
@@ -42,9 +42,10 @@ class EventsMapSearchState {
 }
 
 class EventsMapSearchController extends StateNotifier<EventsMapSearchState> {
-  EventsMapSearchController(this._api) : super(const EventsMapSearchState());
+  EventsMapSearchController(this._repository)
+      : super(const EventsMapSearchState());
 
-  final ApiService _api;
+  final EventsRepository _repository;
   Timer? _debounce;
 
   void onFocusChanged(bool hasFocus) {
@@ -113,7 +114,7 @@ class EventsMapSearchController extends StateNotifier<EventsMapSearchState> {
 
   Future<void> _performSearch(String query) async {
     try {
-      final data = await _api.searchEvents(query);
+      final data = await _repository.searchEvents(query);
       if (mounted && state.query == query) {
         state = state.copyWith(
           results: data,
@@ -149,6 +150,6 @@ class EventsMapSearchController extends StateNotifier<EventsMapSearchState> {
 
 final eventsMapSearchControllerProvider =
     StateNotifierProvider.autoDispose<EventsMapSearchController, EventsMapSearchState>((ref) {
-  final api = ref.read(apiServiceProvider);
-  return EventsMapSearchController(api);
+  final repository = ref.read(eventsRepositoryProvider);
+  return EventsMapSearchController(repository);
 });

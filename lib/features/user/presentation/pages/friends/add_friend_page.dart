@@ -1,4 +1,3 @@
-import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class AddFriendPage extends StatelessWidget {
@@ -6,10 +5,9 @@ class AddFriendPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.add_friend_title),
+        title: const Text('添加好友'),
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -32,50 +30,16 @@ class _AddFriendContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
-
     final contacts = [
-      _ContactRecommendation(
-        name: 'Ethan Chen',
-        note: _localizedText(
-          context,
-          en: 'Joined your cycling crew last month',
-          zh: '上月加入你的骑行团',
-        ),
-        status: loc.add_friend_contact_status_joined(
-          _localizedText(context, en: 'Mar 12', zh: '3月12日'),
-        ),
-        color: colorScheme.primary,
-      ),
-      _ContactRecommendation(
-        name: 'Sofia Wang',
-        note: _localizedText(
-          context,
-          en: 'Saved in contacts as event planner',
-          zh: '通讯录备注为活动策划',
-        ),
-        status: loc.add_friend_contact_status_pending,
-        color: colorScheme.secondary,
-      ),
-      _ContactRecommendation(
-        name: 'Diego Martínez',
-        note: _localizedText(
-          context,
-          en: 'Frequently joins food tours',
-          zh: '常常报名城市美食游',
-        ),
-        status: loc.add_friend_contact_status_joined(
-          _localizedText(context, en: 'Feb 28', zh: '2月28日'),
-        ),
-        color: colorScheme.tertiary,
-      ),
+      const _ContactInfo(name: 'Ethan Chen', crewId: '#EC-7421'),
+      const _ContactInfo(name: 'Sofia Wang', crewId: '#SW-1884'),
+      const _ContactInfo(name: 'Diego Martínez', crewId: '#DM-9935'),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AddFriendSearchBar(hintText: loc.add_friend_search_hint),
+        const _AddFriendSearchBar(hintText: '按姓名或 Crew 号搜索'),
         const SizedBox(height: 24),
         _ContactList(contacts: contacts),
       ],
@@ -122,7 +86,7 @@ class _AddFriendSearchBar extends StatelessWidget {
 class _ContactList extends StatelessWidget {
   const _ContactList({required this.contacts});
 
-  final List<_ContactRecommendation> contacts;
+  final List<_ContactInfo> contacts;
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +106,7 @@ class _ContactList extends StatelessWidget {
 class _ContactTile extends StatelessWidget {
   const _ContactTile({required this.contact});
 
-  final _ContactRecommendation contact;
+  final _ContactInfo contact;
 
   @override
   Widget build(BuildContext context) {
@@ -151,11 +115,11 @@ class _ContactTile extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: contact.color.withValues(alpha: 0.18),
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
           child: Text(
             contact.initials,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: contact.color,
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -169,19 +133,10 @@ class _ContactTile extends StatelessWidget {
                 contact.name,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 4),
               Text(
-                contact.note,
+                contact.crewId,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                contact.status,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
                     ),
               ),
             ],
@@ -194,25 +149,21 @@ class _ContactTile extends StatelessWidget {
             minimumSize: const Size(0, 36),
             padding: const EdgeInsets.symmetric(horizontal: 20),
           ),
-          child: Text(AppLocalizations.of(context)!.add_friend_invite_button),
+          child: const Text('添加好友'),
         ),
       ],
     );
   }
 }
 
-class _ContactRecommendation {
-  const _ContactRecommendation({
+class _ContactInfo {
+  const _ContactInfo({
     required this.name,
-    required this.note,
-    required this.status,
-    required this.color,
+    required this.crewId,
   });
 
   final String name;
-  final String note;
-  final String status;
-  final Color color;
+  final String crewId;
 
   String get initials {
     final trimmed = name.trim();
@@ -227,9 +178,4 @@ class _ContactRecommendation {
     final length = firstPart.length >= 2 ? 2 : 1;
     return firstPart.substring(0, length).toUpperCase();
   }
-}
-
-String _localizedText(BuildContext context, {required String en, required String zh}) {
-  final locale = Localizations.localeOf(context);
-  return locale.languageCode == 'zh' ? zh : en;
 }

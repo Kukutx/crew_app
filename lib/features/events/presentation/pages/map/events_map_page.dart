@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
@@ -7,6 +10,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
@@ -16,7 +20,7 @@ import '../../../data/event.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
-import 'widgets/markers_layer.dart';
+import 'models/event_cluster_item.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
@@ -37,11 +41,29 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ProviderSubscription<Event?>? _mapFocusSubscription;
   ProviderSubscription<EventCarouselManager>? _carouselSubscription;
+  ProviderSubscription<AsyncValue<List<Event>>>? _eventsSubscription;
   bool _isDrawerOpen = false;
+  late final ClusterManager<EventClusterItem> _clusterManager;
+  Set<Marker> _clusterMarkers = const <Marker>{};
+  final Map<String, BitmapDescriptor> _clusterIconCache = <String, BitmapDescriptor>{};
+  Color _clusterPrimaryColor = Colors.blue;
+  Color _clusterTextColor = Colors.white;
+  double _devicePixelRatio = 3;
+  bool _isMapReady = false;
 
   @override
   void initState() {
     super.initState();
+    _clusterManager = ClusterManager<EventClusterItem>(
+      const <EventClusterItem>[],
+      _onClusterMarkersUpdated,
+      markerBuilder: _buildClusterMarker,
+    );
+    _eventsSubscription = ref.listenManual<AsyncValue<List<Event>>>(
+      eventsProvider,
+      (_, next) => _onEventsUpdated(next),
+      fireImmediately: true,
+    );
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -77,6 +99,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   void dispose() {
     _mapFocusSubscription?.close();
     _carouselSubscription?.close();
+    _eventsSubscription?.close();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
       if (controller.state) {
@@ -89,7 +112,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safeBottom = MediaQuery.of(context).viewPadding.bottom;
+    final mediaQuery = MediaQuery.of(context);
+    final safeBottom = mediaQuery.viewPadding.bottom;
+    _clusterPrimaryColor = theme.colorScheme.primary;
+    _clusterTextColor = theme.colorScheme.onPrimary;
+    _devicePixelRatio = mediaQuery.devicePixelRatio;
     
     // 获取各个管理器
     final mapController = ref.watch(mapControllerProvider);
@@ -102,26 +129,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final searchState = ref.watch(eventsMapSearchControllerProvider);
     final loc = AppLocalizations.of(context)!;
     
-    final events = ref.watch(eventsProvider);
     final startCenter = mapController.getInitialCenter();
     final selectionState = ref.watch(mapSelectionControllerProvider);
-
-    final markersLayer = events.when(
-      loading: () => const MarkersLayer(markers: <Marker>{}),
-      error: (_, _) => const MarkersLayer(markers: <Marker>{}),
-      data: (list) => MarkersLayer.fromEvents(
-        events: list,
-        onEventTap: (event) {
-          mapController.focusOnEvent(event);
-          carouselManager.showEventCard(event);
-        },
-      ),
-    );
 
     final shouldHideEventMarkers =
         selectionState.selectedLatLng != null || selectionState.isSelectingDestination;
     final markers = <Marker>{
-      if (!shouldHideEventMarkers) ...markersLayer.markers,
+      if (!shouldHideEventMarkers) ..._clusterMarkers,
     };
     final selected = selectionState.selectedLatLng;
     if (selected != null) {
@@ -201,8 +215,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             onPointerDown: (_) => searchManager.onOutsideTap(),
             child: MapCanvas(
               initialCenter: startCenter,
-              onMapCreated: mapController.onMapCreated,
-              onMapReady: mapController.onMapReady,
+              onMapCreated: _onMapCreated,
+              onMapReady: _onMapReady,
               onTap: (pos) {
                 carouselManager.hideEventCard();
                 unawaited(locationSelectionManager.onMapTap(pos, context));
@@ -211,6 +225,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 carouselManager.hideEventCard();
                 unawaited(locationSelectionManager.onMapLongPress(pos, context));
               },
+              onCameraMove: _onCameraMove,
+              onCameraIdle: _onCameraIdle,
               markers: markers,
               showUserLocation: true,
               showMyLocationButton: true,
@@ -261,6 +277,144 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
+
+  void _onEventsUpdated(AsyncValue<List<Event>> value) {
+    value.whenOrNull(
+      data: (events) {
+        _clusterManager.setItems(events.map(EventClusterItem.new).toList());
+        if (_isMapReady) {
+          unawaited(_clusterManager.updateMap());
+        }
+      },
+      error: (_, __) {
+        _clusterManager.setItems(const <EventClusterItem>[]);
+        _onClusterMarkersUpdated(const <Marker>{});
+      },
+    );
+  }
+
+  void _onClusterMarkersUpdated(Set<Marker> markers) {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _clusterMarkers = markers;
+    });
+  }
+
+  Future<Marker> _buildClusterMarker(Cluster<EventClusterItem> cluster) async {
+    if (cluster.isMultiple) {
+      final icon = await _getClusterBitmap(cluster.count);
+      final markerId = 'cluster_${cluster.location.latitude}_${cluster.location.longitude}_${cluster.count}';
+      return Marker(
+        markerId: MarkerId(markerId),
+        position: cluster.location,
+        icon: icon,
+        consumeTapEvents: true,
+        onTap: () => unawaited(_onClusterTap(cluster)),
+      );
+    }
+
+    final Event event = cluster.items.first.event;
+    return Marker(
+      markerId: MarkerId('event_${event.id}'),
+      position: cluster.location,
+      infoWindow: InfoWindow(title: event.title, snippet: event.location),
+      consumeTapEvents: true,
+      onTap: () => _onEventMarkerTap(event),
+    );
+  }
+
+  Future<BitmapDescriptor> _getClusterBitmap(int count) async {
+    final key = '${_clusterPrimaryColor.value}_${_clusterTextColor.value}_${_devicePixelRatio}_$count';
+    final cached = _clusterIconCache[key];
+    if (cached != null) {
+      return cached;
+    }
+
+    final double size = 56 * _devicePixelRatio;
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final ui.Canvas canvas = ui.Canvas(recorder);
+    final ui.Offset center = ui.Offset(size / 2, size / 2);
+    final double radius = size / 2;
+
+    final ui.Paint fillPaint = ui.Paint()..color = _clusterPrimaryColor;
+    canvas.drawCircle(center, radius, fillPaint);
+
+    final ui.Paint strokePaint = ui.Paint()
+      ..color = _clusterPrimaryColor.withOpacity(0.75)
+      ..style = ui.PaintingStyle.stroke
+      ..strokeWidth = 4 * _devicePixelRatio;
+    canvas.drawCircle(center, radius - strokePaint.strokeWidth / 2, strokePaint);
+
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: count.toString(),
+        style: TextStyle(
+          color: _clusterTextColor,
+          fontSize: 18 * _devicePixelRatio,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    )
+      ..layout();
+    final ui.Offset textOffset = center - ui.Offset(textPainter.width / 2, textPainter.height / 2);
+    textPainter.paint(canvas, textOffset);
+
+    final ui.Image image = await recorder.endRecording().toImage(size.toInt(), size.toInt());
+    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) {
+      return BitmapDescriptor.defaultMarker;
+    }
+    final bitmap = BitmapDescriptor.fromBytes(byteData.buffer.asUint8List());
+    _clusterIconCache[key] = bitmap;
+    return bitmap;
+  }
+
+  Future<void> _onClusterTap(Cluster<EventClusterItem> cluster) async {
+    final controller = ref.read(mapControllerProvider).mapController;
+    if (controller == null) {
+      return;
+    }
+    final double currentZoom = await controller.getZoomLevel();
+    final double targetZoom = math.min(currentZoom + 2, 21);
+    await controller.animateCamera(
+      CameraUpdate.newLatLngZoom(cluster.location, targetZoom),
+    );
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    ref.read(mapControllerProvider).onMapCreated(controller);
+    _clusterManager.setMapId(controller.mapId);
+  }
+
+  void _onMapReady() {
+    ref.read(mapControllerProvider).onMapReady();
+    if (_isMapReady) {
+      return;
+    }
+    _isMapReady = true;
+    unawaited(_clusterManager.updateMap());
+  }
+
+  void _onCameraMove(CameraPosition position) {
+    _clusterManager.onCameraMove(position);
+  }
+
+  Future<void> _onCameraIdle() async {
+    if (!_isMapReady) {
+      return;
+    }
+    await _clusterManager.updateMap();
+  }
+
+  void _onEventMarkerTap(Event event) {
+    final mapController = ref.read(mapControllerProvider);
+    unawaited(mapController.focusOnEvent(event));
+    ref.read(eventCarouselManagerProvider).showEventCard(event);
+  }
 
   void _openQuickActionsDrawer() {
     final searchManager = ref.read(searchManagerProvider);

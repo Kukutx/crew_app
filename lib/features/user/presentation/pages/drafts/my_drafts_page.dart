@@ -32,8 +32,6 @@ class _DraftsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
-
     final drafts = [
       _DraftPreview(
         title: _localizedText(
@@ -41,7 +39,7 @@ class _DraftsContent extends StatelessWidget {
           en: 'Sunrise rooftop flow',
           zh: '日出天台流瑜伽',
         ),
-        schedule: _localizedText(
+        timeLabel: _localizedText(
           context,
           en: 'Apr 26 · 7:00 AM',
           zh: '4月26日 · 07:00',
@@ -51,15 +49,6 @@ class _DraftsContent extends StatelessWidget {
           en: 'Riverside Studio',
           zh: '江畔瑜伽馆',
         ),
-        lastEdited: loc.my_drafts_last_edited(
-          _localizedText(context, en: '2 days ago', zh: '2天'),
-        ),
-        tags: [loc.tag_sports, loc.tag_easy_social],
-        gradient: const LinearGradient(
-          colors: [Color(0xFF8BC6EC), Color(0xFF9599E2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
       ),
       _DraftPreview(
         title: _localizedText(
@@ -67,7 +56,7 @@ class _DraftsContent extends StatelessWidget {
           en: 'Community night market',
           zh: '社区夜市快闪',
         ),
-        schedule: _localizedText(
+        timeLabel: _localizedText(
           context,
           en: 'May 5 · 6:30 PM',
           zh: '5月5日 · 18:30',
@@ -77,15 +66,6 @@ class _DraftsContent extends StatelessWidget {
           en: 'Old Town Plaza',
           zh: '老城广场',
         ),
-        lastEdited: loc.my_drafts_last_edited(
-          _localizedText(context, en: '5 hours ago', zh: '5小时'),
-        ),
-        tags: [loc.tag_trending, loc.tag_party],
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFC3A0), Color(0xFFFFAFBD)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
       ),
       _DraftPreview(
         title: _localizedText(
@@ -93,7 +73,7 @@ class _DraftsContent extends StatelessWidget {
           en: 'Art walk with live sketching',
           zh: '街区艺术写生漫步',
         ),
-        schedule: _localizedText(
+        timeLabel: _localizedText(
           context,
           en: 'Apr 30 · 4:00 PM',
           zh: '4月30日 · 16:00',
@@ -103,15 +83,6 @@ class _DraftsContent extends StatelessWidget {
           en: 'East Riverfront',
           zh: '东岸河畔',
         ),
-        lastEdited: loc.my_drafts_last_edited(
-          _localizedText(context, en: '1 week ago', zh: '1周'),
-        ),
-        tags: [loc.tag_city_explore, loc.tag_friends],
-        gradient: const LinearGradient(
-          colors: [Color(0xFFA1C4FD), Color(0xFFC2E9FB)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
       ),
       _DraftPreview(
         title: _localizedText(
@@ -119,7 +90,7 @@ class _DraftsContent extends StatelessWidget {
           en: 'Coffee tasting circle',
           zh: '城市咖啡品鉴会',
         ),
-        schedule: _localizedText(
+        timeLabel: _localizedText(
           context,
           en: 'May 2 · 3:30 PM',
           zh: '5月2日 · 15:30',
@@ -128,15 +99,6 @@ class _DraftsContent extends StatelessWidget {
           context,
           en: 'Maple Street Hub',
           zh: '枫叶街社群中心',
-        ),
-        lastEdited: loc.my_drafts_last_edited(
-          _localizedText(context, en: 'Yesterday', zh: '昨日'),
-        ),
-        tags: [loc.tag_easy_social, loc.tag_trending],
-        gradient: const LinearGradient(
-          colors: [Color(0xFFF6D365), Color(0xFFFDA085)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
         ),
       ),
     ];
@@ -152,10 +114,7 @@ class _DraftsContent extends StatelessWidget {
         Column(
           children: [
             for (var i = 0; i < drafts.length; i++) ...[
-              _DraftCard(
-                draft: drafts[i],
-                colorScheme: colorScheme,
-              ),
+              _DraftCard(draft: drafts[i]),
               if (i != drafts.length - 1) const SizedBox(height: 16),
             ],
           ],
@@ -166,92 +125,24 @@ class _DraftsContent extends StatelessWidget {
 }
 
 class _DraftCard extends StatelessWidget {
-  const _DraftCard({required this.draft, required this.colorScheme});
+  const _DraftCard({required this.draft});
 
   final _DraftPreview draft;
-  final ColorScheme colorScheme;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
-
-    final metadata = [
-      Text(
-        draft.schedule,
-        style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
-      ),
-      Row(
-        children: [
-          Icon(Icons.place, size: 16, color: colorScheme.outline),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              draft.location,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-            ),
-          ),
-        ],
-      ),
-      Text(
-        draft.lastEdited,
-        style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-      ),
-    ];
-
-    final tagChips = draft.tags
-        .map(
-          (tag) => Chip(
-            label: Text(tag),
-            visualDensity: VisualDensity.compact,
-            backgroundColor: colorScheme.surfaceContainerHigh,
-            labelStyle: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-            shape: StadiumBorder(
-              side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
-            ),
-          ),
-        )
-        .toList(growable: false);
 
     return MapEventFloatingCard(
       title: draft.title,
-      timeLabel: draft.schedule,
+      timeLabel: draft.timeLabel,
       location: draft.location,
-      participantSummary: null,
-      badgeLabel: null,
-      leading: _DraftCover(gradient: draft.gradient, tags: draft.tags),
-      metadataRows: metadata,
-      footer: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: tagChips,
-            ),
-          ),
-          const SizedBox(width: 8),
-          FilledButton.tonal(
-            onPressed: () {},
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(0, 36),
-            ),
-            child: Text(loc.my_drafts_resume_button),
-          ),
-        ],
+      primaryAction: FilledButton.tonal(
+        onPressed: () {},
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(0, 36),
+        ),
+        child: Text(loc.my_drafts_resume_button),
       ),
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(24),
@@ -263,19 +154,13 @@ class _DraftCard extends StatelessWidget {
 class _DraftPreview {
   const _DraftPreview({
     required this.title,
-    required this.schedule,
+    required this.timeLabel,
     required this.location,
-    required this.lastEdited,
-    required this.tags,
-    required this.gradient,
   });
 
   final String title;
-  final String schedule;
+  final String timeLabel;
   final String location;
-  final String lastEdited;
-  final List<String> tags;
-  final Gradient gradient;
 }
 
 String _localizedText(BuildContext context,
@@ -284,47 +169,3 @@ String _localizedText(BuildContext context,
   return locale.languageCode == 'zh' ? zh : en;
 }
 
-class _DraftCover extends StatelessWidget {
-  const _DraftCover({required this.gradient, required this.tags});
-
-  final Gradient gradient;
-  final List<String> tags;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textStyle = theme.textTheme.labelSmall?.copyWith(
-      color: Colors.white,
-      fontWeight: FontWeight.w600,
-    );
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 96,
-        height: 96,
-        decoration: BoxDecoration(gradient: gradient),
-        padding: const EdgeInsets.all(12),
-        alignment: Alignment.bottomLeft,
-        child: Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: tags
-              .take(2)
-              .map(
-                (tag) => Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(tag, style: textStyle),
-                ),
-              )
-              .toList(growable: false),
-        ),
-      ),
-    );
-  }
-}

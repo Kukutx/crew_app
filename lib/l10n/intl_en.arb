@@ -542,7 +542,39 @@
   "qr_scanner_album": "Album",
   "my_moments_title": "My moments",
   "my_drafts_title": "My drafts",
+  "my_drafts_section_saved": "Saved drafts",
+  "my_drafts_last_edited": "Edited {time}",
+  "@my_drafts_last_edited": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "my_drafts_resume_button": "Continue editing",
   "add_friend_title": "Add friends",
+  "add_friend_search_hint": "Search by name or Crew ID",
+  "add_friend_quick_action_scan": "Scan QR code",
+  "add_friend_quick_action_scan_description": "Quickly add someone nearby",
+  "add_friend_quick_action_invite": "Share invite link",
+  "add_friend_quick_action_invite_description": "Send a Crew invite link",
+  "add_friend_quick_action_import_contacts": "Find from contacts",
+  "add_friend_quick_action_import_contacts_description": "See who is already on Crew",
+  "add_friend_interest_section_title": "Popular interests",
+  "add_friend_suggestions_section_title": "People you may know",
+  "add_friend_contacts_section_title": "From your contacts",
+  "add_friend_mutual_count": "{count} mutual friends",
+  "@add_friend_mutual_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "add_friend_invite_button": "Add friend",
+  "add_friend_contact_status_joined": "Joined {time}",
+  "@add_friend_contact_status_joined": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "add_friend_contact_status_pending": "Invite pending",
   "my_activities_title": "My activities",
   "my_activities_joining_title": "Currently joining",
   "my_activities_joining_subtitle": "Events I'm counting down to",

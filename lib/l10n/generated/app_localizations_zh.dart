@@ -1345,7 +1345,64 @@ class AppLocalizationsZh extends AppLocalizations {
   String get my_drafts_title => '我的草稿';
 
   @override
+  String get my_drafts_section_saved => '已保存的草稿';
+
+  @override
+  String my_drafts_last_edited(Object time) {
+    return '${time}前编辑';
+  }
+
+  @override
+  String get my_drafts_resume_button => '继续编辑';
+
+  @override
   String get add_friend_title => '添加好友';
+
+  @override
+  String get add_friend_search_hint => '按姓名或 Crew ID 搜索';
+
+  @override
+  String get add_friend_quick_action_scan => '扫描二维码';
+
+  @override
+  String get add_friend_quick_action_scan_description => '快速添加身边的朋友';
+
+  @override
+  String get add_friend_quick_action_invite => '分享邀请链接';
+
+  @override
+  String get add_friend_quick_action_invite_description => '发送 Crew 邀请链接';
+
+  @override
+  String get add_friend_quick_action_import_contacts => '在通讯录中查找';
+
+  @override
+  String get add_friend_quick_action_import_contacts_description => '看看谁已经在 Crew 上';
+
+  @override
+  String get add_friend_interest_section_title => '热门兴趣';
+
+  @override
+  String get add_friend_suggestions_section_title => '可能认识的人';
+
+  @override
+  String get add_friend_contacts_section_title => '来自你的联系人';
+
+  @override
+  String add_friend_mutual_count(Object count) {
+    return '${count} 个共同好友';
+  }
+
+  @override
+  String get add_friend_invite_button => '添加好友';
+
+  @override
+  String add_friend_contact_status_joined(Object time) {
+    return '在 $time 加入';
+  }
+
+  @override
+  String get add_friend_contact_status_pending => '邀请待接受';
 
   @override
   String get my_activities_title => '我的活动';

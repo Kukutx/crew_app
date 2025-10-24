@@ -7,6 +7,8 @@ class EventDetailBottomBar extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onFavorite;
   final VoidCallback onRegister;
+  final VoidCallback onOpenPrivateChat;
+  final VoidCallback onOpenGroupChat;
   final int favoriteCount;
 
   const EventDetailBottomBar({
@@ -15,6 +17,8 @@ class EventDetailBottomBar extends StatelessWidget {
     required this.isFavorite,
     required this.onFavorite,
     required this.onRegister,
+    required this.onOpenPrivateChat,
+    required this.onOpenGroupChat,
     this.favoriteCount = 0,
   });
 
@@ -62,6 +66,24 @@ class EventDetailBottomBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
+            SizedBox(
+              width: 72,
+              child: _EventDetailQuickAction(
+                icon: Icons.chat_bubble_outline,
+                label: loc.messages_tab_private,
+                onTap: onOpenPrivateChat,
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 72,
+              child: _EventDetailQuickAction(
+                icon: Icons.groups_outlined,
+                label: loc.messages_tab_groups,
+                onTap: onOpenGroupChat,
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: SizedBox(
                 height: 48,
@@ -79,6 +101,53 @@ class EventDetailBottomBar extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EventDetailQuickAction extends StatelessWidget {
+  const _EventDetailQuickAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFFF2F4F7),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: const Color(0xFF3C4B64),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF3C4B64),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

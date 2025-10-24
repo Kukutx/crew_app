@@ -379,6 +379,8 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
             SnackBar(content: Text(loc.registration_not_implemented)),
           );
         },
+        onOpenPrivateChat: () => _showFeatureNotReadyMessage(loc),
+        onOpenGroupChat: () => _showFeatureNotReadyMessage(loc),
       ),
       floatingActionButton: _PlazaPostFab(
         label: loc.event_detail_publish_plaza,

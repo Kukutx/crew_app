@@ -26,7 +26,9 @@ class EventDetailBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final localeTag = Localizations.localeOf(context).toString();
     final sanitizedCount = favoriteCount < 0 ? 0 : favoriteCount;
-    final countLabel = NumberFormat.compact(locale: localeTag).format(sanitizedCount);
+    final countLabel = NumberFormat.compact(
+      locale: localeTag,
+    ).format(sanitizedCount);
     final favoriteColor = isFavorite ? Colors.amber : Colors.amber.shade600;
     final favoriteBackgroundColor = isFavorite
         ? const Color(0xFFFFF7D1)
@@ -40,7 +42,10 @@ class EventDetailBottomBar extends StatelessWidget {
             TextButton(
               onPressed: onFavorite,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 backgroundColor: favoriteBackgroundColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -66,23 +71,9 @@ class EventDetailBottomBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            SizedBox(
-              width: 72,
-              child: _EventDetailQuickAction(
-                icon: Icons.chat_bubble_outline,
-                label: loc.messages_tab_private,
-                onTap: onOpenPrivateChat,
-              ),
-            ),
+            Icon(Icons.chat),
             const SizedBox(width: 12),
-            SizedBox(
-              width: 72,
-              child: _EventDetailQuickAction(
-                icon: Icons.groups_outlined,
-                label: loc.messages_tab_groups,
-                onTap: onOpenGroupChat,
-              ),
-            ),
+            Icon(Icons.group),
             const SizedBox(width: 12),
             Expanded(
               child: SizedBox(
@@ -101,53 +92,6 @@ class EventDetailBottomBar extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EventDetailQuickAction extends StatelessWidget {
-  const _EventDetailQuickAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0xFFF2F4F7),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: const Color(0xFF3C4B64),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF3C4B64),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:crew_app/app/state/app_navigation_controller.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:fake_async/fake_async.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

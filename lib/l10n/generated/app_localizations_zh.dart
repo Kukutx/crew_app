@@ -1349,7 +1349,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String my_drafts_last_edited(Object time) {
-    return '${time}前编辑';
+    return '$time前编辑';
   }
 
   @override
@@ -1377,7 +1377,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get add_friend_quick_action_import_contacts => '在通讯录中查找';
 
   @override
-  String get add_friend_quick_action_import_contacts_description => '看看谁已经在 Crew 上';
+  String get add_friend_quick_action_import_contacts_description =>
+      '看看谁已经在 Crew 上';
 
   @override
   String get add_friend_interest_section_title => '热门兴趣';
@@ -1390,7 +1391,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String add_friend_mutual_count(Object count) {
-    return '${count} 个共同好友';
+    return '$count 个共同好友';
   }
 
   @override

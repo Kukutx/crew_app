@@ -188,11 +188,11 @@ class _AddFriendSearchBar extends StatelessWidget {
         fillColor: colorScheme.surfaceContainerLow,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
-          borderSide: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
-          borderSide: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
@@ -222,7 +222,7 @@ class _QuickActionsCarousel extends StatelessWidget {
             child: _QuickActionCard(action: action),
           );
         },
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemCount: actions.length,
       ),
     );
@@ -242,7 +242,7 @@ class _QuickActionCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: colorScheme.surfaceContainerLow,
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,7 +283,7 @@ class _InterestChips extends StatelessWidget {
               label: Text(interest),
               backgroundColor: colorScheme.surfaceContainerLowest,
               shape: StadiumBorder(
-                side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+                side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
               ),
             ),
           )
@@ -330,14 +330,14 @@ class _FriendSuggestionCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         color: colorScheme.surfaceContainerLow,
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
             radius: 36,
-            backgroundColor: suggestion.color.withOpacity(0.18),
+            backgroundColor: suggestion.color.withValues(alpha: 0.18),
             child: Text(
               suggestion.initials,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -378,7 +378,7 @@ class _FriendSuggestionCard extends StatelessWidget {
                     backgroundColor: colorScheme.surfaceContainerLowest,
                     shape: StadiumBorder(
                       side: BorderSide(
-                        color: colorScheme.outlineVariant.withOpacity(0.3),
+                        color: colorScheme.outlineVariant.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -431,7 +431,7 @@ class _ContactTile extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: contact.color.withOpacity(0.18),
+          backgroundColor: contact.color.withValues(alpha: 0.18),
           child: Text(
             contact.initials,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(

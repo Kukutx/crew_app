@@ -15,15 +15,15 @@ class SkeletonBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final surfaceVariant = colorScheme.surfaceVariant;
+    final surfaceVariant = colorScheme.surfaceContainerHighest;
     final baseSurface = colorScheme.surface;
     final opacity = colorScheme.brightness == Brightness.dark ? 0.25 : 0.6;
     final backgroundColor = Color.alphaBlend(
-      surfaceVariant.withOpacity(opacity),
+      surfaceVariant.withValues(alpha: opacity),
       baseSurface,
     );
     final borderOpacity = colorScheme.brightness == Brightness.dark ? 0.2 : 0.35;
-    final borderColor = colorScheme.outlineVariant.withOpacity(borderOpacity);
+    final borderColor = colorScheme.outlineVariant.withValues(alpha: borderOpacity);
 
     return Container(
       width: width,

@@ -200,13 +200,13 @@ class _DraftCard extends StatelessWidget {
                         (tag) => Chip(
                           label: Text(tag),
                           visualDensity: VisualDensity.compact,
-                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
                           labelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
                           shape: StadiumBorder(
-                            side: BorderSide(color: Colors.white.withOpacity(0.4)),
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
                           ),
                         ),
                       )

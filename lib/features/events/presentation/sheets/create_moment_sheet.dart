@@ -45,7 +45,6 @@ class _CreateMomentSheetState extends State<_CreateMomentSheet> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final selectedType = _selectedType;
 
     return AnimatedPadding(

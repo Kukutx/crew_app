@@ -1425,19 +1425,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add_friend_quick_action_scan => 'Scan QR code';
 
   @override
-  String get add_friend_quick_action_scan_description => 'Quickly add someone nearby';
+  String get add_friend_quick_action_scan_description =>
+      'Quickly add someone nearby';
 
   @override
   String get add_friend_quick_action_invite => 'Share invite link';
 
   @override
-  String get add_friend_quick_action_invite_description => 'Send a Crew invite link';
+  String get add_friend_quick_action_invite_description =>
+      'Send a Crew invite link';
 
   @override
   String get add_friend_quick_action_import_contacts => 'Find from contacts';
 
   @override
-  String get add_friend_quick_action_import_contacts_description => 'See who is already on Crew';
+  String get add_friend_quick_action_import_contacts_description =>
+      'See who is already on Crew';
 
   @override
   String get add_friend_interest_section_title => 'Popular interests';

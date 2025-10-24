@@ -105,7 +105,7 @@ class _DirectChatTile extends StatelessWidget {
     );
 
     final effectiveTileColor = isSystem
-        ? colorScheme.surfaceVariant.withValues(alpha: .6)
+        ? colorScheme.surfaceContainerHighest.withValues(alpha: .6)
         : colorScheme.surface;
     final effectiveShadowColor = colorScheme.shadow.withValues(alpha: .12);
 

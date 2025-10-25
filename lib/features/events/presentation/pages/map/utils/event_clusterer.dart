@@ -16,11 +16,11 @@ class EventCluster {
 
 class EventClusterer {
   const EventClusterer({
-    this.clusterPixelSize = 140,
+    this.clusterPixelRadius = 120,
     this.maxZoomForClustering = 16,
   });
 
-  final double clusterPixelSize;
+  final double clusterPixelRadius;
   final double maxZoomForClustering;
 
   List<EventCluster> cluster(List<Event> events, double zoom) {
@@ -40,23 +40,49 @@ class EventClusterer {
     }
 
     final worldSize = 256 * math.pow(2.0, zoom).toDouble();
-    final gridSize = clusterPixelSize;
-    final buckets = <_GridKey, _ClusterBucket>{};
+    final projected = events
+        .map((event) {
+          final position = LatLng(event.latitude, event.longitude);
+          return _ProjectedEvent(
+            event: event,
+            position: position,
+            pixel: _project(position, worldSize),
+          );
+        })
+        .toList(growable: false);
 
-    for (final event in events) {
-      final latLng = LatLng(event.latitude, event.longitude);
-      final pixel = _project(latLng, worldSize);
-      final key = _GridKey(
-        (pixel.x / gridSize).floor(),
-        (pixel.y / gridSize).floor(),
-      );
-      final bucket = buckets.putIfAbsent(key, _ClusterBucket.new);
-      bucket.add(event, latLng);
+    final visited = List<bool>.filled(projected.length, false);
+    final clusters = <EventCluster>[];
+    final radius = clusterPixelRadius;
+
+    for (var i = 0; i < projected.length; i++) {
+      if (visited[i]) {
+        continue;
+      }
+
+      final accumulator = _ClusterAccumulator()..add(projected[i]);
+      visited[i] = true;
+
+      for (var j = i + 1; j < projected.length; j++) {
+        if (visited[j]) {
+          continue;
+        }
+
+        final centroid = accumulator.centroidPixel;
+        final candidate = projected[j];
+        final distance = centroid.distanceTo(candidate.pixel);
+        if (distance > radius) {
+          continue;
+        }
+
+        visited[j] = true;
+        accumulator.add(candidate);
+      }
+
+      clusters.add(accumulator.toCluster());
     }
 
-    return buckets.values
-        .map((bucket) => bucket.toCluster())
-        .toList(growable: false);
+    return clusters;
   }
 
   _Pixel _project(LatLng latLng, double worldSize) {
@@ -67,40 +93,57 @@ class EventClusterer {
   }
 }
 
-class _ClusterBucket {
+class _ClusterAccumulator {
   final List<Event> _events = <Event>[];
   double _latSum = 0;
   double _lngSum = 0;
+  double _pixelXSum = 0;
+  double _pixelYSum = 0;
 
-  void add(Event event, LatLng position) {
+  void add(_ProjectedEvent projected) {
+    final event = projected.event;
     _events.add(event);
-    _latSum += position.latitude;
-    _lngSum += position.longitude;
+    _latSum += projected.position.latitude;
+    _lngSum += projected.position.longitude;
+    _pixelXSum += projected.pixel.x;
+    _pixelYSum += projected.pixel.y;
+  }
+
+  _Pixel get centroidPixel {
+    final count = _events.length;
+    if (count == 0) {
+      return const _Pixel(0, 0);
+    }
+    return _Pixel(_pixelXSum / count, _pixelYSum / count);
   }
 
   EventCluster toCluster() {
     final count = _events.length;
     final center = LatLng(_latSum / count, _lngSum / count);
-    return EventCluster(position: center, events: _events);
+    return EventCluster(position: center, events: List<Event>.unmodifiable(_events));
   }
-}
-
-class _GridKey {
-  const _GridKey(this.x, this.y);
-  final int x;
-  final int y;
-
-  @override
-  bool operator ==(Object other) {
-    return other is _GridKey && other.x == x && other.y == y;
-  }
-
-  @override
-  int get hashCode => Object.hash(x, y);
 }
 
 class _Pixel {
   const _Pixel(this.x, this.y);
   final double x;
   final double y;
+
+  double distanceTo(_Pixel other) {
+    final dx = x - other.x;
+    final dy = y - other.y;
+    return math.sqrt(dx * dx + dy * dy);
+  }
+}
+
+class _ProjectedEvent {
+  const _ProjectedEvent({
+    required this.event,
+    required this.position,
+    required this.pixel,
+  });
+
+  final Event event;
+  final LatLng position;
+  final _Pixel pixel;
 }

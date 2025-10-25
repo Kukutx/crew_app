@@ -416,7 +416,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _onClusterTap(LatLng position, MapController mapController) {
-    final targetZoom = math.min(_currentZoom + 2, 20);
+    final targetZoom = math.min(_currentZoom + 2, 20).toDouble();
     unawaited(mapController.moveCamera(position, zoom: targetZoom));
   }
 

@@ -19,7 +19,27 @@ class MemberDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     final currency = NumberFormatHelper.currency;
+    final dragHandleColor = colorScheme.outlineVariant
+        .withValues(alpha: isDark ? 0.6 : 0.35);
+    final subtitleStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+    );
+    final highlightScheme = ColorScheme.fromSeed(
+      seedColor: difference >= 0
+          ? colorScheme.tertiary
+          : colorScheme.error,
+      brightness: colorScheme.brightness,
+    );
+    final summaryBackground = Color.alphaBlend(
+      highlightScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+      colorScheme.surfaceContainerHighest,
+    );
+    final summaryBorderColor = highlightScheme.outlineVariant;
+    final summaryAccentColor = highlightScheme.onPrimaryContainer;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Column(
@@ -30,7 +50,7 @@ class MemberDetailsSheet extends StatelessWidget {
               width: 48,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: dragHandleColor,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -46,15 +66,13 @@ class MemberDetailsSheet extends StatelessWidget {
                   children: [
                     Text(
                       participant.name,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     Text(
                       '${currency.format(participant.total)} · ${participant.expenses.length} 笔消费',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.black54,
-                          ),
+                      style: subtitleStyle,
                     ),
                   ],
                 ),
@@ -77,8 +95,9 @@ class MemberDetailsSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F8F0),
+              color: summaryBackground,
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: summaryBorderColor.withValues(alpha: 0.4)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,15 +112,16 @@ class MemberDetailsSheet extends StatelessWidget {
                   value: difference >= 0
                       ? '+${currency.format(difference.abs())}'
                       : '-${currency.format(difference.abs())}',
-                  valueColor:
-                      difference >= 0 ? const Color(0xFF1B8A5C) : Colors.redAccent,
+                  valueColor: summaryAccentColor,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   difference >= 0
                       ? '需要收回 ${currency.format(difference.abs())}'
                       : '仍需补交 ${currency.format(difference.abs())}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: summaryAccentColor,
+                  ),
                 ),
               ],
             ),

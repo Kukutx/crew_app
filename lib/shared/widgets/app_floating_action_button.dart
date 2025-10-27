@@ -26,13 +26,15 @@ class AppFloatingActionButton extends StatelessWidget {
 
     return Padding(
       padding: margin,
-      child: FloatingActionButton(
+      child: FloatingActionButton.small(
         heroTag: heroTag,
         onPressed: onPressed,
         elevation: elevation,
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,
         foregroundColor: foregroundColor ?? theme.colorScheme.onPrimary,
-        shape: const StadiumBorder(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
         child: child,
       ),
     );

@@ -237,12 +237,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         children: [
           Padding(
             padding: const EdgeInsets.only(right: 6),
-            child: FloatingActionButton(
+            child: FloatingActionButton.small(
               heroTag: 'events_map_add_fab',
               backgroundColor: theme.colorScheme.secondary,
               foregroundColor: theme.colorScheme.onSecondary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
               ),
               onPressed: () => showCreateMomentSheet(context),
               child: const Icon(Icons.add),

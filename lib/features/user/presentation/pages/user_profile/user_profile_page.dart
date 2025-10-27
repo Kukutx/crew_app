@@ -15,7 +15,7 @@ import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/c
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_guestbook_page.dart';
-import 'package:crew_app/shared/widgets/report_sheet.dart';
+import 'package:crew_app/shared/widgets/sheets/report_sheet.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key, this.uid, this.onClose});

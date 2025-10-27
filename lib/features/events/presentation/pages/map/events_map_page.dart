@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
-import 'package:crew_app/features/events/presentation/pages/map/widgets/quick_actions_drawer.dart';
+import 'package:crew_app/shared/widgets/app_drawer.dart';
 
 import '../../../data/event.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
@@ -169,7 +169,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       key: _scaffoldKey,
-      drawer: MapQuickActionsDrawer(
+      drawer: AppDrawer(
         onClose: () => Navigator.of(context).pop(),
       ),
       onDrawerChanged: (isOpened) {

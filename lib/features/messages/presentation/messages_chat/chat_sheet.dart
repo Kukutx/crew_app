@@ -5,8 +5,6 @@ import 'package:crew_app/features/messages/data/group_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/chat_conversation_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/direct_chat_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list.dart';
-export 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list_tile.dart';
-export 'package:crew_app/shared/widgets/toggle_tab_chip.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';

@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-class MapQuickActionsDrawer extends StatefulWidget {
-  const MapQuickActionsDrawer({super.key, required this.onClose});
+class AppDrawer extends StatefulWidget {
+  const AppDrawer({super.key, required this.onClose});
 
   final VoidCallback onClose;
 
   @override
-  State<MapQuickActionsDrawer> createState() => _MapQuickActionsDrawerState();
+  State<AppDrawer> createState() => _AppDrawerState();
 }
 
-class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
+class _AppDrawerState extends State<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -19,10 +19,10 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
     final colorScheme = theme.colorScheme;
     final navigator = Navigator.of(context);
 
-    final actionGroups = <_QuickActionGroup>[
-      _QuickActionGroup(
+    final menuGroups = <_AppMenuGroup>[
+      _AppMenuGroup(
         actions: [
-          _QuickActionDefinition(
+          _AppMenuItemDefinition(
             icon: Icons.person_add_alt_1_outlined,
             title: loc.map_quick_actions_add_friend,
             color: colorScheme.primary,
@@ -35,9 +35,9 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           ),
         ],
       ),
-      _QuickActionGroup(
+      _AppMenuGroup(
         actions: [
-          _QuickActionDefinition(
+          _AppMenuItemDefinition(
             icon: Icons.event_available_outlined,
             title: loc.map_quick_actions_my_event,
             color: colorScheme.primary,
@@ -45,7 +45,7 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
               widget.onClose();
             },
           ),
-          _QuickActionDefinition(
+          _AppMenuItemDefinition(
             icon: Icons.auto_awesome_outlined,
             title: loc.map_quick_actions_my_moments,
             color: colorScheme.secondary,
@@ -56,7 +56,7 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
               });
             },
           ),
-          _QuickActionDefinition(
+          _AppMenuItemDefinition(
             icon: Icons.receipt_long_outlined,
             title: loc.map_quick_actions_my_ledger,
             color: colorScheme.tertiary,
@@ -67,7 +67,7 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
               });
             },
           ),
-          _QuickActionDefinition(
+          _AppMenuItemDefinition(
             icon: Icons.account_balance_wallet_outlined,
             title: loc.map_quick_actions_wallet,
             color: colorScheme.secondary,
@@ -80,9 +80,9 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
           ),
         ],
       ),
-      _QuickActionGroup(
+      _AppMenuGroup(
         actions: [
-          _QuickActionDefinition(
+          _AppMenuItemDefinition(
             icon: Icons.drafts_outlined,
             title: loc.map_quick_actions_my_drafts,
             color: colorScheme.secondary,
@@ -144,8 +144,8 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    for (final group in actionGroups) ...[
-                      _QuickActionSection(group: group),
+                    for (final group in menuGroups) ...[
+                      _AppMenuItemSection(group: group),
                       const SizedBox(height: 28),
                     ],
                   ],
@@ -184,8 +184,8 @@ class _MapQuickActionsDrawerState extends State<MapQuickActionsDrawer> {
   }
 }
 
-class _QuickActionDefinition {
-  const _QuickActionDefinition({
+class _AppMenuItemDefinition {
+  const _AppMenuItemDefinition({
     required this.icon,
     required this.title,
     required this.color,
@@ -198,15 +198,15 @@ class _QuickActionDefinition {
   final VoidCallback onTap;
 }
 
-class _QuickActionGroup {
-  const _QuickActionGroup({required this.actions});
+class _AppMenuGroup {
+  const _AppMenuGroup({required this.actions});
 
-  final List<_QuickActionDefinition> actions;
+  final List<_AppMenuItemDefinition> actions;
 }
 
-class _QuickActionSection extends StatelessWidget {
-  const _QuickActionSection({required this.group});
-  final _QuickActionGroup group;
+class _AppMenuItemSection extends StatelessWidget {
+  const _AppMenuItemSection({required this.group});
+  final _AppMenuGroup group;
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +237,7 @@ class _QuickActionSection extends StatelessWidget {
 
 class _MinimalTile extends StatelessWidget {
   const _MinimalTile({required this.definition});
-  final _QuickActionDefinition definition;
+  final _AppMenuItemDefinition definition;
 
   @override
   Widget build(BuildContext context) {

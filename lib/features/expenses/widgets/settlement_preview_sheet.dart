@@ -19,14 +19,22 @@ class SettlementPreviewSheet extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
     final dragHandleColor = colorScheme.outlineVariant
         .withValues(alpha: isDark ? 0.5 : 0.35);
-    final positiveColor = colorScheme.tertiary;
-    final negativeColor = colorScheme.error;
-    final positiveContainer = colorScheme.tertiaryContainer;
-    final negativeContainer = colorScheme.errorContainer;
-    final positiveOnColor = colorScheme.onTertiary;
-    final negativeOnColor = colorScheme.onError;
-    final positiveOnContainer = colorScheme.onTertiaryContainer;
-    final negativeOnContainer = colorScheme.onErrorContainer;
+    final positiveScheme = ColorScheme.fromSeed(
+      seedColor: Colors.green,
+      brightness: colorScheme.brightness,
+    );
+    final negativeScheme = ColorScheme.fromSeed(
+      seedColor: colorScheme.error,
+      brightness: colorScheme.brightness,
+    );
+    final positiveColor = positiveScheme.primary;
+    final negativeColor = negativeScheme.primary;
+    final positiveContainer = positiveScheme.primaryContainer;
+    final negativeContainer = negativeScheme.primaryContainer;
+    final positiveOnColor = positiveScheme.onPrimary;
+    final negativeOnColor = negativeScheme.onPrimary;
+    final positiveOnContainer = positiveScheme.onPrimaryContainer;
+    final negativeOnContainer = negativeScheme.onPrimaryContainer;
     final subtitleStyle = theme.textTheme.bodyMedium?.copyWith(
       color: colorScheme.onSurfaceVariant,
     );

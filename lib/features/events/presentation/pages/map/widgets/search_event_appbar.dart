@@ -97,7 +97,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                     const SizedBox(height: 8),
                   Material(
                     elevation: 4, // 若仍显压，可改为 3
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(16),
                     clipBehavior: Clip.antiAlias,
                     surfaceTintColor: Colors.transparent,
                     child: ValueListenableBuilder<TextEditingValue>(
@@ -118,7 +118,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               vertical: 10,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon: IconButton(

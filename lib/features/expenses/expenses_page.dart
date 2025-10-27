@@ -4,6 +4,7 @@ import 'package:crew_app/features/expenses/widgets/add_expense_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/dialog_row.dart';
 import 'package:crew_app/features/expenses/widgets/member_details_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/participant_bubble.dart';
+import 'package:crew_app/features/expenses/widgets/participant_bubble_cluster.dart';
 import 'package:crew_app/features/expenses/widgets/settlement_preview_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/formatted_date.dart';
@@ -101,32 +102,23 @@ class _ExpensesPageState extends State<ExpensesPage> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final isWide = constraints.maxWidth > 720;
-                    return SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        8,
-                        16,
-                        MediaQuery.paddingOf(context).bottom + 96,
-                      ),
-                      child: AnimatedSize(
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeInOut,
-                        child: Wrap(
-                          alignment: isWide ? WrapAlignment.center : WrapAlignment.start,
-                          spacing: isWide ? 32 : 20,
-                          runSpacing: isWide ? 32 : 20,
-                          children: _participants
-                              .map(
-                                (participant) => ParticipantBubble(
-                                  participant: participant,
-                                  maxTotal: _maxTotal,
-                                  onTap: () => _showMemberDetails(participant),
-                                  onExpenseTap: (expense) =>
-                                      _showExpenseDetails(context, participant, expense),
-                                ),
-                              )
-                              .toList(),
+                    final participants = _participants.take(7).toList();
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          8,
+                          16,
+                          MediaQuery.paddingOf(context).bottom + 120,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: ParticipantBubbleCluster(
+                            participants: participants,
+                            onParticipantTap: _showMemberDetails,
+                            onExpenseTap: (participant, expense) =>
+                                _showExpenseDetails(context, participant, expense),
+                          ),
                         ),
                       ),
                     );

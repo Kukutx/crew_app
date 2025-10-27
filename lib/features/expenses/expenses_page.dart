@@ -4,6 +4,7 @@ import 'package:crew_app/features/expenses/widgets/add_expense_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/dialog_row.dart';
 import 'package:crew_app/features/expenses/widgets/member_details_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/participant_bubble.dart';
+import 'package:crew_app/features/expenses/widgets/participant_bubble_cluster.dart';
 import 'package:crew_app/features/expenses/widgets/settlement_preview_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/formatted_date.dart';
@@ -41,6 +42,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundGradient = isDark
+        ? const [Color(0xFF0F1424), Color(0xFF070910)]
+        : const [Color(0xFFE8EDFF), Colors.white];
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.event_group_expense_title),
@@ -60,11 +66,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFE8F8F0), Colors.white],
+            colors: backgroundGradient,
           ),
         ),
         child: SafeArea(
@@ -80,13 +86,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       loc.event_group_expense_intro,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       loc.event_group_expense_hint,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.black54,
+                        color: colorScheme.onSurface.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -95,32 +102,23 @@ class _ExpensesPageState extends State<ExpensesPage> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final isWide = constraints.maxWidth > 720;
-                    return SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        8,
-                        16,
-                        MediaQuery.paddingOf(context).bottom + 96,
-                      ),
-                      child: AnimatedSize(
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeInOut,
-                        child: Wrap(
-                          alignment: isWide ? WrapAlignment.center : WrapAlignment.start,
-                          spacing: isWide ? 32 : 20,
-                          runSpacing: isWide ? 32 : 20,
-                          children: _participants
-                              .map(
-                                (participant) => ParticipantBubble(
-                                  participant: participant,
-                                  maxTotal: _maxTotal,
-                                  onTap: () => _showMemberDetails(participant),
-                                  onExpenseTap: (expense) =>
-                                      _showExpenseDetails(context, participant, expense),
-                                ),
-                              )
-                              .toList(),
+                    final participants = _participants.take(7).toList();
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          8,
+                          16,
+                          MediaQuery.paddingOf(context).bottom + 120,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: ParticipantBubbleCluster(
+                            participants: participants,
+                            onParticipantTap: _showMemberDetails,
+                            onExpenseTap: (participant, expense) =>
+                                _showExpenseDetails(context, participant, expense),
+                          ),
                         ),
                       ),
                     );
@@ -141,7 +139,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -212,7 +210,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final result = await showModalBottomSheet<AddExpenseResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -253,7 +251,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),

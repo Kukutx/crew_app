@@ -249,6 +249,28 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     ).showSnackBar(SnackBar(content: Text(loc.feature_not_ready)));
   }
 
+  void _showOrganizerDisclaimer() {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('发起人免责声明'),
+          content: const Text(
+            '本活动由发起人自行发布并负责组织，Crew 仅提供信息展示与沟通工具。'
+            '请在参与前自行核实活动详情与安全保障，并根据自身情况评估风险。'
+            '如遇异常情况或争议，请及时与发起人沟通或联系 Crew 寻求协助。',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('我知道了'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showMoreActions(AppLocalizations loc) {
     showModalBottomSheet<void>(
       context: context,
@@ -372,18 +394,37 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         onShare: () => _showShareSheet(context),
         onMore: () => _showMoreActions(loc),
       ),
-      bottomNavigationBar: EventDetailBottomBar(
-        loc: loc,
-        isFavorite: event.isFavorite,
-        favoriteCount: event.favoriteCount,
-        onFavorite: () => _showFeatureNotReadyMessage(loc),
-        onRegister: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(loc.registration_not_implemented)),
-          );
-        },
-        onOpenPrivateChat: () => _showFeatureNotReadyMessage(loc),
-        onOpenGroupChat: () => _showFeatureNotReadyMessage(loc),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          EventDetailBottomBar(
+            loc: loc,
+            isFavorite: event.isFavorite,
+            favoriteCount: event.favoriteCount,
+            onFavorite: () => _showFeatureNotReadyMessage(loc),
+            onRegister: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(loc.registration_not_implemented)),
+              );
+            },
+            onOpenPrivateChat: () => _showFeatureNotReadyMessage(loc),
+            onOpenGroupChat: () => _showFeatureNotReadyMessage(loc),
+          ),
+          Container(
+            width: double.infinity,
+            color: colorScheme.surface,
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SafeArea(
+              top: false,
+              child: Center(
+                child: TextButton(
+                  onPressed: _showOrganizerDisclaimer,
+                  child: const Text('发起人免责声明'),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: _PlazaPostFab(
         label: loc.event_detail_publish_plaza,

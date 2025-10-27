@@ -24,19 +24,33 @@ class EventDetailBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final localeTag = Localizations.localeOf(context).toString();
     final sanitizedCount = favoriteCount < 0 ? 0 : favoriteCount;
     final countLabel = NumberFormat.compact(
       locale: localeTag,
     ).format(sanitizedCount);
-    final favoriteColor = isFavorite ? Colors.amber : Colors.amber.shade600;
-    final favoriteBackgroundColor = isFavorite
-        ? const Color(0xFFFFF7D1)
-        : const Color(0xFFFFFAE6);
+    final favoriteColor = colorScheme.secondary;
+    final favoriteBackgroundColor = colorScheme.secondaryContainer
+        .withOpacity(isFavorite ? 0.45 : 0.25);
+    final iconColor = colorScheme.onSurfaceVariant;
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceVariant,
+          border: Border(
+            top: BorderSide(color: colorScheme.outline.withOpacity(0.2)),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
         child: Row(
           children: [
             TextButton(
@@ -47,6 +61,7 @@ class EventDetailBottomBar extends StatelessWidget {
                   vertical: 10,
                 ),
                 backgroundColor: favoriteBackgroundColor,
+                foregroundColor: favoriteColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -54,10 +69,8 @@ class EventDetailBottomBar extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    isFavorite ? Icons.star : Icons.star_border,
-                    color: favoriteColor,
-                  ),
+                  Icon(isFavorite ? Icons.star : Icons.star_border,
+                      color: favoriteColor),
                   const SizedBox(width: 6),
                   Text(
                     countLabel,
@@ -71,9 +84,9 @@ class EventDetailBottomBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Icon(Icons.chat),
+            Icon(Icons.chat, color: iconColor),
             const SizedBox(width: 12),
-            Icon(Icons.group),
+            Icon(Icons.group, color: iconColor),
             const SizedBox(width: 12),
             Expanded(
               child: SizedBox(
@@ -81,8 +94,8 @@ class EventDetailBottomBar extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onRegister,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

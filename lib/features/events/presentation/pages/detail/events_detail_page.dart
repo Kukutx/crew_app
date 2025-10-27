@@ -362,8 +362,10 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
         ? organizer!.avatarUrl!
         : _fallbackHost.avatar;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7E9),
+      backgroundColor: colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: EventDetailAppBar(
         onBack: () => Navigator.pop(context),

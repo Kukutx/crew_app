@@ -48,9 +48,30 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
     final normalized = widget.maxTotal == 0
         ? 0.0
         : (participant.total / widget.maxTotal).clamp(0.0, 1.0);
-    final bubbleSize = 120.0 + (normalized * 120);
+    const bubbleSize = 220.0;
     final expenses = participant.expenses;
-    final baseRadius = bubbleSize / 2 + 36;
+    final baseRadius = bubbleSize / 2 + 36 + normalized * 12;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final expenseBubbleStart = isDark
+        ? const Color(0xCC2E7C55)
+        : const Color(0xAA66D69D);
+    final expenseBubbleEnd = isDark
+        ? const Color(0x8824593B)
+        : Colors.white.withValues(alpha: 0.7);
+    final expenseBorderColor = isDark
+        ? const Color(0x6624593B)
+        : const Color(0x5566D69D);
+    final expenseShadowColor = isDark
+        ? const Color(0x3324593B)
+        : const Color(0x4466D69D);
+    final mainGradient = isDark
+        ? const [Color(0xFF1F6C49), Color(0xFF124331)]
+        : const [Color(0xFF42BD82), Color(0xFF1B8A5C)];
+    final bubbleShadowColor = isDark
+        ? Colors.black.withOpacity(0.35)
+        : const Color(0x5532A56C);
 
     return AnimatedBuilder(
       animation: _controller,
@@ -89,21 +110,21 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: [
-                          const Color(0xAA66D69D),
-                          Colors.white.withValues(alpha: 0.7),
+                          expenseBubbleStart,
+                          expenseBubbleEnd,
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       border: Border.all(
-                        color: const Color(0x5566D69D),
+                        color: expenseBorderColor,
                         width: 1.5,
                       ),
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
-                          color: Color(0x4466D69D),
+                          color: expenseShadowColor,
                           blurRadius: 10,
-                          offset: Offset(0, 6),
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -111,8 +132,10 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                       child: Text(
                         NumberFormatHelper.shortCurrency(expense.amount),
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: const Color(0xFF1B5E3B),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                              color: isDark
+                                  ? scheme.onTertiary.withOpacity(0.9)
+                                  : const Color(0xFF1B5E3B),
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -128,21 +151,21 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                 height: bubbleSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF42BD82), Color(0xFF1B8A5C)],
+                  gradient: LinearGradient(
+                    colors: mainGradient,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x5532A56C),
-                      blurRadius: 20,
-                      offset: Offset(0, 18),
+                      color: bubbleShadowColor,
+                      blurRadius: isDark ? 30 : 20,
+                      offset: const Offset(0, 18),
                     ),
                   ],
                   border: participant.isCreator
                       ? Border.all(
-                          color: Colors.white.withValues(alpha: .8),
+                          color: scheme.onPrimary.withValues(alpha: .8),
                           width: 3,
                         )
                       : null,
@@ -160,16 +183,16 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                       Text(
                         participant.name,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                              color: scheme.onPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         NumberFormatHelper.currency.format(participant.total),
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: Colors.white,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                              color: scheme.onPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                       ),

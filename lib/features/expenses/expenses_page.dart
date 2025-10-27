@@ -41,6 +41,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundGradient = isDark
+        ? const [Color(0xFF0B1914), Color(0xFF020805)]
+        : const [Color(0xFFE8F8F0), Colors.white];
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.event_group_expense_title),
@@ -60,11 +65,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFE8F8F0), Colors.white],
+            colors: backgroundGradient,
           ),
         ),
         child: SafeArea(
@@ -80,13 +85,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       loc.event_group_expense_intro,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       loc.event_group_expense_hint,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.black54,
+                        color: colorScheme.onSurface.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -141,7 +147,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -212,7 +218,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final result = await showModalBottomSheet<AddExpenseResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -253,7 +259,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),

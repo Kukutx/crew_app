@@ -46,26 +46,27 @@ class ToggleTabBar extends StatelessWidget {
               leading,
               const SizedBox(width: 12),
             ],
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ToggleTabChip(
-                    label: firstLabel,
-                    icon: firstIcon,
-                    selected: selectedIndex == 0,
-                    onTap: () => onChanged(0),
-                  ),
-                  const SizedBox(width: 12),
-                  ToggleTabChip(
-                    label: secondLabel,
-                    icon: secondIcon,
-                    selected: selectedIndex == 1,
-                    onTap: () => onChanged(1),
-                  ),
-                ],
-              ),
+            const Spacer(),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ToggleTabChip(
+                  label: firstLabel,
+                  icon: firstIcon,
+                  selected: selectedIndex == 0,
+                  onTap: () => onChanged(0),
+                ),
+                const SizedBox(width: 12),
+                ToggleTabChip(
+                  label: secondLabel,
+                  icon: secondIcon,
+                  selected: selectedIndex == 1,
+                  onTap: () => onChanged(1),
+                ),
+              ],
             ),
+            const Spacer(),
             if (trailing != null) ...[
               const SizedBox(width: 12),
               trailing,

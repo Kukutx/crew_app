@@ -242,7 +242,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               backgroundColor: theme.colorScheme.secondary,
               foregroundColor: theme.colorScheme.onSecondary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(16),
               ),
               onPressed: () => showCreateMomentSheet(context),
               child: const Icon(Icons.add),

@@ -33,7 +33,7 @@ class AppFloatingActionButton extends StatelessWidget {
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,
         foregroundColor: foregroundColor ?? theme.colorScheme.onPrimary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: child,
       ),

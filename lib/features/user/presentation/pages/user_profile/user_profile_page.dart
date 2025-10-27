@@ -16,6 +16,7 @@ import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/p
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_guestbook_page.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet.dart';
+import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
 class UserProfilePage extends ConsumerStatefulWidget {
   const UserProfilePage({super.key, this.uid, this.onClose});
@@ -41,12 +42,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
   late final TabController _tabController;
   late int _currentTabIndex;
-  final List<Tab> _tabs = const [Tab(text: '活动'), Tab(text: '收藏')];
+  static const List<String> _tabLabels = ['活动', '收藏'];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController = TabController(length: _tabLabels.length, vsync: this);
     _currentTabIndex = _tabController.index;
     _tabController.addListener(_handleTabChanged);
   }
@@ -368,10 +369,20 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         preferredSize: const Size.fromHeight(_tabBarHeight),
         child: Material(
           color: theme.scaffoldBackgroundColor,
-          child: TabBar(
-            controller: _tabController,
-            tabs: _tabs,
-            indicatorSize: TabBarIndicatorSize.tab,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: ToggleTabBar(
+              selectedIndex: _currentTabIndex,
+              firstLabel: _tabLabels[0],
+              secondLabel: _tabLabels[1],
+              firstIcon: Icons.event,
+              secondIcon: Icons.bookmark,
+              onChanged: (index) {
+                if (index != _currentTabIndex) {
+                  _tabController.animateTo(index);
+                }
+              },
+            ),
           ),
         ),
       ),

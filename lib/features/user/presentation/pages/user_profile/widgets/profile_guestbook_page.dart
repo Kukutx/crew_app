@@ -37,7 +37,6 @@ class ProfileGuestbookPage extends ConsumerWidget {
       ),
       body: const ProfileGuestbook(),
       floatingActionButton: AppFloatingActionButton(
-        variant: AppFloatingActionButtonVariant.regular,
         onPressed: () => _openGuestbookComposer(context, ref),
         child: const Icon(Icons.add),
       ),

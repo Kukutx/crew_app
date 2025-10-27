@@ -430,7 +430,6 @@ class _PlazaPostFab extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AppFloatingActionButton(
-      variant: AppFloatingActionButtonVariant.regular,
       onPressed: onPressed,
       tooltip: label,
       backgroundColor: colorScheme.primary,

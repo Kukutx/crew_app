@@ -17,11 +17,7 @@ class AppFloatingActionButton extends StatelessWidget {
     this.tooltip,
     this.shape,
     this.variant = AppFloatingActionButtonVariant.small,
-  }) : assert(
-          (variant == AppFloatingActionButtonVariant.extended && label != null) ||
-              (variant != AppFloatingActionButtonVariant.extended && child != null),
-          'Provide a child for small/regular variants or a label for the extended variant.',
-        );
+  });
 
   final VoidCallback onPressed;
   final Widget? child;

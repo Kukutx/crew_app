@@ -29,15 +29,28 @@ class EventHostCard extends StatelessWidget {
         ? bio!
         : loc.share_card_subtitle;
     final avatar = avatarUrl;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final titleStyle = theme.textTheme.titleMedium?.copyWith(
+      color: colorScheme.onSurface,
+      fontWeight: FontWeight.w600,
+    );
+    final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+    );
+    final cardColor = colorScheme.surfaceVariant;
+    final avatarBackground = colorScheme.primaryContainer;
+    final avatarForeground = colorScheme.onPrimaryContainer;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: cardColor,
+      shadowColor: Colors.black.withOpacity(0.45),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         onTap: onTapProfile,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               CrewAvatar(
@@ -45,10 +58,10 @@ class EventHostCard extends StatelessWidget {
                 backgroundImage: (avatar != null && avatar.isNotEmpty)
                     ? CachedNetworkImageProvider(avatar)
                     : null,
-                backgroundColor: Colors.orange.shade50,
-                foregroundColor: Colors.orange.shade400,
+                backgroundColor: avatarBackground,
+                foregroundColor: avatarForeground,
                 child: (avatar == null || avatar.isEmpty)
-                    ? const Icon(Icons.person)
+                    ? Icon(Icons.person, color: avatarForeground)
                     : null,
               ),
               const SizedBox(width: 12),
@@ -58,17 +71,19 @@ class EventHostCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: titleStyle ??
+                          const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      style: subtitleStyle ??
+                          const TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -80,8 +95,11 @@ class EventHostCard extends StatelessWidget {
                     ? OutlinedButton.icon(
                         onPressed: onToggleFollow,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.orange,
-                          side: BorderSide(color: Colors.orange.shade300),
+                          foregroundColor: colorScheme.primary,
+                          side: BorderSide(
+                            color: colorScheme.primary.withOpacity(0.6),
+                          ),
+                          overlayColor: colorScheme.primary.withOpacity(0.08),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -92,8 +110,8 @@ class EventHostCard extends StatelessWidget {
                     : ElevatedButton.icon(
                         onPressed: onToggleFollow,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

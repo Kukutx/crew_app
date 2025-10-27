@@ -1,13 +1,14 @@
-import 'package:crew_app/features/expenses/data/sample_data.dart';
 import 'package:crew_app/features/expenses/data/participant.dart';
-import 'package:crew_app/shared/utils/formatted_date.dart';
-import 'package:crew_app/shared/utils/number_format_helper.dart';
+import 'package:crew_app/features/expenses/data/sample_data.dart';
 import 'package:crew_app/features/expenses/widgets/add_expense_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/dialog_row.dart';
 import 'package:crew_app/features/expenses/widgets/member_details_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/participant_bubble.dart';
 import 'package:crew_app/features/expenses/widgets/settlement_preview_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/formatted_date.dart';
+import 'package:crew_app/shared/utils/number_format_helper.dart';
+import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 
 class ExpensesPage extends StatefulWidget {
@@ -51,7 +52,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: AppFloatingActionButton(
+        variant: AppFloatingActionButtonVariant.extended,
         onPressed: _showAddExpenseSheet,
         icon: const Icon(Icons.add),
         label: const Text('添加费用'),

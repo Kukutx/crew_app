@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/profile_guestbook_provider.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_guestbook.dart';
+import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProfileGuestbookPage extends ConsumerWidget {
   const ProfileGuestbookPage({super.key});
@@ -36,7 +36,8 @@ class ProfileGuestbookPage extends ConsumerWidget {
         title: const Text('留言簿'),
       ),
       body: const ProfileGuestbook(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AppFloatingActionButton(
+        variant: AppFloatingActionButtonVariant.regular,
         onPressed: () => _openGuestbookComposer(context, ref),
         child: const Icon(Icons.add),
       ),

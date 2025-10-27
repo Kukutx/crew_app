@@ -9,6 +9,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/sheets/event_
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/shared/widgets/report_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -428,7 +429,8 @@ class _PlazaPostFab extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return FloatingActionButton(
+    return AppFloatingActionButton(
+      variant: AppFloatingActionButtonVariant.regular,
       onPressed: onPressed,
       tooltip: label,
       backgroundColor: colorScheme.primary,

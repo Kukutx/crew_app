@@ -1,7 +1,7 @@
+import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
+import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
 
 import '../edit_moment_page.dart';
 
@@ -339,7 +339,7 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
                 Positioned(
                   bottom: 28,
                   right: 20,
-                  child: FloatingActionButton.small(
+                  child: AppFloatingActionButton(
                     heroTag: null,
                     backgroundColor: Colors.white12,
                     foregroundColor: Colors.white,

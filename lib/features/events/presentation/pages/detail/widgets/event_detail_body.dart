@@ -26,6 +26,7 @@ class EventDetailBody extends StatefulWidget {
   final bool isFollowing;
   final VoidCallback onTapLocation;
   final String heroTag;
+  final VoidCallback onShowOrganizerDisclaimer;
 
   const EventDetailBody({
     super.key,
@@ -42,6 +43,7 @@ class EventDetailBody extends StatefulWidget {
     required this.isFollowing,
     required this.onTapLocation,
     required this.heroTag,
+    required this.onShowOrganizerDisclaimer,
   });
 
   @override
@@ -326,6 +328,13 @@ class _EventDetailBodyState extends State<EventDetailBody>
                 ),
                 const SizedBox(height: 10),
                 EventPlazaCard(loc: widget.loc),
+                const SizedBox(height: 16),
+                Center(
+                  child: TextButton(
+                    onPressed: widget.onShowOrganizerDisclaimer,
+                    child: const Text('发起人免责声明'),
+                  ),
+                ),
                 const SizedBox(height: 120),
               ],
             ),

@@ -394,37 +394,18 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         onShare: () => _showShareSheet(context),
         onMore: () => _showMoreActions(loc),
       ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          EventDetailBottomBar(
-            loc: loc,
-            isFavorite: event.isFavorite,
-            favoriteCount: event.favoriteCount,
-            onFavorite: () => _showFeatureNotReadyMessage(loc),
-            onRegister: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.registration_not_implemented)),
-              );
-            },
-            onOpenPrivateChat: () => _showFeatureNotReadyMessage(loc),
-            onOpenGroupChat: () => _showFeatureNotReadyMessage(loc),
-          ),
-          Container(
-            width: double.infinity,
-            color: colorScheme.surface,
-            padding: const EdgeInsets.only(bottom: 12),
-            child: SafeArea(
-              top: false,
-              child: Center(
-                child: TextButton(
-                  onPressed: _showOrganizerDisclaimer,
-                  child: const Text('发起人免责声明'),
-                ),
-              ),
-            ),
-          ),
-        ],
+      bottomNavigationBar: EventDetailBottomBar(
+        loc: loc,
+        isFavorite: event.isFavorite,
+        favoriteCount: event.favoriteCount,
+        onFavorite: () => _showFeatureNotReadyMessage(loc),
+        onRegister: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(loc.registration_not_implemented)),
+          );
+        },
+        onOpenPrivateChat: () => _showFeatureNotReadyMessage(loc),
+        onOpenGroupChat: () => _showFeatureNotReadyMessage(loc),
       ),
       floatingActionButton: _PlazaPostFab(
         label: loc.event_detail_publish_plaza,
@@ -456,6 +437,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         isFollowing: _following,
         onTapLocation: () => Navigator.pop(context, widget.event),
         heroTag: 'event-media-${event.id}',
+        onShowOrganizerDisclaimer: _showOrganizerDisclaimer,
       ),
     );
   }

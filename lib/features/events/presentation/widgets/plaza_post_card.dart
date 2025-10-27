@@ -74,10 +74,9 @@ class PlazaPostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final backgroundColor = switch (post.momentType) {
-      PlazaMomentType.instant => const Color(0xFFFFEEF4),
-      PlazaMomentType.event => const Color(0xFFE7F0FF),
-    };
+    final baseBackground = colorScheme.surfaceContainerHighest;
+    final accentTint = post.accentColor.withValues(alpha: 0.14);
+    final backgroundColor = Color.alphaBlend(accentTint, baseBackground);
 
     return Card(
       margin: margin ?? EdgeInsets.zero,

@@ -13,6 +13,7 @@ class ParticipantBubble extends StatefulWidget {
     required this.onExpenseTap,
     this.bubbleDiameter = defaultBubbleDiameter,
     this.expenseBubbleDiameter = defaultExpenseBubbleDiameter,
+    this.expenseAngles,
   });
 
   final Participant participant;
@@ -20,6 +21,7 @@ class ParticipantBubble extends StatefulWidget {
   final ValueChanged<ParticipantExpense> onExpenseTap;
   final double bubbleDiameter;
   final double expenseBubbleDiameter;
+  final List<double>? expenseAngles;
 
   static const double defaultBubbleDiameter = 200;
   static const double defaultExpenseBubbleDiameter = 72;
@@ -46,7 +48,9 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 2600 + (widget.participant.total * 4).toInt()),
+      duration: Duration(
+        milliseconds: 2600 + (widget.participant.total * 4).toInt(),
+      ),
     )..repeat(reverse: true);
   }
 
@@ -61,7 +65,7 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
     final participant = widget.participant;
     final bubbleSize = widget.bubbleDiameter;
     final expenses = participant.expenses;
-    final orbitRadius = bubbleSize / 2 + ParticipantBubble._expenseOrbitPadding;
+    final orbitRadius = bubbleSize / 2 + _expenseOrbitPadding;
     final stackExtent = (orbitRadius + widget.expenseBubbleDiameter / 2) * 2;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
@@ -105,7 +109,12 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
             ...List.generate(expenses.length, (index) {
               final expense = expenses[index];
               final size = widget.expenseBubbleDiameter;
-              final angle = (2 * math.pi / expenses.length) * index - math.pi / 2;
+              final angles = widget.expenseAngles;
+              final hasCustomAngles =
+                  angles != null && angles.length == expenses.length;
+              final angle = hasCustomAngles
+                  ? angles[index]
+                  : (2 * math.pi / expenses.length) * index - math.pi / 2;
               final dx = math.cos(angle) * orbitRadius;
               final dy = math.sin(angle) * orbitRadius;
               return Positioned(
@@ -119,17 +128,11 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
-                        colors: [
-                          expenseBubbleStart,
-                          expenseBubbleEnd,
-                        ],
+                        colors: [expenseBubbleStart, expenseBubbleEnd],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      border: Border.all(
-                        color: expenseBorderColor,
-                        width: 1.5,
-                      ),
+                      border: Border.all(color: expenseBorderColor, width: 1.5),
                       boxShadow: [
                         BoxShadow(
                           color: expenseShadowColor,
@@ -145,11 +148,11 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelMedium?.copyWith(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.9)
-                                  : const Color(0xFF1B2A75),
-                              fontWeight: FontWeight.w600,
-                            ),
+                          color: isDark
+                              ? Colors.white.withOpacity(0.9)
+                              : const Color(0xFF1B2A75),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -189,26 +192,23 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Avatar(
-                        name: participant.name,
-                        isPrimary: true,
-                      ),
+                      Avatar(name: participant.name, isPrimary: true),
                       const SizedBox(height: 12),
                       Text(
                         participant.name,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium?.copyWith(
-                              color: primaryContentColor,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          color: primaryContentColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         NumberFormatHelper.currency.format(participant.total),
                         style: theme.textTheme.headlineSmall?.copyWith(
-                              color: primaryContentColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          color: primaryContentColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),

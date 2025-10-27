@@ -31,6 +31,8 @@ class ParticipantBubbleCluster extends StatelessWidget {
       bubbleDiameter: _bubbleDiameter,
       expenseBubbleDiameter: _expenseBubbleDiameter,
     );
+    final expenseRadius = _expenseBubbleDiameter / 2;
+    final orbitRadius = outerExtent / 2 - expenseRadius;
 
     double maxX = 0;
     double maxY = 0;
@@ -40,6 +42,14 @@ class ParticipantBubbleCluster extends StatelessWidget {
     }
 
     final size = Size(maxX * 2, maxY * 2);
+    final centers = offsets
+        .map(
+          (offset) => Offset(
+            size.width / 2 + offset.dx,
+            size.height / 2 + offset.dy,
+          ),
+        )
+        .toList();
 
     return SizedBox(
       width: size.width,
@@ -52,6 +62,9 @@ class ParticipantBubbleCluster extends StatelessWidget {
               offset: offsets[i],
               canvasSize: size,
               extent: outerExtent,
+              centers: centers,
+              centerIndex: i,
+              orbitRadius: orbitRadius,
             ),
         ],
       ),
@@ -63,10 +76,23 @@ class ParticipantBubbleCluster extends StatelessWidget {
     required Offset offset,
     required Size canvasSize,
     required double extent,
+    required List<Offset> centers,
+    required int centerIndex,
+    required double orbitRadius,
   }) {
     final center = Offset(
       canvasSize.width / 2 + offset.dx,
       canvasSize.height / 2 + offset.dy,
+    );
+    final bubbleRadius = _bubbleDiameter / 2;
+    final expenseRadius = _expenseBubbleDiameter / 2;
+    final expenseAngles = _computeExpenseAngles(
+      participant: participant,
+      centers: centers,
+      centerIndex: centerIndex,
+      orbitRadius: orbitRadius,
+      bubbleRadius: bubbleRadius,
+      expenseRadius: expenseRadius,
     );
 
     return Positioned(
@@ -80,8 +106,208 @@ class ParticipantBubbleCluster extends StatelessWidget {
         expenseBubbleDiameter: _expenseBubbleDiameter,
         onTap: () => onParticipantTap(participant),
         onExpenseTap: (expense) => onExpenseTap(participant, expense),
+        expenseAngles: expenseAngles,
       ),
     );
+  }
+
+  List<double>? _computeExpenseAngles({
+    required Participant participant,
+    required List<Offset> centers,
+    required int centerIndex,
+    required double orbitRadius,
+    required double bubbleRadius,
+    required double expenseRadius,
+  }) {
+    final expenses = participant.expenses;
+    if (expenses.isEmpty) {
+      return const <double>[];
+    }
+
+    final neighbors = <Offset>[];
+    final center = centers[centerIndex];
+    for (var i = 0; i < centers.length; i++) {
+      if (i == centerIndex) {
+        continue;
+      }
+      neighbors.add(centers[i] - center);
+    }
+
+    if (neighbors.isEmpty) {
+      return null;
+    }
+
+    final minSpacingAngle =
+        2 * math.asin(math.min(1.0, expenseRadius / orbitRadius));
+    final availableArcs = _availableAngleArcs(
+      neighbors: neighbors,
+      orbitRadius: orbitRadius,
+      bubbleRadius: bubbleRadius,
+      expenseRadius: expenseRadius,
+      minSpacingAngle: minSpacingAngle,
+    );
+
+    if (availableArcs.isEmpty) {
+      return null;
+    }
+
+    final angles = _distributeAngles(
+      arcs: availableArcs,
+      count: expenses.length,
+      minSpacingAngle: minSpacingAngle,
+    );
+
+    if (angles.length != expenses.length) {
+      return null;
+    }
+
+    angles.sort();
+    return angles;
+  }
+
+  List<_AngleRange> _availableAngleArcs({
+    required List<Offset> neighbors,
+    required double orbitRadius,
+    required double bubbleRadius,
+    required double expenseRadius,
+    required double minSpacingAngle,
+  }) {
+    const twoPi = math.pi * 2;
+    final blocked = <_AngleRange>[];
+
+    for (final neighbor in neighbors) {
+      final distance = neighbor.distance;
+      if (distance == 0) {
+        return const <_AngleRange>[];
+      }
+
+      final theta = _normalizeAngle(math.atan2(neighbor.dy, neighbor.dx));
+      final minDistance = bubbleRadius + expenseRadius;
+      final denominator = 2 * distance * orbitRadius;
+      if (denominator <= 0) {
+        continue;
+      }
+
+      final numerator =
+          distance * distance + orbitRadius * orbitRadius - minDistance * minDistance;
+      var ratio = numerator / denominator;
+
+      if (ratio >= 1) {
+        continue;
+      }
+
+      if (ratio <= -1) {
+        return const <_AngleRange>[];
+      }
+
+      final delta = math.acos(ratio) + minSpacingAngle / 2;
+      final start = _normalizeAngle(theta - delta);
+      final end = _normalizeAngle(theta + delta);
+
+      if (end < start) {
+        blocked.add(_AngleRange(start, twoPi));
+        blocked.add(_AngleRange(0, end));
+      } else {
+        blocked.add(_AngleRange(start, end));
+      }
+    }
+
+    if (blocked.isEmpty) {
+      return [_AngleRange(0, twoPi)];
+    }
+
+    blocked.sort((a, b) => a.start.compareTo(b.start));
+    final merged = <_AngleRange>[];
+    for (final range in blocked) {
+      if (merged.isEmpty) {
+        merged.add(range);
+        continue;
+      }
+
+      final last = merged.last;
+      if (range.start <= last.end) {
+        merged[merged.length - 1] =
+            _AngleRange(last.start, math.max(last.end, range.end));
+      } else {
+        merged.add(range);
+      }
+    }
+
+    var cursor = 0.0;
+    final available = <_AngleRange>[];
+    for (final range in merged) {
+      if (range.start > cursor) {
+        available.add(_AngleRange(cursor, range.start));
+      }
+      cursor = math.max(cursor, range.end);
+      if (cursor >= twoPi) {
+        cursor = twoPi;
+        break;
+      }
+    }
+
+    if (cursor < twoPi) {
+      available.add(_AngleRange(cursor, twoPi));
+    }
+
+    return available
+        .where((range) => range.span > 0.01)
+        .map((range) => _AngleRange(range.start, math.min(range.end, twoPi)))
+        .toList();
+  }
+
+  List<double> _distributeAngles({
+    required List<_AngleRange> arcs,
+    required int count,
+    required double minSpacingAngle,
+  }) {
+    final angles = <double>[];
+    if (count == 0) {
+      return angles;
+    }
+
+    final margin = minSpacingAngle / 2;
+    final sortedArcs = arcs.toList()
+      ..sort((a, b) => b.span.compareTo(a.span));
+
+    var remaining = count;
+    for (final arc in sortedArcs) {
+      if (remaining == 0) {
+        break;
+      }
+
+      final span = arc.span;
+      if (span <= 0) {
+        continue;
+      }
+
+      final effectiveMargin = math.min(margin, span / 2);
+      final availableSpan = span - effectiveMargin * 2;
+      if (availableSpan <= 0) {
+        continue;
+      }
+
+      final slotCount = math.min(
+        remaining,
+        math.max(1, (availableSpan / minSpacingAngle).floor() + 1),
+      );
+      if (slotCount <= 0) {
+        continue;
+      }
+
+      final step = slotCount == 1 ? 0 : availableSpan / (slotCount - 1);
+      for (var i = 0; i < slotCount && remaining > 0; i++) {
+        final angle = arc.start + effectiveMargin + step * i;
+        angles.add(_normalizeAngle(angle));
+        remaining--;
+      }
+    }
+
+    if (remaining > 0) {
+      return const <double>[];
+    }
+
+    return angles;
   }
 
   List<Offset> _positionsForCount(int count) {
@@ -135,4 +361,22 @@ class ParticipantBubbleCluster extends StatelessWidget {
       return Offset(math.cos(angle) * radius, math.sin(angle) * radius);
     });
   }
+
+  double _normalizeAngle(double angle) {
+    const twoPi = math.pi * 2;
+    var normalized = angle % twoPi;
+    if (normalized < 0) {
+      normalized += twoPi;
+    }
+    return normalized;
+  }
+}
+
+class _AngleRange {
+  const _AngleRange(this.start, this.end);
+
+  final double start;
+  final double end;
+
+  double get span => end - start;
 }

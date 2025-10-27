@@ -257,19 +257,6 @@ class SettingsPage extends ConsumerWidget {
               title: loc.settings_section_developer,
               children: [
                 ListTile(
-                  leading: const Icon(Icons.credit_card_outlined),
-                  title: Text(loc.settings_developer_stripe_test),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StripeTestPage(),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
                   leading: const Icon(Icons.person_outline),
                   title: Text(loc.settings_account_info),
                   subtitle: firebaseUser != null
@@ -285,6 +272,19 @@ class SettingsPage extends ConsumerWidget {
                   leading: const Icon(Icons.delete_outline),
                   title: Text(loc.settings_account_delete),
                   onTap: () => _showComingSoon(context, loc),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.credit_card_outlined),
+                  title: Text(loc.settings_developer_stripe_test),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StripeTestPage(),
+                      ),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.help_outline),

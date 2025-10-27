@@ -240,7 +240,6 @@ class _MomentTypeSelector extends StatelessWidget {
             title: loc.create_moment_type_instant,
             icon: Icons.flash_on_outlined,
             accentColor: const Color(0xFFE8457C),
-            backgroundColor: const Color(0xFFFFEDF3),
             selected: selectedType == _MomentType.instant,
             onTap: () => onChanged(_MomentType.instant),
           ),
@@ -251,7 +250,6 @@ class _MomentTypeSelector extends StatelessWidget {
             title: loc.create_moment_type_event,
             icon: Icons.event_outlined,
             accentColor: const Color(0xFF3D6FE0),
-            backgroundColor: const Color(0xFFE7F1FF),
             selected: selectedType == _MomentType.event,
             onTap: () => onChanged(_MomentType.event),
           ),
@@ -266,7 +264,6 @@ class _MomentTypeCard extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.accentColor,
-    required this.backgroundColor,
     required this.selected,
     required this.onTap,
   });
@@ -274,7 +271,6 @@ class _MomentTypeCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color accentColor;
-  final Color backgroundColor;
   final bool selected;
   final VoidCallback onTap;
 
@@ -282,10 +278,15 @@ class _MomentTypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final effectiveBackground =
-        selected ? backgroundColor : colorScheme.surfaceContainerHighest;
-    final borderColor =
-        selected ? accentColor : colorScheme.outlineVariant.withValues(alpha: 0.4);
+    final effectiveBackground = selected
+        ? Color.alphaBlend(
+            accentColor.withValues(alpha: 0.18),
+            colorScheme.surfaceContainerHighest,
+          )
+        : colorScheme.surfaceContainerHighest;
+    final borderColor = selected
+        ? accentColor
+        : colorScheme.outlineVariant.withValues(alpha: 0.4);
     final titleStyle = theme.textTheme.titleSmall?.copyWith(
       fontWeight: FontWeight.w600,
     );
@@ -321,7 +322,14 @@ class _MomentTypeCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Text(title, style: titleStyle),
+            Text(
+              title,
+              style: titleStyle?.copyWith(
+                color: selected
+                    ? accentColor
+                    : theme.colorScheme.onSurface,
+              ),
+            ),
           ],
         ),
       ),

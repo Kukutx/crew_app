@@ -14,6 +14,22 @@ class SettlementPreviewSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final dragHandleColor = colorScheme.outlineVariant
+        .withValues(alpha: isDark ? 0.5 : 0.35);
+    final positiveColor = colorScheme.tertiary;
+    final negativeColor = colorScheme.error;
+    final positiveContainer = colorScheme.tertiaryContainer;
+    final negativeContainer = colorScheme.errorContainer;
+    final positiveOnColor = colorScheme.onTertiary;
+    final negativeOnColor = colorScheme.onError;
+    final positiveOnContainer = colorScheme.onTertiaryContainer;
+    final negativeOnContainer = colorScheme.onErrorContainer;
+    final subtitleStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+    );
     final currency = NumberFormatHelper.currency;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
@@ -26,7 +42,7 @@ class SettlementPreviewSheet extends StatelessWidget {
               width: 48,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: dragHandleColor,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -45,22 +61,29 @@ class SettlementPreviewSheet extends StatelessWidget {
               itemCount: entries.length,
               itemBuilder: (context, index) {
                 final entry = entries[index];
-                final color = entry.difference >= 0
-                    ? const Color(0xFF1B8A5C)
-                    : Colors.redAccent;
-                return ListTile(
-                  leading: Avatar(name: entry.participant.name),
-                  title: Text(entry.participant.name),
-                  subtitle: Text(
-                    entry.difference >= 0
-                        ? '应收 ${currency.format(entry.difference.abs())}'
-                        : '需补 ${currency.format(entry.difference.abs())}',
-                  ),
-                  trailing: Text(
-                    '${entry.difference >= 0 ? '+' : '-'}${currency.format(entry.difference.abs())}',
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.w600,
+                final isPositive = entry.difference >= 0;
+                final accentColor = isPositive ? positiveColor : negativeColor;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    tileColor: colorScheme.surfaceContainerHighest,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    leading: Avatar(name: entry.participant.name),
+                    title: Text(entry.participant.name),
+                    subtitle: Text(
+                      isPositive
+                          ? '应收 ${currency.format(entry.difference.abs())}'
+                          : '需补 ${currency.format(entry.difference.abs())}',
+                      style: subtitleStyle,
+                    ),
+                    trailing: Text(
+                      '${isPositive ? '+' : '-'}${currency.format(entry.difference.abs())}',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 );
@@ -73,20 +96,30 @@ class SettlementPreviewSheet extends StatelessWidget {
             runSpacing: 12,
             children: entries.map((entry) {
               final isPositive = entry.difference >= 0;
+              final accentColor = isPositive ? positiveColor : negativeColor;
+              final onAccentColor =
+                  isPositive ? positiveOnColor : negativeOnColor;
+              final containerColor =
+                  isPositive ? positiveContainer : negativeContainer;
+              final onContainerColor = isPositive
+                  ? positiveOnContainer
+                  : negativeOnContainer;
               return Chip(
                 avatar: CrewAvatar(
                   radius: 16,
-                  backgroundColor:
-                      isPositive ? const Color(0xFF1B8A5C) : Colors.redAccent,
-                  foregroundColor: Colors.white,
+                  backgroundColor: accentColor,
+                  foregroundColor: onAccentColor,
                   child: Icon(
                     isPositive ? Icons.arrow_downward : Icons.arrow_upward,
                     size: 16,
                   ),
                 ),
-                backgroundColor: const Color(0xFFE8F8F0),
+                backgroundColor: containerColor,
                 label: Text(
                   '${entry.participant.name} ${isPositive ? '收回' : '补给'} ${currency.format(entry.difference.abs())}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: onContainerColor,
+                  ),
                 ),
               );
             }).toList(),

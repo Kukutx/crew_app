@@ -295,7 +295,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                                               appOverlayIndexProvider.notifier,
                                             )
                                             .state =
-                                        1;
+                                        0;
                                     ref
                                             .read(
                                               mapFocusEventProvider.notifier,

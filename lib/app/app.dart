@@ -6,7 +6,6 @@ import 'package:crew_app/features/events/presentation/pages/map/sheets/map_momen
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/playground/my_test_page.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,11 +21,11 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
-  int _index = 1; // 默认打开“地图”
+  int _index = 0; // 默认打开“地图”
   int _navigationIndex = 1;
   bool _isScrolling = false;
   Timer? _scrollDebounceTimer;
-  late final PageController _overlayController = PageController(initialPage: 1);
+  late final PageController _overlayController = PageController(initialPage: 0);
   ProviderSubscription<int>? _overlayIndexSubscription;
 
   @override
@@ -40,7 +39,7 @@ class _AppState extends ConsumerState<App> {
         }
         setState(() {
           _index = next;
-          if (next == 1) {
+          if (next == 0) {
             _isScrolling = false;
           }
         });
@@ -153,10 +152,10 @@ class _AppState extends ConsumerState<App> {
       ),
     ];
 
-    final isOverlayOpen = _index != 1;
+    final isOverlayOpen = _index != 0;
 
     final showBottomNav =
-        _index == 1 && ref.watch(bottomNavigationVisibilityProvider);
+        _index == 0 && ref.watch(bottomNavigationVisibilityProvider);
 
     return Scaffold(
       extendBody: true,
@@ -176,34 +175,26 @@ class _AppState extends ConsumerState<App> {
                   : const NeverScrollableScrollPhysics(),
               onPageChanged: (page) {
                 final shouldUpdateIndex = _index != page;
-                final shouldResetScroll = page == 1 && _isScrolling;
+                final shouldResetScroll = page == 0 && _isScrolling;
                 if (!shouldUpdateIndex && !shouldResetScroll) {
                   return;
                 }
                 setState(() {
                   _index = page;
-                  if (page == 1) {
+                  if (page == 0) {
                     _isScrolling = false;
                   }
                 });
                 ref.read(appOverlayIndexProvider.notifier).state = page;
               },
               children: [
-                ScrollActivityListener(
-                  onScrollActivityChanged: _handleScrollActivity,
-                  child: MyTestPage(
-                    onClose: () {
-                      ref.read(appOverlayIndexProvider.notifier).state = 1;
-                    },
-                  ),
-                ),
                 const SizedBox.expand(),
                 ScrollActivityListener(
                   onScrollActivityChanged: _handleScrollActivity,
                   child: UserProfilePage(
                     uid: currentUser?.uid,
                     onClose: () {
-                      ref.read(appOverlayIndexProvider.notifier).state = 1;
+                      ref.read(appOverlayIndexProvider.notifier).state = 0;
                     },
                   ),
                 ),
@@ -298,8 +289,8 @@ class _AppState extends ConsumerState<App> {
                             if (_navigationIndex != 1) {
                               setState(() => _navigationIndex = 1);
                             }
-                            if (_index != 1) {
-                              ref.read(appOverlayIndexProvider.notifier).state = 1;
+                            if (_index != 0) {
+                              ref.read(appOverlayIndexProvider.notifier).state = 0;
                             }
                           },
                           destinations: destinations,

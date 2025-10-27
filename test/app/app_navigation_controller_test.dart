@@ -29,8 +29,8 @@ void main() {
       addTearDown(container.dispose);
       final controller = container.read(appNavigationControllerProvider);
 
-      container.read(appOverlayIndexProvider.notifier).state = 2;
-      expect(controller.index, 2);
+      container.read(appOverlayIndexProvider.notifier).state = 1;
+      expect(controller.index, 1);
 
       await controller.onDestinationSelected(
         1,
@@ -38,7 +38,7 @@ void main() {
         showChatSheet: () async {},
       );
 
-      expect(container.read(appOverlayIndexProvider), 1);
+      expect(container.read(appOverlayIndexProvider), 0);
     });
 
     test('handleScrollActivity debounces scroll end updates', () {

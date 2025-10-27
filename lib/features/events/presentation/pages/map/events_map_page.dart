@@ -296,7 +296,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       Navigator.of(context).pushNamed('/login');
       return;
     }
-    ref.read(appOverlayIndexProvider.notifier).state = 2;
+    ref.read(appOverlayIndexProvider.notifier).state = 1;
   }
 }
 

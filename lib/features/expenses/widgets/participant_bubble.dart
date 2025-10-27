@@ -65,7 +65,7 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
     final participant = widget.participant;
     final bubbleSize = widget.bubbleDiameter;
     final expenses = participant.expenses;
-    final orbitRadius = bubbleSize / 2 + ParticipantBubble._expenseOrbitPadding;
+    final orbitRadius = bubbleSize / 2 + _expenseOrbitPadding;
     final stackExtent = (orbitRadius + widget.expenseBubbleDiameter / 2) * 2;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
@@ -86,16 +86,16 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
         ? const [Color(0xFF4F46E5), Color(0xFF9333EA)]
         : const [Color(0xFF5B8DEF), Color(0xFF7C3AED)];
     final mainGradient = mainGradientBase
-        .map((color) => color.withValues(alpha: isDark ? 0.72 : 0.78))
+        .map(
+          (color) => color.withValues(
+            alpha: isDark ? 0.72 : 0.78,
+          ),
+        )
         .toList();
     final bubbleShadowColor = isDark
         ? Colors.black.withOpacity(0.4)
         : const Color(0x335B8DEF);
     final primaryContentColor = isDark ? Colors.white : scheme.onPrimary;
-    final borderColor = isDark
-        ? Colors.white.withOpacity(0.85)
-        : scheme.onPrimary.withValues(alpha: .8);
-
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -134,11 +134,17 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
-                        colors: [expenseBubbleStart, expenseBubbleEnd],
+                        colors: [
+                          expenseBubbleStart,
+                          expenseBubbleEnd,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      border: Border.all(color: expenseBorderColor, width: 1.5),
+                      border: Border.all(
+                        color: expenseBorderColor,
+                        width: 1.5,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: expenseShadowColor,
@@ -154,11 +160,11 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: isDark
-                              ? Colors.white.withOpacity(0.9)
-                              : const Color(0xFF1B2A75),
-                          fontWeight: FontWeight.w600,
-                        ),
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.9)
+                                  : const Color(0xFF1B2A75),
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
                     ),
                   ),
@@ -184,7 +190,6 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                       offset: const Offset(0, 18),
                     ),
                   ],
-                  border: Border.all(color: borderColor, width: 3),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
@@ -197,17 +202,17 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                         participant.name,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: primaryContentColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                              color: primaryContentColor,
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         NumberFormatHelper.currency.format(participant.total),
                         style: theme.textTheme.headlineSmall?.copyWith(
-                          color: primaryContentColor,
-                          fontWeight: FontWeight.bold,
-                        ),
+                              color: primaryContentColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ],
                   ),

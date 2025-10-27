@@ -37,16 +37,8 @@ class AppFloatingActionButton extends StatelessWidget {
     final theme = Theme.of(context);
     final effectiveBackgroundColor = backgroundColor ?? theme.colorScheme.primary;
     final effectiveForegroundColor = foregroundColor ?? theme.colorScheme.onPrimary;
-    final ShapeBorder defaultShape;
-    switch (variant) {
-      case AppFloatingActionButtonVariant.extended:
-        defaultShape = const StadiumBorder();
-        break;
-      case AppFloatingActionButtonVariant.small:
-      case AppFloatingActionButtonVariant.regular:
-        defaultShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
-        break;
-    }
+    final ShapeBorder defaultShape =
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
     final effectiveShape = shape ?? defaultShape;
 
     final Widget button;

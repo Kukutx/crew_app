@@ -434,7 +434,6 @@ class _PlazaPostFab extends StatelessWidget {
       tooltip: label,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
-      shape: const CircleBorder(),
       child: const Icon(Icons.add),
     );
   }

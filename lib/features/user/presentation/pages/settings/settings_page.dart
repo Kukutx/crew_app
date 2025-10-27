@@ -214,35 +214,44 @@ class SettingsPage extends ConsumerWidget {
               ),
             ],
           ),
-          _SettingsSection(
-            title: loc.settings_section_account,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.person_outline),
-                title: Text(loc.settings_account_info),
-                subtitle: firebaseUser != null
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${loc.settings_account_uid_label}: $uid'),
-                        ],
-                      )
-                    : Text(loc.login_prompt),
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: Text(loc.action_logout),
-                onTap: () async {
-                  await _signOut(context, ref);
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48),
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                  foregroundColor: Theme.of(
+                    context,
+                  ).colorScheme.onErrorContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0, // 暗黑里更干净
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+                onPressed: () async {
+                  final ok = await _confirmLogout(context, loc);
+                  if (ok) await _signOut(context, ref);
                 },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.logout_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      loc.action_logout,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: Text(loc.settings_account_delete),
-                onTap: () => _showComingSoon(context, loc),
-              ),
-            ],
+            ),
           ),
+
           if (kDebugMode)
             _SettingsSection(
               title: loc.settings_section_developer,
@@ -259,6 +268,23 @@ class SettingsPage extends ConsumerWidget {
                       ),
                     );
                   },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.person_outline),
+                  title: Text(loc.settings_account_info),
+                  subtitle: firebaseUser != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${loc.settings_account_uid_label}: $uid'),
+                          ],
+                        )
+                      : Text(loc.login_prompt),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete_outline),
+                  title: Text(loc.settings_account_delete),
+                  onTap: () => _showComingSoon(context, loc),
                 ),
                 ListTile(
                   leading: const Icon(Icons.help_outline),
@@ -309,6 +335,30 @@ class SettingsPage extends ConsumerWidget {
     Navigator.of(
       context,
     ).popUntil((route) => route.settings.name == '/' || route.isFirst);
+  }
+
+  Future<bool> _confirmLogout(
+    BuildContext context,
+    AppLocalizations loc,
+  ) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(loc.action_logout),
+            content: Text("确认退出登录?"), // 若无该文案，可临时写死：'确认退出登录？'
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text("取消"),
+              ),
+              FilledButton.tonal(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text("确认"),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   void _showLocationPermissionSheet(
@@ -400,7 +450,6 @@ class _SettingsSection extends StatelessWidget {
     );
   }
 }
-
 
 String _resolveUid(fa.User user, AuthenticatedUserDto? backendUser) {
   final backendId = backendUser?.uid.trim();

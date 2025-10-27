@@ -38,39 +38,54 @@ class ToggleTabBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (leading != null) ...[
-              leading,
-              const SizedBox(width: 12),
-            ],
-            const Spacer(),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ToggleTabChip(
-                  label: firstLabel,
-                  icon: firstIcon,
-                  selected: selectedIndex == 0,
-                  onTap: () => onChanged(0),
+        SizedBox(
+          width: double.infinity,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              if (leading != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      leading,
+                      const SizedBox(width: 12),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 12),
-                ToggleTabChip(
-                  label: secondLabel,
-                  icon: secondIcon,
-                  selected: selectedIndex == 1,
-                  onTap: () => onChanged(1),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ToggleTabChip(
+                    label: firstLabel,
+                    icon: firstIcon,
+                    selected: selectedIndex == 0,
+                    onTap: () => onChanged(0),
+                  ),
+                  const SizedBox(width: 12),
+                  ToggleTabChip(
+                    label: secondLabel,
+                    icon: secondIcon,
+                    selected: selectedIndex == 1,
+                    onTap: () => onChanged(1),
+                  ),
+                ],
+              ),
+              if (trailing != null)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(width: 12),
+                      trailing,
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            const Spacer(),
-            if (trailing != null) ...[
-              const SizedBox(width: 12),
-              trailing,
             ],
-          ],
+          ),
         ),
         if (accessory != null) ...[
           const SizedBox(height: 8),

@@ -55,23 +55,24 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
     final scheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final expenseBubbleStart = isDark
-        ? const Color(0xCC2E7C55)
-        : const Color(0xAA66D69D);
+        ? const Color(0xCC4C5CFF)
+        : const Color(0xAA81A4FF);
     final expenseBubbleEnd = isDark
-        ? const Color(0x8824593B)
-        : Colors.white.withValues(alpha: 0.7);
+        ? const Color(0x882B2E4F)
+        : Colors.white.withValues(alpha: 0.75);
     final expenseBorderColor = isDark
-        ? const Color(0x6624593B)
-        : const Color(0x5566D69D);
+        ? const Color(0x663C3F71)
+        : const Color(0x5581A4FF);
     final expenseShadowColor = isDark
-        ? const Color(0x3324593B)
-        : const Color(0x4466D69D);
+        ? const Color(0x332B2E4F)
+        : const Color(0x3381A4FF);
     final mainGradient = isDark
-        ? const [Color(0xFF1F6C49), Color(0xFF124331)]
-        : const [Color(0xFF42BD82), Color(0xFF1B8A5C)];
+        ? const [Color(0xFF4F46E5), Color(0xFF9333EA)]
+        : const [Color(0xFF5B8DEF), Color(0xFF7C3AED)];
     final bubbleShadowColor = isDark
-        ? Colors.black.withOpacity(0.35)
-        : const Color(0x5532A56C);
+        ? Colors.black.withOpacity(0.4)
+        : const Color(0x335B8DEF);
+    final primaryContentColor = isDark ? Colors.white : scheme.onPrimary;
 
     return AnimatedBuilder(
       animation: _controller,
@@ -134,8 +135,8 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                         textAlign: TextAlign.center,
                         style: theme.textTheme.labelMedium?.copyWith(
                               color: isDark
-                                  ? scheme.onTertiary.withOpacity(0.9)
-                                  : const Color(0xFF1B5E3B),
+                                  ? Colors.white.withOpacity(0.9)
+                                  : const Color(0xFF1B2A75),
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -165,7 +166,9 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                   ],
                   border: participant.isCreator
                       ? Border.all(
-                          color: scheme.onPrimary.withValues(alpha: .8),
+                          color: isDark
+                              ? Colors.white.withOpacity(0.85)
+                              : scheme.onPrimary.withValues(alpha: .8),
                           width: 3,
                         )
                       : null,
@@ -184,7 +187,7 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                         participant.name,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium?.copyWith(
-                              color: scheme.onPrimary,
+                              color: primaryContentColor,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -192,7 +195,7 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
                       Text(
                         NumberFormatHelper.currency.format(participant.total),
                         style: theme.textTheme.headlineSmall?.copyWith(
-                              color: scheme.onPrimary,
+                              color: primaryContentColor,
                               fontWeight: FontWeight.bold,
                             ),
                       ),

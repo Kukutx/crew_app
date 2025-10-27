@@ -44,8 +44,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final backgroundGradient = isDark
-        ? const [Color(0xFF0B1914), Color(0xFF020805)]
-        : const [Color(0xFFE8F8F0), Colors.white];
+        ? const [Color(0xFF0F1424), Color(0xFF070910)]
+        : const [Color(0xFFE8EDFF), Colors.white];
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.event_group_expense_title),

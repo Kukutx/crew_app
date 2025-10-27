@@ -61,7 +61,7 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
     final participant = widget.participant;
     final bubbleSize = widget.bubbleDiameter;
     final expenses = participant.expenses;
-    final orbitRadius = bubbleSize / 2 + _expenseOrbitPadding;
+    final orbitRadius = bubbleSize / 2 + ParticipantBubble._expenseOrbitPadding;
     final stackExtent = (orbitRadius + widget.expenseBubbleDiameter / 2) * 2;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;

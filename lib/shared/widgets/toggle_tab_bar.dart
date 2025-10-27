@@ -49,6 +49,7 @@ class ToggleTabBar extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      const SizedBox(width: 12),
                       leading,
                       const SizedBox(width: 12),
                     ],
@@ -81,6 +82,7 @@ class ToggleTabBar extends StatelessWidget {
                     children: [
                       const SizedBox(width: 12),
                       trailing,
+                      const SizedBox(width: 12),
                     ],
                   ),
                 ),

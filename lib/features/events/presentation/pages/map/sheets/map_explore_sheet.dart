@@ -16,14 +16,14 @@ import '../../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
-class MapMomentsSheet extends ConsumerStatefulWidget {
-  const MapMomentsSheet({super.key});
+class MapExploreSheet extends ConsumerStatefulWidget {
+  const MapExploreSheet({super.key});
 
   @override
-  ConsumerState<MapMomentsSheet> createState() => _MapEventsExploreSheetState();
+  ConsumerState<MapExploreSheet> createState() => _MapExploreSheetState();
 }
 
-class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
+class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   int _tab = 0;
   String? _selectedCountry;
 
@@ -200,9 +200,7 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                   final theme = Theme.of(context);
                   final buttonColor = theme.colorScheme.surfaceContainerHighest;
 
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: PopupMenuButton<String>(
+                  return PopupMenuButton<String>(
                       onSelected: (value) {
                         setState(() {
                           _selectedCountry = value;
@@ -233,7 +231,6 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                           ],
                         ),
                       ),
-                    ),
                   );
                 },
                 trailingBuilder: (context, selectedIndex) {
@@ -249,12 +246,9 @@ class _MapEventsExploreSheetState extends ConsumerState<MapMomentsSheet> {
                           );
                         }
                       : () => showCreateMomentSheet(context);
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: IconButton(
+                  return IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: onPressed,
-                    ),
                   );
                 },
               ),

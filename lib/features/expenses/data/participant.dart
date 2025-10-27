@@ -2,12 +2,12 @@ class Participant {
   const Participant({
     required this.name,
     required this.expenses,
-    this.isCreator = false,
+    this.isHost = false,
   });
 
   final String name;
   final List<ParticipantExpense> expenses;
-  final bool isCreator;
+  final bool isHost;
 
   double get total => expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
 }

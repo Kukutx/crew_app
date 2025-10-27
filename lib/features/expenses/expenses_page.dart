@@ -21,7 +21,6 @@ class ExpensesPage extends StatefulWidget {
 
 class _ExpensesPageState extends State<ExpensesPage> {
   late final List<Participant> _participants;
-  late final double _maxTotal;
   late final double _overallTotal;
 
   @override
@@ -31,10 +30,6 @@ class _ExpensesPageState extends State<ExpensesPage> {
     _overallTotal = _participants.fold<double>(
       0,
       (previousValue, element) => previousValue + element.total,
-    );
-    _maxTotal = _participants.fold<double>(
-      0,
-      (previousValue, element) => previousValue > element.total ? previousValue : element.total,
     );
   }
 

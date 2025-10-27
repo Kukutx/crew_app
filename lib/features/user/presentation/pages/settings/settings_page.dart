@@ -67,15 +67,6 @@ class SettingsPage extends ConsumerWidget {
           _SettingsSection(
             title: loc.settings_section_general,
             children: [
-              SwitchListTile.adaptive(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                title: Text(loc.dark_mode),
-                value: settings.themeMode == ThemeMode.dark,
-                onChanged: (value) {
-                  ref.read(settingsProvider.notifier).setDarkMode(value);
-                  _showSavedSnackBar(context, loc);
-                },
-              ),
               ListTile(
                 leading: const Icon(Icons.language_outlined),
                 title: Text(loc.language),

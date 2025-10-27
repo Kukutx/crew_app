@@ -28,13 +28,10 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       : super(
           SettingsState(
             locale: _resolveLocale(_prefs.getString(_kLangKey)),
-            themeMode: _prefs.getBool(_kDarkKey) ?? false
-                ? ThemeMode.dark
-                : ThemeMode.light,
+            themeMode: ThemeMode.dark,
           ),
         );
   static const _kLangKey = 'language';
-  static const _kDarkKey = 'darkMode';
 
   final SharedPreferences _prefs;
 
@@ -48,13 +45,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> setLocale(Locale locale) async {
     await _prefs.setString(_kLangKey, locale.languageCode);
     state = state.copyWith(locale: locale);
-  }
-
-  Future<void> setDarkMode(bool value) async {
-    await _prefs.setBool(_kDarkKey, value);
-    state = state.copyWith(
-      themeMode: value ? ThemeMode.dark : ThemeMode.light,
-    );
   }
 }
 final settingsProvider =

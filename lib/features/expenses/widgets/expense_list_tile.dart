@@ -17,15 +17,20 @@ class ExpenseListTile extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final currency = NumberFormatHelper.currency;
-    final cardColor = colorScheme.surfaceContainerHighest;
-    final categoryScheme = ColorScheme.fromSeed(
-      seedColor: colorScheme.tertiary,
-      brightness: colorScheme.brightness,
+    final cardColor = isDark
+        ? Color.alphaBlend(
+            Colors.white.withOpacity(0.04),
+            colorScheme.surface,
+          )
+        : Colors.white;
+    const categoryColor = Color(0xFF1B8A5C);
+    final categoryBackground = isDark
+        ? categoryColor.withOpacity(0.24)
+        : categoryColor.withOpacity(0.12);
+    final categoryForeground = isDark ? Colors.white : categoryColor;
+    final supportingTextStyle = theme.textTheme.bodySmall?.copyWith(
+      color: isDark ? colorScheme.onSurfaceVariant : Colors.black54,
     );
-    final categoryBackground = categoryScheme.secondaryContainer;
-    final categoryForeground = categoryScheme.onSecondaryContainer;
-    final supportingTextStyle =
-        theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(

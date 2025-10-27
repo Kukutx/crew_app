@@ -23,23 +23,18 @@ class MemberDetailsSheet extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final currency = NumberFormatHelper.currency;
-    final dragHandleColor = colorScheme.outlineVariant
-        .withValues(alpha: isDark ? 0.6 : 0.35);
+    final dragHandleColor = isDark ? Colors.white24 : Colors.grey.shade300;
     final subtitleStyle = theme.textTheme.bodyMedium?.copyWith(
-      color: colorScheme.onSurfaceVariant,
+      color: isDark ? colorScheme.onSurfaceVariant : Colors.black54,
     );
-    final highlightScheme = ColorScheme.fromSeed(
-      seedColor: difference >= 0
-          ? colorScheme.tertiary
-          : colorScheme.error,
-      brightness: colorScheme.brightness,
-    );
-    final summaryBackground = Color.alphaBlend(
-      highlightScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1),
-      colorScheme.surfaceContainerHighest,
-    );
-    final summaryBorderColor = highlightScheme.outlineVariant;
-    final summaryAccentColor = highlightScheme.onPrimaryContainer;
+    const positiveAccent = Color(0xFF1B8A5C);
+    final summaryBackground = isDark
+        ? Color.alphaBlend(positiveAccent.withOpacity(0.2), colorScheme.surface)
+        : const Color(0xFFE8F8F0);
+    final summaryBorderColor = positiveAccent.withOpacity(isDark ? 0.3 : 0.2);
+    final summaryAccentColor = difference >= 0
+        ? positiveAccent
+        : Colors.redAccent;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Column(
@@ -97,7 +92,9 @@ class MemberDetailsSheet extends StatelessWidget {
             decoration: BoxDecoration(
               color: summaryBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: summaryBorderColor.withValues(alpha: 0.4)),
+              border: Border.all(
+                color: summaryBorderColor.withValues(alpha: 0.4),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +116,7 @@ class MemberDetailsSheet extends StatelessWidget {
                   difference >= 0
                       ? '需要收回 ${currency.format(difference.abs())}'
                       : '仍需补交 ${currency.format(difference.abs())}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: summaryAccentColor,
-                  ),
+                  style: theme.textTheme.bodyMedium,
                 ),
               ],
             ),

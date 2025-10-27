@@ -27,6 +27,7 @@ class AppNavigationController extends ChangeNotifier {
   }
 
   static const _mapIndex = 1;
+  static const _profileIndex = 2;
 
   final Ref _ref;
   late final ProviderSubscription<int> _overlayIndexSubscription;
@@ -41,6 +42,21 @@ class AppNavigationController extends ChangeNotifier {
   int get navigationIndex => _navigationIndex;
   bool get isScrolling => _isScrolling;
   bool get isOverlayOpen => _index != _mapIndex;
+
+  void openProfile() {
+    final overlayNotifier = _ref.read(appOverlayIndexProvider.notifier);
+    if (overlayNotifier.state != _profileIndex) {
+      overlayNotifier.state = _profileIndex;
+      return;
+    }
+
+    if (_index != _profileIndex) {
+      _index = _profileIndex;
+      notifyListeners();
+    }
+
+    _animateOverlayTo(_profileIndex);
+  }
 
   void handleScrollActivity(bool scrolling) {
     _scrollDebounceTimer?.cancel();

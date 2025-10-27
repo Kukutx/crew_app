@@ -41,6 +41,31 @@ void main() {
       expect(container.read(appOverlayIndexProvider), 1);
     });
 
+    test('openProfile updates overlay index when closed', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(appNavigationControllerProvider);
+
+      controller.openProfile();
+
+      expect(container.read(appOverlayIndexProvider), 2);
+    });
+
+    test('openProfile keeps controller state in sync if already open', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(appNavigationControllerProvider);
+
+      controller.openProfile();
+      expect(container.read(appOverlayIndexProvider), 2);
+      expect(controller.index, 2);
+
+      controller.openProfile();
+
+      expect(container.read(appOverlayIndexProvider), 2);
+      expect(controller.index, 2);
+    });
+
     test('handleScrollActivity debounces scroll end updates', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);

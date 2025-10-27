@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:crew_app/app/state/app_overlay_provider.dart';
+import 'package:crew_app/app/state/app_navigation_controller.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -296,7 +296,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       Navigator.of(context).pushNamed('/login');
       return;
     }
-    ref.read(appOverlayIndexProvider.notifier).state = 2;
+    ref.read(appNavigationControllerProvider).openProfile();
   }
 }
 

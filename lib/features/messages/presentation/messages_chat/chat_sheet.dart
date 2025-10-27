@@ -3,6 +3,7 @@ import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:crew_app/features/messages/data/group_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/chat_conversation_page.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/system_notifications_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/direct_chat_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list.dart';
 export 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list_tile.dart';
@@ -32,6 +33,7 @@ class _ChatSheetState extends State<ChatSheet> {
       lastMessagePreview: '查看最新公告，不错过任何重要提醒',
       lastMessageTimeLabel: '刚刚',
       isSystem: true,
+      hasUnread: true,
     ),
     DirectChatPreview(
       id: 'direct-1',
@@ -73,6 +75,11 @@ class _ChatSheetState extends State<ChatSheet> {
   late final List<DirectChatPreview> _nonSystemPrivateConversations =
       _samplePrivateConversations
           .where((conversation) => !conversation.isSystem)
+          .toList(growable: false);
+
+  late final List<DirectChatPreview> _systemPrivateConversations =
+      _samplePrivateConversations
+          .where((conversation) => conversation.isSystem)
           .toList(growable: false);
 
   late final ChatParticipant _currentUser = const ChatParticipant(
@@ -363,6 +370,20 @@ class _ChatSheetState extends State<ChatSheet> {
     super.dispose();
   }
 
+  void _openSystemNotifications() {
+    if (_systemPrivateConversations.isEmpty) {
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => SystemNotificationsPage(
+          notifications: _systemPrivateConversations,
+        ),
+      ),
+    );
+  }
+
   String _resolveInitials(String name, [String? provided]) {
     final source = (provided ?? name).trim();
     if (source.isEmpty) {
@@ -510,24 +531,73 @@ class _ChatSheetState extends State<ChatSheet> {
               ),
             ),
             const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: ToggleTabBar(
-                selectedIndex: _tab,
-                firstLabel: loc.messages_tab_private,
-                secondLabel: loc.messages_tab_groups,
-                onChanged: (value) => setState(() => _tab = value),
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: ToggleTabBar(
+              selectedIndex: _tab,
+              firstLabel: loc.messages_tab_private,
+              secondLabel: loc.messages_tab_groups,
+              onChanged: (value) => setState(() => _tab = value),
+              trailingBuilder: (_, __) {
+                final hasUnreadNotifications = _systemPrivateConversations
+                    .any((conversation) => conversation.hasUnread);
+                final canOpenNotifications =
+                    _systemPrivateConversations.isNotEmpty;
+
+                return Opacity(
+                  opacity: canOpenNotifications ? 1 : 0.6,
+                  child: Material(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: .7),
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap:
+                          canOpenNotifications ? _openSystemNotifications : null,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Icon(
+                              Icons.notifications_none_outlined,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            if (hasUnreadNotifications)
+                              Positioned(
+                                top: -2,
+                                right: -2,
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.error,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-            Expanded(
-              child: AnimatedSwitcher(
+          ),
+          Expanded(
+            child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
                 child: _tab == 0
                     ? DirectChatList(
                         key: ValueKey('private-$query'),
-                        conversations: privateResults,
+                        conversations: privateResults
+                            .where((conversation) => !conversation.isSystem)
+                            .toList(growable: false),
                         onConversationTap: _openPrivateChat,
                         onAvatarTap: (conversation) {
                           final participant =
@@ -540,6 +610,8 @@ class _ChatSheetState extends State<ChatSheet> {
                             ),
                           );
                         },
+                        showSectionHeaders:
+                            _systemPrivateConversations.isNotEmpty,
                       )
                     : GroupChatList(
                         key: ValueKey('registered-$query'),

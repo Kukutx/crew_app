@@ -8,11 +8,15 @@ class DirectChatList extends StatelessWidget {
     required this.conversations,
     this.onConversationTap,
     this.onAvatarTap,
+    this.showSectionHeaders = true,
+    this.storageKey,
   });
 
   final List<DirectChatPreview> conversations;
   final ValueChanged<DirectChatPreview>? onConversationTap;
   final ValueChanged<DirectChatPreview>? onAvatarTap;
+  final bool showSectionHeaders;
+  final Key? storageKey;
 
   @override
   Widget build(BuildContext context) {
@@ -25,30 +29,32 @@ class DirectChatList extends StatelessWidget {
     final tiles = <Widget>[];
 
     if (systemConversations.isNotEmpty) {
-      tiles
-        ..add(
+      if (showSectionHeaders) {
+        tiles.add(
           const Padding(
             padding: EdgeInsets.fromLTRB(24, 16, 24, 4),
             child: _SectionHeader(label: '系统通知'),
           ),
-        )
-        ..addAll(
-          systemConversations.map(
-            (conversation) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: _DirectChatTile(
-                conversation: conversation,
-                onConversationTap: onConversationTap,
-                onAvatarTap: onAvatarTap,
-                isSystem: true,
-              ),
+        );
+      }
+
+      tiles.addAll(
+        systemConversations.map(
+          (conversation) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: _DirectChatTile(
+              conversation: conversation,
+              onConversationTap: onConversationTap,
+              onAvatarTap: onAvatarTap,
+              isSystem: true,
             ),
           ),
-        );
+        ),
+      );
     }
 
     if (regularConversations.isNotEmpty) {
-      if (systemConversations.isNotEmpty) {
+      if (systemConversations.isNotEmpty && showSectionHeaders) {
         tiles.add(
           const Padding(
             padding: EdgeInsets.fromLTRB(24, 12, 24, 0),
@@ -72,7 +78,7 @@ class DirectChatList extends StatelessWidget {
     }
 
     return ListView(
-      key: const PageStorageKey('messages-chat-private-list'),
+      key: storageKey ?? const PageStorageKey('messages-chat-private-list'),
       padding: const EdgeInsets.only(bottom: 24),
       physics: const BouncingScrollPhysics(),
       children: tiles,

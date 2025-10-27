@@ -52,6 +52,8 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final dragHandleColor = isDark ? Colors.white24 : Colors.grey.shade300;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -68,7 +70,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
               width: 48,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: dragHandleColor,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

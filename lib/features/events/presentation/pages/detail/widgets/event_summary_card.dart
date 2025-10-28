@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class EventSummaryCard extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
+  final VoidCallback onTapCalculate;
 
   const EventSummaryCard({
     super.key,
     required this.event,
     required this.loc,
+    required this.onTapCalculate,
   });
 
   @override
@@ -43,13 +45,26 @@ class EventSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              event.title,
-              style: titleStyle ??
-                  const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    event.title,
+                    style: titleStyle ??
+                        const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
+                ),
+                const SizedBox(width: 12),
+                _CalculatorButton(
+                  onPressed: onTapCalculate,
+                  colorScheme: colorScheme,
+                  tooltip: loc.event_expense_calculate_button,
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             Wrap(
@@ -118,4 +133,40 @@ class EventSummaryCard extends StatelessWidget {
         )
         .toList(growable: false);
   }
+}
+
+class _CalculatorButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final ColorScheme colorScheme;
+  final String tooltip;
+
+  const _CalculatorButton({
+    required this.onPressed,
+    required this.colorScheme,
+    required this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(16),
+            child: Ink(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                Icons.calculate_outlined,
+                color: colorScheme.onPrimaryContainer,
+                size: 24,
+              ),
+            ),
+          ),
+        ),
+      );
 }

@@ -308,6 +308,18 @@ abstract class AppLocalizations {
   /// **'Meeting point'**
   String get event_meeting_point_title;
 
+  /// No description provided for @event_meeting_point_view_button.
+  ///
+  /// In en, this message translates to:
+  /// **'View on map'**
+  String get event_meeting_point_view_button;
+
+  /// No description provided for @event_meeting_point_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view directions to the meeting point.'**
+  String get event_meeting_point_hint;
+
   /// No description provided for @event_copy_address_button.
   ///
   /// In en, this message translates to:
@@ -325,6 +337,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Participants'**
   String get event_participants_title;
+
+  /// No description provided for @event_route_start_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start point'**
+  String get event_route_start_label;
+
+  /// No description provided for @event_route_end_label.
+  ///
+  /// In en, this message translates to:
+  /// **'End point'**
+  String get event_route_end_label;
 
   /// No description provided for @event_time_title.
   ///

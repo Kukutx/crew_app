@@ -32,9 +32,9 @@ class _AddFriendContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contacts = [
-      const _ContactInfo(name: 'Ethan Chen', crewId: '#EC-7421'),
-      const _ContactInfo(name: 'Sofia Wang', crewId: '#SW-1884'),
-      const _ContactInfo(name: 'Diego Martínez', crewId: '#DM-9935'),
+      const _ContactInfo(name: 'Ethan Chen', crewId: '@EC·7421'),
+      const _ContactInfo(name: 'Sofia Wang', crewId: '@SW·1884'),
+      const _ContactInfo(name: 'Diego Martínez', crewId: '@DM·9935'),
     ];
 
     return Column(

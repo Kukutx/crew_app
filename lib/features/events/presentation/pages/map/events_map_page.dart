@@ -169,6 +169,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final hideSearchBar = selectionState.isSelectionSheetOpen ||
         selectionState.isSelectingDestination ||
         selectionState.selectedLatLng != null;
+    final showClearSelectionInAppBar =
+        !hideSearchBar && selectionState.selectedLatLng != null;
 
     if (hideSearchBar &&
         (searchManager.searchFocusNode.hasFocus || searchState.showResults)) {
@@ -209,8 +211,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               isLoading: searchState.isLoading,
               results: searchState.results,
               errorText: searchState.errorText,
-              showClearSelectionAction: selectionState.selectedLatLng != null,
-              onClearSelection: selectionState.selectedLatLng != null
+              showClearSelectionAction: showClearSelectionInAppBar,
+              onClearSelection: showClearSelectionInAppBar
                   ? () => unawaited(locationSelectionManager.clearSelectedLocation())
                   : null,
             ),
@@ -248,6 +250,54 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             onRegister: () => _showSnackBar(loc.registration_not_implemented),
             onFavorite: () => _showSnackBar(loc.feature_not_ready),
           ),
+          if (hideSearchBar)
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(16),
+                    color: theme.colorScheme.surface,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              selectionState.isSelectingDestination
+                                  ? loc.map_select_location_destination_tip
+                                  : loc.map_select_location_tip,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurface.withOpacity(.8),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          TextButton.icon(
+                            onPressed: () => unawaited(
+                                locationSelectionManager.clearSelectedLocation()),
+                            icon: const Icon(Icons.close),
+                            label: Text(loc.map_clear_selected_point),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

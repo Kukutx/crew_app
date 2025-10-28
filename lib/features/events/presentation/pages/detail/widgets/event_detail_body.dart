@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_expense_action_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_meeting_point_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -313,18 +313,24 @@ class _EventDetailBodyState extends State<EventDetailBody>
                 const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
-                  child: EventSummaryCard(event: widget.event, loc: widget.loc),
+                  child: EventSummaryCard(
+                    event: widget.event,
+                    loc: widget.loc,
+                    onTapCalculate: _openGroupExpensePage,
+                  ),
                 ),
                 const SizedBox(height: 10),
-                EventExpenseActionCard(
+                EventMeetingPointCard(
                   loc: widget.loc,
-                  onPressed: _openGroupExpensePage,
+                  meetingPoint: widget.event.address?.isNotEmpty == true
+                      ? widget.event.address!
+                      : widget.event.location,
+                  onViewOnMap: widget.onTapLocation,
                 ),
                 const SizedBox(height: 10),
                 EventInfoCard(
                   event: widget.event,
                   loc: widget.loc,
-                  onTapLocation: widget.onTapLocation,
                 ),
                 const SizedBox(height: 10),
                 EventPlazaCard(loc: widget.loc),

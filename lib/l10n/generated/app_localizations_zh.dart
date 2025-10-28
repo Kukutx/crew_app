@@ -118,6 +118,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_meeting_point_title => '集合地点';
 
   @override
+  String get event_meeting_point_view_button => '查看地图';
+
+  @override
+  String get event_meeting_point_hint => '点击按钮即可打开地图查看集合地点。';
+
+  @override
   String get event_copy_address_button => '复制地址';
 
   @override
@@ -125,6 +131,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get event_participants_title => '参与人数';
+
+  @override
+  String get event_route_start_label => '起点';
+
+  @override
+  String get event_route_end_label => '终点';
 
   @override
   String get event_time_title => '活动时间';

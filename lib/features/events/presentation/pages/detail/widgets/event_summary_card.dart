@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class EventSummaryCard extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
+  final VoidCallback onTapCalculate;
 
   const EventSummaryCard({
     super.key,
     required this.event,
     required this.loc,
+    required this.onTapCalculate,
   });
 
   @override
@@ -31,52 +33,75 @@ class EventSummaryCard extends StatelessWidget {
     final tagBackground = colorScheme.primaryContainer;
     final tagBorderColor = colorScheme.primary.withOpacity(0.4);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      color: colorScheme.surfaceVariant,
-      shadowColor: Colors.black.withOpacity(0.45),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              event.title,
-              style: titleStyle ??
-                  const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Card(
+            margin: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: _buildTags(
-                loc,
-                tagBackground,
-                tagBorderColor,
-                tagTextStyle ??
-                    const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+            color: colorScheme.surfaceVariant,
+            shadowColor: Colors.black.withOpacity(0.45),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 60),
+                    child: Text(
+                      event.title,
+                      style: titleStyle ??
+                          const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: _buildTags(
+                      loc,
+                      tagBackground,
+                      tagBorderColor,
+                      tagTextStyle ??
+                          const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Text(
+                      event.description,
+                      style: descriptionStyle ??
+                          const TextStyle(
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 18),
-            Text(
-              event.description,
-              style: descriptionStyle ??
-                  const TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: _CalculatorButton(
+              onPressed: onTapCalculate,
+              colorScheme: colorScheme,
+              tooltip: loc.event_expense_calculate_button,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -118,4 +143,40 @@ class EventSummaryCard extends StatelessWidget {
         )
         .toList(growable: false);
   }
+}
+
+class _CalculatorButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final ColorScheme colorScheme;
+  final String tooltip;
+
+  const _CalculatorButton({
+    required this.onPressed,
+    required this.colorScheme,
+    required this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(16),
+            child: Ink(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                Icons.calculate_outlined,
+                color: colorScheme.onPrimaryContainer,
+                size: 24,
+              ),
+            ),
+          ),
+        ),
+      );
 }

@@ -119,6 +119,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_meeting_point_title => 'Meeting point';
 
   @override
+  String get event_meeting_point_view_button => 'View on map';
+
+  @override
+  String get event_meeting_point_hint =>
+      'Tap to view directions to the meeting point.';
+
+  @override
   String get event_copy_address_button => 'Copy address';
 
   @override
@@ -126,6 +133,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get event_participants_title => 'Participants';
+
+  @override
+  String get event_route_start_label => 'Start point';
+
+  @override
+  String get event_route_end_label => 'End point';
 
   @override
   String get event_time_title => 'Event time';

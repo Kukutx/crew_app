@@ -1,7 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class EventInfoCard extends StatelessWidget {
@@ -14,12 +13,10 @@ class EventInfoCard extends StatelessWidget {
 
   final Event event;
   final AppLocalizations loc;
-  final VoidCallback onTapLocation;
   const EventInfoCard({
     super.key,
     required this.event,
     required this.loc,
-    required this.onTapLocation,
   });
 
   @override
@@ -36,9 +33,6 @@ class EventInfoCard extends StatelessWidget {
     final displayRouteType = routeType ?? _defaultIsRoundTrip;
     final localeTag = Localizations.localeOf(context).toString();
     final feeText = _formatFee(localeTag);
-    final addressText =
-        event.address?.isNotEmpty == true ? event.address! : event.location;
-    final linkColor = colorScheme.primary;
     final titleStyle = theme.textTheme.titleMedium?.copyWith(
       color: colorScheme.onSurface,
       fontWeight: FontWeight.w700,
@@ -59,17 +53,6 @@ class EventInfoCard extends StatelessWidget {
       fontSize: 14,
       color: colorScheme.onSurfaceVariant,
     );
-    final linkTextStyle = valueTextStyle?.copyWith(
-      color: linkColor,
-      decoration: TextDecoration.underline,
-      decorationColor: linkColor,
-    );
-    final fallbackLinkStyle = TextStyle(
-      fontSize: 14,
-      color: linkColor,
-      decoration: TextDecoration.underline,
-      decorationColor: linkColor,
-    );
     final chipBackground = colorScheme.primaryContainer;
     final chipTextColor = colorScheme.onPrimaryContainer;
     final chipBorderColor = colorScheme.primary.withOpacity(0.4);
@@ -82,6 +65,13 @@ class EventInfoCard extends StatelessWidget {
       color: chipTextColor,
       fontWeight: FontWeight.w600,
     );
+
+    final startPoint = event.address?.isNotEmpty == true
+        ? event.address!
+        : event.location;
+    final endPoint = event.waypoints.isNotEmpty
+        ? event.waypoints.last
+        : event.location;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -128,32 +118,21 @@ class EventInfoCard extends StatelessWidget {
               titleStyle: detailTitleStyle ?? fallbackDetailTitleStyle,
               valueStyle: valueTextStyle ?? fallbackValueStyle,
             ),
-            InkWell(
-              onTap: onTapLocation,
-              child: _detailRow(
-                Icons.place,
-                loc.event_meeting_point_title,
-                addressText,
-                iconColor: colorScheme.primary,
-                titleStyle: detailTitleStyle ?? fallbackDetailTitleStyle,
-                valueStyle: linkTextStyle ?? fallbackLinkStyle,
-                trailing: IconButton(
-                  icon: const Icon(Icons.copy, size: 18),
-                  color: linkColor,
-                  tooltip: loc.event_copy_address_button,
-                  onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: addressText));
-                    if (!context.mounted) {
-                      return;
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(loc.event_copy_address_success),
-                      ),
-                    );
-                  },
-                ),
-              ),
+            _detailRow(
+              Icons.trip_origin,
+              loc.event_route_start_label,
+              startPoint,
+              iconColor: colorScheme.primary,
+              titleStyle: detailTitleStyle ?? fallbackDetailTitleStyle,
+              valueStyle: valueTextStyle ?? fallbackValueStyle,
+            ),
+            _detailRow(
+              Icons.flag,
+              loc.event_route_end_label,
+              endPoint,
+              iconColor: colorScheme.primary,
+              titleStyle: detailTitleStyle ?? fallbackDetailTitleStyle,
+              valueStyle: valueTextStyle ?? fallbackValueStyle,
             ),
             if (displayWaypoints.isNotEmpty)
               _waypointsRow(

@@ -166,6 +166,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       }
     });
 
+    final hideSearchBar = selectionState.isSelectionSheetOpen ||
+        selectionState.isSelectingDestination ||
+        selectionState.selectedLatLng != null;
+
+    if (hideSearchBar &&
+        (searchManager.searchFocusNode.hasFocus || searchState.showResults)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        final manager = ref.read(searchManagerProvider);
+        if (manager.searchFocusNode.hasFocus) {
+          manager.searchFocusNode.unfocus();
+        }
+        ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
+      });
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       key: _scaffoldKey,
@@ -176,24 +194,26 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         _isDrawerOpen = isOpened;
         _updateBottomNavigation(!isOpened && !carouselManager.isVisible);
       },
-      appBar: SearchEventAppBar(
-        controller: searchManager.searchController,
-        focusNode: searchManager.searchFocusNode,
-        onSearch: searchManager.onSearchSubmitted,
-        onChanged: searchManager.onQueryChanged,
-        onClear: searchManager.clearSearch,
-        onQuickActionsTap: _openQuickActionsDrawer,
-        onAvatarTap: _onAvatarTap,
-        onResultTap: (event) => searchManager.onSearchResultTap(event, context),
-        showResults: searchState.showResults,
-        isLoading: searchState.isLoading,
-        results: searchState.results,
-        errorText: searchState.errorText,
-        showClearSelectionAction: selectionState.selectedLatLng != null,
-        onClearSelection: selectionState.selectedLatLng != null
-            ? () => unawaited(locationSelectionManager.clearSelectedLocation())
-            : null,
-      ),
+      appBar: hideSearchBar
+          ? null
+          : SearchEventAppBar(
+              controller: searchManager.searchController,
+              focusNode: searchManager.searchFocusNode,
+              onSearch: searchManager.onSearchSubmitted,
+              onChanged: searchManager.onQueryChanged,
+              onClear: searchManager.clearSearch,
+              onQuickActionsTap: _openQuickActionsDrawer,
+              onAvatarTap: _onAvatarTap,
+              onResultTap: (event) => searchManager.onSearchResultTap(event, context),
+              showResults: searchState.showResults,
+              isLoading: searchState.isLoading,
+              results: searchState.results,
+              errorText: searchState.errorText,
+              showClearSelectionAction: selectionState.selectedLatLng != null,
+              onClearSelection: selectionState.selectedLatLng != null
+                  ? () => unawaited(locationSelectionManager.clearSelectedLocation())
+                  : null,
+            ),
       body: Stack(
         children: [
           Listener(

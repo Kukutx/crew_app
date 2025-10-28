@@ -74,21 +74,18 @@ class EventDetailBottomBar extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
             _PillActionButton(
               onPressed: onOpenPrivateChat,
               backgroundColor: chatBackgroundColor,
               foregroundColor: chatForegroundColor,
               child: const Icon(Icons.chat_bubble_outline),
             ),
-            const SizedBox(width: 12),
             _PillActionButton(
               onPressed: onOpenGroupChat,
               backgroundColor: chatBackgroundColor,
               foregroundColor: chatForegroundColor,
               child: const Icon(Icons.groups_2_outlined),
             ),
-            const SizedBox(width: 12),
             Expanded(
               child: SizedBox(
                 height: 48,

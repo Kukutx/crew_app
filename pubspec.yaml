@@ -72,6 +72,7 @@ dependencies:
   stream_transform: ^2.1.1
   pigeon: ^26.0.2
   quick_actions: ^1.1.0
+  chatview: ^2.5.0
 
 dev_dependencies:
   flutter_test:

@@ -34,7 +34,9 @@ class EventDetailBottomBar extends StatelessWidget {
     final favoriteColor = colorScheme.secondary;
     final favoriteBackgroundColor = colorScheme.secondaryContainer
         .withOpacity(isFavorite ? 0.45 : 0.25);
-    final iconColor = colorScheme.onSurfaceVariant;
+    final chatBackgroundColor =
+        colorScheme.surfaceVariant.withOpacity(0.35);
+    final chatForegroundColor = colorScheme.onSurfaceVariant;
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -53,30 +55,38 @@ class EventDetailBottomBar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _ActionIconButton(
-              onTap: onFavorite,
+            _PillActionButton(
+              onPressed: onFavorite,
               backgroundColor: favoriteBackgroundColor,
-              icon: Icon(
-                isFavorite ? Icons.star : Icons.star_border,
-                color: favoriteColor,
+              foregroundColor: favoriteColor,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(isFavorite ? Icons.star : Icons.star_border),
+                  const SizedBox(width: 6),
+                  Text(
+                    countLabel,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              badge: sanitizedCount > 0
-                  ? _ActionBadge(label: countLabel, color: favoriteColor)
-                  : null,
             ),
             const SizedBox(width: 12),
-            _ActionIconButton(
-              onTap: onOpenPrivateChat,
-              icon: Icon(Icons.chat_bubble_outline, color: iconColor),
-              backgroundColor: colorScheme.surface,
-              borderColor: colorScheme.outlineVariant,
+            _PillActionButton(
+              onPressed: onOpenPrivateChat,
+              backgroundColor: chatBackgroundColor,
+              foregroundColor: chatForegroundColor,
+              child: const Icon(Icons.chat_bubble_outline),
             ),
             const SizedBox(width: 12),
-            _ActionIconButton(
-              onTap: onOpenGroupChat,
-              icon: Icon(Icons.groups_2_outlined, color: iconColor),
-              backgroundColor: colorScheme.surface,
-              borderColor: colorScheme.outlineVariant,
+            _PillActionButton(
+              onPressed: onOpenGroupChat,
+              backgroundColor: chatBackgroundColor,
+              foregroundColor: chatForegroundColor,
+              child: const Icon(Icons.groups_2_outlined),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -102,80 +112,39 @@ class EventDetailBottomBar extends StatelessWidget {
   }
 }
 
-class _ActionIconButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final Widget icon;
-  final Color? backgroundColor;
-  final Color? borderColor;
-  final Widget? badge;
+class _PillActionButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final Widget child;
+  final Color backgroundColor;
+  final Color foregroundColor;
 
-  const _ActionIconButton({
-    required this.onTap,
-    required this.icon,
-    this.backgroundColor,
-    this.borderColor,
-    this.badge,
+  const _PillActionButton({
+    required this.onPressed,
+    required this.child,
+    required this.backgroundColor,
+    required this.foregroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final resolvedBackgroundColor = backgroundColor ??
-        colorScheme.surfaceVariant.withOpacity(0.4);
-    final resolvedBorderColor = borderColor ??
-        colorScheme.outlineVariant.withOpacity(0.6);
-
-    return Material(
-      color: resolvedBackgroundColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: resolvedBorderColor),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          height: 48,
-          width: 56,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              icon,
-              if (badge != null)
-                Positioned(
-                  top: 6,
-                  right: 8,
-                  child: badge!,
-                ),
-            ],
-          ),
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
         ),
       ),
-    );
-  }
-}
-
-class _ActionBadge extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _ActionBadge({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.85),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
+      child: IconTheme(
+        data: IconThemeData(color: foregroundColor, size: 22),
+        child: DefaultTextStyle(
+          style: TextStyle(
+            color: foregroundColor,
+            fontWeight: FontWeight.w600,
+          ),
+          child: child,
         ),
       ),
     );

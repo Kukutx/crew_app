@@ -370,7 +370,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         child: Material(
           color: theme.scaffoldBackgroundColor,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: ToggleTabBar(
               selectedIndex: _currentTabIndex,
               firstLabel: _tabLabels[0],

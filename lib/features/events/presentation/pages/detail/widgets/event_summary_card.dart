@@ -45,7 +45,7 @@ class EventSummaryCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(

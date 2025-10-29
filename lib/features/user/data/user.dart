@@ -1,6 +1,7 @@
 enum Gender {
   female,
   male,
+  custom,
   undisclosed,
 }
 
@@ -11,6 +12,8 @@ extension GenderEmoji on Gender {
         return '♀';
       case Gender.male:
         return '♂';
+      case Gender.custom:
+        return '⚧';
       case Gender.undisclosed:
         return '✦';
     }

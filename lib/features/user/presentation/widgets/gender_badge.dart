@@ -49,6 +49,8 @@ class GenderBadge extends StatelessWidget {
         return const [Color(0xFFFF7AD5), Color(0xFFFFB7E2)];
       case Gender.male:
         return const [Color(0xFF6AA9FF), Color(0xFF92E4FF)];
+      case Gender.custom:
+        return const [Color(0xFF9B5DE5), Color(0xFFF15BB5)];
       case Gender.undisclosed:
         return const [Color(0xFFB4B5FF), Color(0xFFE1E1FF)];
     }

@@ -295,6 +295,7 @@
   "preferences_gender_label": "Gender",
   "preferences_gender_female": "Female",
   "preferences_gender_male": "Male",
+  "preferences_gender_custom": "Custom",
   "preferences_gender_other": "Prefer not to say",
   "preferences_country_label": "Country / region",
   "preferences_country_hint": "Show a flag next to your avatar",

@@ -728,6 +728,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_gender_male => 'Male';
 
   @override
+  String get preferences_gender_custom => 'Custom';
+
+  @override
   String get preferences_gender_other => 'Prefer not to say';
 
   @override

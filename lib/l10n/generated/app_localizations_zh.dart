@@ -702,6 +702,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferences_gender_male => '男生';
 
   @override
+  String get preferences_gender_custom => '自定义';
+
+  @override
   String get preferences_gender_other => '不透露';
 
   @override

@@ -195,6 +195,8 @@ String _genderLabel(AppLocalizations loc, Gender gender) {
       return loc.preferences_gender_female;
     case Gender.male:
       return loc.preferences_gender_male;
+    case Gender.custom:
+      return loc.preferences_gender_custom;
     case Gender.undisclosed:
       return loc.preferences_gender_other;
   }

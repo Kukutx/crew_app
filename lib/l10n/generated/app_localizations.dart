@@ -1412,6 +1412,12 @@ abstract class AppLocalizations {
   /// **'Male'**
   String get preferences_gender_male;
 
+  /// No description provided for @preferences_gender_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get preferences_gender_custom;
+
   /// No description provided for @preferences_gender_other.
   ///
   /// In en, this message translates to:

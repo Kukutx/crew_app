@@ -1418,6 +1418,18 @@ abstract class AppLocalizations {
   /// **'Custom'**
   String get preferences_gender_custom;
 
+  /// No description provided for @preferences_gender_custom_field_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom gender'**
+  String get preferences_gender_custom_field_label;
+
+  /// No description provided for @preferences_gender_custom_field_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your gender'**
+  String get preferences_gender_custom_field_hint;
+
   /// No description provided for @preferences_gender_other.
   ///
   /// In en, this message translates to:

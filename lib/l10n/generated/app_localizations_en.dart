@@ -731,6 +731,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences_gender_custom => 'Custom';
 
   @override
+  String get preferences_gender_custom_field_label => 'Custom gender';
+
+  @override
+  String get preferences_gender_custom_field_hint => 'Enter your gender';
+
+  @override
   String get preferences_gender_other => 'Prefer not to say';
 
   @override

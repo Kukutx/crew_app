@@ -395,6 +395,8 @@
   "preferences_gender_female": "女生",
   "preferences_gender_male": "男生",
   "preferences_gender_custom": "自定义",
+  "preferences_gender_custom_field_label": "自定义性别",
+  "preferences_gender_custom_field_hint": "请输入你的性别",
   "preferences_gender_other": "不透露",
   "preferences_country_label": "国家 / 地区",
   "preferences_country_hint": "在头像旁展示国旗",

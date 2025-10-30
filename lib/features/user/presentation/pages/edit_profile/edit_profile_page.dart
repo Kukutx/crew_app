@@ -37,6 +37,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late final TextEditingController _birthdayController;
   late final TextEditingController _schoolController;
   late final TextEditingController _locationController;
+  late final TextEditingController _customGenderController;
   late List<String> _tags;
   String? _countryCode;
   late Gender _gender;
@@ -54,6 +55,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         TextEditingController(text: _formatBirthday(profile.birthday));
     _schoolController = TextEditingController(text: profile.school ?? '');
     _locationController = TextEditingController(text: profile.location ?? '');
+    _customGenderController =
+        TextEditingController(text: profile.customGender ?? '');
     _tags = [...profile.tags];
     _countryCode = profile.countryCode;
     _gender = profile.gender;
@@ -69,6 +72,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _birthdayController.dispose();
     _schoolController.dispose();
     _locationController.dispose();
+    _customGenderController.dispose();
     super.dispose();
   }
 
@@ -85,6 +89,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final bio = _bioController.text.trim();
     final school = _schoolController.text.trim();
     final location = _locationController.text.trim();
+    final customGenderText = _customGenderController.text.trim();
+    final customGender =
+        _gender == Gender.custom && customGenderText.isNotEmpty
+            ? customGenderText
+            : null;
 
     if (name.isEmpty) {
       _showSnack(loc.preferences_name_empty_error);
@@ -98,6 +107,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       tags: _tags,
       countryCode: _countryCode,
       gender: _gender,
+      customGender: customGender,
       avatar: _selectedAvatar,
       birthday: _birthday,
       school: school.isEmpty ? null : school,
@@ -259,6 +269,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             tags: _tags,
             countryCode: _countryCode ?? profile.countryCode,
             gender: _gender,
+            customGender: _gender == Gender.custom
+                ? (_customGenderController.text.trim().isEmpty
+                    ? null
+                    : _customGenderController.text.trim())
+                : null,
             birthday: _birthday,
             school: _schoolController.text.trim().isEmpty
                 ? null
@@ -281,6 +296,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             onGenderChanged: (gender) => setState(() {
               _gender = gender;
             }),
+            customGenderController: _customGenderController,
+            onCustomGenderChanged: (_) => setState(() {}),
             countryCode: _countryCode,
             onCountryChanged: (value) => setState(() {
               _countryCode = value;

@@ -11,6 +11,8 @@ class BasicInfoSection extends StatelessWidget {
     required this.nameController,
     required this.gender,
     required this.onGenderChanged,
+    required this.customGenderController,
+    required this.onCustomGenderChanged,
     required this.countryCode,
     required this.onCountryChanged,
     required this.birthdayController,
@@ -27,6 +29,8 @@ class BasicInfoSection extends StatelessWidget {
   final TextEditingController nameController;
   final Gender gender;
   final ValueChanged<Gender> onGenderChanged;
+  final TextEditingController customGenderController;
+  final ValueChanged<String> onCustomGenderChanged;
   final String? countryCode;
   final ValueChanged<String?> onCountryChanged;
   final TextEditingController birthdayController;
@@ -81,6 +85,21 @@ class BasicInfoSection extends StatelessWidget {
                 ),
             ],
           ),
+          if (gender == Gender.custom) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: customGenderController,
+              onChanged: (value) {
+                onCustomGenderChanged(value);
+                onFieldChanged();
+              },
+              maxLength: 24,
+              decoration: InputDecoration(
+                labelText: loc.preferences_gender_custom_field_label,
+                hintText: loc.preferences_gender_custom_field_hint,
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           DropdownButtonFormField<String?>(
             initialValue: countryCode,

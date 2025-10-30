@@ -16,6 +16,7 @@ class ProfilePreviewSection extends StatelessWidget {
     required this.tags,
     required this.countryCode,
     required this.gender,
+    this.customGender,
     required this.birthday,
     required this.school,
     required this.location,
@@ -30,6 +31,7 @@ class ProfilePreviewSection extends StatelessWidget {
   final List<String> tags;
   final String? countryCode;
   final Gender gender;
+  final String? customGender;
   final DateTime? birthday;
   final String? school;
   final String? location;
@@ -190,7 +192,21 @@ class ProfilePreviewSection extends StatelessWidget {
                             ),
                             if (gender.shouldDisplay) ...[
                               const SizedBox(width: 8),
-                              GenderBadge(gender: gender, size: 26),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GenderBadge(gender: gender, size: 26),
+                                  if (customGender?.isNotEmpty ?? false) ...[
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      customGender!,
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ],
                           ],
                         ),

@@ -37,6 +37,7 @@ class User {
   final List<String> tags;
   final String? countryCode;
   final Gender gender;
+  final String? customGender;
   final DateTime? birthday;
   final String? school;
   final String? location;
@@ -56,6 +57,7 @@ class User {
     this.gender = Gender.undisclosed,
     this.tags = const [],
     this.countryCode,
+    this.customGender,
     this.birthday,
     this.school,
     this.location,
@@ -73,6 +75,7 @@ class User {
     List<String>? tags,
     String? countryCode,
     Gender? gender,
+    Object? customGender = _sentinel,
     Object? birthday = _sentinel,
     Object? school = _sentinel,
     Object? location = _sentinel,
@@ -90,6 +93,9 @@ class User {
         tags: tags ?? this.tags,
         countryCode: countryCode ?? this.countryCode,
         gender: gender ?? this.gender,
+        customGender: customGender == _sentinel
+            ? this.customGender
+            : customGender as String?,
         birthday: birthday == _sentinel ? this.birthday : birthday as DateTime?,
         school: school == _sentinel ? this.school : school as String?,
         location:

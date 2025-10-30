@@ -72,7 +72,21 @@ class ProfileHeaderCard extends StatelessWidget {
                             ),
                             if (userProfile.gender.shouldDisplay) ...[
                               const SizedBox(width: 8),
-                              GenderBadge(gender: userProfile.gender),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GenderBadge(gender: userProfile.gender),
+                                  if (userProfile.customGender?.isNotEmpty ??
+                                      false) ...[
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      userProfile.customGender!,
+                                      style: t.bodySmall!
+                                          .copyWith(color: Colors.white),
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ],
                           ],
                         ),

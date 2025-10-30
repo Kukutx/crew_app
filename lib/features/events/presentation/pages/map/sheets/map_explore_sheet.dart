@@ -27,7 +27,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   int _tab = 0;
   String? _selectedFilter;
 
-  static const _filters = ['最新', '热门', '关注'];
+  static const _filters = ['附近','最新', '热门', '关注'];
 
   @override
   void initState() {

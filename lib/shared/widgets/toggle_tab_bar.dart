@@ -11,7 +11,6 @@ class ToggleTabBar extends StatelessWidget {
     required this.onChanged,
     this.firstIcon = Icons.favorite,
     this.secondIcon = Icons.autorenew,
-    this.accessoryBuilder,
     this.leadingBuilder,
     this.trailingBuilder,
   });
@@ -23,15 +22,12 @@ class ToggleTabBar extends StatelessWidget {
   final IconData firstIcon;
   final IconData secondIcon;
   final Widget? Function(BuildContext context, int selectedIndex)?
-      accessoryBuilder;
-  final Widget? Function(BuildContext context, int selectedIndex)?
       leadingBuilder;
   final Widget? Function(BuildContext context, int selectedIndex)?
       trailingBuilder;
 
   @override
   Widget build(BuildContext context) {
-    final accessory = accessoryBuilder?.call(context, selectedIndex);
     final leading = leadingBuilder?.call(context, selectedIndex);
     final trailing = trailingBuilder?.call(context, selectedIndex);
 
@@ -89,10 +85,6 @@ class ToggleTabBar extends StatelessWidget {
             ],
           ),
         ),
-        if (accessory != null) ...[
-          const SizedBox(height: 8),
-          accessory,
-        ],
       ],
     );
   }

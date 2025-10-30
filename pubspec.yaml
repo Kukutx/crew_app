@@ -85,11 +85,22 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 flutter_launcher_icons:
   android: true
   ios: true
   remove_alpha_ios: true
+  adaptive_icon_background: "#2D2D2D" # 或指定图片: assets/icon_bg.png
+  adaptive_icon_foreground: "assets/images/icons/logo.png"
   image_path: "assets/images/icons/logo.png"
+flutter_native_splash:
+  color: "#2D2D2D"            # 背景色，用你logo的背景一致
+  image: "assets/images/icons/logo.png"      # 你的logo路径
+  android_gravity: center 
+  android_12:
+    image: "assets/images/icons/logo.png"
+    icon_background_color: "#2D2D2D"
+  web: false                    # 一般不需要为 Web 配置
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

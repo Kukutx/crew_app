@@ -95,10 +95,10 @@ flutter_launcher_icons:
   image_path: "assets/images/icons/logo.png"
 flutter_native_splash:
   color: "#2D2D2D"            # 背景色，用你logo的背景一致
-  image: "assets/images/icons/logo.png"      # 你的logo路径
+  image: "assets/images/icons/splash.png"      # 你的logo路径
   android_gravity: center 
   android_12:
-    image: "assets/images/icons/logo.png"
+    image: "assets/images/icons/splash.png"
     icon_background_color: "#2D2D2D"
   web: false                    # 一般不需要为 Web 配置
 

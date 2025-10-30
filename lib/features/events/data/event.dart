@@ -386,7 +386,7 @@ class Event {
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
         if (distanceKm != null) 'distanceKm': distanceKm,
         if (organizer != null) 'organizer': organizer!.toJson(),
-        if (status != null) 'status': status.name,
+        if (status != null) 'status': status,
       };
 
   /// Returns the first non-empty image URL among [imageUrls] and

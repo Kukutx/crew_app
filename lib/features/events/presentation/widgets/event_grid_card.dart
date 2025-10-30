@@ -33,6 +33,11 @@ class EventGridCard extends StatelessWidget {
     final mq = MediaQuery.of(context);
     final memCacheW = ((mq.size.width / 2) * mq.devicePixelRatio).round();
     final imageUrl = event.firstAvailableImageUrl;
+    final loc = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final tagLabel = event.tags.isNotEmpty
+        ? event.tags.first
+        : loc?.tag_city_explore ?? 'Event';
 
     return Material(
       elevation: 4,
@@ -90,6 +95,29 @@ class EventGridCard extends StatelessWidget {
                         event.isFavorite ? Icons.star : Icons.star_border,
                         size: 20,
                         color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                left: 8,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    child: Text(
+                      tagLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

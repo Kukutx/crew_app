@@ -98,13 +98,18 @@ class MapEventFloatingCard extends StatelessWidget {
         children: [
           _smallChip(context, loc.registration_open),
           const SizedBox(width: 6),
-          const Icon(Icons.groups, size: 16, color: Colors.grey),
+          Icon(
+            Icons.groups,
+            size: 16,
+            color: colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
               participantSummary,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: Colors.black54),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           if (actionButton != null) ...[
@@ -154,17 +159,22 @@ class MapEventFloatingCard extends StatelessWidget {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                               ),
-                              errorWidget: (_, _, _) => const ColoredBox(
-                                color: Colors.black12,
-                                child: Center(child: Icon(Icons.error)),
+                              errorWidget: (_, _, _) => ColoredBox(
+                                color: colorScheme.surfaceVariant,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.error,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
                               ),
                             )
-                          : const ColoredBox(
-                              color: Colors.black12,
+                          : ColoredBox(
+                              color: colorScheme.surfaceVariant,
                               child: Center(
                                 child: Icon(
                                   Icons.image_not_supported,
-                                  color: Colors.black45,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ),

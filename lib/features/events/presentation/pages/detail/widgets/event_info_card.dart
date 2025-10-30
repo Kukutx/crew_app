@@ -72,12 +72,6 @@ class EventInfoCard extends StatelessWidget {
     final endPoint = event.waypoints.isNotEmpty
         ? event.waypoints.last
         : event.location;
-    final statusChip = _buildStatusChip(
-      loc: loc,
-      theme: theme,
-      colorScheme: colorScheme,
-    );
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(
@@ -95,10 +89,6 @@ class EventInfoCard extends StatelessWidget {
               style: titleStyle ??
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            if (statusChip != null) ...[
-              const SizedBox(height: 12),
-              statusChip,
-            ],
             Divider(
               height: 24,
               color: colorScheme.outline.withOpacity(0.4),
@@ -284,95 +274,6 @@ class EventInfoCard extends StatelessWidget {
         ),
       );
 
-  Widget? _buildStatusChip({
-    required AppLocalizations loc,
-    required ThemeData theme,
-    required ColorScheme colorScheme,
-  }) {
-    final statusType = event.lifecycleStatus;
-    final statusLabel = statusType != null
-        ? _localizedStatusLabel(loc, statusType)
-        : event.status?.trim();
-    if (statusLabel == null || statusLabel.isEmpty) {
-      return null;
-    }
-
-    final visuals = _statusVisualStyle(colorScheme, statusType);
-    final textStyle = theme.textTheme.labelMedium?.copyWith(
-          color: visuals.foreground,
-          fontWeight: FontWeight.w600,
-        ) ??
-        TextStyle(
-          color: visuals.foreground,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: visuals.background,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: visuals.border, width: 1),
-      ),
-      child: Text(statusLabel, style: textStyle),
-    );
-  }
-
-  String _localizedStatusLabel(
-    AppLocalizations loc,
-    EventLifecycleStatus status,
-  ) {
-    switch (status) {
-      case EventLifecycleStatus.reviewing:
-        return loc.event_status_reviewing;
-      case EventLifecycleStatus.recruiting:
-        return loc.event_status_recruiting;
-      case EventLifecycleStatus.ongoing:
-        return loc.event_status_ongoing;
-      case EventLifecycleStatus.ended:
-        return loc.event_status_ended;
-    }
-  }
-
-  _EventStatusVisualStyle _statusVisualStyle(
-    ColorScheme colorScheme,
-    EventLifecycleStatus? status,
-  ) {
-    switch (status) {
-      case EventLifecycleStatus.reviewing:
-        return _EventStatusVisualStyle(
-          background: colorScheme.secondaryContainer,
-          foreground: colorScheme.onSecondaryContainer,
-          border: colorScheme.secondary.withOpacity(0.6),
-        );
-      case EventLifecycleStatus.recruiting:
-        return _EventStatusVisualStyle(
-          background: colorScheme.primaryContainer,
-          foreground: colorScheme.onPrimaryContainer,
-          border: colorScheme.primary.withOpacity(0.6),
-        );
-      case EventLifecycleStatus.ongoing:
-        return _EventStatusVisualStyle(
-          background: colorScheme.tertiaryContainer,
-          foreground: colorScheme.onTertiaryContainer,
-          border: colorScheme.tertiary.withOpacity(0.6),
-        );
-      case EventLifecycleStatus.ended:
-        return _EventStatusVisualStyle(
-          background: colorScheme.errorContainer,
-          foreground: colorScheme.onErrorContainer,
-          border: colorScheme.error.withOpacity(0.6),
-        );
-      case null:
-        return _EventStatusVisualStyle(
-          background: colorScheme.surfaceVariant,
-          foreground: colorScheme.onSurfaceVariant,
-          border: colorScheme.outline.withOpacity(0.4),
-        );
-    }
-  }
-
   String _formatStartTime() {
     final start = event.startTime;
     if (start == null) {
@@ -412,16 +313,4 @@ class EventInfoCard extends StatelessWidget {
     }
     return formatter.format(price);
   }
-}
-
-class _EventStatusVisualStyle {
-  const _EventStatusVisualStyle({
-    required this.background,
-    required this.foreground,
-    required this.border,
-  });
-
-  final Color background;
-  final Color foreground;
-  final Color border;
 }

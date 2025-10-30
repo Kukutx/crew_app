@@ -223,6 +223,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_route_type_one_way => '单程路线';
 
   @override
+  String get event_status_reviewing => '审核中';
+
+  @override
+  String get event_status_recruiting => '招募中';
+
+  @override
+  String get event_status_ongoing => '进行中';
+
+  @override
+  String get event_status_ended => '已结束';
+
+  @override
   String get event_distance_title => '总里程';
 
   @override

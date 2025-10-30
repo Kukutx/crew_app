@@ -180,6 +180,10 @@
   "event_route_type_title": "路线类型",
   "event_route_type_round": "往返路线",
   "event_route_type_one_way": "单程路线",
+  "event_status_reviewing": "审核中",
+  "event_status_recruiting": "招募中",
+  "event_status_ongoing": "进行中",
+  "event_status_ended": "已结束",
   "event_distance_title": "总里程",
   "event_distance_value": "{kilometers} 公里",
   "@event_distance_value": {

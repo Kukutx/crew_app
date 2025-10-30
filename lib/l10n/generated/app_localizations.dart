@@ -518,6 +518,30 @@ abstract class AppLocalizations {
   /// **'One-way'**
   String get event_route_type_one_way;
 
+  /// No description provided for @event_status_reviewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Under review'**
+  String get event_status_reviewing;
+
+  /// No description provided for @event_status_recruiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Recruiting'**
+  String get event_status_recruiting;
+
+  /// No description provided for @event_status_ongoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get event_status_ongoing;
+
+  /// No description provided for @event_status_ended.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get event_status_ended;
+
   /// No description provided for @event_distance_title.
   ///
   /// In en, this message translates to:

@@ -230,6 +230,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_route_type_one_way => 'One-way';
 
   @override
+  String get event_status_reviewing => 'Under review';
+
+  @override
+  String get event_status_recruiting => 'Recruiting';
+
+  @override
+  String get event_status_ongoing => 'Ongoing';
+
+  @override
+  String get event_status_ended => 'Ended';
+
+  @override
   String get event_distance_title => 'Distance';
 
   @override

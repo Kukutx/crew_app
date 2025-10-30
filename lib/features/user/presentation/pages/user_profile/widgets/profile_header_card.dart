@@ -26,11 +26,14 @@ class ProfileHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    const borderRadius = BorderRadius.all(Radius.circular(24));
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: borderRadius,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Material(
+          shape: RoundedRectangleBorder(borderRadius: borderRadius),
           elevation: 6,
           color: Colors.white.withValues(alpha: 0.12),
           surfaceTintColor: Colors.white,

@@ -80,6 +80,10 @@
   "event_route_type_title": "Route type",
   "event_route_type_round": "Round trip",
   "event_route_type_one_way": "One-way",
+  "event_status_reviewing": "Under review",
+  "event_status_recruiting": "Recruiting",
+  "event_status_ongoing": "Ongoing",
+  "event_status_ended": "Ended",
   "event_distance_title": "Distance",
   "event_distance_value": "{kilometers} km",
   "@event_distance_value": {

@@ -83,8 +83,7 @@ class Event {
   final bool? isRoundTrip;
   final double? distanceKm;
   final EventOrganizer? organizer;
-  final String? status;
-  final String? statusCode;
+  final EventStatus? status;
 
   const Event({
     required this.id,
@@ -114,7 +113,6 @@ class Event {
     this.distanceKm,
     this.organizer,
     this.status,
-    this.statusCode,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -303,60 +301,12 @@ class Event {
           json['length'] ??
           json['routeLength'],
     );
-
-    String? statusLabel;
-    String? statusCode;
-
-    void parseStatus(dynamic value) {
-      if (value == null) {
-        return;
-      }
-      if (value is Map<String, dynamic>) {
-        statusLabel ??= parseString(
-          value['label'] ??
-              value['display'] ??
-              value['text'] ??
-              value['name'],
-        );
-        statusCode ??= parseString(
-          value['code'] ??
-              value['value'] ??
-              value['status'] ??
-              value['state'] ??
-              value['key'],
-        );
-        if (statusLabel == null && statusCode != null) {
-          statusLabel = statusCode;
-        }
-        if (statusCode == null && statusLabel != null) {
-          statusCode = statusLabel;
-        }
-        return;
-      }
-      final parsed = parseString(value is String ? value : value.toString());
-      if (parsed == null || parsed.isEmpty) {
-        return;
-      }
-      statusLabel ??= parsed;
-      statusCode ??= parsed;
-    }
-
-    parseStatus(json['status']);
-    if (statusLabel == null || statusCode == null) {
-      parseStatus(statsJson?['status']);
-    }
-    if (statusLabel == null || statusCode == null) {
-      parseStatus(json['state']);
-    }
-    if (statusLabel == null || statusCode == null) {
-      parseStatus(json['phase']);
-    }
-    if (statusLabel == null) {
-      parseStatus(json['statusLabel']);
-    }
-    if (statusLabel == null) {
-      parseStatus(json['statusText']);
-    }
+    final parsedStatus = _parseEventStatus(
+      json['status'] ??
+          statsJson?['status'] ??
+          statsJson?['state'] ??
+          statsJson?['phase'],
+    );
 
     return Event(
       id: parseString(json['id'] ?? json['eventId']) ?? '',
@@ -405,8 +355,7 @@ class Event {
                   avatarUrl: parseString(json['organizerAvatar']),
                 )
               : null,
-      status: statusLabel,
-      statusCode: statusCode,
+      status: parsedStatus,
     );
   }
 
@@ -437,8 +386,7 @@ class Event {
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
         if (distanceKm != null) 'distanceKm': distanceKm,
         if (organizer != null) 'organizer': organizer!.toJson(),
-        if (status != null) 'status': status,
-        if (statusCode != null) 'statusCode': statusCode,
+        if (status != null) 'status': status.name,
       };
 
   /// Returns the first non-empty image URL among [imageUrls] and
@@ -471,81 +419,61 @@ class Event {
   }
 }
 
-enum EventLifecycleStatus {
-  reviewing,
-  recruiting,
-  ongoing,
-  ended,
-}
-
-EventLifecycleStatus? eventLifecycleStatusFromRaw(String? raw) {
-  if (raw == null) {
+EventStatus? _parseEventStatus(dynamic value) {
+  if (value == null) {
     return null;
   }
-  final normalized = raw.trim().toLowerCase();
+  if (value is EventStatus) {
+    return value;
+  }
+  dynamic raw = value;
+  if (raw is Map<String, dynamic>) {
+    raw = raw['name'] ?? raw['status'] ?? raw['value'];
+  }
+  if (raw is Enum) {
+    raw = raw.name;
+  }
+  final text = raw?.toString();
+  if (text == null) {
+    return null;
+  }
+  final normalized = text.trim();
   if (normalized.isEmpty) {
     return null;
   }
-
-  bool matchAny(Iterable<String> keywords) =>
-      keywords.any((keyword) => normalized.contains(keyword));
-
-  if (matchAny(const [
-    '审核',
-    'review',
-    'pending',
-    'await',
-    'approv',
-    'under_review',
-  ])) {
-    return EventLifecycleStatus.reviewing;
+  final lower = normalized.toLowerCase();
+  final key = lower.contains('.') ? lower.split('.').last : lower;
+  switch (key) {
+    case 'reviewing':
+    case 'under_review':
+    case 'pending_review':
+    case 'review':
+      return EventStatus.reviewing;
+    case 'recruiting':
+    case 'recruitment':
+    case 'open':
+    case 'signup':
+    case 'sign_up':
+      return EventStatus.recruiting;
+    case 'ongoing':
+    case 'in_progress':
+    case 'progress':
+    case 'running':
+    case 'active':
+      return EventStatus.ongoing;
+    case 'ended':
+    case 'finished':
+    case 'complete':
+    case 'completed':
+    case 'closed':
+    case 'done':
+      return EventStatus.ended;
+    default:
+      return null;
   }
-
-  if (matchAny(const [
-    '招募',
-    '招收',
-    'recruit',
-    'enroll',
-    'open',
-    'registering',
-    'registration_open',
-  ])) {
-    return EventLifecycleStatus.recruiting;
-  }
-
-  if (matchAny(const [
-    '进行',
-    '进行中',
-    'ongoing',
-    'in_progress',
-    'active',
-    'running',
-  ])) {
-    return EventLifecycleStatus.ongoing;
-  }
-
-  if (matchAny(const [
-    '结束',
-    '已结束',
-    '结束了',
-    'end',
-    'ended',
-    'finish',
-    'completed',
-    'complete',
-    'done',
-    'closed',
-  ])) {
-    return EventLifecycleStatus.ended;
-  }
-
-  return null;
 }
 
-extension EventStatusX on Event {
-  EventLifecycleStatus? get lifecycleStatus =>
-      eventLifecycleStatusFromRaw(statusCode ?? status);
-}
+enum EventStatus { reviewing, recruiting, ongoing, ended }
 
 Map<String, dynamic>? _asMap(dynamic value) {
   if (value is Map<String, dynamic>) {

@@ -25,14 +25,14 @@ class MapExploreSheet extends ConsumerStatefulWidget {
 
 class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   int _tab = 0;
-  String? _selectedCountry;
+  String? _selectedFilter;
 
-  static const _countries = ['附近', '中国', '日本', '美国', '英国', '法国', '德国'];
+  static const _filters = ['最新', '热门', '关注'];
 
   @override
   void initState() {
     super.initState();
-    _selectedCountry = _countries.first;
+    _selectedFilter = _filters.first;
   }
 
   static const List<PlazaPost> _plazaPosts = [
@@ -203,14 +203,14 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                   return PopupMenuButton<String>(
                       onSelected: (value) {
                         setState(() {
-                          _selectedCountry = value;
+                          _selectedFilter = value;
                         });
                       },
                       itemBuilder: (context) => [
-                        for (final country in _countries)
+                        for (final filter in _filters)
                           PopupMenuItem<String>(
-                            value: country,
-                            child: Text(country),
+                            value: filter,
+                            child: Text(filter),
                           ),
                       ],
                       child: Container(
@@ -225,7 +225,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(_selectedCountry ?? '附近'),
+                            Text(_selectedFilter ?? _filters.first),
                             const SizedBox(width: 4),
                             const Icon(Icons.keyboard_arrow_down, size: 18),
                           ],

@@ -83,7 +83,7 @@ class Event {
   final bool? isRoundTrip;
   final double? distanceKm;
   final EventOrganizer? organizer;
-  final String? status;
+  final EventStatus? status;
 
   const Event({
     required this.id,
@@ -301,7 +301,7 @@ class Event {
           json['length'] ??
           json['routeLength'],
     );
-    final parsedStatus = parseString(
+    final parsedStatus = _parseEventStatus(
       json['status'] ??
           statsJson?['status'] ??
           statsJson?['state'] ??
@@ -386,7 +386,7 @@ class Event {
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
         if (distanceKm != null) 'distanceKm': distanceKm,
         if (organizer != null) 'organizer': organizer!.toJson(),
-        if (status != null) 'status': status,
+        if (status != null) 'status': status.name,
       };
 
   /// Returns the first non-empty image URL among [imageUrls] and
@@ -418,6 +418,62 @@ class Event {
     return (current ?? max).toString();
   }
 }
+
+EventStatus? _parseEventStatus(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is EventStatus) {
+    return value;
+  }
+  dynamic raw = value;
+  if (raw is Map<String, dynamic>) {
+    raw = raw['name'] ?? raw['status'] ?? raw['value'];
+  }
+  if (raw is Enum) {
+    raw = raw.name;
+  }
+  final text = raw?.toString();
+  if (text == null) {
+    return null;
+  }
+  final normalized = text.trim();
+  if (normalized.isEmpty) {
+    return null;
+  }
+  final lower = normalized.toLowerCase();
+  final key = lower.contains('.') ? lower.split('.').last : lower;
+  switch (key) {
+    case 'reviewing':
+    case 'under_review':
+    case 'pending_review':
+    case 'review':
+      return EventStatus.reviewing;
+    case 'recruiting':
+    case 'recruitment':
+    case 'open':
+    case 'signup':
+    case 'sign_up':
+      return EventStatus.recruiting;
+    case 'ongoing':
+    case 'in_progress':
+    case 'progress':
+    case 'running':
+    case 'active':
+      return EventStatus.ongoing;
+    case 'ended':
+    case 'finished':
+    case 'complete':
+    case 'completed':
+    case 'closed':
+    case 'done':
+      return EventStatus.ended;
+    default:
+      return null;
+  }
+}
+
+enum EventStatus { reviewing, recruiting, ongoing, ended }
 
 Map<String, dynamic>? _asMap(dynamic value) {
   if (value is Map<String, dynamic>) {

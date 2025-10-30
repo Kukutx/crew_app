@@ -394,7 +394,6 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         onShare: () => _showShareSheet(context),
         onMore: () => _showMoreActions(loc),
         event: event,
-        loc: loc,
       ),
       bottomNavigationBar: EventDetailBottomBar(
         loc: loc,

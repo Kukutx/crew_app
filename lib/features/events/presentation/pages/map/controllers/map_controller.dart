@@ -75,7 +75,13 @@ class MapController {
 
   /// 移动到我的位置
   Future<void> moveToMyLocation() async {
-    final loc = ref.read(userLocationProvider).value;
+    var loc = ref.read(userLocationProvider).value;
+
+    // 如果当前没有已缓存的位置，主动刷新一次
+    if (loc == null) {
+      loc = await ref.read(userLocationProvider.notifier).refreshNow();
+    }
+
     if (loc != null) {
       await moveCamera(loc, zoom: 14);
     }

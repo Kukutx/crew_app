@@ -55,29 +55,16 @@ class ToggleTabBar extends StatelessWidget {
       children: [
         SizedBox(
           width: double.infinity,
-          child: Stack(
-            alignment: Alignment.center,
+          child: Row(
             children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: leading ?? const SizedBox.shrink(),
-                  ),
-                ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: leading ?? const SizedBox.shrink(),
               ),
-
-              Flexible(flex: 0, child: tabs),
-
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: trailing ?? const SizedBox.shrink(),
-                  ),
-                ),
+              Expanded(child: Center(child: tabs)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: trailing ?? const SizedBox.shrink(),
               ),
             ],
           ),

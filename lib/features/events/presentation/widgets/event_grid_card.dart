@@ -95,6 +95,32 @@ class EventGridCard extends StatelessWidget {
                   ),
                 ),
               ),
+
+              // 待看
+                     Positioned(
+                top: 8,
+                left: 8,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color:  Theme.of(context).colorScheme.primary.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    child: Text(
+                      "招募中",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color:  Theme.of(context).colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               Positioned(
                 left: 0,
                 right: 0,

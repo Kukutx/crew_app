@@ -32,25 +32,7 @@ class UserLocationCtrl extends AsyncNotifier<LatLng?> {
       return null;
     }
 
-    try {
-      final pos = await Geolocator.getCurrentPosition(
-        timeLimit: const Duration(seconds: 10),
-      );
-      return LatLng(pos.latitude, pos.longitude);
-    } on TimeoutException catch (_) {
-      final last = await Geolocator.getLastKnownPosition();
-      if (last != null) {
-        return LatLng(last.latitude, last.longitude);
-      }
-      return null;
-    } on LocationServiceDisabledException {
-      return null;
-    } catch (_) {
-      final last = await Geolocator.getLastKnownPosition();
-      if (last != null) {
-        return LatLng(last.latitude, last.longitude);
-      }
-      return null;
-    }
+   final pos = await Geolocator.getCurrentPosition();
+    return LatLng(pos.latitude, pos.longitude);
   }
 }

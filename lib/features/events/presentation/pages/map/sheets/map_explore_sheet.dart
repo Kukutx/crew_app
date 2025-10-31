@@ -27,7 +27,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   int _tab = 0;
   String? _selectedFilter;
 
-  static const _filters = ['附近','最新', '热门', '关注'];
+  static const _filters = ['附近', '最新', '热门', '关注'];
 
   @override
   void initState() {
@@ -174,7 +174,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 4, 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 children: [
                   Text(loc.events_title, style: theme.textTheme.titleLarge),
@@ -201,36 +201,36 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                   final buttonColor = theme.colorScheme.surfaceContainerHighest;
 
                   return PopupMenuButton<String>(
-                      onSelected: (value) {
-                        setState(() {
-                          _selectedFilter = value;
-                        });
-                      },
-                      itemBuilder: (context) => [
-                        for (final filter in _filters)
-                          PopupMenuItem<String>(
-                            value: filter,
-                            child: Text(filter),
-                          ),
-                      ],
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                    onSelected: (value) {
+                      setState(() {
+                        _selectedFilter = value;
+                      });
+                    },
+                    itemBuilder: (context) => [
+                      for (final filter in _filters)
+                        PopupMenuItem<String>(
+                          value: filter,
+                          child: Text(filter),
                         ),
-                        decoration: BoxDecoration(
-                          color: buttonColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(_selectedFilter ?? _filters.first),
-                            const SizedBox(width: 4),
-                            const Icon(Icons.keyboard_arrow_down, size: 18),
-                          ],
-                        ),
+                    ],
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
+                      decoration: BoxDecoration(
+                        color: buttonColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(_selectedFilter ?? _filters.first),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.keyboard_arrow_down, size: 18),
+                        ],
+                      ),
+                    ),
                   );
                 },
                 trailingBuilder: (context, selectedIndex) {
@@ -246,9 +246,13 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                           );
                         }
                       : () => showCreateMomentSheet(context);
-                  return IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: onPressed,
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: onPressed,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(Icons.add),
+                    ),
                   );
                 },
               ),

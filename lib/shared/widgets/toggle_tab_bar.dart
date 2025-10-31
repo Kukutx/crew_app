@@ -22,14 +22,33 @@ class ToggleTabBar extends StatelessWidget {
   final IconData firstIcon;
   final IconData secondIcon;
   final Widget? Function(BuildContext context, int selectedIndex)?
-      leadingBuilder;
+  leadingBuilder;
   final Widget? Function(BuildContext context, int selectedIndex)?
-      trailingBuilder;
+  trailingBuilder;
 
   @override
   Widget build(BuildContext context) {
     final leading = leadingBuilder?.call(context, selectedIndex);
     final trailing = trailingBuilder?.call(context, selectedIndex);
+
+    final tabs = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ToggleTabChip(
+          label: firstLabel,
+          icon: firstIcon,
+          selected: selectedIndex == 0,
+          onTap: () => onChanged(0),
+        ),
+        const SizedBox(width: 10),
+        ToggleTabChip(
+          label: secondLabel,
+          icon: secondIcon,
+          selected: selectedIndex == 1,
+          onTap: () => onChanged(1),
+        ),
+      ],
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -39,49 +58,27 @@ class ToggleTabBar extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              if (leading != null)
-                Align(
+              Expanded(
+                child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(width: 12),
-                      leading,
-                      const SizedBox(width: 12),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: leading ?? const SizedBox.shrink(),
                   ),
                 ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ToggleTabChip(
-                    label: firstLabel,
-                    icon: firstIcon,
-                    selected: selectedIndex == 0,
-                    onTap: () => onChanged(0),
-                  ),
-                  const SizedBox(width: 12),
-                  ToggleTabChip(
-                    label: secondLabel,
-                    icon: secondIcon,
-                    selected: selectedIndex == 1,
-                    onTap: () => onChanged(1),
-                  ),
-                ],
               ),
-              if (trailing != null)
-                Align(
+
+              Flexible(flex: 0, child: tabs),
+
+              Expanded(
+                child: Align(
                   alignment: Alignment.centerRight,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(width: 12),
-                      trailing,
-                      const SizedBox(width: 12),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: trailing ?? const SizedBox.shrink(),
                   ),
                 ),
+              ),
             ],
           ),
         ),
@@ -107,21 +104,31 @@ class ToggleTabChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final foregroundColor = selected ? colorScheme.onPrimary : colorScheme.onSurface;
+    final foregroundColor = selected
+        ? colorScheme.onPrimary
+        : colorScheme.onSurface;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(12),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(24),
+          color: selected
+              ? colorScheme.primary
+              : colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant),
+            Icon(
+              icon,
+              size: 16,
+              color: selected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 6),
             Text(
               label,

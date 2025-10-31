@@ -23,7 +23,8 @@ class LoginPage extends ConsumerStatefulWidget {
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends ConsumerState<LoginPage>
+    with SingleTickerProviderStateMixin {
   bool _agreed = false;
   bool _loading = false;
 
@@ -78,7 +79,9 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
   }
 
   void _openPrivacy() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PrivacyDocumentsPage()));
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const PrivacyDocumentsPage()));
   }
 
   @override
@@ -108,12 +111,19 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,
-                      child: Icon(Icons.nightlight_round, color: cs.primary, size: 40),
+                      child: Image.asset(
+                        'assets/images/icons/logo_login.png',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.contain, // 保持比例不裁剪
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       loc.login_title,
-                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Padding(
@@ -121,7 +131,9 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                       child: Text(
                         loc.login_subtitle,
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ],
@@ -138,7 +150,8 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                 child: GoogleWobbleButton(
                   loading: _loading,
                   canProceed: _agreed, // 是否允许继续；未勾选时按钮自己抖动并提示
-                  invalidMessage: "Please agree to the terms before continuing.",
+                  invalidMessage:
+                      "Please agree to the terms before continuing.",
                   label: 'Continue with Google',
                   svgAssetPath: 'assets/images/icons/google_g.svg',
                   onProceed: _signInWithGoogle,
@@ -159,8 +172,10 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                       children: [
                         Checkbox(
                           value: _agreed,
-                          onChanged: (v) => setState(() => _agreed = v ?? false),
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          onChanged: (v) =>
+                              setState(() => _agreed = v ?? false),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                           visualDensity: VisualDensity.compact,
                         ),
                         const SizedBox(width: 6),
@@ -170,7 +185,10 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                             runSpacing: 2,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              Text(loc.login_agreement_prefix, style: theme.textTheme.bodySmall),
+                              Text(
+                                loc.login_agreement_prefix,
+                                style: theme.textTheme.bodySmall,
+                              ),
                               GestureDetector(
                                 onTap: _openPrivacy,
                                 child: Text(
@@ -212,7 +230,9 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
                     Text(
                       loc.login_footer,
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -258,9 +278,7 @@ class GoogleWobbleButton extends StatelessWidget {
       opacity: enabledVisual ? 1 : 0.65,
       child: Material(
         color: theme.colorScheme.surface,
-        shape: const StadiumBorder(
-          side: BorderSide(color: Color(0xFFDADCE0)),
-        ),
+        shape: const StadiumBorder(side: BorderSide(color: Color(0xFFDADCE0))),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: (!canProceed || loading) ? null : onProceed,

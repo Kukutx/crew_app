@@ -50,15 +50,15 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget? _buildStatusBadge(BuildContext context) {
     final status = event.status;
-    if (status == null) {
-      return null;
-    }
+    // if (status == null) {
+    //   return null;
+    // }
 
     final loc = AppLocalizations.of(context)!;
-    final label = _localizedStatusLabel(loc, status);
+    final label = _localizedStatusLabel(loc, status ?? EventStatus.reviewing);
 
     final colorScheme = Theme.of(context).colorScheme;
-    final visuals = _statusVisualStyle(colorScheme, status);
+    final visuals = _statusVisualStyle(colorScheme, status ?? EventStatus.reviewing);
     final textStyle = Theme.of(context).textTheme.labelMedium?.copyWith(
           color: visuals.foreground,
           fontWeight: FontWeight.w600,
@@ -81,6 +81,7 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   String _localizedStatusLabel(AppLocalizations loc, EventStatus status) {
+    
     switch (status) {
       case EventStatus.reviewing:
         return loc.event_status_reviewing;

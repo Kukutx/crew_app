@@ -166,27 +166,11 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       );
     });
 
-    final theme = Theme.of(context);
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Row(
-                children: [
-                  Text(loc.events_title, style: theme.textTheme.titleLarge),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: ToggleTabBar(

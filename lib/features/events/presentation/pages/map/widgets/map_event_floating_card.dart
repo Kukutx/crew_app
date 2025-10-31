@@ -40,7 +40,8 @@ class MapEventFloatingCard extends StatelessWidget {
     final event = this.event;
     final imageUrl = this.imageUrl ?? event?.firstAvailableImageUrl;
     final startTime = event?.startTime;
-    final resolvedTimeLabel = timeLabel ??
+    final resolvedTimeLabel =
+        timeLabel ??
         (startTime != null
             ? DateFormat('MM.dd HH:mm').format(startTime.toLocal())
             : (event != null ? loc.to_be_announced : null));
@@ -49,7 +50,8 @@ class MapEventFloatingCard extends StatelessWidget {
     final resolvedIsFavorite = isFavorite ?? event?.isFavorite ?? false;
     final participantSummary = event?.participantSummary ?? loc.to_be_announced;
 
-    final actionButton = primaryAction ??
+    final actionButton =
+        primaryAction ??
         (event != null && onRegister != null
             ? FilledButton(
                 style: FilledButton.styleFrom(
@@ -68,8 +70,9 @@ class MapEventFloatingCard extends StatelessWidget {
                 onPressed: onRegister,
                 child: Text(
                   loc.action_register_now,
-                  style: theme.textTheme.labelLarge
-                      ?.copyWith(color: Colors.white),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
               )
             : null);
@@ -79,9 +82,7 @@ class MapEventFloatingCard extends StatelessWidget {
         IconButton(
           onPressed: onFavorite,
           visualDensity: VisualDensity.compact,
-          icon: Icon(
-            resolvedIsFavorite ? Icons.star : Icons.star_border,
-          ),
+          icon: Icon(resolvedIsFavorite ? Icons.star : Icons.star_border),
         ),
       if (onClose != null)
         IconButton(
@@ -98,11 +99,7 @@ class MapEventFloatingCard extends StatelessWidget {
         children: [
           _smallChip(context, loc.registration_open),
           const SizedBox(width: 6),
-          Icon(
-            Icons.groups,
-            size: 16,
-            color: colorScheme.onSurfaceVariant,
-          ),
+          Icon(Icons.groups, size: 16, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
@@ -112,137 +109,136 @@ class MapEventFloatingCard extends StatelessWidget {
               ),
             ),
           ),
-          if (actionButton != null) ...[
-            const SizedBox(width: 8),
-            actionButton,
-          ],
+          if (actionButton != null) ...[const SizedBox(width: 8), actionButton],
         ],
       );
     } else if (actionButton != null) {
-      footer = Row(
-        children: [
-          const Spacer(),
-          actionButton,
-        ],
-      );
+      footer = Row(children: [const Spacer(), actionButton]);
     }
 
-    return Material(
-      elevation: 12,
-      borderRadius: BorderRadius.circular(20),
-      clipBehavior: Clip.antiAlias,
-      color: colorScheme.surface,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: SizedBox(
-                      width: 96,
-                      height: 96,
-                      child: imageUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              fit: BoxFit.cover,
-                              placeholder: (_, _) => const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+    return MediaQuery(
+      data: MediaQuery.of(
+        context,
+      ).copyWith(textScaler: const TextScaler.linear(0.9)),
+      child: Material(
+        elevation: 12,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        color: colorScheme.surface,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        width: 96,
+                        height: 96,
+                        child: imageUrl != null
+                            ? CachedNetworkImage(
+                                imageUrl: imageUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (_, _) => const Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              errorWidget: (_, _, _) => ColoredBox(
+                                errorWidget: (_, _, _) => ColoredBox(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.error,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : ColoredBox(
                                 color: colorScheme.surfaceContainerHighest,
                                 child: Center(
                                   child: Icon(
-                                    Icons.error,
+                                    Icons.image_not_supported,
                                     color: colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ),
-                            )
-                          : ColoredBox(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                resolvedTitle,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            ...trailingActions,
-                          ],
-                        ),
-                        if (resolvedTimeLabel != null) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            resolvedTimeLabel,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                                  color: colorScheme.onSurface,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ],
-                        if (resolvedLocation != null &&
-                            resolvedLocation.isNotEmpty) ...[
-                          const SizedBox(height: 6),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.place,
-                                size: 16,
-                                color: colorScheme.outline,
-                              ),
-                              const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  resolvedLocation,
-                                  maxLines: 1,
+                                  resolvedTitle,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ),
+                              ...trailingActions,
                             ],
                           ),
+                          if (resolvedTimeLabel != null) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              resolvedTimeLabel,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onSurface,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                          if (resolvedLocation != null &&
+                              resolvedLocation.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.place,
+                                  size: 16,
+                                  color: colorScheme.outline,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    resolvedLocation,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (footer != null) const SizedBox(height: 6),
+                          if (footer != null) footer,
                         ],
-                        if (footer != null)
-                          const SizedBox(height: 6),
-                        if (footer != null) footer,
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

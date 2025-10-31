@@ -71,7 +71,9 @@ class ProfilePreviewSection extends StatelessWidget {
       ));
     }
 
-    return Card(
+    return MediaQuery(
+  data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(0.9)),
+  child:Card(
       clipBehavior: Clip.antiAlias,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -260,6 +262,7 @@ class ProfilePreviewSection extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

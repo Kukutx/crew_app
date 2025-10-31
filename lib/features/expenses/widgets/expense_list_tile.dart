@@ -4,10 +4,7 @@ import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseListTile extends StatelessWidget {
-  const ExpenseListTile({
-    super.key,
-    required this.expense,
-  });
+  const ExpenseListTile({super.key, required this.expense});
 
   final ParticipantExpense expense;
 
@@ -19,14 +16,14 @@ class ExpenseListTile extends StatelessWidget {
     final currency = NumberFormatHelper.currency;
     final cardColor = isDark
         ? Color.alphaBlend(
-            Colors.white.withOpacity(0.04),
+            Colors.white.withValues(alpha: 0.04),
             colorScheme.surface,
           )
         : Colors.white;
     const categoryColor = Color(0xFF1B8A5C);
     final categoryBackground = isDark
-        ? categoryColor.withOpacity(0.24)
-        : categoryColor.withOpacity(0.12);
+        ? categoryColor.withValues(alpha: 0.24)
+        : categoryColor.withValues(alpha: 0.12);
     final categoryForeground = isDark ? Colors.white : categoryColor;
     final supportingTextStyle = theme.textTheme.bodySmall?.copyWith(
       color: isDark ? colorScheme.onSurfaceVariant : Colors.black54,
@@ -52,7 +49,10 @@ class ExpenseListTile extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: categoryBackground,
                   borderRadius: BorderRadius.circular(12),
@@ -60,25 +60,22 @@ class ExpenseListTile extends StatelessWidget {
                 child: Text(
                   expense.category,
                   style: theme.textTheme.labelMedium?.copyWith(
-                        color: categoryForeground,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: categoryForeground,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const Spacer(),
               Text(
                 currency.format(expense.amount),
                 style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            expense.title,
-            style: theme.textTheme.titleMedium,
-          ),
+          Text(expense.title, style: theme.textTheme.titleMedium),
           const SizedBox(height: 6),
           Text(
             FormattedDate.relative(expense.timestamp),
@@ -87,10 +84,7 @@ class ExpenseListTile extends StatelessWidget {
           if (expense.paymentMethod != null || expense.note != null) ...[
             const SizedBox(height: 12),
             if (expense.paymentMethod != null)
-              Text(
-                '支付方式：${expense.paymentMethod}',
-                style: supportingTextStyle,
-              ),
+              Text('支付方式：${expense.paymentMethod}', style: supportingTextStyle),
             if (expense.note != null)
               Padding(
                 padding: const EdgeInsets.only(top: 6),

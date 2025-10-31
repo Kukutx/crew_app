@@ -29,9 +29,14 @@ class MemberDetailsSheet extends StatelessWidget {
     );
     const positiveAccent = Color(0xFF1B8A5C);
     final summaryBackground = isDark
-        ? Color.alphaBlend(positiveAccent.withOpacity(0.2), colorScheme.surface)
+        ? Color.alphaBlend(
+            positiveAccent.withValues(alpha: 0.2),
+            colorScheme.surface,
+          )
         : const Color(0xFFE8F8F0);
-    final summaryBorderColor = positiveAccent.withOpacity(isDark ? 0.3 : 0.2);
+    final summaryBorderColor = positiveAccent.withValues(
+      alpha: isDark ? 0.3 : 0.2,
+    );
     final summaryAccentColor = difference >= 0
         ? positiveAccent
         : Colors.redAccent;

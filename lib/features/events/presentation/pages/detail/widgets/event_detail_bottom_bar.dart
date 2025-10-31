@@ -32,22 +32,24 @@ class EventDetailBottomBar extends StatelessWidget {
       locale: localeTag,
     ).format(sanitizedCount);
     final favoriteColor = colorScheme.secondary;
-    final favoriteBackgroundColor = colorScheme.secondaryContainer
-        .withOpacity(isFavorite ? 0.45 : 0.25);
-    final chatBackgroundColor =
-        colorScheme.surfaceVariant.withOpacity(0.35);
+    final favoriteBackgroundColor = colorScheme.secondaryContainer.withValues(
+      alpha: isFavorite ? 0.45 : 0.25,
+    );
+    final chatBackgroundColor = colorScheme.surfaceContainerHighest.withValues(
+      alpha: 0.35,
+    );
     final chatForegroundColor = colorScheme.onSurfaceVariant;
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceVariant,
+          color: colorScheme.surfaceContainerHighest,
           border: Border(
-            top: BorderSide(color: colorScheme.outline.withOpacity(0.2)),
+            top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.35),
+              color: Colors.black.withValues(alpha: 0.35),
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),
@@ -130,17 +132,12 @@ class _PillActionButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       child: IconTheme(
         data: IconThemeData(color: foregroundColor, size: 22),
         child: DefaultTextStyle(
-          style: TextStyle(
-            color: foregroundColor,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: foregroundColor, fontWeight: FontWeight.w600),
           child: child,
         ),
       ),

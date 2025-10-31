@@ -22,10 +22,11 @@ class EventGridCard extends StatelessWidget {
 
   void _onFavoriteTap(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final message = loc?.feature_not_ready ?? 'This feature is under development.';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    final message =
+        loc?.feature_not_ready ?? 'This feature is under development.';
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -42,9 +43,7 @@ class EventGridCard extends StatelessWidget {
         onTap: () async {
           final result = await Navigator.push<Event>(
             context,
-            MaterialPageRoute(
-              builder: (_) => EventDetailPage(event: event),
-            ),
+            MaterialPageRoute(builder: (_) => EventDetailPage(event: event)),
           );
           if (result != null) {
             onShowOnMap?.call(result);
@@ -97,23 +96,27 @@ class EventGridCard extends StatelessWidget {
               ),
 
               // 待看
-                     Positioned(
+              Positioned(
                 top: 8,
                 left: 8,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color:  Theme.of(context).colorScheme.primary.withOpacity(0.85),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     child: Text(
                       "招募中",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color:  Theme.of(context).colorScheme.onPrimary,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

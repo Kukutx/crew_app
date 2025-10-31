@@ -41,7 +41,7 @@ class CrewAvatar extends StatelessWidget {
         borderRadius ?? BorderRadius.circular(_effectiveSize / 3);
     final effectiveBackgroundColor = backgroundColor ??
         (backgroundImage == null
-            ? theme.colorScheme.surfaceVariant
+            ? theme.colorScheme.surfaceContainerHighest
             : Colors.transparent);
     final effectiveForegroundColor =
         foregroundColor ?? theme.colorScheme.onSurface;

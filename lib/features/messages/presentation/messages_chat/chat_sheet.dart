@@ -484,22 +484,6 @@ class _ChatSheetState extends State<ChatSheet> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 12, 8),
-              child: Row(
-                children: [
-                  Text(
-                    loc.messages,
-                    style: theme.textTheme.titleLarge,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
               child: TextField(
                 controller: _searchController,
@@ -536,7 +520,7 @@ class _ChatSheetState extends State<ChatSheet> {
               firstLabel: loc.messages_tab_private,
               secondLabel: loc.messages_tab_groups,
               onChanged: (value) => setState(() => _tab = value),
-              trailingBuilder: (_, __) {
+              trailingBuilder: (_, _) {
                 final hasUnreadNotifications = _systemPrivateConversations
                     .any((conversation) => conversation.hasUnread);
                 final canOpenNotifications =

@@ -56,15 +56,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       carouselManager.showEventCard(event);
       ref.read(mapFocusEventProvider.notifier).state = null;
     });
-    _carouselSubscription = ref.listenManual(
-      eventCarouselManagerProvider,
-      (_, manager) {
-        if (!mounted) {
-          return;
-        }
-        _updateBottomNavigation(!_isDrawerOpen && !manager.isVisible);
-      },
-    );
+    _carouselSubscription = ref.listenManual(eventCarouselManagerProvider, (
+      _,
+      manager,
+    ) {
+      if (!mounted) {
+        return;
+      }
+      _updateBottomNavigation(!_isDrawerOpen && !manager.isVisible);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -90,18 +90,21 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
-    
+
     // 获取各个管理器
     final mapController = ref.watch(mapControllerProvider);
     final carouselManager = ref.watch(eventCarouselManagerProvider);
     final searchManager = ref.watch(searchManagerProvider);
-    final locationSelectionManager = ref.watch(locationSelectionManagerProvider);
-    
-    final cardVisible = carouselManager.isVisible && carouselManager.events.isNotEmpty;
+    final locationSelectionManager = ref.watch(
+      locationSelectionManagerProvider,
+    );
+
+    final cardVisible =
+        carouselManager.isVisible && carouselManager.events.isNotEmpty;
     final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
     final searchState = ref.watch(eventsMapSearchControllerProvider);
     final loc = AppLocalizations.of(context)!;
-    
+
     final events = ref.watch(eventsProvider);
     final startCenter = mapController.getInitialCenter();
     final selectionState = ref.watch(mapSelectionControllerProvider);
@@ -119,7 +122,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
 
     final shouldHideEventMarkers =
-        selectionState.selectedLatLng != null || selectionState.isSelectingDestination;
+        selectionState.selectedLatLng != null ||
+        selectionState.isSelectingDestination;
     final markers = <Marker>{
       if (!shouldHideEventMarkers) ...markersLayer.markers,
     };
@@ -133,10 +137,15 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueAzure,
           ),
-          onTap: () => unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) => ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(pos),
+          onTap: () =>
+              unawaited(locationSelectionManager.clearSelectedLocation()),
+          onDrag: (pos) => ref
+              .read(mapSelectionControllerProvider.notifier)
+              .setSelectedLatLng(pos),
           onDragEnd: (pos) {
-            ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(pos);
+            ref
+                .read(mapSelectionControllerProvider.notifier)
+                .setSelectedLatLng(pos);
             HapticFeedback.lightImpact();
           },
         ),
@@ -153,7 +162,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueGreen,
           ),
-          onTap: () => unawaited(locationSelectionManager.clearSelectedLocation()),
+          onTap: () =>
+              unawaited(locationSelectionManager.clearSelectedLocation()),
         ),
       );
     }
@@ -166,7 +176,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       }
     });
 
-    final hideSearchBar = selectionState.isSelectionSheetOpen ||
+    final hideSearchBar =
+        selectionState.isSelectionSheetOpen ||
         selectionState.isSelectingDestination ||
         selectionState.selectedLatLng != null;
     final showClearSelectionInAppBar =
@@ -189,9 +200,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       key: _scaffoldKey,
-      drawer: AppDrawer(
-        onClose: () => Navigator.of(context).pop(),
-      ),
+      drawer: AppDrawer(onClose: () => Navigator.of(context).pop()),
       onDrawerChanged: (isOpened) {
         _isDrawerOpen = isOpened;
         _updateBottomNavigation(!isOpened && !carouselManager.isVisible);
@@ -206,14 +215,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               onClear: searchManager.clearSearch,
               onQuickActionsTap: _openQuickActionsDrawer,
               onAvatarTap: _onAvatarTap,
-              onResultTap: (event) => searchManager.onSearchResultTap(event, context),
+              onResultTap: (event) =>
+                  searchManager.onSearchResultTap(event, context),
               showResults: searchState.showResults,
               isLoading: searchState.isLoading,
               results: searchState.results,
               errorText: searchState.errorText,
               showClearSelectionAction: showClearSelectionInAppBar,
               onClearSelection: showClearSelectionInAppBar
-                  ? () => unawaited(locationSelectionManager.clearSelectedLocation())
+                  ? () => unawaited(
+                      locationSelectionManager.clearSelectedLocation(),
+                    )
                   : null,
             ),
       body: Stack(
@@ -231,7 +243,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               },
               onLongPress: (pos) {
                 carouselManager.hideEventCard();
-                unawaited(locationSelectionManager.onMapLongPress(pos, context));
+                unawaited(
+                  locationSelectionManager.onMapLongPress(pos, context),
+                );
               },
               markers: markers,
               showUserLocation: true,
@@ -241,11 +255,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ),
           EventsMapEventCarousel(
             events: carouselManager.events,
-            visible: carouselManager.isVisible && carouselManager.events.isNotEmpty,
+            visible:
+                carouselManager.isVisible && carouselManager.events.isNotEmpty,
             controller: carouselManager.pageController,
             safeBottom: safeBottom,
             onPageChanged: carouselManager.onPageChanged,
-            onOpenDetails: (event) => carouselManager.openEventDetails(event, context),
+            onOpenDetails: (event) =>
+                carouselManager.openEventDetails(event, context),
             onClose: carouselManager.hideEventCard,
             onRegister: () => _showSnackBar(loc.registration_not_implemented),
             onFavorite: () => _showSnackBar(loc.feature_not_ready),
@@ -280,14 +296,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                                   ? loc.map_select_location_destination_tip
                                   : loc.map_select_location_tip,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(.8),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: .8,
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(width: 12),
                           TextButton.icon(
                             onPressed: () => unawaited(
-                                locationSelectionManager.clearSelectedLocation()),
+                              locationSelectionManager.clearSelectedLocation(),
+                            ),
                             icon: const Icon(Icons.close),
                             label: Text(loc.map_clear_selected_point),
                           ),
@@ -328,13 +347,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-
   void _openQuickActionsDrawer() {
     final searchManager = ref.read(searchManagerProvider);
     if (searchManager.searchFocusNode.hasFocus) {
       searchManager.searchFocusNode.unfocus();
     }
-    final searchController = ref.read(eventsMapSearchControllerProvider.notifier);
+    final searchController = ref.read(
+      eventsMapSearchControllerProvider.notifier,
+    );
     searchController.hideResults();
     _scaffoldKey.currentState?.openDrawer();
   }
@@ -350,7 +370,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _onAvatarTap(bool authed) {
@@ -366,4 +388,3 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ref.read(appOverlayIndexProvider.notifier).state = 1;
   }
 }
-

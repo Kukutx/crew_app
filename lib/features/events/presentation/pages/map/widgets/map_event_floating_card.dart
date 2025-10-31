@@ -160,7 +160,7 @@ class MapEventFloatingCard extends StatelessWidget {
                                 ),
                               ),
                               errorWidget: (_, _, _) => ColoredBox(
-                                color: colorScheme.surfaceVariant,
+                                color: colorScheme.surfaceContainerHighest,
                                 child: Center(
                                   child: Icon(
                                     Icons.error,
@@ -170,7 +170,7 @@ class MapEventFloatingCard extends StatelessWidget {
                               ),
                             )
                           : ColoredBox(
-                              color: colorScheme.surfaceVariant,
+                              color: colorScheme.surfaceContainerHighest,
                               child: Center(
                                 child: Icon(
                                   Icons.image_not_supported,

@@ -49,7 +49,7 @@ class _DraftsContent extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _drafts.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 14),
+          separatorBuilder: (_, _) => const SizedBox(height: 14),
           itemBuilder: (context, i) => _DraftCard(
             title: _drafts[i].title,
             timeLabel: _drafts[i].timeLabel,
@@ -101,23 +101,23 @@ class _DraftCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [bg.withOpacity(0.98), bg.withOpacity(0.92)],
+            colors: [bg.withValues(alpha: 0.98), bg.withValues(alpha: 0.92)],
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.45),
+              color: Colors.black.withValues(alpha: 0.45),
               offset: const Offset(8, 10),
               blurRadius: 20,
               spreadRadius: -6,
             ),
             BoxShadow(
-              color: Colors.white.withOpacity(0.06),
+              color: Colors.white.withValues(alpha: 0.06),
               offset: const Offset(-6, -6),
               blurRadius: 12,
               spreadRadius: -8,
             ),
           ],
-          border: Border.all(color: Colors.white.withOpacity(0.04)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
         ),
         child: Row(
           children: [
@@ -206,12 +206,12 @@ class _Thumb extends StatelessWidget {
       height: 60,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: cs.surfaceVariant.withOpacity(.5),
+        color: cs.surfaceContainerHighest.withValues(alpha: .5),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(.35), blurRadius: 10, offset: const Offset(6, 8), spreadRadius: -6),
-          BoxShadow(color: Colors.white.withOpacity(.06), blurRadius: 8, offset: const Offset(-4, -4), spreadRadius: -6),
+          BoxShadow(color: Colors.black.withValues(alpha: .35), blurRadius: 10, offset: const Offset(6, 8), spreadRadius: -6),
+          BoxShadow(color: Colors.white.withValues(alpha: .06), blurRadius: 8, offset: const Offset(-4, -4), spreadRadius: -6),
         ],
-        border: Border.all(color: Colors.white.withOpacity(.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: .06)),
       ),
       child: const Icon(Icons.image_not_supported_outlined, size: 22),
     );
@@ -228,9 +228,9 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: cs.secondaryContainer.withOpacity(.6),
+        color: cs.secondaryContainer.withValues(alpha: .6),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withOpacity(.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: .08)),
       ),
       child: Text(text, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
     );
@@ -253,22 +253,22 @@ class _DeleteButton extends StatelessWidget {
         height: 28,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: cs.surface.withOpacity(0.4),
+          color: cs.surface.withValues(alpha: 0.4),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
               offset: const Offset(2, 3),
               blurRadius: 6,
               spreadRadius: -2,
             ),
             BoxShadow(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               offset: const Offset(-2, -2),
               blurRadius: 6,
               spreadRadius: -3,
             ),
           ],
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: const Icon(Icons.close_rounded, size: 18),
       ),

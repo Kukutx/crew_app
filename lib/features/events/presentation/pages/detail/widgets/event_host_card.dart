@@ -38,14 +38,14 @@ class EventHostCard extends StatelessWidget {
     final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
       color: colorScheme.onSurfaceVariant,
     );
-    final cardColor = colorScheme.surfaceVariant;
+    final cardColor = colorScheme.surfaceContainerHighest;
     final avatarBackground = colorScheme.primaryContainer;
     final avatarForeground = colorScheme.onPrimaryContainer;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: cardColor,
-      shadowColor: Colors.black.withOpacity(0.45),
+      shadowColor: Colors.black.withValues(alpha: 0.45),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTapProfile,
@@ -71,7 +71,8 @@ class EventHostCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: titleStyle ??
+                      style:
+                          titleStyle ??
                           const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -82,7 +83,8 @@ class EventHostCard extends StatelessWidget {
                       description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: subtitleStyle ??
+                      style:
+                          subtitleStyle ??
                           const TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ],
@@ -97,9 +99,11 @@ class EventHostCard extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: colorScheme.primary,
                           side: BorderSide(
-                            color: colorScheme.primary.withOpacity(0.6),
+                            color: colorScheme.primary.withValues(alpha: 0.6),
                           ),
-                          overlayColor: colorScheme.primary.withOpacity(0.08),
+                          overlayColor: colorScheme.primary.withValues(
+                            alpha: 0.08,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

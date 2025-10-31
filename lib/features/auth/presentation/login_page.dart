@@ -107,7 +107,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                       width: 72,
                       height: 72,
                       decoration: BoxDecoration(
-                        color: cs.primary.withOpacity(0.08),
+                        color: cs.primary.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,

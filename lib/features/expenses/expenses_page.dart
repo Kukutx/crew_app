@@ -3,7 +3,6 @@ import 'package:crew_app/features/expenses/data/sample_data.dart';
 import 'package:crew_app/features/expenses/widgets/add_expense_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/dialog_row.dart';
 import 'package:crew_app/features/expenses/widgets/member_details_sheet.dart';
-import 'package:crew_app/features/expenses/widgets/participant_bubble.dart';
 import 'package:crew_app/features/expenses/widgets/participant_bubble_cluster.dart';
 import 'package:crew_app/features/expenses/widgets/settlement_preview_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -88,7 +87,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     Text(
                       loc.event_group_expense_hint,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.7),
+                        color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -112,7 +111,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             participants: participants,
                             onParticipantTap: _showMemberDetails,
                             onExpenseTap: (participant, expense) =>
-                                _showExpenseDetails(context, participant, expense),
+                                _showExpenseDetails(
+                                  context,
+                                  participant,
+                                  expense,
+                                ),
                           ),
                         ),
                       ),
@@ -223,9 +226,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          participant == null
-              ? '请选择支付人'
-              : '已为 $name 添加 $amountText 费用',
+          participant == null ? '请选择支付人' : '已为 $name 添加 $amountText 费用',
         ),
       ),
     );
@@ -233,15 +234,16 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
   Future<void> _showSettlementPreview() async {
     final evenShare = _overallTotal / _participants.length;
-    final entries = _participants
-        .map(
-          (participant) => SettlementEntry(
-            participant: participant,
-            difference: participant.total - evenShare,
-          ),
-        )
-        .toList()
-      ..sort((a, b) => b.difference.compareTo(a.difference));
+    final entries =
+        _participants
+            .map(
+              (participant) => SettlementEntry(
+                participant: participant,
+                difference: participant.total - evenShare,
+              ),
+            )
+            .toList()
+          ..sort((a, b) => b.difference.compareTo(a.difference));
 
     await showModalBottomSheet<void>(
       context: context,

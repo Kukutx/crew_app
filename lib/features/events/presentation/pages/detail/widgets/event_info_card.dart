@@ -4,20 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventInfoCard extends StatelessWidget {
-  static const List<String> _defaultWaypoints = [
-    '柏林大教堂',
-    '御林广场',
-    '波茨坦广场',
-  ];
+  static const List<String> _defaultWaypoints = ['柏林大教堂', '御林广场', '波茨坦广场'];
   static const bool _defaultIsRoundTrip = true;
 
   final Event event;
   final AppLocalizations loc;
-  const EventInfoCard({
-    super.key,
-    required this.event,
-    required this.loc,
-  });
+  const EventInfoCard({super.key, required this.event, required this.loc});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +19,9 @@ class EventInfoCard extends StatelessWidget {
     final endTimeText = _formatEndTime();
     final participantText = event.participantSummary ?? loc.to_be_announced;
     final waypoints = event.waypoints;
-    final displayWaypoints =
-        waypoints.isNotEmpty ? waypoints : _defaultWaypoints;
+    final displayWaypoints = waypoints.isNotEmpty
+        ? waypoints
+        : _defaultWaypoints;
     final routeType = event.isRoundTrip;
     final displayRouteType = routeType ?? _defaultIsRoundTrip;
     final localeTag = Localizations.localeOf(context).toString();
@@ -55,7 +48,7 @@ class EventInfoCard extends StatelessWidget {
     );
     final chipBackground = colorScheme.primaryContainer;
     final chipTextColor = colorScheme.onPrimaryContainer;
-    final chipBorderColor = colorScheme.primary.withOpacity(0.4);
+    final chipBorderColor = colorScheme.primary.withValues(alpha: 0.4);
     final chipTextStyle = theme.textTheme.labelMedium?.copyWith(
       color: chipTextColor,
       fontWeight: FontWeight.w600,
@@ -74,11 +67,9 @@ class EventInfoCard extends StatelessWidget {
         : event.location;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      color: colorScheme.surfaceVariant,
-      shadowColor: Colors.black.withOpacity(0.45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: colorScheme.surfaceContainerHighest,
+      shadowColor: Colors.black.withValues(alpha: 0.45),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -86,12 +77,13 @@ class EventInfoCard extends StatelessWidget {
           children: [
             Text(
               loc.event_details_title,
-              style: titleStyle ??
+              style:
+                  titleStyle ??
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Divider(
               height: 24,
-              color: colorScheme.outline.withOpacity(0.4),
+              color: colorScheme.outline.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 12),
             _timeRow(
@@ -167,30 +159,26 @@ class EventInfoCard extends StatelessWidget {
     required TextStyle titleStyle,
     required TextStyle valueStyle,
     Widget? trailing,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: iconColor),
-            const SizedBox(width: 12),
-            Text(title, style: titleStyle),
-            const Spacer(),
-            Flexible(
-              child: Text(
-                value,
-                textAlign: TextAlign.right,
-                overflow: TextOverflow.ellipsis,
-                style: valueStyle,
-              ),
-            ),
-            if (trailing != null) ...[
-              const SizedBox(width: 4),
-              trailing,
-            ],
-          ],
+  }) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      children: [
+        Icon(icon, size: 20, color: iconColor),
+        const SizedBox(width: 12),
+        Text(title, style: titleStyle),
+        const Spacer(),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            overflow: TextOverflow.ellipsis,
+            style: valueStyle,
+          ),
         ),
-      );
+        if (trailing != null) ...[const SizedBox(width: 4), trailing],
+      ],
+    ),
+  );
 
   Widget _waypointsRow(
     List<String> waypoints,
@@ -200,43 +188,42 @@ class EventInfoCard extends StatelessWidget {
     Color chipBackground,
     Color chipBorderColor,
     TextStyle chipTextStyle,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.alt_route, size: 20, color: iconColor),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(loc.event_waypoints_title, style: titleStyle),
-                  const SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: waypoints
-                          .map(
-                            (point) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: Chip(
-                                label: Text(point, style: chipTextStyle),
-                                backgroundColor: chipBackground,
-                                side: BorderSide(color: chipBorderColor),
-                              ),
-                            ),
-                          )
-                          .toList(growable: false),
-                    ),
-                  ),
-                ],
+  ) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.alt_route, size: 20, color: iconColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(loc.event_waypoints_title, style: titleStyle),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: waypoints
+                      .map(
+                        (point) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Chip(
+                            label: Text(point, style: chipTextStyle),
+                            backgroundColor: chipBackground,
+                            side: BorderSide(color: chipBorderColor),
+                          ),
+                        ),
+                      )
+                      .toList(growable: false),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   Widget _timeRow(
     String startText,
@@ -244,35 +231,31 @@ class EventInfoCard extends StatelessWidget {
     required Color iconColor,
     required TextStyle titleStyle,
     required TextStyle valueStyle,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.calendar_today, size: 20, color: iconColor),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(loc.event_time_title, style: titleStyle),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${loc.event_start_time_label}: $startText',
-                    style: valueStyle,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${loc.event_end_time_label}: $endText',
-                    style: valueStyle,
-                  ),
-                ],
+  }) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.calendar_today, size: 20, color: iconColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(loc.event_time_title, style: titleStyle),
+              const SizedBox(height: 4),
+              Text(
+                '${loc.event_start_time_label}: $startText',
+                style: valueStyle,
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text('${loc.event_end_time_label}: $endText', style: valueStyle),
+            ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   String _formatStartTime() {
     final start = event.startTime;
@@ -289,7 +272,8 @@ class EventInfoCard extends StatelessWidget {
     }
     final endLocal = end.toLocal();
     final startLocal = event.startTime?.toLocal();
-    final sameDay = startLocal != null &&
+    final sameDay =
+        startLocal != null &&
         startLocal.year == endLocal.year &&
         startLocal.month == endLocal.month &&
         startLocal.day == endLocal.day;

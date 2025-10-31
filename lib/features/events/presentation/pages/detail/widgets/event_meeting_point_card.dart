@@ -33,8 +33,8 @@ class EventMeetingPointCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: colorScheme.surfaceVariant,
-      shadowColor: Colors.black.withOpacity(0.45),
+      color: colorScheme.surfaceContainerHighest,
+      shadowColor: Colors.black.withValues(alpha: 0.45),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -43,7 +43,8 @@ class EventMeetingPointCard extends StatelessWidget {
           children: [
             Text(
               loc.event_meeting_point_title,
-              style: titleStyle ??
+              style:
+                  titleStyle ??
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
@@ -58,7 +59,8 @@ class EventMeetingPointCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               loc.event_meeting_point_hint,
-              style: helperStyle ??
+              style:
+                  helperStyle ??
                   TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
@@ -70,9 +72,7 @@ class EventMeetingPointCard extends StatelessWidget {
                   return;
                 }
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(loc.event_copy_address_success),
-                  ),
+                  SnackBar(content: Text(loc.event_copy_address_success)),
                 );
               },
               icon: const Icon(Icons.copy),
@@ -102,7 +102,8 @@ class _MeetingPointButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveStyle = meetingPointStyle ??
+    final effectiveStyle =
+        meetingPointStyle ??
         TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
@@ -125,8 +126,11 @@ class _MeetingPointButton extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.place_outlined,
-                    color: colorScheme.onPrimaryContainer, size: 24),
+                Icon(
+                  Icons.place_outlined,
+                  color: colorScheme.onPrimaryContainer,
+                  size: 24,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -137,8 +141,11 @@ class _MeetingPointButton extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.chevron_right,
-                    color: colorScheme.onPrimaryContainer, size: 24),
+                Icon(
+                  Icons.chevron_right,
+                  color: colorScheme.onPrimaryContainer,
+                  size: 24,
+                ),
               ],
             ),
           ),

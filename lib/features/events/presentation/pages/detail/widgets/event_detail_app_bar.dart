@@ -58,8 +58,12 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     final label = _localizedStatusLabel(loc, status ?? EventStatus.reviewing);
 
     final colorScheme = Theme.of(context).colorScheme;
-    final visuals = _statusVisualStyle(colorScheme, status ?? EventStatus.reviewing);
-    final textStyle = Theme.of(context).textTheme.labelMedium?.copyWith(
+    final visuals = _statusVisualStyle(
+      colorScheme,
+      status ?? EventStatus.reviewing,
+    );
+    final textStyle =
+        Theme.of(context).textTheme.labelMedium?.copyWith(
           color: visuals.foreground,
           fontWeight: FontWeight.w600,
         ) ??
@@ -81,7 +85,6 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   String _localizedStatusLabel(AppLocalizations loc, EventStatus status) {
-    
     switch (status) {
       case EventStatus.reviewing:
         return loc.event_status_reviewing;
@@ -101,27 +104,27 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     switch (status) {
       case EventStatus.reviewing:
         return _StatusVisualStyle(
-          background: colorScheme.secondaryContainer.withOpacity(0.9),
+          background: colorScheme.secondaryContainer.withValues(alpha: 0.9),
           foreground: colorScheme.onSecondaryContainer,
-          border: colorScheme.secondary.withOpacity(0.45),
+          border: colorScheme.secondary.withValues(alpha: 0.45),
         );
       case EventStatus.recruiting:
         return _StatusVisualStyle(
-          background: colorScheme.primaryContainer.withOpacity(0.9),
+          background: colorScheme.primaryContainer.withValues(alpha: 0.9),
           foreground: colorScheme.onPrimaryContainer,
-          border: colorScheme.primary.withOpacity(0.45),
+          border: colorScheme.primary.withValues(alpha: 0.45),
         );
       case EventStatus.ongoing:
         return _StatusVisualStyle(
-          background: colorScheme.tertiaryContainer.withOpacity(0.9),
+          background: colorScheme.tertiaryContainer.withValues(alpha: 0.9),
           foreground: colorScheme.onTertiaryContainer,
-          border: colorScheme.tertiary.withOpacity(0.45),
+          border: colorScheme.tertiary.withValues(alpha: 0.45),
         );
       case EventStatus.ended:
         return _StatusVisualStyle(
-          background: colorScheme.errorContainer.withOpacity(0.9),
+          background: colorScheme.errorContainer.withValues(alpha: 0.9),
           foreground: colorScheme.onErrorContainer,
-          border: colorScheme.error.withOpacity(0.45),
+          border: colorScheme.error.withValues(alpha: 0.45),
         );
     }
   }

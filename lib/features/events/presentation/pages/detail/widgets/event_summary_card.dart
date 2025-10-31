@@ -31,17 +31,15 @@ class EventSummaryCard extends StatelessWidget {
       fontWeight: FontWeight.w600,
     );
     final tagBackground = colorScheme.primaryContainer;
-    final tagBorderColor = colorScheme.primary.withOpacity(0.4);
+    final tagBorderColor = colorScheme.primary.withValues(alpha: 0.4);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Card(
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        color: colorScheme.surfaceVariant,
-        shadowColor: Colors.black.withOpacity(0.45),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: colorScheme.surfaceContainerHighest,
+        shadowColor: Colors.black.withValues(alpha: 0.45),
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Row(
@@ -53,7 +51,8 @@ class EventSummaryCard extends StatelessWidget {
                   children: [
                     Text(
                       event.title,
-                      style: titleStyle ??
+                      style:
+                          titleStyle ??
                           const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -79,11 +78,9 @@ class EventSummaryCard extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 12),
                       child: Text(
                         event.description,
-                        style: descriptionStyle ??
-                            const TextStyle(
-                              fontSize: 14,
-                              height: 1.5,
-                            ),
+                        style:
+                            descriptionStyle ??
+                            const TextStyle(fontSize: 14, height: 1.5),
                       ),
                     ),
                   ],
@@ -107,16 +104,15 @@ class EventSummaryCard extends StatelessWidget {
     Color backgroundColor,
     Color borderColor,
     TextStyle textStyle,
-  ) =>
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: borderColor, width: 1),
-        ),
-        child: Text(label, style: textStyle),
-      );
+  ) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    decoration: BoxDecoration(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: borderColor, width: 1),
+    ),
+    child: Text(label, style: textStyle),
+  );
 
   List<Widget> _buildTags(
     AppLocalizations loc,
@@ -129,7 +125,12 @@ class EventSummaryCard extends StatelessWidget {
       return [
         _tagChip(loc.tag_city_explore, backgroundColor, borderColor, textStyle),
         _tagChip(loc.tag_easy_social, backgroundColor, borderColor, textStyle),
-        _tagChip(loc.tag_walk_friendly, backgroundColor, borderColor, textStyle),
+        _tagChip(
+          loc.tag_walk_friendly,
+          backgroundColor,
+          borderColor,
+          textStyle,
+        ),
       ];
     }
     return tags
@@ -154,26 +155,26 @@ class _CalculatorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Tooltip(
-        message: tooltip,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onPressed,
+    message: tooltip,
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(20),
+        child: Ink(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(20),
-            child: Ink(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.calculate_outlined,
-                color: colorScheme.onPrimaryContainer,
-                size: 30,
-              ),
-            ),
+          ),
+          child: Icon(
+            Icons.calculate_outlined,
+            color: colorScheme.onPrimaryContainer,
+            size: 30,
           ),
         ),
-      );
+      ),
+    ),
+  );
 }

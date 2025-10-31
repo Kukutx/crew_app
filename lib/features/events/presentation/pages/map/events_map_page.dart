@@ -249,7 +249,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               },
               markers: markers,
               showUserLocation: true,
-              showMyLocationButton: true,
               mapPadding: selectionState.mapPadding,
             ),
           ),

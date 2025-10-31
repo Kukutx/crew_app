@@ -79,6 +79,7 @@ class MapController {
 
     if (loc != null) {
       await moveCamera(loc, zoom: 14);
+      loc = await ref.read(userLocationProvider.notifier).refreshNow();
     }
   }
 
@@ -92,12 +93,16 @@ class MapController {
   Set<Marker> getEventMarkers() {
     final events = ref.read(eventsProvider);
     return events.maybeWhen(
-      data: (eventList) => eventList.map((event) => Marker(
-        markerId: MarkerId(event.id),
-        position: LatLng(event.latitude, event.longitude),
-        infoWindow: InfoWindow(title: event.title),
-        onTap: () => focusOnEvent(event),
-      )).toSet(),
+      data: (eventList) => eventList
+          .map(
+            (event) => Marker(
+              markerId: MarkerId(event.id),
+              position: LatLng(event.latitude, event.longitude),
+              infoWindow: InfoWindow(title: event.title),
+              onTap: () => focusOnEvent(event),
+            ),
+          )
+          .toSet(),
       orElse: () => <Marker>{},
     );
   }

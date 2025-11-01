@@ -17,7 +17,14 @@ import '../../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 
 class MapExploreSheet extends ConsumerStatefulWidget {
-  const MapExploreSheet({super.key});
+  final VoidCallback? onClose;
+  final bool useSafeArea;
+
+  const MapExploreSheet({
+    super.key,
+    this.onClose,
+    this.useSafeArea = true,
+  });
 
   @override
   ConsumerState<MapExploreSheet> createState() => _MapExploreSheetState();
@@ -166,8 +173,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       );
     });
 
-    return SafeArea(
-      child: Padding(
+    final content = Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(
           children: [
@@ -271,7 +277,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                                   event: events[i],
                                   heroTag: 'event_$i',
                                   onShowOnMap: (event) {
-                                    Navigator.of(context).maybePop();
+                                    widget.onClose?.call();
                                     ref
                                             .read(
                                               appOverlayIndexProvider.notifier,
@@ -306,7 +312,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
           ],
         ),
       ),
-    );
+    return widget.useSafeArea ? SafeArea(child: content) : content;
   }
 }
 

@@ -1,0 +1,4 @@
+enum MapOverlaySheet {
+  explore,
+  chat,
+}

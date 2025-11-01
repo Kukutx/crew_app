@@ -12,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 
 class ChatSheet extends StatefulWidget {
-  const ChatSheet({super.key});
+  final bool useSafeArea;
+
+  const ChatSheet({super.key, this.useSafeArea = true});
 
   @override
   State<ChatSheet> createState() => _ChatSheetState();
@@ -478,8 +480,7 @@ class _ChatSheetState extends State<ChatSheet> {
           .toList(growable: false);
     }
 
-    return SafeArea(
-      child: Padding(
+    final content = Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(
           children: [
@@ -605,6 +606,6 @@ class _ChatSheetState extends State<ChatSheet> {
           ],
         ),
       ),
-    );
+    return widget.useSafeArea ? SafeArea(child: content) : content;
   }
 }

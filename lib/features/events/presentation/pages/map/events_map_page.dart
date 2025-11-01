@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/shared/widgets/app_drawer.dart';
+
+import '../../../../../app/state/map_overlay_sheet.dart';
 
 import '../../../data/event.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
@@ -24,10 +27,18 @@ import 'controllers/map_controller.dart';
 import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import 'controllers/location_selection_manager.dart';
+import 'sheets/map_explore_sheet.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
-  const EventsMapPage({super.key, this.selectedEvent});
+  final MapOverlaySheet? activeSheet;
+  final VoidCallback? onSheetDismissed;
+  const EventsMapPage({
+    super.key,
+    this.selectedEvent,
+    this.activeSheet,
+    this.onSheetDismissed,
+  });
 
   @override
   ConsumerState<EventsMapPage> createState() => _EventsMapPageState();
@@ -38,6 +49,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   ProviderSubscription<Event?>? _mapFocusSubscription;
   ProviderSubscription<EventCarouselManager>? _carouselSubscription;
   bool _isDrawerOpen = false;
+  static const double _sheetBottomInset = 320;
 
   @override
   void initState() {
@@ -87,6 +99,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   @override
+  void didUpdateWidget(covariant EventsMapPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.activeSheet != null && oldWidget.activeSheet == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _updateBottomNavigation(true);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
@@ -99,15 +124,43 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       locationSelectionManagerProvider,
     );
 
+    final sheetVisible = widget.activeSheet != null;
+    final additionalBottomInset = sheetVisible ? _sheetBottomInset : 0.0;
+
     final cardVisible =
         carouselManager.isVisible && carouselManager.events.isNotEmpty;
-    final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
+    final bottomPadding =
+        (cardVisible ? 240 : 120) + safeBottom + additionalBottomInset;
     final searchState = ref.watch(eventsMapSearchControllerProvider);
     final loc = AppLocalizations.of(context)!;
 
     final events = ref.watch(eventsProvider);
     final startCenter = mapController.getInitialCenter();
     final selectionState = ref.watch(mapSelectionControllerProvider);
+
+    final mapPadding = sheetVisible
+        ? selectionState.mapPadding.copyWith(
+            bottom:
+                selectionState.mapPadding.bottom + additionalBottomInset,
+          )
+        : selectionState.mapPadding;
+
+    Widget? sheetContent;
+    switch (widget.activeSheet) {
+      case MapOverlaySheet.explore:
+        sheetContent = MapExploreSheet(
+          onClose: widget.onSheetDismissed,
+          useSafeArea: false,
+        );
+        break;
+      case MapOverlaySheet.chat:
+        sheetContent = const ChatSheet(
+          useSafeArea: false,
+        );
+        break;
+      default:
+        sheetContent = null;
+    }
 
     final markersLayer = events.when(
       loading: () => const MarkersLayer(markers: <Marker>{}),
@@ -249,7 +302,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               },
               markers: markers,
               showUserLocation: true,
-              mapPadding: selectionState.mapPadding,
+              mapPadding: mapPadding,
             ),
           ),
           EventsMapEventCarousel(
@@ -316,6 +369,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 ),
               ),
             ),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            reverseDuration: const Duration(milliseconds: 200),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            child: sheetContent != null
+                ? _MapSheetHost(
+                    key: ValueKey(widget.activeSheet),
+                    onClose: widget.onSheetDismissed,
+                    child: sheetContent!,
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -335,7 +401,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ),
           AppFloatingActionButton(
             heroTag: 'events_map_my_location_fab',
-            margin: EdgeInsets.only(top: 12, bottom: bottomPadding, right: 6),
+            margin: EdgeInsets.only(
+              top: 12,
+              bottom: bottomPadding,
+              right: 6,
+            ),
             onPressed: () async {
               await mapController.moveToMyLocation();
             },
@@ -360,8 +430,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
   void _updateBottomNavigation(bool visible) {
     final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
-    if (controller.state != visible) {
-      controller.state = visible;
+    final shouldShow = widget.activeSheet != null ? true : visible;
+    if (controller.state != shouldShow) {
+      controller.state = shouldShow;
     }
   }
 
@@ -385,5 +456,89 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     ref.read(appOverlayIndexProvider.notifier).state = 1;
+  }
+}
+
+class _MapSheetHost extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onClose;
+
+  const _MapSheetHost({
+    super.key,
+    required this.child,
+    this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final handleColor = theme.colorScheme.outlineVariant.withValues(alpha: 0.7);
+    final surfaceColor = theme.colorScheme.surface;
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: FractionallySizedBox(
+            alignment: Alignment.bottomCenter,
+            heightFactor: 0.88,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.shadow.withValues(alpha: 0.16),
+                    blurRadius: 24,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: handleColor,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          if (onClose != null)
+                            Positioned(
+                              right: -8,
+                              child: IconButton(
+                                onPressed: onClose,
+                                tooltip: MaterialLocalizations.of(context)
+                                    .closeButtonTooltip,
+                                style: IconButton.styleFrom(
+                                  padding: const EdgeInsets.all(8),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                                icon: const Icon(Icons.close),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Expanded(child: child),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -44,6 +44,7 @@ class _MapWithPlannerSheetPageState extends State<MapWithPlannerSheetPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: Stack(
         children: [
           // 地图层
@@ -155,15 +156,39 @@ class _MapWithPlannerSheetPageState extends State<MapWithPlannerSheetPage>
         ],
       ),
       // 底部导航（示例）
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.repeat), label: 'Planner'),
-          BottomNavigationBarItem(icon: Icon(Icons.confirmation_num), label: 'Tickets'),
-          BottomNavigationBarItem(icon: Icon(Icons.warning_amber), label: 'Alerts'),
-          BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
-        ],
-        currentIndex: 0,
-        onTap: (_) {},
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              selectedItemColor: Colors.teal[700],
+              unselectedItemColor: Colors.black54,
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.repeat), label: 'Planner'),
+                BottomNavigationBarItem(icon: Icon(Icons.confirmation_num), label: 'Tickets'),
+                BottomNavigationBarItem(icon: Icon(Icons.warning_amber), label: 'Alerts'),
+                BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
+              ],
+              currentIndex: 0,
+              onTap: (_) {},
+            ),
+          ),
+        ),
       ),
     );
   }

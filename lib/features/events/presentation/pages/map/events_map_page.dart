@@ -405,14 +405,27 @@ class _MapOverlaySheet extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final handleColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.2);
 
+    final List<double> snapSizes = switch (sheetType) {
+      MapOverlaySheetType.chat => const [0.32, 0.55, 0.92],
+      MapOverlaySheetType.explore => const [0.2, 0.5, 0.92],
+      MapOverlaySheetType.none => const [0.2, 0.5, 0.92],
+    };
+    final initialSize = switch (sheetType) {
+      MapOverlaySheetType.chat => snapSizes[1],
+      MapOverlaySheetType.explore => snapSizes.first,
+      MapOverlaySheetType.none => snapSizes.first,
+    };
+
     return Align(
       alignment: Alignment.bottomCenter,
       child: DraggableScrollableActuator(
         child: DraggableScrollableSheet(
           expand: false,
-          minChildSize: 0.25,
-          maxChildSize: 0.92,
-          initialChildSize: sheetType == MapOverlaySheetType.chat ? 0.42 : 0.36,
+          minChildSize: snapSizes.first,
+          maxChildSize: snapSizes.last,
+          initialChildSize: initialSize,
+          snap: true,
+          snapSizes: snapSizes,
           builder: (context, scrollController) {
             final Widget effectiveContent;
             switch (sheetType) {

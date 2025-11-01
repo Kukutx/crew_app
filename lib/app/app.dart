@@ -157,7 +157,7 @@ class _AppState extends ConsumerState<App> {
         _index == 0 && ref.watch(bottomNavigationVisibilityProvider);
 
     return Scaffold(
-      extendBody: false,
+      extendBody: true,
       body: Stack(
         children: [
           ScrollActivityListener(

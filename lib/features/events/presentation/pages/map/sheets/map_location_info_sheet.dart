@@ -3,6 +3,8 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'widgets/map_draggable_sheet.dart';
+
 Future<void> showMapLocationInfoSheet({
   required BuildContext context,
   required LatLng position,
@@ -45,94 +47,81 @@ class _MapLocationInfoSheet extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
+    return MapDraggableSheet(
+      minChildSize: 0.2,
+      initialChildSize: 0.35,
+      maxChildSize: 0.9,
+      childBuilder: (context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              loc.map_location_info_title,
+              style: theme.textTheme.titleMedium,
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            loc.map_location_info_title,
-            style: theme.textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.location_on_outlined, color: Colors.redAccent),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  loc.location_coordinates(
-                    position.latitude.toStringAsFixed(6),
-                    position.longitude.toStringAsFixed(6),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, color: Colors.redAccent),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    loc.location_coordinates(
+                      position.latitude.toStringAsFixed(6),
+                      position.longitude.toStringAsFixed(6),
+                    ),
+                    style: theme.textTheme.bodyMedium,
                   ),
-                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            FutureBuilder<String?>(
+              future: addressFuture,
+              builder: (context, snapshot) {
+                final icon = Icon(
+                  Icons.home_outlined,
+                  color: Colors.blueGrey.shade600,
+                );
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _SheetRow(
+                    icon: icon,
+                    child: Text(loc.map_location_info_address_loading),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return _SheetRow(
+                    icon: icon,
+                    child: Text(loc.map_location_info_address_unavailable),
+                  );
+                }
+                final address = snapshot.data;
+                final text = (address == null || address.trim().isEmpty)
+                    ? loc.map_location_info_address_unavailable
+                    : address;
+                return _SheetRow(
+                  icon: icon,
+                  child: Text(text),
+                );
+              },
+            ),
+            if (nearbyPlacesFuture != null) ...[
+              const SizedBox(height: 24),
+              _NearbyPlacesSection(nearbyPlacesFuture: nearbyPlacesFuture!),
+            ],
+            if (onCreateEvent != null) ...[
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: onCreateEvent,
+                  child: Text(loc.map_location_info_create_event),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          FutureBuilder<String?>(
-            future: addressFuture,
-            builder: (context, snapshot) {
-              final icon = Icon(
-                Icons.home_outlined,
-                color: Colors.blueGrey.shade600,
-              );
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _SheetRow(
-                  icon: icon,
-                  child: Text(loc.map_location_info_address_loading),
-                );
-              }
-              if (snapshot.hasError) {
-                return _SheetRow(
-                  icon: icon,
-                  child: Text(loc.map_location_info_address_unavailable),
-                );
-              }
-              final address = snapshot.data;
-              final text = (address == null || address.trim().isEmpty)
-                  ? loc.map_location_info_address_unavailable
-                  : address;
-              return _SheetRow(
-                icon: icon,
-                child: Text(text),
-              );
-            },
-          ),
-          if (nearbyPlacesFuture != null) ...[
-            const SizedBox(height: 24),
-            _NearbyPlacesSection(nearbyPlacesFuture: nearbyPlacesFuture!),
           ],
-          if (onCreateEvent != null) ...[
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: onCreateEvent,
-                child: Text(loc.map_location_info_create_event),
-              ),
-            ),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -216,7 +205,7 @@ class _NearbyPlacesSection extends StatelessWidget {
                   final place = places[index];
                   return _NearbyPlaceCard(place: place);
                 },
-                separatorBuilder: (_, _) => const SizedBox(width: 12),
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemCount: places.length,
               );
             },
@@ -286,7 +275,7 @@ class _NearbyPlaceImage extends StatelessWidget {
     if (photoUrl == null) {
       return _PlaceholderImage(
         icon: Icons.image_outlined,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest ,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       );
     }
     return AspectRatio(
@@ -302,7 +291,7 @@ class _NearbyPlaceImage extends StatelessWidget {
         },
         errorBuilder: (context, error, stackTrace) => _PlaceholderImage(
           icon: Icons.broken_image_outlined,
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest ,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         ),
       ),
     );

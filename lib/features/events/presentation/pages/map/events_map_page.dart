@@ -394,32 +394,162 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 }
 
-class _MapOverlaySheet extends ConsumerWidget {
+class _MapOverlaySheet extends ConsumerStatefulWidget {
   const _MapOverlaySheet({required this.sheetType});
 
   final MapOverlaySheetType sheetType;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final handleColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.2);
+  ConsumerState<_MapOverlaySheet> createState() => _MapOverlaySheetState();
+}
 
-    final List<double> snapSizes = switch (sheetType) {
+class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
+  late final DraggableScrollableController _controller;
+  double _currentSize = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = DraggableScrollableController()
+      ..addListener(_handleSizeChanged);
+    _currentSize = _initialSize;
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_handleSizeChanged);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleSizeChanged() {
+    final size = _controller.size;
+    if (size == _currentSize || !mounted) {
+      return;
+    }
+    setState(() => _currentSize = size);
+  }
+
+  void _onDragUpdate(
+    DragUpdateDetails details,
+    double minSize,
+    double maxSize,
+    double height,
+  ) {
+    final delta = details.primaryDelta ?? 0;
+    if (delta == 0) {
+      return;
+    }
+    final proposed = (_controller.size - delta / height).clamp(minSize, maxSize);
+    if (proposed != _controller.size) {
+      _controller.jumpTo(proposed);
+    }
+  }
+
+  void _onDragEnd(
+    DragEndDetails details,
+    List<double> snapSizes,
+  ) {
+    final velocity = details.primaryVelocity ?? 0;
+    final currentSize = _currentSize;
+    final target = _targetSnapFor(currentSize, velocity, snapSizes);
+    if ((target - currentSize).abs() < 0.001) {
+      return;
+    }
+    _controller.animateTo(
+      target,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  double _targetSnapFor(double size, double velocity, List<double> snapSizes) {
+    if (velocity.abs() < 50) {
+      return _nearestSnap(size, snapSizes);
+    }
+    if (velocity < 0) {
+      for (final snap in snapSizes) {
+        if (snap > size + 1e-4) {
+          return snap;
+        }
+      }
+      return snapSizes.last;
+    }
+    for (final snap in snapSizes.reversed) {
+      if (snap < size - 1e-4) {
+        return snap;
+      }
+    }
+    return snapSizes.first;
+  }
+
+  double _nearestSnap(double size, List<double> snapSizes) {
+    double closest = snapSizes.first;
+    double distance = (size - closest).abs();
+    for (final snap in snapSizes.skip(1)) {
+      final d = (size - snap).abs();
+      if (d < distance) {
+        closest = snap;
+        distance = d;
+      }
+    }
+    return closest;
+  }
+
+  List<double> get _snapSizes {
+    return switch (widget.sheetType) {
       MapOverlaySheetType.chat => const [0.32, 0.55, 0.92],
       MapOverlaySheetType.explore => const [0.2, 0.5, 0.92],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.92],
     };
-    final initialSize = switch (sheetType) {
+  }
+
+  double get _initialSize {
+    final snapSizes = _snapSizes;
+    return switch (widget.sheetType) {
       MapOverlaySheetType.chat => snapSizes[1],
       MapOverlaySheetType.explore => snapSizes.first,
       MapOverlaySheetType.none => snapSizes.first,
     };
+  }
+
+  @override
+  void didUpdateWidget(covariant _MapOverlaySheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.sheetType != widget.sheetType) {
+      final newSize = _initialSize;
+      setState(() => _currentSize = newSize);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        DraggableScrollableActuator.reset(context);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final handleColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.2);
+
+    final snapSizes = _snapSizes;
+    final initialSize = _initialSize;
+
+    final mediaQuery = MediaQuery.of(context);
+    final totalHeight = mediaQuery.size.height;
+    final currentSize = _currentSize;
+    final isExpanded = currentSize >= snapSizes.last - 0.01;
+    final actionIcon = isExpanded
+        ? Icons.keyboard_arrow_down_rounded
+        : Icons.close;
 
     return Align(
       alignment: Alignment.bottomCenter,
       child: DraggableScrollableActuator(
         child: DraggableScrollableSheet(
+          controller: _controller,
           expand: false,
           minChildSize: snapSizes.first,
           maxChildSize: snapSizes.last,
@@ -428,7 +558,7 @@ class _MapOverlaySheet extends ConsumerWidget {
           snapSizes: snapSizes,
           builder: (context, scrollController) {
             final Widget effectiveContent;
-            switch (sheetType) {
+            switch (widget.sheetType) {
               case MapOverlaySheetType.explore:
                 effectiveContent = MapExploreSheet(scrollController: scrollController);
                 break;
@@ -450,30 +580,54 @@ class _MapOverlaySheet extends ConsumerWidget {
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: handleColor,
-                              borderRadius: BorderRadius.circular(2),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onVerticalDragUpdate: (details) => _onDragUpdate(
+                        details,
+                        snapSizes.first,
+                        snapSizes.last,
+                        totalHeight,
+                      ),
+                      onVerticalDragEnd: (details) =>
+                          _onDragEnd(details, snapSizes),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: handleColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
                             ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              visualDensity: VisualDensity.compact,
-                              icon: const Icon(Icons.close),
-                              onPressed: () => ref
-                                  .read(mapOverlaySheetProvider.notifier)
-                                  .state = MapOverlaySheetType.none,
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                visualDensity: VisualDensity.compact,
+                                icon: Icon(actionIcon),
+                                onPressed: () {
+                                  if (isExpanded) {
+                                    _controller.animateTo(
+                                      snapSizes[snapSizes.length - 2],
+                                      duration: const Duration(milliseconds: 220),
+                                      curve: Curves.easeOutCubic,
+                                    );
+                                    return;
+                                  }
+                                  ref
+                                      .read(mapOverlaySheetProvider.notifier)
+                                      .state = MapOverlaySheetType.none;
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     const Divider(height: 1),

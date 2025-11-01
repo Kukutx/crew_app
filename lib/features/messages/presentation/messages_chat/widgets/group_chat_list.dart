@@ -7,17 +7,27 @@ class GroupChatList extends StatelessWidget {
     super.key,
     required this.events,
     this.onEventTap,
+    this.controller,
+    this.physics,
+    this.padding = const EdgeInsets.only(bottom: 24),
+    this.shrinkWrap = false,
   });
 
   final List<GroupChatPreview> events;
   final ValueChanged<GroupChatPreview>? onEventTap;
+  final ScrollController? controller;
+  final ScrollPhysics? physics;
+  final EdgeInsetsGeometry? padding;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       key: const PageStorageKey('messages-chat-group-list'),
-      padding: const EdgeInsets.only(bottom: 24),
-      physics: const BouncingScrollPhysics(),
+      controller: controller,
+      padding: padding,
+      physics: physics ?? const BouncingScrollPhysics(),
+      shrinkWrap: shrinkWrap,
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];

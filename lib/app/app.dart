@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:crew_app/core/state/auth/auth_providers.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
@@ -13,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
 import 'state/app_overlay_provider.dart';
 import 'state/bottom_navigation_visibility_provider.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -27,6 +26,7 @@ class _AppState extends ConsumerState<App> {
   Timer? _scrollDebounceTimer;
   late final PageController _overlayController = PageController(initialPage: 0);
   ProviderSubscription<int>? _overlayIndexSubscription;
+  ProviderSubscription<MapOverlaySheetType>? _mapSheetSubscription;
 
   @override
   void initState() {
@@ -50,6 +50,32 @@ class _AppState extends ConsumerState<App> {
         );
       },
     );
+
+    _mapSheetSubscription = ref.listenManual(
+      mapOverlaySheetProvider,
+      (previous, next) {
+        if (!mounted) {
+          return;
+        }
+        switch (next) {
+          case MapOverlaySheetType.none:
+            if (_navigationIndex != 1) {
+              setState(() => _navigationIndex = 1);
+            }
+            break;
+          case MapOverlaySheetType.explore:
+            if (_navigationIndex != 0) {
+              setState(() => _navigationIndex = 0);
+            }
+            break;
+          case MapOverlaySheetType.chat:
+            if (_navigationIndex != 2) {
+              setState(() => _navigationIndex = 2);
+            }
+            break;
+        }
+      },
+    );
   }
 
   @override
@@ -57,6 +83,7 @@ class _AppState extends ConsumerState<App> {
     _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _overlayIndexSubscription?.close();
+    _mapSheetSubscription?.close();
     super.dispose();
   }
 
@@ -77,34 +104,6 @@ class _AppState extends ConsumerState<App> {
         setState(() => _isScrolling = false);
       }
     });
-  }
-
-  Future<void> _showEventsListSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.92,
-          child: const MapExploreSheet(),
-        );
-      },
-    );
-  }
-
-  Future<void> _showChatSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.92,
-          child: const ChatSheet(),
-        );
-      },
-    );
   }
 
   @override
@@ -158,7 +157,7 @@ class _AppState extends ConsumerState<App> {
         _index == 0 && ref.watch(bottomNavigationVisibilityProvider);
 
     return Scaffold(
-      extendBody: true,
+      extendBody: false,
       body: Stack(
         children: [
           ScrollActivityListener(
@@ -204,100 +203,70 @@ class _AppState extends ConsumerState<App> {
         ],
       ),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.only(bottom: 28),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: AnimatedSlide(
-            duration: const Duration(milliseconds: 260),
+        child: AnimatedSlide(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeInOut,
+          offset: Offset(0, showBottomNav ? 0 : 1.2),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 180),
             curve: Curves.easeInOut,
-            offset: Offset(0, showBottomNav ? 0 : 1.2),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeInOut,
-              opacity: showBottomNav ? 1 : 0,
-              child: FractionallySizedBox(
-                widthFactor: 0.88,
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 240),
-                      curve: Curves.easeInOut,
-                      decoration: navDecoration(_isScrolling),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child: NavigationBarTheme(
-                        data: theme.navigationBarTheme.copyWith(
-                          backgroundColor: Colors.transparent,
-                          height: 64,
-                          indicatorColor:
-                              colorScheme.primary.withValues(alpha: 0.18),
-                          indicatorShape: const StadiumBorder(),
-                          labelBehavior:
-                              NavigationDestinationLabelBehavior.alwaysShow,
-                          labelTextStyle: WidgetStateProperty.resolveWith(
-                            (states) => theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: states.contains(WidgetState.selected)
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                              color: states.contains(WidgetState.selected)
-                                  ? colorScheme.primary
-                                  : colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          iconTheme: WidgetStateProperty.resolveWith(
-                            (states) => IconThemeData(
-                              size: states.contains(WidgetState.selected)
-                                  ? 30
-                                  : 26,
-                              color: states.contains(WidgetState.selected)
-                                  ? colorScheme.primary
-                                  : colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                        child: NavigationBar(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          selectedIndex: _navigationIndex,
-                          onDestinationSelected: (i) async {
-                            if (i == 0) {
-                              if (_navigationIndex != 0) {
-                                setState(() => _navigationIndex = 0);
-                              }
-                              await _showEventsListSheet(context);
-                              if (!mounted) return;
-                              if (_navigationIndex != 1) {
-                                setState(() => _navigationIndex = 1);
-                              }
-                              return;
-                            }
-                            if (i == 2) {
-                              if (_navigationIndex != 2) {
-                                setState(() => _navigationIndex = 2);
-                              }
-                              await _showChatSheet(context);
-                              if (!mounted) return;
-                              if (_navigationIndex != 1) {
-                                setState(() => _navigationIndex = 1);
-                              }
-                              return;
-                            }
-                            if (_navigationIndex != 1) {
-                              setState(() => _navigationIndex = 1);
-                            }
-                            if (_index != 0) {
-                              ref.read(appOverlayIndexProvider.notifier).state = 0;
-                            }
-                          },
-                          destinations: destinations,
-                        ),
-                      ),
+            opacity: showBottomNav ? 1 : 0,
+            child: Material(
+              color: theme.colorScheme.surface,
+              elevation: _isScrolling ? 12 : 6,
+              shadowColor:
+                  theme.colorScheme.shadow.withValues(alpha: _isScrolling ? 0.12 : 0.18),
+              child: NavigationBarTheme(
+                data: theme.navigationBarTheme.copyWith(
+                  backgroundColor: Colors.transparent,
+                  height: 68,
+                  indicatorColor: colorScheme.primary.withValues(alpha: 0.12),
+                  indicatorShape: const StadiumBorder(),
+                  labelBehavior:
+                      NavigationDestinationLabelBehavior.alwaysShow,
+                  labelTextStyle: WidgetStateProperty.resolveWith(
+                    (states) => theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: states.contains(WidgetState.selected)
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      color: states.contains(WidgetState.selected)
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  iconTheme: WidgetStateProperty.resolveWith(
+                    (states) => IconThemeData(
+                      size: states.contains(WidgetState.selected) ? 30 : 26,
+                      color: states.contains(WidgetState.selected)
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                child: NavigationBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  selectedIndex: _navigationIndex,
+                  onDestinationSelected: (i) {
+                    if (_navigationIndex != i) {
+                      setState(() => _navigationIndex = i);
+                    }
+                    if (i != 0 && i != 2) {
+                      ref.read(mapOverlaySheetProvider.notifier).state =
+                          MapOverlaySheetType.none;
+                    }
+                    if (i == 0) {
+                      ref.read(mapOverlaySheetProvider.notifier).state =
+                          MapOverlaySheetType.explore;
+                    } else if (i == 2) {
+                      ref.read(mapOverlaySheetProvider.notifier).state =
+                          MapOverlaySheetType.chat;
+                    }
+                    if (_index != 0) {
+                      ref.read(appOverlayIndexProvider.notifier).state = 0;
+                    }
+                  },
+                  destinations: destinations,
                 ),
               ),
             ),

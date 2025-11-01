@@ -12,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 
 class ChatSheet extends StatefulWidget {
-  const ChatSheet({super.key});
+  const ChatSheet({super.key, this.scrollController});
+
+  final ScrollController? scrollController;
 
   @override
   State<ChatSheet> createState() => _ChatSheetState();
@@ -478,49 +480,84 @@ class _ChatSheetState extends State<ChatSheet> {
           .toList(growable: false);
     }
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) => setState(() => _searchQuery = value),
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                  hintText: loc.chat_search_hint,
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchQuery.trim().isEmpty
-                      ? null
-                      : IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        ),
-                  filled: true,
-                  fillColor: colorScheme.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+    final privateList = DirectChatList(
+      key: ValueKey('private-$query'),
+      conversations: privateResults
+          .where((conversation) => !conversation.isSystem)
+          .toList(growable: false),
+      onConversationTap: _openPrivateChat,
+      onAvatarTap: (conversation) {
+        final participant = _privateContactsByConversationId[conversation.id];
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => UserProfilePage(
+              uid: participant?.id ?? conversation.id,
+            ),
+          ),
+        );
+      },
+      showSectionHeaders: _systemPrivateConversations.isNotEmpty,
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(bottom: 12),
+    );
+
+    final groupList = GroupChatList(
+      key: ValueKey('registered-$query'),
+      events: eventResults,
+      onEventTap: _openGroupChat,
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(bottom: 12),
+    );
+
+    final scrollable = CustomScrollView(
+      controller: widget.scrollController,
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => setState(() => _searchQuery = value),
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: loc.chat_search_hint,
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.trim().isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      ),
+                filled: true,
+                fillColor: colorScheme.surfaceContainerHighest,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
                 ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
               ),
             ),
-            const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+          ),
+        ),
+        const SliverToBoxAdapter(child: Divider(height: 1)),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          sliver: SliverToBoxAdapter(
             child: ToggleTabBar(
               selectedIndex: _tab,
               firstLabel: loc.messages_tab_private,
               secondLabel: loc.messages_tab_groups,
               onChanged: (value) => setState(() => _tab = value),
-              trailingBuilder: (_, _) {
+              trailingBuilder: (_, __) {
                 final hasUnreadNotifications = _systemPrivateConversations
                     .any((conversation) => conversation.hasUnread);
                 final canOpenNotifications =
@@ -569,42 +606,25 @@ class _ChatSheetState extends State<ChatSheet> {
               },
             ),
           ),
-          Expanded(
-            child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                child: _tab == 0
-                    ? DirectChatList(
-                        key: ValueKey('private-$query'),
-                        conversations: privateResults
-                            .where((conversation) => !conversation.isSystem)
-                            .toList(growable: false),
-                        onConversationTap: _openPrivateChat,
-                        onAvatarTap: (conversation) {
-                          final participant =
-                              _privateContactsByConversationId[conversation.id];
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => UserProfilePage(
-                                uid: participant?.id ?? conversation.id,
-                              ),
-                            ),
-                          );
-                        },
-                        showSectionHeaders:
-                            _systemPrivateConversations.isNotEmpty,
-                      )
-                    : GroupChatList(
-                        key: ValueKey('registered-$query'),
-                        events: eventResults,
-                        onEventTap: _openGroupChat,
-                      ),
-              ),
-            ),
-          ],
         ),
-      ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+          sliver: SliverToBoxAdapter(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: _tab == 0 ? privateList : groupList,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: scrollable,
     );
   }
 }

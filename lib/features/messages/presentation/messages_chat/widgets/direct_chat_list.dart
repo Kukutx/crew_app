@@ -10,6 +10,10 @@ class DirectChatList extends StatelessWidget {
     this.onAvatarTap,
     this.showSectionHeaders = true,
     this.storageKey,
+    this.controller,
+    this.physics,
+    this.padding = const EdgeInsets.only(bottom: 24),
+    this.shrinkWrap = false,
   });
 
   final List<DirectChatPreview> conversations;
@@ -17,6 +21,10 @@ class DirectChatList extends StatelessWidget {
   final ValueChanged<DirectChatPreview>? onAvatarTap;
   final bool showSectionHeaders;
   final Key? storageKey;
+  final ScrollController? controller;
+  final ScrollPhysics? physics;
+  final EdgeInsetsGeometry? padding;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +87,10 @@ class DirectChatList extends StatelessWidget {
 
     return ListView(
       key: storageKey ?? const PageStorageKey('messages-chat-private-list'),
-      padding: const EdgeInsets.only(bottom: 24),
-      physics: const BouncingScrollPhysics(),
+      controller: controller,
+      padding: padding,
+      physics: physics ?? const BouncingScrollPhysics(),
+      shrinkWrap: shrinkWrap,
       children: tiles,
     );
   }

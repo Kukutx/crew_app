@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
+import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +26,7 @@ import 'controllers/map_controller.dart';
 import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import 'controllers/location_selection_manager.dart';
+import 'state/map_overlay_sheet_provider.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -98,6 +101,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final locationSelectionManager = ref.watch(
       locationSelectionManagerProvider,
     );
+    final mapSheetType = ref.watch(mapOverlaySheetProvider);
 
     final cardVisible =
         carouselManager.isVisible && carouselManager.events.isNotEmpty;
@@ -316,6 +320,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 ),
               ),
             ),
+          if (mapSheetType != MapOverlaySheetType.none)
+            _MapOverlaySheet(sheetType: mapSheetType),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -385,5 +391,107 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     ref.read(appOverlayIndexProvider.notifier).state = 1;
+  }
+}
+
+class _MapOverlaySheet extends ConsumerWidget {
+  const _MapOverlaySheet({required this.sheetType});
+
+  static const double _minChildSize = 0.25;
+  static const double _maxChildSize = 0.92;
+
+  final MapOverlaySheetType sheetType;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final handleColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.18);
+
+    final initialSize = sheetType == MapOverlaySheetType.chat ? 0.42 : 0.36;
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: DraggableScrollableActuator(
+        child: DraggableScrollableSheet(
+          expand: false,
+          minChildSize: _minChildSize,
+          maxChildSize: _maxChildSize,
+          initialChildSize: initialSize,
+          builder: (context, scrollController) {
+            final Widget effectiveContent;
+            switch (sheetType) {
+              case MapOverlaySheetType.explore:
+                effectiveContent = MapExploreSheet(scrollController: scrollController);
+                break;
+              case MapOverlaySheetType.chat:
+                effectiveContent = ChatSheet(scrollController: scrollController);
+                break;
+              case MapOverlaySheetType.none:
+                effectiveContent = const SizedBox.shrink();
+                break;
+            }
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.shadow.withValues(alpha: 0.14),
+                      blurRadius: 32,
+                      offset: const Offset(0, 16),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 12, 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Container(
+                                  width: 46,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: handleColor,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(Icons.close),
+                              onPressed: () => ref
+                                  .read(mapOverlaySheetProvider.notifier)
+                                  .state = MapOverlaySheetType.none,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: SafeArea(
+                          top: false,
+                          child: effectiveContent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

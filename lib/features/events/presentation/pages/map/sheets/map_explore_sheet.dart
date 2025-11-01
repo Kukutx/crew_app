@@ -15,9 +15,12 @@ import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import '../../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
+import '../state/map_overlay_sheet_provider.dart';
 
 class MapExploreSheet extends ConsumerStatefulWidget {
-  const MapExploreSheet({super.key});
+  const MapExploreSheet({super.key, this.scrollController});
+
+  final ScrollController? scrollController;
 
   @override
   ConsumerState<MapExploreSheet> createState() => _MapExploreSheetState();
@@ -166,146 +169,153 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       );
     });
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: ToggleTabBar(
-                selectedIndex: _tab,
-                firstLabel: loc.events_tab_invites,
-                secondLabel: loc.events_tab_moments,
-                firstIcon: Icons.campaign,
-                secondIcon: Icons.public,
-                onChanged: (value) => setState(() => _tab = value),
-                leadingBuilder: (context, _) {
-                  final theme = Theme.of(context);
-                  final buttonColor = theme.colorScheme.surfaceContainerHighest;
+    Widget buildInvitesContent() {
+      return eventsAsync.when(
+        data: (events) {
+          if (events.isEmpty) {
+            return _CenteredMessage(text: loc.no_events);
+          }
 
-                  return PopupMenuButton<String>(
-                    onSelected: (value) {
-                      setState(() {
-                        _selectedFilter = value;
-                      });
-                    },
-                    itemBuilder: (context) => [
-                      for (final filter in _filters)
-                        PopupMenuItem<String>(
-                          value: filter,
-                          child: Text(filter),
-                        ),
-                    ],
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: buttonColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_selectedFilter ?? _filters.first),
-                          const SizedBox(width: 4),
-                          const Icon(Icons.keyboard_arrow_down, size: 18),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                trailingBuilder: (context, selectedIndex) {
-                  final isInvitesTab = selectedIndex == 0;
-                  final onPressed = isInvitesTab
-                      ? () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (routeContext) => RoadTripEditorPage(
-                                onClose: () => Navigator.of(routeContext).pop(),
-                              ),
-                            ),
-                          );
-                        }
-                      : () => showCreateMomentSheet(context);
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: onPressed,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Icons.add),
-                    ),
-                  );
-                },
-              ),
+          return AppMasonryGrid(
+            padding: const EdgeInsets.only(bottom: 16),
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            itemCount: events.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, i) => EventGridCard(
+              event: events[i],
+              heroTag: 'event_$i',
+              onShowOnMap: (event) {
+                ref.read(mapOverlaySheetProvider.notifier).state =
+                    MapOverlaySheetType.none;
+                ref.read(appOverlayIndexProvider.notifier).state = 0;
+                ref.read(mapFocusEventProvider.notifier).state = event;
+              },
             ),
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                child: _tab == 0
-                    ? KeyedSubtree(
-                        key: const ValueKey('invites'),
-                        child: RefreshIndicator(
-                          onRefresh: () async =>
-                              await ref.refresh(eventsProvider.future),
-                          child: eventsAsync.when(
-                            data: (events) {
-                              if (events.isEmpty) {
-                                return _CenteredScrollable(
-                                  child: Text(loc.no_events),
-                                );
-                              }
+          );
+        },
+        loading: () => const Padding(
+          padding: EdgeInsets.symmetric(vertical: 40),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (error, __) => _CenteredMessage(text: _errorMessage(error)),
+      );
+    }
 
-                              return AppMasonryGrid(
-                                padding: const EdgeInsets.all(8),
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 8,
-                                crossAxisSpacing: 8,
-                                itemCount: events.length,
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                itemBuilder: (context, i) => EventGridCard(
-                                  event: events[i],
-                                  heroTag: 'event_$i',
-                                  onShowOnMap: (event) {
-                                    Navigator.of(context).maybePop();
-                                    ref
-                                            .read(
-                                              appOverlayIndexProvider.notifier,
-                                            )
-                                            .state =
-                                        0;
-                                    ref
-                                            .read(
-                                              mapFocusEventProvider.notifier,
-                                            )
-                                            .state =
-                                        event;
-                                  },
-                                ),
-                              );
-                            },
-                            loading: () => const _CenteredScrollable(
-                              child: CircularProgressIndicator(),
-                            ),
-                            error: (_, _) => _CenteredScrollable(
-                              child: Text(loc.load_failed),
+    final scrollable = CustomScrollView(
+      controller: widget.scrollController,
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: ToggleTabBar(
+              selectedIndex: _tab,
+              firstLabel: loc.events_tab_invites,
+              secondLabel: loc.events_tab_moments,
+              firstIcon: Icons.campaign,
+              secondIcon: Icons.public,
+              onChanged: (value) => setState(() => _tab = value),
+              leadingBuilder: (context, _) {
+                final theme = Theme.of(context);
+                final buttonColor = theme.colorScheme.surfaceContainerHighest;
+
+                return PopupMenuButton<String>(
+                  onSelected: (value) {
+                    setState(() {
+                      _selectedFilter = value;
+                    });
+                  },
+                  itemBuilder: (context) => [
+                    for (final filter in _filters)
+                      PopupMenuItem<String>(
+                        value: filter,
+                        child: Text(filter),
+                      ),
+                  ],
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: buttonColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(_selectedFilter ?? _filters.first),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.keyboard_arrow_down, size: 18),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              trailingBuilder: (context, selectedIndex) {
+                final isInvitesTab = selectedIndex == 0;
+                final onPressed = isInvitesTab
+                    ? () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (routeContext) => RoadTripEditorPage(
+                              onClose: () => Navigator.of(routeContext).pop(),
                             ),
                           ),
-                        ),
-                      )
-                    : KeyedSubtree(
-                        key: const ValueKey('plaza'),
-                        child: _MapEventsPlazaFeed(posts: _plazaPosts),
-                      ),
-              ),
+                        );
+                      }
+                    : () => showCreateMomentSheet(context);
+                return InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: onPressed,
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(Icons.add),
+                  ),
+                );
+              },
             ),
-          ],
+          ),
         ),
-      ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          sliver: SliverToBoxAdapter(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: _tab == 0
+                  ? KeyedSubtree(
+                      key: const ValueKey('invites'),
+                      child: buildInvitesContent(),
+                    )
+                  : KeyedSubtree(
+                      key: const ValueKey('plaza'),
+                      child: _MapEventsPlazaFeed(posts: _plazaPosts),
+                    ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    final effectiveContent = _tab == 0
+        ? RefreshIndicator(
+            onRefresh: () async =>
+                await ref.refresh(eventsProvider.future),
+            child: scrollable,
+          )
+        : scrollable;
+
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: effectiveContent,
     );
   }
 }
@@ -318,10 +328,10 @@ class _MapEventsPlazaFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      primary: false,
       itemBuilder: (context, index) {
         final post = posts[index];
         return PlazaPostCard(
@@ -349,25 +359,24 @@ String _errorMessage(Object error) {
   return msg.isEmpty ? 'Unknown error' : msg;
 }
 
-class _CenteredScrollable extends StatelessWidget {
-  final Widget child;
+class _CenteredMessage extends StatelessWidget {
+  final String text;
 
-  const _CenteredScrollable({required this.child});
+  const _CenteredMessage({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            SizedBox(
-              height: constraints.maxHeight,
-              child: Center(child: child),
-            ),
-          ],
-        );
-      },
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.9);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48),
+      child: Center(
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(color: color),
+        ),
+      ),
     );
   }
 }

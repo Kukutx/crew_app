@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:crew_app/core/state/auth/auth_providers.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
@@ -13,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
 import 'state/app_overlay_provider.dart';
 import 'state/bottom_navigation_visibility_provider.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -27,6 +26,7 @@ class _AppState extends ConsumerState<App> {
   Timer? _scrollDebounceTimer;
   late final PageController _overlayController = PageController(initialPage: 0);
   ProviderSubscription<int>? _overlayIndexSubscription;
+  ProviderSubscription<MapOverlaySheetType>? _mapSheetSubscription;
 
   @override
   void initState() {
@@ -50,6 +50,32 @@ class _AppState extends ConsumerState<App> {
         );
       },
     );
+
+    _mapSheetSubscription = ref.listenManual(
+      mapOverlaySheetProvider,
+      (previous, next) {
+        if (!mounted) {
+          return;
+        }
+        switch (next) {
+          case MapOverlaySheetType.none:
+            if (_navigationIndex != 1) {
+              setState(() => _navigationIndex = 1);
+            }
+            break;
+          case MapOverlaySheetType.explore:
+            if (_navigationIndex != 0) {
+              setState(() => _navigationIndex = 0);
+            }
+            break;
+          case MapOverlaySheetType.chat:
+            if (_navigationIndex != 2) {
+              setState(() => _navigationIndex = 2);
+            }
+            break;
+        }
+      },
+    );
   }
 
   @override
@@ -57,6 +83,7 @@ class _AppState extends ConsumerState<App> {
     _overlayController.dispose();
     _scrollDebounceTimer?.cancel();
     _overlayIndexSubscription?.close();
+    _mapSheetSubscription?.close();
     super.dispose();
   }
 
@@ -79,34 +106,6 @@ class _AppState extends ConsumerState<App> {
     });
   }
 
-  Future<void> _showEventsListSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.92,
-          child: const MapExploreSheet(),
-        );
-      },
-    );
-  }
-
-  Future<void> _showChatSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.92,
-          child: const ChatSheet(),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -124,7 +123,7 @@ class _AppState extends ConsumerState<App> {
         ),
         color: isScrolling
             ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.52)
-            : colorScheme.surface,
+            : colorScheme.surface.withValues(alpha: 0.9),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: isScrolling ? 0.08 : 0.12),
@@ -204,7 +203,7 @@ class _AppState extends ConsumerState<App> {
         ],
       ),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.only(bottom: 28),
+        minimum: const EdgeInsets.fromLTRB(20, 0, 20, 22),
         child: Align(
           alignment: Alignment.bottomCenter,
           child: AnimatedSlide(
@@ -215,26 +214,23 @@ class _AppState extends ConsumerState<App> {
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeInOut,
               opacity: showBottomNav ? 1 : 0,
-              child: FractionallySizedBox(
-                widthFactor: 0.88,
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 240),
-                      curve: Curves.easeInOut,
-                      decoration: navDecoration(_isScrolling),
+              child: ClipRRect(
+                borderRadius: borderRadius,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  child: DecoratedBox(
+                    decoration: navDecoration(_isScrolling),
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
+                        horizontal: 18,
+                        vertical: 12,
                       ),
                       child: NavigationBarTheme(
                         data: theme.navigationBarTheme.copyWith(
                           backgroundColor: Colors.transparent,
                           height: 64,
                           indicatorColor:
-                              colorScheme.primary.withValues(alpha: 0.18),
+                              colorScheme.primary.withValues(alpha: 0.16),
                           indicatorShape: const StadiumBorder(),
                           labelBehavior:
                               NavigationDestinationLabelBehavior.alwaysShow,
@@ -263,31 +259,20 @@ class _AppState extends ConsumerState<App> {
                           backgroundColor: Colors.transparent,
                           elevation: 0,
                           selectedIndex: _navigationIndex,
-                          onDestinationSelected: (i) async {
+                          onDestinationSelected: (i) {
+                            if (_navigationIndex != i) {
+                              setState(() => _navigationIndex = i);
+                            }
+                            if (i != 0 && i != 2) {
+                              ref.read(mapOverlaySheetProvider.notifier).state =
+                                  MapOverlaySheetType.none;
+                            }
                             if (i == 0) {
-                              if (_navigationIndex != 0) {
-                                setState(() => _navigationIndex = 0);
-                              }
-                              await _showEventsListSheet(context);
-                              if (!mounted) return;
-                              if (_navigationIndex != 1) {
-                                setState(() => _navigationIndex = 1);
-                              }
-                              return;
-                            }
-                            if (i == 2) {
-                              if (_navigationIndex != 2) {
-                                setState(() => _navigationIndex = 2);
-                              }
-                              await _showChatSheet(context);
-                              if (!mounted) return;
-                              if (_navigationIndex != 1) {
-                                setState(() => _navigationIndex = 1);
-                              }
-                              return;
-                            }
-                            if (_navigationIndex != 1) {
-                              setState(() => _navigationIndex = 1);
+                              ref.read(mapOverlaySheetProvider.notifier).state =
+                                  MapOverlaySheetType.explore;
+                            } else if (i == 2) {
+                              ref.read(mapOverlaySheetProvider.notifier).state =
+                                  MapOverlaySheetType.chat;
                             }
                             if (_index != 0) {
                               ref.read(appOverlayIndexProvider.notifier).state = 0;

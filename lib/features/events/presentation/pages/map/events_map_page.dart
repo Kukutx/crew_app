@@ -7,6 +7,7 @@ import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -424,10 +425,22 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
 
   void _handleSizeChanged() {
     final size = _controller.size;
-    if (size == _currentSize || !mounted) {
+    if ((size - _currentSize).abs() < 1e-4 || !mounted) {
       return;
     }
-    setState(() => _currentSize = size);
+
+    final schedulerPhase = SchedulerBinding.instance.schedulerPhase;
+    if (schedulerPhase == SchedulerPhase.idle) {
+      setState(() => _currentSize = size);
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _currentSize = size);
+    });
   }
 
   void _onDragUpdate(

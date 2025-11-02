@@ -284,7 +284,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
-                title: const Text('编辑活动'),
+                title: const Text('编辑'),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   final event = widget.event;
@@ -330,7 +330,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
               const Divider(height: 0),
               ListTile(
                 leading: const Icon(Icons.delete_outline),
-                title: const Text('删除活动'),
+                title: const Text('删除'),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

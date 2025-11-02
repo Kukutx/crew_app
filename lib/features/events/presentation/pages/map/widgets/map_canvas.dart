@@ -13,6 +13,7 @@ class MapCanvas extends StatelessWidget {
   final ValueChanged<CameraPosition>? onCameraMove;
   final VoidCallback? onCameraIdle;
   final Set<Marker> markers;
+  final Set<ClusterManager> clusterManagers;
   final bool showUserLocation;
   final EdgeInsets mapPadding;
 
@@ -27,6 +28,7 @@ class MapCanvas extends StatelessWidget {
     this.onCameraMove,
     this.onCameraIdle,
     this.markers = const <Marker>{},
+    this.clusterManagers = const <ClusterManager>{},
     this.showUserLocation = false,
     this.mapPadding = EdgeInsets.zero,
   });
@@ -47,6 +49,7 @@ class MapCanvas extends StatelessWidget {
       onCameraMove: onCameraMove,
       onCameraIdle: onCameraIdle,
       markers: markers,
+      clusterManagers: clusterManagers,
       myLocationEnabled: showUserLocation,
       zoomControlsEnabled: false,
       mapToolbarEnabled: true,

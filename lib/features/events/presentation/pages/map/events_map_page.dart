@@ -45,10 +45,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   ProviderSubscription<Event?>? _mapFocusSubscription;
   ProviderSubscription<EventCarouselManager>? _carouselSubscription;
   bool _isDrawerOpen = false;
+  final ClusterManagerId _eventsClusterManagerId =
+      const ClusterManagerId('events_cluster_manager');
+  late final ClusterManager _eventsClusterManager;
 
   @override
   void initState() {
     super.initState();
+    _eventsClusterManager = ClusterManager(
+      clusterManagerId: _eventsClusterManagerId,
+      onClusterTap: (cluster) {
+        final controller = ref.read(mapControllerProvider);
+        unawaited(controller.moveCamera(cluster.position, zoom: 14));
+      },
+    );
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -141,6 +151,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           mapController.focusOnEvent(event);
           carouselManager.showEventCard(event);
         },
+        clusterManagerId: _eventsClusterManagerId,
       ),
     );
 
@@ -149,6 +160,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         selectionState.isSelectingDestination;
     final markers = <Marker>{
       if (!shouldHideEventMarkers) ...markersLayer.markers,
+    };
+    final clusterManagers = <ClusterManager>{
+      if (!shouldHideEventMarkers) _eventsClusterManager,
     };
     final selected = selectionState.selectedLatLng;
     if (selected != null) {
@@ -276,6 +290,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 );
               },
               markers: markers,
+              clusterManagers: clusterManagers,
               showUserLocation: true,
               mapPadding: selectionState.mapPadding,
             ),

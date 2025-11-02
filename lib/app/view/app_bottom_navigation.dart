@@ -51,6 +51,11 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
             setState(() => _navigationIndex = 2);
           }
           break;
+        case MapOverlaySheetType.roadTripCreate:
+          if (_navigationIndex != 1) {
+            setState(() => _navigationIndex = 1);
+          }
+          break;
       }
     });
   }

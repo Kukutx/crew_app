@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
@@ -233,7 +235,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   }
 
   void _openEditProfile() {
-    Navigator.of(context).pushNamed('/preferences');
+    if (!mounted) {
+      return;
+    }
+    context.push(AppRoutePaths.preferences);
   }
 
   @override
@@ -289,7 +294,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
         if (isViewingSelf)
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+            onPressed: () {
+              if (!mounted) {
+                return;
+              }
+              context.push(AppRoutePaths.settings);
+            },
           ),
       ],
       flexibleSpace: LayoutBuilder(

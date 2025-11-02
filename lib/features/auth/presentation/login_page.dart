@@ -1,8 +1,10 @@
 import 'dart:io' show Platform;
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,9 +14,6 @@ import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-
-/// 登录完成后跳转的路由名
-const String kHomeRoute = '/';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -65,7 +64,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
       await ref.read(authenticatedUserProvider.notifier).refreshProfile();
 
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(kHomeRoute);
+      context.go(AppRoutePaths.home);
     } on ApiException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e, st) {

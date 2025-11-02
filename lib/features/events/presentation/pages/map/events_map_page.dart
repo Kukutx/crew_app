@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
@@ -388,7 +390,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     }
     ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
     if (!authed) {
-      Navigator.of(context).pushNamed('/login');
+      if (!mounted) {
+        return;
+      }
+      context.push(AppRoutePaths.login);
       return;
     }
     ref.read(appOverlayIndexProvider.notifier).state = 1;

@@ -1,3 +1,4 @@
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/state/settings_providers.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }
 
@@ -97,7 +99,7 @@ class SettingsPage extends ConsumerWidget {
                 leading: const Icon(Icons.account_balance_wallet_outlined),
                 title: Text(loc.wallet_title),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).pushNamed('/wallet'),
+                onTap: () => context.push(AppRoutePaths.wallet),
               ),
               ListTile(
                 leading: const Icon(Icons.workspace_premium_outlined),

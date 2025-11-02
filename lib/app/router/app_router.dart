@@ -1,0 +1,136 @@
+import 'package:crew_app/app/app.dart';
+import 'package:crew_app/core/monitoring/monitoring_providers.dart';
+import 'package:crew_app/features/auth/presentation/login_page.dart';
+import 'package:crew_app/features/expenses/expenses_page.dart';
+import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
+import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
+import 'package:crew_app/features/user/presentation/pages/drafts/my_drafts_page.dart';
+import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
+import 'package:crew_app/features/user/presentation/pages/moments/my_moments_page.dart';
+import 'package:crew_app/features/user/presentation/pages/qr/my_qr_code_page.dart';
+import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/wallet_page.dart';
+import 'package:crew_app/features/user/presentation/pages/settings/settings_page.dart';
+import 'package:crew_app/features/user/presentation/pages/support/support_feedback_page.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
+import 'package:crew_app/shared/widgets/qr_scanner/qr_scanner_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+class AppRoutePaths {
+  static const String home = '/';
+  static const String login = '/login';
+  static const String settings = '/settings';
+  static const String preferences = '/preferences';
+  static const String messagesChat = '/messages_chat';
+  static const String expenses = '/expenses';
+  static const String wallet = '/wallet';
+  static const String support = '/support';
+  static const String moments = '/moments';
+  static const String drafts = '/drafts';
+  static const String addFriend = '/add_friend';
+  static const String qrScanner = '/qr-scanner';
+  static const String myQrCode = '/my-qr-code';
+  static const String profile = '/profile';
+}
+
+class AppRouteNames {
+  static const String home = 'home';
+  static const String login = 'login';
+  static const String settings = 'settings';
+  static const String preferences = 'preferences';
+  static const String messagesChat = 'messages_chat';
+  static const String expenses = 'expenses';
+  static const String wallet = 'wallet';
+  static const String support = 'support';
+  static const String moments = 'moments';
+  static const String drafts = 'drafts';
+  static const String addFriend = 'add_friend';
+  static const String qrScanner = 'qr_scanner';
+  static const String myQrCode = 'my_qr_code';
+  static const String profile = 'profile';
+}
+
+final crewAppRouterProvider = Provider<GoRouter>((ref) {
+  final observer = ref.watch(talkerRouteObserverProvider);
+
+  return GoRouter(
+    initialLocation: AppRoutePaths.home,
+    observers: [observer],
+    routes: [
+      GoRoute(
+        path: AppRoutePaths.home,
+        name: AppRouteNames.home,
+        builder: (context, state) => const App(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.login,
+        name: AppRouteNames.login,
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.settings,
+        name: AppRouteNames.settings,
+        builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.preferences,
+        name: AppRouteNames.preferences,
+        builder: (context, state) => EditProfilePage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.messagesChat,
+        name: AppRouteNames.messagesChat,
+        builder: (context, state) => const ChatSheet(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.expenses,
+        name: AppRouteNames.expenses,
+        builder: (context, state) => const ExpensesPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.wallet,
+        name: AppRouteNames.wallet,
+        builder: (context, state) => const WalletPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.support,
+        name: AppRouteNames.support,
+        builder: (context, state) => const SupportFeedbackPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.moments,
+        name: AppRouteNames.moments,
+        builder: (context, state) => const MyMomentsPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.drafts,
+        name: AppRouteNames.drafts,
+        builder: (context, state) => const MyDraftsPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.addFriend,
+        name: AppRouteNames.addFriend,
+        builder: (context, state) => const AddFriendPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.qrScanner,
+        name: AppRouteNames.qrScanner,
+        builder: (context, state) => const QrScannerScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.myQrCode,
+        name: AppRouteNames.myQrCode,
+        builder: (context, state) => const MyQrCodePage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.profile,
+        name: AppRouteNames.profile,
+        builder: (context, state) {
+          final uid = state.extra is String ? state.extra as String : null;
+          return UserProfilePage(uid: uid);
+        },
+      ),
+    ],
+  );
+});
+

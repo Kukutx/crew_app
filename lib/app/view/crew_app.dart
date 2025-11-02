@@ -1,30 +1,14 @@
 import 'dart:async';
 
-import 'package:crew_app/app/app.dart';
-import 'package:crew_app/core/monitoring/monitoring_providers.dart';
-import 'package:crew_app/features/auth/presentation/login_page.dart';
-import 'package:crew_app/features/expenses/expenses_page.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
-import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
-import 'package:crew_app/features/user/presentation/pages/drafts/my_drafts_page.dart';
-import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
-import 'package:crew_app/features/user/presentation/pages/moments/my_moments_page.dart';
-import 'package:crew_app/features/user/presentation/pages/qr/my_qr_code_page.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/wallet_page.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/settings_page.dart';
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/features/user/presentation/pages/settings/state/settings_providers.dart';
-import 'package:crew_app/features/user/presentation/pages/support/support_feedback_page.dart';
-import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/widgets/qr_scanner/qr_scanner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quick_actions/quick_actions.dart';
 
 const String _scanQrShortcutType = 'action_scan_qr';
 const String _myQrShortcutType = 'action_my_qr_code';
-
-final GlobalKey<NavigatorState> crewAppNavigatorKey = GlobalKey<NavigatorState>();
 
 class CrewApp extends ConsumerStatefulWidget {
   const CrewApp({super.key});
@@ -75,17 +59,12 @@ class _CrewAppState extends ConsumerState<CrewApp> {
       return false;
     }
 
-    final navigator = crewAppNavigatorKey.currentState;
-    if (navigator == null) {
-      return false;
-    }
-
     switch (shortcutType) {
       case _scanQrShortcutType:
-        navigator.pushNamed('/qr-scanner');
+        ref.read(crewAppRouterProvider).push(AppRoutePaths.qrScanner);
         return true;
       case _myQrShortcutType:
-        navigator.pushNamed('/my-qr-code');
+        ref.read(crewAppRouterProvider).push(AppRoutePaths.myQrCode);
         return true;
       default:
         return false;
@@ -142,10 +121,9 @@ class _CrewAppState extends ConsumerState<CrewApp> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
-    final routeObserver = ref.watch(talkerRouteObserverProvider);
+    final router = ref.watch(crewAppRouterProvider);
 
-    return MaterialApp(
-      navigatorKey: crewAppNavigatorKey,
+    return MaterialApp.router(
       title: 'Events Demo',
       locale: settings.locale,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -153,8 +131,7 @@ class _CrewAppState extends ConsumerState<CrewApp> {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: settings.themeMode,
-      navigatorObservers: [routeObserver],
-      routes: appRoutes,
+      routerConfig: router,
       builder: (context, child) {
         final loc = AppLocalizations.of(context);
         if (loc != null) {
@@ -167,24 +144,3 @@ class _CrewAppState extends ConsumerState<CrewApp> {
     );
   }
 }
-
-final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
-  '/': (context) => const App(),
-  '/login': (context) => const LoginPage(),
-  '/settings': (context) => const SettingsPage(),
-  '/preferences': (context) => EditProfilePage(),
-  '/messages_chat': (context) => const ChatSheet(),
-  '/expenses': (context) => const ExpensesPage(),
-  '/wallet': (context) => const WalletPage(),
-  '/support': (context) => const SupportFeedbackPage(),
-  '/moments': (context) => const MyMomentsPage(),
-  '/drafts': (context) => const MyDraftsPage(),
-  '/add_friend': (context) => const AddFriendPage(),
-  '/qr-scanner': (context) => const QrScannerScreen(),
-  '/my-qr-code': (context) => const MyQrCodePage(),
-  '/profile': (context) {
-    final args = ModalRoute.of(context)?.settings.arguments;
-    final uid = args is String ? args : null;
-    return UserProfilePage(uid: uid);
-  },
-};

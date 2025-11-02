@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key, required this.onClose});
@@ -17,7 +18,7 @@ class _AppDrawerState extends State<AppDrawer> {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final navigator = Navigator.of(context);
+    final router = GoRouter.of(context);
 
     final menuGroups = <_AppMenuGroup>[
       _AppMenuGroup(
@@ -29,7 +30,7 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               widget.onClose();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/add_friend');
+                router.push(AppRoutePaths.addFriend);
               });
             },
           ),
@@ -52,7 +53,7 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               widget.onClose();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/moments');
+                router.push(AppRoutePaths.moments);
               });
             },
           ),
@@ -63,7 +64,7 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               widget.onClose();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/expenses');
+                router.push(AppRoutePaths.expenses);
               });
             },
           ),
@@ -74,7 +75,7 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               widget.onClose();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/wallet');
+                router.push(AppRoutePaths.wallet);
               });
             },
           ),
@@ -89,7 +90,7 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               widget.onClose();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                navigator.pushNamed('/drafts');
+                router.push(AppRoutePaths.drafts);
               });
             },
           ),
@@ -104,7 +105,7 @@ class _AppDrawerState extends State<AppDrawer> {
         onTap: () {
           widget.onClose();
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            navigator.pushNamed('/qr-scanner');
+            router.push(AppRoutePaths.qrScanner);
           });
         },
       ),
@@ -114,7 +115,7 @@ class _AppDrawerState extends State<AppDrawer> {
         onTap: () {
           widget.onClose();
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            navigator.pushNamed('/support');
+            router.push(AppRoutePaths.support);
           });
         },
       ),
@@ -124,7 +125,7 @@ class _AppDrawerState extends State<AppDrawer> {
         onTap: () {
           widget.onClose();
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            navigator.pushNamed('/settings');
+            router.push(AppRoutePaths.settings);
           });
         },
       ),

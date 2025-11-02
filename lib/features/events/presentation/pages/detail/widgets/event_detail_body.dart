@@ -9,7 +9,9 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 
 class EventDetailBody extends StatefulWidget {
@@ -180,7 +182,10 @@ class _EventDetailBodyState extends State<EventDetailBody>
   }
 
   void _openGroupExpensePage() {
-    Navigator.of(context).pushNamed("/expenses");
+    if (!mounted) {
+      return;
+    }
+    context.push(AppRoutePaths.expenses);
   }
 
   double get _currentHeaderHeight =>

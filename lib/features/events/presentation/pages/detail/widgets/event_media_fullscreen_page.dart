@@ -231,6 +231,7 @@ class _FullscreenImageViewer extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.contain,
+        memCacheHeight: 512, // 合理压缩，减内存抖动
         fadeInDuration: const Duration(milliseconds: 200),
         fadeOutDuration: const Duration(milliseconds: 200),
         errorWidget: (context, url, error) =>

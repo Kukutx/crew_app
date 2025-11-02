@@ -141,6 +141,7 @@ class _NetworkImageSlide extends StatelessWidget {
       imageUrl: url,
       width: double.infinity,
       fit: BoxFit.cover,
+      memCacheHeight: 512, // 合理压缩，减内存抖动
       placeholder: (context, url) => const Center(
         child: CircularProgressIndicator(),
       ),

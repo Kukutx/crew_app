@@ -84,6 +84,7 @@ class ProfilePreviewSection extends StatelessWidget {
             Positioned.fill(
               child: CachedNetworkImage(
                 imageUrl: coverUrl,
+                memCacheHeight: 512, // 合理压缩，减内存抖动
                 fit: BoxFit.cover,
               ),
             ),

@@ -319,7 +319,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           return Stack(
             fit: StackFit.expand,
             children: [
-              CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover),
+              CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover ,memCacheHeight: 512),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(

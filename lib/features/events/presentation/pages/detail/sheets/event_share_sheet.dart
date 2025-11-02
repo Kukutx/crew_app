@@ -395,6 +395,7 @@ class _SharePreviewImage extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       width: double.infinity,
+      memCacheHeight: 512, // 合理压缩，减内存抖动
       placeholder: (context, url) =>
           const Center(child: CircularProgressIndicator()),
       errorWidget: (context, url, error) => const EventImagePlaceholder(),

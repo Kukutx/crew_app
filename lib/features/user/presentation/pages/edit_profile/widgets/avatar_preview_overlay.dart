@@ -41,6 +41,7 @@ class AvatarPreviewOverlay extends StatelessWidget {
                           )
                         : CachedNetworkImage(
                             imageUrl: imageUrl,
+                            memCacheHeight: 512, // 合理压缩，减内存抖动
                             fit: BoxFit.cover,
                           ),
                   ),

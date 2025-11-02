@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class CrewAvatar extends StatelessWidget {
@@ -37,14 +38,47 @@ class CrewAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final targetPixels = (_effectiveSize * devicePixelRatio).round();
     final effectiveBorderRadius =
         borderRadius ?? BorderRadius.circular(_effectiveSize / 3);
     final effectiveBackgroundColor = backgroundColor ??
-        (backgroundImage == null
-            ? theme.colorScheme.surfaceContainerHighest
-            : Colors.transparent);
+        theme.colorScheme.surfaceContainerHighest;
     final effectiveForegroundColor =
         foregroundColor ?? theme.colorScheme.onSurface;
+
+    Widget buildPlaceholder() => Container(
+          color: effectiveBackgroundColor,
+        );
+
+    Widget? buildBackgroundImage() {
+      if (backgroundImage == null) {
+        return null;
+      }
+
+      if (backgroundImage case final CachedNetworkImageProvider provider) {
+        return CachedNetworkImage(
+          imageUrl: provider.url,
+          cacheKey: provider.cacheKey,
+          httpHeaders: provider.headers,
+          cacheManager: provider.cacheManager,
+          memCacheHeight: provider.memCacheHeight ?? targetPixels,
+          memCacheWidth: provider.memCacheWidth,
+          maxHeightDiskCache: provider.maxHeight ?? targetPixels,
+          maxWidthDiskCache: provider.maxWidth,
+          fit: fit,
+          fadeInDuration: const Duration(milliseconds: 200),
+          fadeOutDuration: const Duration(milliseconds: 150),
+          placeholder: (_, __) => buildPlaceholder(),
+          errorWidget: (_, __, ___) => buildPlaceholder(),
+        );
+      }
+
+      return Image(
+        image: backgroundImage!,
+        fit: fit,
+      );
+    }
 
     Widget? content = child;
     if (content != null) {
@@ -70,18 +104,19 @@ class CrewAvatar extends StatelessWidget {
       width: _effectiveSize,
       height: _effectiveSize,
       decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
+        color: backgroundImage == null ? effectiveBackgroundColor : null,
         borderRadius: effectiveBorderRadius,
         border: border,
-        image: backgroundImage != null
-            ? DecorationImage(
-                image: backgroundImage!,
-                fit: fit,
-              )
-            : null,
       ),
       clipBehavior: Clip.antiAlias,
-      child: content,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (backgroundImage == null) buildPlaceholder(),
+          if (backgroundImage != null) buildBackgroundImage()!,
+          if (content != null) content,
+        ],
+      ),
     );
   }
 }

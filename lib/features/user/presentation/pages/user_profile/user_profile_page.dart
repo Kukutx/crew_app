@@ -316,10 +316,35 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           );
           final collapseProgress = 1 - t;
 
+          final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+          final coverHeight = (_expandedHeight * devicePixelRatio).round();
+
           return Stack(
             fit: StackFit.expand,
             children: [
-              CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover ,memCacheHeight: 512),
+              CachedNetworkImage(
+                imageUrl: profile.cover,
+                fit: BoxFit.cover,
+                memCacheHeight: coverHeight,
+                maxHeightDiskCache: coverHeight,
+                fadeInDuration: const Duration(milliseconds: 200),
+                fadeOutDuration: const Duration(milliseconds: 150),
+                placeholder: (_, __) => const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF2B2B2E),
+                        Color(0xFF202024),
+                      ],
+                    ),
+                  ),
+                ),
+                errorWidget: (_, __, ___) => const DecoratedBox(
+                  decoration: BoxDecoration(color: Color(0xFF2B2B2E)),
+                ),
+              ),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(

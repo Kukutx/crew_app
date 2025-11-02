@@ -482,18 +482,6 @@ abstract class AppLocalizations {
   /// **'Group ledger'**
   String get event_group_expense_title;
 
-  /// No description provided for @event_group_expense_intro.
-  ///
-  /// In en, this message translates to:
-  /// **'Create and track shared expenses for everyone on this trip.'**
-  String get event_group_expense_intro;
-
-  /// No description provided for @event_group_expense_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Add participants, log costs on the go, and we\'ll help you settle balances fairly.'**
-  String get event_group_expense_hint;
-
   /// No description provided for @event_waypoints_title.
   ///
   /// In en, this message translates to:

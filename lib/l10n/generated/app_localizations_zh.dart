@@ -205,12 +205,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_group_expense_title => '多人记账';
 
   @override
-  String get event_group_expense_intro => '创建一个多人账本，随时记录本次活动的公共支出。';
-
-  @override
-  String get event_group_expense_hint => '添加参与者、实时登记费用，系统会自动帮你核对每个人的应付金额。';
-
-  @override
   String get event_waypoints_title => '途径点';
 
   @override

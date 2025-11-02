@@ -74,8 +74,6 @@
   "event_expense_section_description": "Keep track of shared costs with your crew and settle up easily after the trip.",
   "event_expense_calculate_button": "Calculate",
   "event_group_expense_title": "Group ledger",
-  "event_group_expense_intro": "Create and track shared expenses for everyone on this trip.",
-  "event_group_expense_hint": "Add participants, log costs on the go, and we'll help you settle balances fairly.",
   "event_waypoints_title": "Waypoints",
   "event_route_type_title": "Route type",
   "event_route_type_round": "Round trip",

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:crew_app/core/state/auth/auth_providers.dart';
@@ -115,24 +116,6 @@ class _AppState extends ConsumerState<App> {
     final colorScheme = theme.colorScheme;
     final borderRadius = BorderRadius.circular(30);
     final glassBorderColor = colorScheme.outline.withValues(alpha: 0.14);
-    BoxDecoration navDecoration(bool isScrolling) {
-      return BoxDecoration(
-        borderRadius: borderRadius,
-        border: Border.all(
-          color: isScrolling ? glassBorderColor : Colors.transparent,
-        ),
-        color: isScrolling
-            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.52)
-            : colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: isScrolling ? 0.08 : 0.12),
-            blurRadius: isScrolling ? 30 : 24,
-            offset: Offset(0, isScrolling ? 18 : 12),
-          ),
-        ],
-      );
-    }
     final destinations = <NavigationDestination>[
       NavigationDestination(
         icon: const Icon(Icons.event_outlined),
@@ -211,62 +194,206 @@ class _AppState extends ConsumerState<App> {
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeInOut,
             opacity: showBottomNav ? 1 : 0,
-            child: Material(
-              color: theme.colorScheme.surface,
-              elevation: _isScrolling ? 12 : 6,
-              shadowColor:
-                  theme.colorScheme.shadow.withValues(alpha: _isScrolling ? 0.12 : 0.18),
-              child: NavigationBarTheme(
-                data: theme.navigationBarTheme.copyWith(
-                  backgroundColor: Colors.transparent,
-                  height: 68,
-                  indicatorColor: colorScheme.primary.withValues(alpha: 0.12),
-                  indicatorShape: const StadiumBorder(),
-                  labelBehavior:
-                      NavigationDestinationLabelBehavior.alwaysShow,
-                  labelTextStyle: WidgetStateProperty.resolveWith(
-                    (states) => theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: states.contains(WidgetState.selected)
-                          ? FontWeight.w600
-                          : FontWeight.w500,
-                      color: states.contains(WidgetState.selected)
-                          ? colorScheme.primary
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  iconTheme: WidgetStateProperty.resolveWith(
-                    (states) => IconThemeData(
-                      size: states.contains(WidgetState.selected) ? 30 : 26,
-                      color: states.contains(WidgetState.selected)
-                          ? colorScheme.primary
-                          : colorScheme.onSurfaceVariant,
-                    ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: _GlassNavigationBar(
+                    destinations: destinations,
+                    selectedIndex: _navigationIndex,
+                    onDestinationSelected: (i) {
+                      if (_navigationIndex != i) {
+                        setState(() => _navigationIndex = i);
+                      }
+                      if (i != 0 && i != 2) {
+                        ref.read(mapOverlaySheetProvider.notifier).state =
+                            MapOverlaySheetType.none;
+                      }
+                      if (i == 0) {
+                        ref.read(mapOverlaySheetProvider.notifier).state =
+                            MapOverlaySheetType.explore;
+                      } else if (i == 2) {
+                        ref.read(mapOverlaySheetProvider.notifier).state =
+                            MapOverlaySheetType.chat;
+                      }
+                      if (_index != 0) {
+                        ref.read(appOverlayIndexProvider.notifier).state = 0;
+                      }
+                    },
+                    colorScheme: colorScheme,
+                    borderRadius: borderRadius,
+                    glassBorderColor: glassBorderColor,
+                    isScrolling: _isScrolling,
+                    theme: theme,
                   ),
                 ),
-                child: NavigationBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  selectedIndex: _navigationIndex,
-                  onDestinationSelected: (i) {
-                    if (_navigationIndex != i) {
-                      setState(() => _navigationIndex = i);
-                    }
-                    if (i != 0 && i != 2) {
-                      ref.read(mapOverlaySheetProvider.notifier).state =
-                          MapOverlaySheetType.none;
-                    }
-                    if (i == 0) {
-                      ref.read(mapOverlaySheetProvider.notifier).state =
-                          MapOverlaySheetType.explore;
-                    } else if (i == 2) {
-                      ref.read(mapOverlaySheetProvider.notifier).state =
-                          MapOverlaySheetType.chat;
-                    }
-                    if (_index != 0) {
-                      ref.read(appOverlayIndexProvider.notifier).state = 0;
-                    }
-                  },
-                  destinations: destinations,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassNavigationBar extends StatelessWidget {
+  const _GlassNavigationBar({
+    required this.destinations,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+    required this.colorScheme,
+    required this.borderRadius,
+    required this.glassBorderColor,
+    required this.isScrolling,
+    required this.theme,
+  });
+
+  final List<NavigationDestination> destinations;
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
+  final ColorScheme colorScheme;
+  final BorderRadius borderRadius;
+  final Color glassBorderColor;
+  final bool isScrolling;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final baseColor = colorScheme.surface.withValues(
+      alpha: theme.brightness == Brightness.dark ? 0.42 : 0.82,
+    );
+    final borderColor = isScrolling
+        ? glassBorderColor
+        : glassBorderColor.withValues(alpha: 0.6);
+    final shadowColor = colorScheme.shadow.withValues(
+      alpha: isScrolling ? 0.08 : 0.12,
+    );
+
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.all(color: borderColor),
+            color: baseColor,
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor,
+                blurRadius: isScrolling ? 30 : 24,
+                offset: Offset(0, isScrolling ? 18 : 12),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final itemCount = destinations.length;
+                final itemWidth = constraints.maxWidth / itemCount;
+                final indicatorWidth = math.min(48.0, itemWidth - 16);
+                final indicatorLeft =
+                    (itemWidth * selectedIndex) + (itemWidth - indicatorWidth) / 2;
+
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        for (var i = 0; i < itemCount; i++)
+                          Expanded(
+                            child: _GlassNavigationItem(
+                              destination: destinations[i],
+                              isSelected: selectedIndex == i,
+                              colorScheme: colorScheme,
+                              onTap: () => onDestinationSelected(i),
+                            ),
+                          ),
+                      ],
+                    ),
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOut,
+                      left: indicatorLeft,
+                      right: null,
+                      bottom: 6,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOut,
+                        height: 3,
+                        width: indicatorWidth,
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassNavigationItem extends StatelessWidget {
+  const _GlassNavigationItem({
+    required this.destination,
+    required this.isSelected,
+    required this.colorScheme,
+    required this.onTap,
+  });
+
+  final NavigationDestination destination;
+  final bool isSelected;
+  final ColorScheme colorScheme;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final iconColor = isSelected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
+
+    final iconSize = isSelected ? 30.0 : 26.0;
+
+    return Semantics(
+      label: destination.label,
+      button: true,
+      selected: isSelected,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? colorScheme.primary.withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: IconTheme.merge(
+                  data: IconThemeData(
+                    size: iconSize,
+                    color: iconColor,
+                  ),
+                  child: isSelected
+                      ? destination.selectedIcon
+                      : destination.icon,
                 ),
               ),
             ),

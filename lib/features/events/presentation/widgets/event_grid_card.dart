@@ -5,6 +5,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import '../../data/event.dart';
 import '../pages/detail/events_detail_page.dart';
+import 'event_image_cache_manager.dart';
 import 'event_image_placeholder.dart';
 
 /// A reusable grid card for displaying [Event] items inside masonry layouts.
@@ -59,6 +60,9 @@ class EventGridCard extends StatelessWidget {
                   child: imageUrl != null
                       ? CachedNetworkImage(
                           imageUrl: imageUrl,
+                          cacheKey: event.id,
+                          cacheManager: EventImageCacheManager.instance,
+                          useOldImageOnUrlChange: true,
                           fit: BoxFit.cover,
                           memCacheWidth: memCacheW,
                           placeholder: (c, _) => const AspectRatio(

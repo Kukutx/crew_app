@@ -49,6 +49,7 @@ dependencies:
   firebase_ui_oauth_apple: ^2.0.0   # 仅 iOS/macOS 用得到
   firebase_remote_config: ^6.0.2
   firebase_crashlytics: ^5.0.1
+  cloud_firestore: ^6.0.3
   feedback: ^3.2.0
   talker_flutter: ^5.0.1
   flutter_riverpod: ^3.0.0

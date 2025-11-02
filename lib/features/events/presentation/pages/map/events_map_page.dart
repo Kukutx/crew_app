@@ -15,7 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
-import 'package:crew_app/shared/widgets/app_drawer.dart';
+import 'package:crew_app/app/view/app_drawer.dart';
 
 import '../../../data/event.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';

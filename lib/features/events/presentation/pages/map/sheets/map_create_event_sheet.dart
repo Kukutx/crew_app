@@ -1,10 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:crew_app/features/events/data/event_draft.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
-import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class _CreateEventImage {
   _CreateEventImage({required this.file, required this.bytes});
@@ -13,323 +14,461 @@ class _CreateEventImage {
   final Uint8List bytes;
 }
 
-Future<EventDraft?> showCreateEventBottomSheet(BuildContext context, LatLng pos) {
-  final loc = AppLocalizations.of(context)!;
-  final title = TextEditingController();
-  final desc = TextEditingController();
-  final city = TextEditingController(text: loc.city_loading);
-  final formKey = GlobalKey<FormState>();
-  final picker = ImagePicker();
-  final images = <_CreateEventImage>[];
-  int? coverIndex;
-
-  // 开始反地理编码
-  () async {
-    try {
-      final list = await placemarkFromCoordinates(
-        pos.latitude,
-        pos.longitude,
-      ).timeout(const Duration(seconds: 5));
-      if (list.isNotEmpty) {
-        final p = list.first;
-        // 优先 city/locality，其次 subAdministrativeArea 或 administrativeArea
-        final name = (p.locality?.trim().isNotEmpty == true)
-            ? p.locality!
-            : (p.subAdministrativeArea?.trim().isNotEmpty == true)
-                ? p.subAdministrativeArea!
-                : (p.administrativeArea ?? loc.unknown);
-        city.text = name;
-      } else {
-        city.text = loc.unknown;
-      }
-    } catch (_) {
-      city.text = loc.unknown;
-    }
-  }();
-  return showModalBottomSheet<EventDraft>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+Future<EventDraft?> showCreateEventBottomSheet(
+  BuildContext context,
+  LatLng position,
+) {
+  return Navigator.of(context).push<EventDraft>(
+    PageRouteBuilder<EventDraft>(
+      opaque: false,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      pageBuilder: (routeContext, animation, secondaryAnimation) {
+        return _MapCreateEventSheetRoute(
+          animation: animation,
+          position: position,
+        );
+      },
     ),
-    builder: (_) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          Future<void> handleAddImages() async {
-            final remain = 5 - images.length;
-            if (remain <= 0) return;
+  );
+}
 
-            final picked = await picker.pickMultiImage();
-            if (picked.isEmpty) return;
+class _MapCreateEventSheetRoute extends StatefulWidget {
+  const _MapCreateEventSheetRoute({
+    required this.animation,
+    required this.position,
+  });
 
-            for (final img in picked.take(remain)) {
-              final bytes = await img.readAsBytes();
-              images.add(_CreateEventImage(file: img, bytes: bytes));
-            }
+  final Animation<double> animation;
+  final LatLng position;
 
-            if (images.isNotEmpty && coverIndex == null) {
-              coverIndex = 0;
-            }
+  @override
+  State<_MapCreateEventSheetRoute> createState() =>
+      _MapCreateEventSheetRouteState();
+}
 
-            setState(() {});
-          }
+class _MapCreateEventSheetRouteState
+    extends State<_MapCreateEventSheetRoute> {
+  late final Animation<double> _fadeAnimation;
 
-          void handleRemoveImage(int index) {
-            setState(() {
-              images.removeAt(index);
-              if (images.isEmpty) {
-                coverIndex = null;
-              } else if (coverIndex != null) {
-                if (coverIndex! == index) {
-                  coverIndex = 0;
-                } else if (coverIndex! > index) {
-                  coverIndex = coverIndex! - 1;
-                }
-              }
-            });
-          }
+  @override
+  void initState() {
+    super.initState();
+    _fadeAnimation = CurvedAnimation(
+      parent: widget.animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+  }
 
-          void handleSelectCover(int index) {
-            setState(() {
-              coverIndex = index;
-            });
-          }
-          return DraggableScrollableSheet(
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: SafeArea(
+          top: false,
+          child: DraggableScrollableSheet(
             expand: false,
             minChildSize: 0.25,
             initialChildSize: 0.6,
             maxChildSize: 0.95,
             snap: true,
             snapSizes: const [0.25, 0.6, 0.95],
-            builder: (context, scrollController) {
-              return AnimatedPadding(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut,
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-                  top: 24,
-                  left: 24,
-                  right: 24,
-                ),
-                child: Form(
-                  key: formKey,
-                  child: ListView(
-                    controller: scrollController,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 48,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade400,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        loc.create_event_title,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        loc.location_coordinates(
-                          pos.latitude.toStringAsFixed(6),
-                          pos.longitude.toStringAsFixed(6),
-                        ),
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: city,
-                        decoration: InputDecoration(
-                          labelText: loc.city_field_label,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.location_city),
-                        ),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? loc.please_enter_city
-                            : null,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: title,
-                        decoration: InputDecoration(
-                          labelText: loc.event_title_field_label,
-                          border: const OutlineInputBorder(),
-                        ),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? loc.please_enter_event_title
-                            : null,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: desc,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          labelText: loc.event_description_field_label,
-                          border: const OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '活动图片 (最多5张)',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                          Text(
-                            '${images.length}/5',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (images.isNotEmpty)
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            for (var i = 0; i < images.length; i++)
-                              Stack(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => handleSelectCover(i),
-                                    child: Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: coverIndex == i
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Colors.grey.shade300,
-                                          width: coverIndex == i ? 2 : 1,
-                                        ),
-                                      ),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: Image.memory(
-                                        images[i].bytes,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 4,
-                                    right: 4,
-                                    child: GestureDetector(
-                                      onTap: () => handleRemoveImage(i),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        padding: const EdgeInsets.all(2),
-                                        child: const Icon(
-                                          Icons.close,
-                                          size: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  if (coverIndex == i)
-                                    Positioned(
-                                      bottom: 4,
-                                      left: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: const Text(
-                                          '封面',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      if (images.length < 5)
-                        OutlinedButton.icon(
-                          onPressed: handleAddImages,
-                          icon: const Icon(Icons.add_a_photo),
-                          label: const Text('添加图片'),
-                        ),
-                      if (images.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            coverIndex == null
-                                ? '未选择封面，默认使用第一张图片。'
-                                : '已选择第${coverIndex! + 1}张作为封面。',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Colors.grey[600]),
-                          ),
-                        ),
-                      const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text(loc.action_cancel),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (formKey.currentState?.validate() != true) {
-                                  return;
-                                }
-                                Navigator.pop(
-                                  context,
-                                  EventDraft(
-                                    title: title.text,
-                                    description: desc.text,
-                                    locationName: city.text.trim().isEmpty
-                                        ? loc.unknown
-                                        : city.text.trim(),
-                                  ),
-                                );
-                              },
-                              child: Text(loc.action_create),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
+            builder: (sheetContext, scrollController) {
+              return Material(
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 12,
+                shadowColor:
+                    Theme.of(context).colorScheme.shadow.withValues(alpha: .18),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                clipBehavior: Clip.antiAlias,
+                child: MapCreateEventSheet(
+                  position: widget.position,
+                  scrollController: scrollController,
+                  onCancel: () => Navigator.of(sheetContext).pop(),
+                  onSubmit: (draft) => Navigator.of(sheetContext).pop(draft),
                 ),
               );
             },
-          );
-        },
-      );
-    },
-  );
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MapCreateEventSheet extends StatefulWidget {
+  const MapCreateEventSheet({
+    super.key,
+    required this.position,
+    required this.scrollController,
+    required this.onCancel,
+    required this.onSubmit,
+  });
+
+  final LatLng position;
+  final ScrollController scrollController;
+  final VoidCallback onCancel;
+  final ValueChanged<EventDraft> onSubmit;
+
+  @override
+  State<MapCreateEventSheet> createState() => _MapCreateEventSheetState();
+}
+
+class _MapCreateEventSheetState extends State<MapCreateEventSheet> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _cityController;
+  final ImagePicker _picker = ImagePicker();
+  final List<_CreateEventImage> _images = [];
+  int? _coverIndex;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _cityController = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
+    final loc = AppLocalizations.of(context)!;
+    _cityController.text = loc.city_loading;
+    _loadCityName(loc);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadCityName(AppLocalizations loc) async {
+    try {
+      final list = await placemarkFromCoordinates(
+        widget.position.latitude,
+        widget.position.longitude,
+      ).timeout(const Duration(seconds: 5));
+      if (!mounted) {
+        return;
+      }
+      if (list.isEmpty) {
+        _cityController.text = loc.unknown;
+        return;
+      }
+      final placemark = list.first;
+      final cityName = (placemark.locality?.trim().isNotEmpty == true)
+          ? placemark.locality!
+          : (placemark.subAdministrativeArea?.trim().isNotEmpty == true)
+              ? placemark.subAdministrativeArea!
+              : (placemark.administrativeArea ?? loc.unknown);
+      _cityController.text = cityName;
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      _cityController.text = loc.unknown;
+    }
+  }
+
+  Future<void> _handleAddImages() async {
+    final remain = 5 - _images.length;
+    if (remain <= 0) {
+      return;
+    }
+    final picked = await _picker.pickMultiImage();
+    if (picked.isEmpty) {
+      return;
+    }
+    for (final img in picked.take(remain)) {
+      final bytes = await img.readAsBytes();
+      _images.add(_CreateEventImage(file: img, bytes: bytes));
+    }
+    if (_images.isNotEmpty && _coverIndex == null) {
+      _coverIndex = 0;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _handleRemoveImage(int index) {
+    if (index < 0 || index >= _images.length) {
+      return;
+    }
+    setState(() {
+      _images.removeAt(index);
+      if (_images.isEmpty) {
+        _coverIndex = null;
+      } else if (_coverIndex != null) {
+        if (_coverIndex! == index) {
+          _coverIndex = 0;
+        } else if (_coverIndex! > index) {
+          _coverIndex = _coverIndex! - 1;
+        }
+      }
+    });
+  }
+
+  void _handleSelectCover(int index) {
+    setState(() => _coverIndex = index);
+  }
+
+  void _handleSubmit(AppLocalizations loc) {
+    if (_formKey.currentState?.validate() != true) {
+      return;
+    }
+    final draft = EventDraft(
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
+      locationName: _cityController.text.trim().isEmpty
+          ? loc.unknown
+          : _cityController.text.trim(),
+    );
+    widget.onSubmit(draft);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        top: 24,
+        left: 24,
+        right: 24,
+      ),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          controller: widget.scrollController,
+          children: [
+            Center(
+              child: Container(
+                width: 48,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: .2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.create_event_title,
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        loc.location_coordinates(
+                          widget.position.latitude.toStringAsFixed(6),
+                          widget.position.longitude.toStringAsFixed(6),
+                        ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: .7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: widget.onCancel,
+                  tooltip: loc.action_cancel,
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _cityController,
+              decoration: InputDecoration(
+                labelText: loc.city_field_label,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.location_city),
+              ),
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? loc.please_enter_city
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                labelText: loc.event_title_field_label,
+                border: const OutlineInputBorder(),
+              ),
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? loc.please_enter_event_title
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _descriptionController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: loc.event_description_field_label,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '活动图片 (最多5张)',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+                Text(
+                  '${_images.length}/5',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: .7),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (_images.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (var i = 0; i < _images.length; i++)
+                    Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () => _handleSelectCover(i),
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _coverIndex == i
+                                    ? theme.colorScheme.primary
+                                    : Colors.grey.shade300,
+                                width: _coverIndex == i ? 2 : 1,
+                              ),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.memory(
+                              _images[i].bytes,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => _handleRemoveImage(i),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.all(2),
+                              child: const Icon(
+                                Icons.close,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_coverIndex == i)
+                          Positioned(
+                            bottom: 4,
+                            left: 4,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                '封面',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ),
+            if (_images.length < 5)
+              OutlinedButton.icon(
+                onPressed: _handleAddImages,
+                icon: const Icon(Icons.add_a_photo),
+                label: const Text('添加图片'),
+              ),
+            if (_images.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  _coverIndex == null
+                      ? '未选择封面，默认使用第一张图片。'
+                      : '已选择第${_coverIndex! + 1}张作为封面。',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: .7),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: widget.onCancel,
+                    child: Text(loc.action_cancel),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () => _handleSubmit(loc),
+                    child: Text(loc.action_create),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
 }

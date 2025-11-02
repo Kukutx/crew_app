@@ -20,7 +20,7 @@ class AppRoutePaths {
   static const String home = '/';
   static const String login = '/login';
   static const String settings = '/settings';
-  static const String preferences = '/preferences';
+  static const String editProfile = '/edit_profile';
   static const String messagesChat = '/messages_chat';
   static const String expenses = '/expenses';
   static const String wallet = '/wallet';
@@ -37,7 +37,7 @@ class AppRouteNames {
   static const String home = 'home';
   static const String login = 'login';
   static const String settings = 'settings';
-  static const String preferences = 'preferences';
+  static const String editProfile = 'edit_profile';
   static const String messagesChat = 'messages_chat';
   static const String expenses = 'expenses';
   static const String wallet = 'wallet';
@@ -73,8 +73,8 @@ final crewAppRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SettingsPage(),
       ),
       GoRoute(
-        path: AppRoutePaths.preferences,
-        name: AppRouteNames.preferences,
+        path: AppRoutePaths.editProfile,
+        name: AppRouteNames.editProfile,
         builder: (context, state) => EditProfilePage(),
       ),
       GoRoute(

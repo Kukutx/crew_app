@@ -195,9 +195,9 @@ class _AppState extends ConsumerState<App> {
             curve: Curves.easeInOut,
             opacity: showBottomNav ? 1 : 0,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8), // 留出圆角阴影空间
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0), // 留出圆角阴影空间
               child: ClipRRect(
-                borderRadius: borderRadius, // 你上面定义的 30 圆角
+                borderRadius: borderRadius, 
                 child: BackdropFilter(
                   filter: ImageFilter.blur(
                     sigmaX: _isScrolling ? 12 : 0, // 滑动时开毛玻璃
@@ -234,8 +234,9 @@ class _AppState extends ConsumerState<App> {
                         elevation: 0,
                         selectedIndex: _navigationIndex,
                         onDestinationSelected: (i) {
-                          if (_navigationIndex != i)
+                          if (_navigationIndex != i) {
                             setState(() => _navigationIndex = i);
+                          }
                           if (i != 0 && i != 2) {
                             ref.read(mapOverlaySheetProvider.notifier).state =
                                 MapOverlaySheetType.none;

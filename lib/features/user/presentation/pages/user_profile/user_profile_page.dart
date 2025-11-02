@@ -238,7 +238,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     if (!mounted) {
       return;
     }
-    context.push(AppRoutePaths.preferences);
+    context.push(AppRoutePaths.editProfile);
   }
 
   @override

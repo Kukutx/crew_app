@@ -144,19 +144,18 @@ class _LoginPageState extends ConsumerState<LoginPage>
             Align(
               alignment: Alignment.center,
               child: SizedBox(
-  width: 320,
-  height: 56,
-  child: GoogleNeoButton(
-    loading: _loading,
-    canProceed: _agreed,
-    label: 'Continue with Google',
-    svgAssetPath: 'assets/images/icons/google_g.svg',
-    iconColor: Colors.white, // 纯白
-    radius: 18,              // 圆角 18
-    onProceed: _signInWithGoogle,
-  ),
-),
-
+                width: 320,
+                height: 56,
+                child: GoogleNeoButton(
+                  loading: _loading,
+                  canProceed: _agreed,
+                  label: 'Continue with Google',
+                  svgAssetPath: 'assets/images/icons/google_g.svg',
+                  iconColor: Colors.white, // 纯白
+                  radius: 18, // 圆角 18
+                  onProceed: _signInWithGoogle,
+                ),
+              ),
             ),
 
             // 底部协议区
@@ -254,8 +253,8 @@ class GoogleNeoButton extends StatefulWidget {
     required this.label,
     required this.svgAssetPath,
     this.invalidMessage,
-    this.radius = 18,                 // 新：圆角
-    this.iconColor = Colors.white,    // 新：图标纯色（白）
+    this.radius = 18, // 新：圆角
+    this.iconColor = Colors.white, // 新：图标纯色（白）
   });
 
   final bool loading;
@@ -281,7 +280,10 @@ class _GoogleNeoButtonState extends State<GoogleNeoButton> {
     final enabled = widget.canProceed && !widget.loading;
 
     // 比 surface 略亮，形成凸起
-    final base = Color.alphaBlend(cs.onSurface.withOpacity(0.06), cs.surface);
+    final base = Color.alphaBlend(
+      cs.onSurface.withValues(alpha: 0.06),
+      cs.surface,
+    );
 
     return Semantics(
       button: true,
@@ -297,28 +299,30 @@ class _GoogleNeoButtonState extends State<GoogleNeoButton> {
           decoration: BoxDecoration(
             color: base,
             borderRadius: BorderRadius.circular(widget.radius), // 圆角 18
-            border: Border.all(color: cs.outlineVariant.withOpacity(0.35)),
+            border: Border.all(
+              color: cs.outlineVariant.withValues(alpha: 0.35),
+            ),
             boxShadow: _pressed || widget.loading
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.30),
+                      color: Colors.black.withValues(alpha: 0.30),
                       offset: const Offset(2, 3),
                       blurRadius: 6,
                     ),
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Colors.white.withValues(alpha: 0.04),
                       offset: const Offset(-2, -3),
                       blurRadius: 6,
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.45),
+                      color: Colors.black.withValues(alpha: 0.45),
                       offset: const Offset(6, 8),
                       blurRadius: 18,
                     ),
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.06),
+                      color: Colors.white.withValues(alpha: 0.06),
                       offset: const Offset(-6, -8),
                       blurRadius: 18,
                     ),
@@ -329,8 +333,14 @@ class _GoogleNeoButtonState extends State<GoogleNeoButton> {
               colors: _pressed || widget.loading
                   ? [base, base]
                   : [
-                      Color.alphaBlend(Colors.white.withOpacity(0.04), base),
-                      Color.alphaBlend(Colors.black.withOpacity(0.06), base),
+                      Color.alphaBlend(
+                        Colors.white.withValues(alpha: 0.04),
+                        base,
+                      ),
+                      Color.alphaBlend(
+                        Colors.black.withValues(alpha: 0.06),
+                        base,
+                      ),
                     ],
             ),
           ),
@@ -359,7 +369,8 @@ class _GoogleNeoButtonState extends State<GoogleNeoButton> {
                               widget.svgAssetPath,
                               width: 18,
                               height: 18,
-                              colorFilter: ColorFilter.mode( // 强制单色
+                              colorFilter: ColorFilter.mode(
+                                // 强制单色
                                 widget.iconColor,
                                 BlendMode.srcIn,
                               ),
@@ -369,7 +380,7 @@ class _GoogleNeoButtonState extends State<GoogleNeoButton> {
                               widget.label,
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: cs.onSurface.withOpacity(0.92),
+                                color: cs.onSurface.withValues(alpha: 0.92),
                                 letterSpacing: 0.2,
                               ),
                             ),
@@ -384,7 +395,6 @@ class _GoogleNeoButtonState extends State<GoogleNeoButton> {
     );
   }
 }
-
 
 /// 使用 flutter_svg 显示 Google “G” 图标的登录按钮。
 ///

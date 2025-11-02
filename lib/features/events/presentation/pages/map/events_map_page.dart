@@ -107,6 +107,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
     final mapSheetType = ref.watch(mapOverlaySheetProvider);
     final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
+    final showBottomNavigation = ref.watch(bottomNavigationVisibilityProvider);
 
     if (mapSheetType == MapOverlaySheetType.none &&
         mapSheetStage != MapOverlaySheetStage.collapsed) {
@@ -230,8 +231,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       appBar: hideSearchBar
           ? null
           : _SlidingAppBar(
-              hidden: mapSheetType != MapOverlaySheetType.none &&
-                  mapSheetStage == MapOverlaySheetStage.expanded,
+              hidden: !showBottomNavigation ||
+                  (mapSheetType != MapOverlaySheetType.none &&
+                      mapSheetStage == MapOverlaySheetStage.expanded),
               child: SearchEventAppBar(
                 controller: searchManager.searchController,
                 focusNode: searchManager.searchFocusNode,

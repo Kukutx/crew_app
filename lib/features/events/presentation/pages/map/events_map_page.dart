@@ -30,6 +30,7 @@ import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import 'controllers/location_selection_manager.dart';
 import 'state/map_overlay_sheet_provider.dart';
+import 'state/map_overlay_sheet_stage_provider.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -105,6 +106,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       locationSelectionManagerProvider,
     );
     final mapSheetType = ref.watch(mapOverlaySheetProvider);
+    final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
 
     final cardVisible =
         carouselManager.isVisible && carouselManager.events.isNotEmpty;
@@ -214,26 +216,30 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       },
       appBar: hideSearchBar
           ? null
-          : SearchEventAppBar(
-              controller: searchManager.searchController,
-              focusNode: searchManager.searchFocusNode,
-              onSearch: searchManager.onSearchSubmitted,
-              onChanged: searchManager.onQueryChanged,
-              onClear: searchManager.clearSearch,
-              onQuickActionsTap: _openQuickActionsDrawer,
-              onAvatarTap: _onAvatarTap,
-              onResultTap: (event) =>
-                  searchManager.onSearchResultTap(event, context),
-              showResults: searchState.showResults,
-              isLoading: searchState.isLoading,
-              results: searchState.results,
-              errorText: searchState.errorText,
-              showClearSelectionAction: showClearSelectionInAppBar,
-              onClearSelection: showClearSelectionInAppBar
-                  ? () => unawaited(
-                      locationSelectionManager.clearSelectedLocation(),
-                    )
-                  : null,
+          : _SlidingAppBar(
+              hidden: mapSheetType != MapOverlaySheetType.none &&
+                  mapSheetStage == MapOverlaySheetStage.expanded,
+              child: SearchEventAppBar(
+                controller: searchManager.searchController,
+                focusNode: searchManager.searchFocusNode,
+                onSearch: searchManager.onSearchSubmitted,
+                onChanged: searchManager.onQueryChanged,
+                onClear: searchManager.clearSearch,
+                onQuickActionsTap: _openQuickActionsDrawer,
+                onAvatarTap: _onAvatarTap,
+                onResultTap: (event) =>
+                    searchManager.onSearchResultTap(event, context),
+                showResults: searchState.showResults,
+                isLoading: searchState.isLoading,
+                results: searchState.results,
+                errorText: searchState.errorText,
+                showClearSelectionAction: showClearSelectionInAppBar,
+                onClearSelection: showClearSelectionInAppBar
+                    ? () => unawaited(
+                          locationSelectionManager.clearSelectedLocation(),
+                        )
+                    : null,
+              ),
             ),
       body: Stack(
         children: [
@@ -409,6 +415,31 @@ class _MapOverlaySheet extends ConsumerStatefulWidget {
   ConsumerState<_MapOverlaySheet> createState() => _MapOverlaySheetState();
 }
 
+class _SlidingAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _SlidingAppBar({required this.child, required this.hidden});
+
+  final PreferredSizeWidget child;
+  final bool hidden;
+
+  @override
+  Size get preferredSize => child.preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSlide(
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeInOut,
+      offset: Offset(0, hidden ? -1.2 : 0),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeInOut,
+        opacity: hidden ? 0 : 1,
+        child: child,
+      ),
+    );
+  }
+}
+
 class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   late final DraggableScrollableController _controller;
   double _currentSize = 0;
@@ -419,12 +450,15 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     _controller = DraggableScrollableController()
       ..addListener(_handleSizeChanged);
     _currentSize = _initialSize;
+    _notifyStage(_currentSize);
   }
 
   @override
   void dispose() {
     _controller.removeListener(_handleSizeChanged);
     _controller.dispose();
+    ref.read(mapOverlaySheetStageProvider.notifier).state =
+        MapOverlaySheetStage.collapsed;
     super.dispose();
   }
 
@@ -436,6 +470,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
 
     final schedulerPhase = SchedulerBinding.instance.schedulerPhase;
     if (schedulerPhase == SchedulerPhase.idle) {
+      _notifyStage(size);
       setState(() => _currentSize = size);
       return;
     }
@@ -444,6 +479,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       if (!mounted) {
         return;
       }
+      _notifyStage(size);
       setState(() => _currentSize = size);
     });
   }
@@ -537,6 +573,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     if (oldWidget.sheetType != widget.sheetType) {
       final newSize = _initialSize;
       setState(() => _currentSize = newSize);
+      _notifyStage(newSize);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {
           return;
@@ -544,6 +581,28 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
         DraggableScrollableActuator.reset(context);
       });
     }
+  }
+
+  void _notifyStage(double size) {
+    final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
+    final newStage = _stageForSize(size);
+    if (notifier.state != newStage) {
+      notifier.state = newStage;
+    }
+  }
+
+  MapOverlaySheetStage _stageForSize(double size) {
+    final snapSizes = _snapSizes;
+    if (snapSizes.isEmpty) {
+      return MapOverlaySheetStage.collapsed;
+    }
+    if (size >= snapSizes.last - 0.01) {
+      return MapOverlaySheetStage.expanded;
+    }
+    if (snapSizes.length > 1 && size >= snapSizes[1] - 0.01) {
+      return MapOverlaySheetStage.middle;
+    }
+    return MapOverlaySheetStage.collapsed;
   }
 
   @override

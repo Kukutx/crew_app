@@ -586,9 +586,24 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   void _notifyStage(double size) {
     final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
     final newStage = _stageForSize(size);
-    if (notifier.state != newStage) {
+    if (notifier.state == newStage) {
+      return;
+    }
+
+    void updateStage() {
+      if (!mounted) {
+        return;
+      }
       notifier.state = newStage;
     }
+
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.idle || phase == SchedulerPhase.postFrameCallbacks) {
+      updateStage();
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => updateStage());
   }
 
   MapOverlaySheetStage _stageForSize(double size) {

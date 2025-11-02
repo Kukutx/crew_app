@@ -9,3 +9,13 @@ enum MapOverlaySheetType {
 
 final mapOverlaySheetProvider =
     StateProvider<MapOverlaySheetType>((ref) => MapOverlaySheetType.none);
+
+enum MapOverlaySheetStage {
+  collapsed,
+  mid,
+  expanded,
+}
+
+final mapOverlaySheetStageProvider = StateProvider<MapOverlaySheetStage>(
+  (ref) => MapOverlaySheetStage.collapsed,
+);

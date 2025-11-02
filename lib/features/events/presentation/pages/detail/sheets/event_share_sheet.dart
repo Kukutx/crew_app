@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../widgets/event_image_cache_manager.dart';
+
 class EventShareSheet extends StatelessWidget {
   final Event event;
   final AppLocalizations loc;
@@ -393,6 +395,8 @@ class _SharePreviewImage extends StatelessWidget {
     }
     return CachedNetworkImage(
       imageUrl: imageUrl,
+      cacheKey: event.id,
+      cacheManager: EventImageCacheManager.instance,
       fit: BoxFit.cover,
       width: double.infinity,
       memCacheHeight: 512, // 合理压缩，减内存抖动

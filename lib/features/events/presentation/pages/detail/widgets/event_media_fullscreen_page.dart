@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../widgets/event_image_cache_manager.dart';
+
 class EventMediaFullscreenScreen extends StatefulWidget {
   const EventMediaFullscreenScreen({
     super.key,
@@ -66,10 +68,16 @@ class _EventMediaFullscreenScreenState extends State<EventMediaFullscreenScreen>
   }
 
   List<_FullscreenMediaItem> _parseMediaItems(Event event) {
-    final images = event.imageUrls
+    final imageUrls = event.imageUrls
         .map((url) => url.trim())
         .where((url) => url.isNotEmpty)
-        .map(_FullscreenMediaItem.image);
+        .toList();
+    final images = imageUrls.asMap().entries.map(
+          (entry) => _FullscreenMediaItem.image(
+            entry.value,
+            cacheKey: '${event.id}_image_${entry.key}',
+          ),
+        );
     final videos = event.videoUrls
         .map((url) => url.trim())
         .where((url) => url.isNotEmpty)
@@ -108,7 +116,10 @@ class _EventMediaFullscreenScreenState extends State<EventMediaFullscreenScreen>
           final item = items[index];
           switch (item.type) {
             case _FullscreenMediaType.image:
-              return _FullscreenImageViewer(url: item.url);
+              return _FullscreenImageViewer(
+                url: item.url,
+                cacheKey: item.cacheKey,
+              );
             case _FullscreenMediaType.video:
               return _FullscreenVideoPlayer(
                 key: ValueKey(item.url),
@@ -219,9 +230,13 @@ class _FullscreenPageIndicator extends StatelessWidget {
 }
 
 class _FullscreenImageViewer extends StatelessWidget {
-  const _FullscreenImageViewer({required this.url});
+  const _FullscreenImageViewer({
+    required this.url,
+    this.cacheKey,
+  });
 
   final String url;
+  final String? cacheKey;
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +245,8 @@ class _FullscreenImageViewer extends StatelessWidget {
       maxScale: 4,
       child: CachedNetworkImage(
         imageUrl: url,
+        cacheKey: cacheKey,
+        cacheManager: EventImageCacheManager.instance,
         fit: BoxFit.contain,
         memCacheHeight: 512, // 合理压缩，减内存抖动
         fadeInDuration: const Duration(milliseconds: 200),
@@ -244,15 +261,16 @@ class _FullscreenImageViewer extends StatelessWidget {
 enum _FullscreenMediaType { image, video }
 
 class _FullscreenMediaItem {
-  const _FullscreenMediaItem._(this.type, this.url);
+  const _FullscreenMediaItem._(this.type, this.url, this.cacheKey);
 
-  factory _FullscreenMediaItem.image(String url) =>
-      _FullscreenMediaItem._(_FullscreenMediaType.image, url);
+  factory _FullscreenMediaItem.image(String url, {String? cacheKey}) =>
+      _FullscreenMediaItem._(_FullscreenMediaType.image, url, cacheKey);
   factory _FullscreenMediaItem.video(String url) =>
-      _FullscreenMediaItem._(_FullscreenMediaType.video, url);
+      _FullscreenMediaItem._(_FullscreenMediaType.video, url, null);
 
   final _FullscreenMediaType type;
   final String url;
+  final String? cacheKey;
 }
 
 class _FullscreenVideoPlayer extends StatefulWidget {

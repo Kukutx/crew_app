@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
+import '../../../widgets/event_image_cache_manager.dart';
+import '../../../widgets/event_image_placeholder.dart';
 
 class EventMediaCarousel extends StatefulWidget {
   final Event event;
@@ -45,10 +47,16 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
   }
 
   List<_EventMediaItem> _parseMediaItems(Event event) {
-    final images = event.imageUrls
+    final imageUrls = event.imageUrls
         .map((url) => url.trim())
         .where((url) => url.isNotEmpty)
-        .map(_EventMediaItem.image);
+        .toList();
+    final images = imageUrls.asMap().entries.map(
+          (entry) => _EventMediaItem.image(
+            entry.value,
+            cacheKey: '${event.id}_image_${entry.key}',
+          ),
+        );
     final videos = event.videoUrls
         .map((url) => url.trim())
         .where((url) => url.isNotEmpty)
@@ -59,7 +67,6 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
   @override
   Widget build(BuildContext context) {
     final mediaItems = _mediaItems;
-    final fallbackUrl = widget.event.firstAvailableImageUrl;
     final hasMedia = mediaItems.isNotEmpty;
 
     final height = widget.height;
@@ -73,7 +80,10 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
               final item = mediaItems[index];
               switch (item.type) {
                 case _EventMediaType.image:
-                  return _NetworkImageSlide(url: item.url);
+                  return _NetworkImageSlide(
+                    url: item.url,
+                    cacheKey: item.cacheKey,
+                  );
                 case _EventMediaType.video:
                   return _EventVideoPlayer(
                     key: ValueKey(item.url),
@@ -83,7 +93,7 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
               }
             },
           )
-        : _buildFallback(fallbackUrl);
+        : _buildFallback(widget.event);
 
     return Stack(
       children: [
@@ -120,25 +130,30 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
     );
   }
 
-  Widget _buildFallback(String? url) {
+  Widget _buildFallback(Event event) {
+    final url = event.firstAvailableImageUrl;
     if (url == null) {
       return const EventImagePlaceholder(aspectRatio: 16 / 10);
     }
-    return _NetworkImageSlide(url: url);
+    return _NetworkImageSlide(url: url, cacheKey: event.id);
   }
 }
 
 class _NetworkImageSlide extends StatelessWidget {
   const _NetworkImageSlide({
     required this.url,
+    this.cacheKey,
   });
 
   final String url;
+  final String? cacheKey;
 
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       imageUrl: url,
+      cacheKey: cacheKey,
+      cacheManager: EventImageCacheManager.instance,
       width: double.infinity,
       fit: BoxFit.cover,
       memCacheHeight: 512, // 合理压缩，减内存抖动
@@ -157,14 +172,15 @@ enum _EventMediaType { image, video }
 class _EventMediaItem {
   final _EventMediaType type;
   final String url;
+  final String? cacheKey;
 
-  const _EventMediaItem._(this.type, this.url);
+  const _EventMediaItem._(this.type, this.url, this.cacheKey);
 
-  factory _EventMediaItem.image(String url) =>
-      _EventMediaItem._(_EventMediaType.image, url);
+  factory _EventMediaItem.image(String url, {String? cacheKey}) =>
+      _EventMediaItem._(_EventMediaType.image, url, cacheKey);
 
   factory _EventMediaItem.video(String url) =>
-      _EventMediaItem._(_EventMediaType.video, url);
+      _EventMediaItem._(_EventMediaType.video, url, null);
 }
 
 class _EventVideoPlayer extends StatefulWidget {

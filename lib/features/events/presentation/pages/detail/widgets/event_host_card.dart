@@ -3,6 +3,8 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/event_image_cache_manager.dart';
+
 class EventHostCard extends StatelessWidget {
   final AppLocalizations loc;
   final String name;
@@ -56,7 +58,10 @@ class EventHostCard extends StatelessWidget {
               CrewAvatar(
                 radius: 28,
                 backgroundImage: (avatar != null && avatar.isNotEmpty)
-                    ? CachedNetworkImageProvider(avatar)
+                    ? CachedNetworkImageProvider(
+                        avatar,
+                        cacheManager: EventImageCacheManager.instance,
+                      )
                     : null,
                 backgroundColor: avatarBackground,
                 foregroundColor: avatarForeground,

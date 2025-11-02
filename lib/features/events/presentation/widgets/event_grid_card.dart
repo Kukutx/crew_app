@@ -61,6 +61,8 @@ class EventGridCard extends StatelessWidget {
                           imageUrl: imageUrl,
                           fit: BoxFit.cover,
                           memCacheWidth: memCacheW,
+                          useOldImageOnUrlChange: true,
+                          fadeOutDuration: const Duration(milliseconds: 100),
                           placeholder: (c, _) => const AspectRatio(
                             aspectRatio: 1,
                             child: Center(

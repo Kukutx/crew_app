@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
@@ -32,6 +34,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   int _page = 0;
   final GlobalKey _sharePreviewKey = GlobalKey();
   SystemUiOverlayStyle? _previousOverlayStyle;
+  bool _hasPrefetchedCover = false;
 
   static const _fallbackHost = (
     name: 'Crew Host',
@@ -70,14 +73,29 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_hasPrefetchedCover) {
+      return;
+    }
+
     final url = widget.event.firstAvailableImageUrl;
     if (url != null && url.isNotEmpty) {
-      precacheImage(
-        Image.network(url).image,
-        context,
-        onError: (error, stackTrace) {
-          debugPrint('Failed to precache event image: $error');
-        },
+      _hasPrefetchedCover = true;
+      final mq = MediaQuery.of(context);
+      final targetHeight =
+          (mq.size.width * mq.devicePixelRatio).round();
+      final provider = CachedNetworkImageProvider(
+        url,
+        maxHeight: targetHeight,
+        maxWidth: targetHeight,
+      );
+      unawaited(
+        precacheImage(
+          provider,
+          context,
+          onError: (error, stackTrace) {
+            debugPrint('Failed to precache event image: $error');
+          },
+        ),
       );
     }
   }

@@ -1,14 +1,19 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/plaza/widgets/plaza_post_detail_screen.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
+import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
-import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
@@ -29,6 +34,7 @@ class MapExploreSheet extends ConsumerStatefulWidget {
 class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   int _tab = 0;
   String? _selectedFilter;
+  final Set<String> _prefetchedEventImages = <String>{};
 
   static const _filters = ['附近', '最新', '热门', '关注'];
 
@@ -176,6 +182,8 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
             return _CenteredMessage(text: loc.no_events);
           }
 
+          _scheduleEventPrefetch(context, events);
+
           return AppMasonryGrid(
             padding: const EdgeInsets.only(bottom: 16),
             crossAxisCount: 2,
@@ -202,6 +210,50 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
         ),
         error: (error, __) => _CenteredMessage(text: _errorMessage(error)),
       );
+    }
+
+    Future<void> _prefetchEventImages(
+      BuildContext context,
+      List<Event> events,
+    ) async {
+      if (!mounted) return;
+
+      final mq = MediaQuery.of(context);
+      final imageExtent = mq.size.width / 2;
+      final targetPixels = (imageExtent * mq.devicePixelRatio).round();
+
+      for (final event in events.take(12)) {
+        final url = event.firstAvailableImageUrl;
+        if (url == null || url.isEmpty) {
+          continue;
+        }
+        if (!_prefetchedEventImages.add(url)) {
+          continue;
+        }
+
+        final provider = CachedNetworkImageProvider(
+          url,
+          maxHeight: targetPixels,
+          maxWidth: targetPixels,
+        );
+
+        unawaited(
+          precacheImage(
+            provider,
+            context,
+            onError: (error, stackTrace) {
+              debugPrint('Prefetch event image failed: $error');
+            },
+          ),
+        );
+      }
+    }
+
+    void _scheduleEventPrefetch(BuildContext context, List<Event> events) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(_prefetchEventImages(context, events));
+      });
     }
 
     final scrollable = CustomScrollView(

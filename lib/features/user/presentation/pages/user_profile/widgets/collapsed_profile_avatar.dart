@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/shared/utils/image_url.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 
 class CollapsedProfileAvatar extends StatelessWidget {
   const CollapsedProfileAvatar({super.key, required this.user});
@@ -11,6 +12,7 @@ class CollapsedProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final avatarUrl = sanitizeImageUrl(user.avatar);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.85),
@@ -30,7 +32,12 @@ class CollapsedProfileAvatar extends StatelessWidget {
           children: [
             CrewAvatar(
               radius: 20,
-              backgroundImage: CachedNetworkImageProvider(user.avatar),
+              backgroundImage:
+                  avatarUrl != null ? CachedNetworkImageProvider(avatarUrl) : null,
+              backgroundColor: Colors.white.withValues(alpha: 0.12),
+              foregroundColor: Colors.white,
+              child:
+                  avatarUrl == null ? const Icon(Icons.person_outline) : null,
               borderRadius: BorderRadius.circular(18),
             ),
             if (user.countryFlag != null)

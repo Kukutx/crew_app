@@ -17,6 +17,7 @@ import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/c
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_guestbook_page.dart';
+import 'package:crew_app/shared/utils/image_url.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
@@ -319,7 +320,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           return Stack(
             fit: StackFit.expand,
             children: [
-              CachedNetworkImage(imageUrl: profile.cover, fit: BoxFit.cover ,memCacheHeight: 512),
+              _buildCoverImage(profile.cover, theme),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -396,6 +397,27 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCoverImage(String? coverUrl, ThemeData theme) {
+    final sanitizedUrl = sanitizeImageUrl(coverUrl);
+    final placeholder = DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+      ),
+    );
+
+    if (sanitizedUrl == null) {
+      return placeholder;
+    }
+
+    return CachedNetworkImage(
+      imageUrl: sanitizedUrl,
+      fit: BoxFit.cover,
+      memCacheHeight: 512,
+      placeholder: (_, __) => placeholder,
+      errorWidget: (_, __, ___) => placeholder,
     );
   }
 }

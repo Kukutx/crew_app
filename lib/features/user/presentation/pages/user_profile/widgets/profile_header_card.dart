@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
+import 'package:crew_app/shared/utils/image_url.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
-import 'package:flutter/material.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
@@ -172,13 +174,20 @@ class ProfileHeaderCard extends StatelessWidget {
                   ),
                 );
 
+                final avatarUrl = sanitizeImageUrl(userProfile.avatar);
                 final avatar = Stack(
                   clipBehavior: Clip.none,
                   children: [
                     CrewAvatar(
                       size: 72,
-                      backgroundImage:
-                          CachedNetworkImageProvider(userProfile.avatar),
+                      backgroundImage: avatarUrl != null
+                          ? CachedNetworkImageProvider(avatarUrl)
+                          : null,
+                      backgroundColor: Colors.white.withValues(alpha: 0.12),
+                      foregroundColor: Colors.white,
+                      child: avatarUrl == null
+                          ? const Icon(Icons.person_outline, size: 32)
+                          : null,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.2),

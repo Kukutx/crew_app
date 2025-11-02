@@ -526,7 +526,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     final snapSizes = _snapSizes;
     return switch (widget.sheetType) {
       MapOverlaySheetType.chat => snapSizes[1],
-      MapOverlaySheetType.explore => snapSizes.first,
+      MapOverlaySheetType.explore => snapSizes[1],
       MapOverlaySheetType.none => snapSizes.first,
     };
   }

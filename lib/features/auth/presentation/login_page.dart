@@ -144,18 +144,19 @@ class _LoginPageState extends ConsumerState<LoginPage>
             Align(
               alignment: Alignment.center,
               child: SizedBox(
-                width: 320,
-                height: 56,
-                child: GoogleWobbleButton(
-                  loading: _loading,
-                  canProceed: _agreed, // 是否允许继续；未勾选时按钮自己抖动并提示
-                  invalidMessage:
-                      "Please agree to the terms before continuing.",
-                  label: 'Continue with Google',
-                  svgAssetPath: 'assets/images/icons/google_g.svg',
-                  onProceed: _signInWithGoogle,
-                ),
-              ),
+  width: 320,
+  height: 56,
+  child: GoogleNeoButton(
+    loading: _loading,
+    canProceed: _agreed,
+    label: 'Continue with Google',
+    svgAssetPath: 'assets/images/icons/google_g.svg',
+    iconColor: Colors.white, // 纯白
+    radius: 18,              // 圆角 18
+    onProceed: _signInWithGoogle,
+  ),
+),
+
             ),
 
             // 底部协议区
@@ -243,6 +244,147 @@ class _LoginPageState extends ConsumerState<LoginPage>
     );
   }
 }
+
+class GoogleNeoButton extends StatefulWidget {
+  const GoogleNeoButton({
+    super.key,
+    required this.loading,
+    required this.canProceed,
+    required this.onProceed,
+    required this.label,
+    required this.svgAssetPath,
+    this.invalidMessage,
+    this.radius = 18,                 // 新：圆角
+    this.iconColor = Colors.white,    // 新：图标纯色（白）
+  });
+
+  final bool loading;
+  final bool canProceed;
+  final VoidCallback onProceed;
+  final String label;
+  final String svgAssetPath;
+  final String? invalidMessage;
+  final double radius;
+  final Color iconColor;
+
+  @override
+  State<GoogleNeoButton> createState() => _GoogleNeoButtonState();
+}
+
+class _GoogleNeoButtonState extends State<GoogleNeoButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final enabled = widget.canProceed && !widget.loading;
+
+    // 比 surface 略亮，形成凸起
+    final base = Color.alphaBlend(cs.onSurface.withOpacity(0.06), cs.surface);
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: widget.label,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 160),
+        opacity: enabled ? 1 : 0.6,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          height: 56,
+          decoration: BoxDecoration(
+            color: base,
+            borderRadius: BorderRadius.circular(widget.radius), // 圆角 18
+            border: Border.all(color: cs.outlineVariant.withOpacity(0.35)),
+            boxShadow: _pressed || widget.loading
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.30),
+                      offset: const Offset(2, 3),
+                      blurRadius: 6,
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.04),
+                      offset: const Offset(-2, -3),
+                      blurRadius: 6,
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.45),
+                      offset: const Offset(6, 8),
+                      blurRadius: 18,
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.06),
+                      offset: const Offset(-6, -8),
+                      blurRadius: 18,
+                    ),
+                  ],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _pressed || widget.loading
+                  ? [base, base]
+                  : [
+                      Color.alphaBlend(Colors.white.withOpacity(0.04), base),
+                      Color.alphaBlend(Colors.black.withOpacity(0.06), base),
+                    ],
+            ),
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(widget.radius),
+              onHighlightChanged: (v) => setState(() => _pressed = v),
+              onTap: enabled ? widget.onProceed : null,
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  child: widget.loading
+                      ? const SizedBox(
+                          key: ValueKey('loading'),
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Row(
+                          key: const ValueKey('content'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // 直接用纯白 SVG 图标（无方块）
+                            SvgPicture.asset(
+                              widget.svgAssetPath,
+                              width: 18,
+                              height: 18,
+                              colorFilter: ColorFilter.mode( // 强制单色
+                                widget.iconColor,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              widget.label,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: cs.onSurface.withOpacity(0.92),
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 /// 使用 flutter_svg 显示 Google “G” 图标的登录按钮。
 ///

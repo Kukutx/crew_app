@@ -108,6 +108,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final mapSheetType = ref.watch(mapOverlaySheetProvider);
     final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
 
+    if (mapSheetType == MapOverlaySheetType.none &&
+        mapSheetStage != MapOverlaySheetStage.collapsed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
+        if (notifier.state != MapOverlaySheetStage.collapsed) {
+          notifier.state = MapOverlaySheetStage.collapsed;
+        }
+      });
+    }
+
     final cardVisible =
         carouselManager.isVisible && carouselManager.events.isNotEmpty;
     final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
@@ -457,8 +470,6 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   void dispose() {
     _controller.removeListener(_handleSizeChanged);
     _controller.dispose();
-    ref.read(mapOverlaySheetStageProvider.notifier).state =
-        MapOverlaySheetStage.collapsed;
     super.dispose();
   }
 

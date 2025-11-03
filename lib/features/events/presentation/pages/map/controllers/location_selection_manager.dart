@@ -25,7 +25,8 @@ class LocationSelectionManager {
 
   final Ref ref;
   bool _isHandlingLongPress = false;
-  BuildContext? _selectionSheetContext;
+  NavigatorState? _activeSheetNavigator;
+  Object? _activeSheetCancelResult;
 
   // Getters
   bool get isHandlingLongPress => _isHandlingLongPress;
@@ -119,16 +120,18 @@ class LocationSelectionManager {
 
     final proceed = await _presentSelectionSheet<bool>(
       context: context,
-      expandedPadding: 320.0,
-      builder: (sheetContext, collapsedNotifier) {
+      initialChildSize: 0.45,
+      minChildSize: 0.3,
+      maxChildSize: 0.9,
+      cancelResult: false,
+      builder: (sheetContext, scrollController) {
         return StartLocationSheet(
           positionListenable: selectionController.selectedLatLngListenable,
           onConfirm: () => Navigator.of(sheetContext).pop(true),
           onCancel: () => Navigator.of(sheetContext).pop(false),
           reverseGeocode: _reverseGeocode,
           fetchNearbyPlaces: selectionController.getNearbyPlaces,
-          collapsedListenable: collapsedNotifier,
-          onExpand: () => collapsedNotifier.value = false,
+          scrollController: scrollController,
         );
       },
     );
@@ -171,15 +174,16 @@ class LocationSelectionManager {
 
     final result = await _presentSelectionSheet<QuickRoadTripResult>(
       context: context,
-      expandedPadding: 360.0,
-      builder: (sheetContext, collapsedNotifier) {
+      initialChildSize: 0.55,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      builder: (sheetContext, scrollController) {
         return DestinationSelectionSheet(
           startPositionListenable: selectionController.selectedLatLngListenable,
           destinationListenable: selectionController.destinationLatLngListenable,
           reverseGeocode: _reverseGeocode,
           fetchNearbyPlaces: selectionController.getNearbyPlaces,
-          collapsedListenable: collapsedNotifier,
-          onExpand: () => collapsedNotifier.value = false,
+          scrollController: scrollController,
           onCancel: () => Navigator.of(sheetContext).pop(null),
         );
       },
@@ -237,8 +241,11 @@ class LocationSelectionManager {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final selectionState = ref.read(mapSelectionControllerProvider);
 
-    if (dismissSheet && selectionState.isSelectionSheetOpen && _selectionSheetContext != null) {
-      Navigator.of(_selectionSheetContext!).pop(false);
+    if (dismissSheet &&
+        selectionState.isSelectionSheetOpen &&
+        _activeSheetNavigator != null &&
+        _activeSheetNavigator!.canPop()) {
+      _activeSheetNavigator!.pop(_activeSheetCancelResult);
       await _waitForSelectionSheetToClose();
     }
 
@@ -257,51 +264,57 @@ class LocationSelectionManager {
   /// 显示Sheet
   Future<T?> _presentSelectionSheet<T>({
     required BuildContext context,
-    required double expandedPadding,
-    required Widget Function(BuildContext sheetContext, ValueNotifier<bool> collapsedNotifier) builder,
+    required double initialChildSize,
+    required Widget Function(BuildContext sheetContext, ScrollController scrollController) builder,
+    double minChildSize = 0.3,
+    double maxChildSize = 0.95,
+    T? cancelResult,
   }) async {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final media = MediaQuery.of(context);
-    final collapsedHeight = media.size.height * 0.15;
-    final collapsedPadding = EdgeInsets.only(bottom: collapsedHeight);
-    final expandedEdgeInsets = EdgeInsets.only(bottom: expandedPadding);
-    final collapsedNotifier = ValueNotifier<bool>(false);
+    final controller = DraggableScrollableController();
+    _activeSheetCancelResult = cancelResult;
 
-    void updatePadding() {
-      final isCollapsed = collapsedNotifier.value;
-      selectionController.setMapPadding(isCollapsed ? collapsedPadding : expandedEdgeInsets);
+    EdgeInsets _paddingForSize(double size) {
+      final height = media.size.height;
+      final bottom = height * size;
+      return EdgeInsets.only(bottom: bottom);
     }
 
+    void updatePadding() {
+      selectionController.setMapPadding(_paddingForSize(controller.size));
+    }
+
+    selectionController.setMapPadding(_paddingForSize(initialChildSize));
     selectionController.setSelectionSheetOpen(true);
-    selectionController.setMapPadding(expandedEdgeInsets);
-    collapsedNotifier.addListener(updatePadding);
+    controller.addListener(updatePadding);
 
     T? result;
     try {
-      result = await Navigator.of(context).push<T>(
-        PageRouteBuilder<T>(
-          opaque: false,
-          barrierDismissible: false,
-          barrierColor: Colors.transparent,
-          pageBuilder: (routeContext, animation, secondaryAnimation) {
-            return CollapsibleSheetRouteContent<T>(
-              animation: animation,
-              collapsedNotifier: collapsedNotifier,
-              onBackgroundTap: () => collapsedNotifier.value = true,
-              builder: (sheetContext) {
-                _selectionSheetContext = sheetContext;
-                return builder(sheetContext, collapsedNotifier);
-              },
-            );
-          },
-        ),
+      result = await showModalBottomSheet<T>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        barrierColor: Colors.black.withValues(alpha: .45),
+        builder: (modalContext) {
+          _activeSheetNavigator = Navigator.of(modalContext);
+          return _DraggableSheetModal(
+            controller: controller,
+            initialChildSize: initialChildSize,
+            minChildSize: minChildSize,
+            maxChildSize: maxChildSize,
+            childBuilder: (sheetContext, scrollController) {
+              return builder(sheetContext, scrollController);
+            },
+          );
+        },
       );
     } finally {
-      collapsedNotifier.removeListener(updatePadding);
-      collapsedNotifier.dispose();
-      _selectionSheetContext = null;
+      controller.removeListener(updatePadding);
       selectionController.resetMapPadding();
       selectionController.setSelectionSheetOpen(false);
+      _activeSheetNavigator = null;
+      _activeSheetCancelResult = null;
     }
 
     return result;
@@ -431,6 +444,54 @@ class LocationSelectionManager {
   /// 显示SnackBar
   void _showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _DraggableSheetModal extends StatelessWidget {
+  const _DraggableSheetModal({
+    required this.controller,
+    required this.initialChildSize,
+    required this.minChildSize,
+    required this.maxChildSize,
+    required this.childBuilder,
+  });
+
+  final DraggableScrollableController controller;
+  final double initialChildSize;
+  final double minChildSize;
+  final double maxChildSize;
+  final Widget Function(BuildContext context, ScrollController scrollController)
+      childBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      controller: controller,
+      expand: false,
+      initialChildSize: initialChildSize,
+      minChildSize: minChildSize,
+      maxChildSize: maxChildSize,
+      builder: (context, scrollController) {
+        final theme = Theme.of(context);
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: Material(
+              color: theme.colorScheme.surface,
+              child: SafeArea(
+                top: false,
+                child: childBuilder(context, scrollController),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

@@ -12,10 +12,10 @@ import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/location_selection_sheets.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/start_location_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/destination_selection_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/map_place_details_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/sheets/location_selection_sheets.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/sheets/start_location_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/sheets/destination_selection_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/sheets/map_place_details_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
 

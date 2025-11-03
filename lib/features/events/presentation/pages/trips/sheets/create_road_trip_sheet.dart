@@ -11,7 +11,7 @@ import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_t
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/location_selection_sheets.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/sheets/location_selection_sheets.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

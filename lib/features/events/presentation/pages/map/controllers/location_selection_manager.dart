@@ -109,12 +109,12 @@ class LocationSelectionManager {
   }
 
   /// 显示位置选择Sheet
-  Future<void> _showLocationSelectionSheet(BuildContext context) async {
+  Future<bool?> _showLocationSelectionSheet(BuildContext context) async {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final selectionState = ref.read(mapSelectionControllerProvider);
     
     if (selectionState.selectedLatLng == null || selectionState.isSelectionSheetOpen) {
-      return;
+      return null;
     }
 
     final proceed = await _presentSelectionSheet<bool>(
@@ -138,6 +138,8 @@ class LocationSelectionManager {
     } else {
       await clearSelectedLocation(dismissSheet: false);
     }
+
+    return proceed;
   }
 
   /// 开始目标位置选择

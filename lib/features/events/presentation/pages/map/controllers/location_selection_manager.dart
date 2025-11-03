@@ -307,6 +307,63 @@ class LocationSelectionManager {
     return result;
   }
 
+  /// 对外公开的反向地理编码
+  Future<String?> reverseGeocode(LatLng latlng) {
+    return _reverseGeocode(latlng);
+  }
+
+  /// 获取附近地点
+  Future<List<NearbyPlace>> fetchNearbyPlaces(LatLng latlng) {
+    return ref
+        .read(mapSelectionControllerProvider.notifier)
+        .getNearbyPlaces(latlng);
+  }
+
+  /// 从路线规划页重新发起位置选择
+  Future<void> startRouteSelectionFlow(
+    BuildContext context, {
+    LatLng? initialStart,
+    LatLng? initialDestination,
+    bool skipStart = false,
+  }) async {
+    await clearSelectedLocation(dismissSheet: false);
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final mapController = ref.read(mapControllerProvider);
+
+    if (initialStart != null) {
+      selectionController.setSelectedLatLng(initialStart);
+    }
+
+    if (skipStart && initialStart != null) {
+      selectionController.setSelectingDestination(true);
+      if (initialDestination != null) {
+        selectionController.setDestinationLatLng(initialDestination);
+        await mapController.moveCamera(initialDestination, zoom: 12);
+      } else {
+        selectionController.setDestinationLatLng(initialStart);
+        await mapController.moveCamera(initialStart, zoom: 6);
+      }
+      await _showDestinationSelectionSheet(context);
+      return;
+    }
+
+    if (initialStart != null) {
+      await mapController.moveCamera(initialStart, zoom: 12);
+    }
+
+    final proceed = await _showLocationSelectionSheet(context);
+    if (proceed == true) {
+      await _beginDestinationSelection();
+      if (initialDestination != null) {
+        selectionController.setDestinationLatLng(initialDestination);
+        await mapController.moveCamera(initialDestination, zoom: 12);
+      }
+      await _showDestinationSelectionSheet(context);
+    } else {
+      await clearSelectedLocation(dismissSheet: false);
+    }
+  }
+
   /// 反向地理编码
   Future<String?> _reverseGeocode(LatLng latlng) async {
     try {

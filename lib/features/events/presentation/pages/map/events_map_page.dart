@@ -4,6 +4,7 @@ import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/map/sheets/create_road_trip_sheet.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -146,7 +147,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     final shouldHideEventMarkers =
         selectionState.selectedLatLng != null ||
-        selectionState.isSelectingDestination;
+        selectionState.destinationLatLng != null;
     final markers = <Marker>{
       if (!shouldHideEventMarkers) ...markersLayer.markers,
     };
@@ -201,8 +202,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     final hideSearchBar =
         selectionState.isSelectionSheetOpen ||
-        selectionState.isSelectingDestination ||
-        selectionState.selectedLatLng != null;
+        selectionState.selectedLatLng != null ||
+        selectionState.destinationLatLng != null;
     final showClearSelectionInAppBar =
         !hideSearchBar && selectionState.selectedLatLng != null;
 
@@ -319,7 +320,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              selectionState.isSelectingDestination
+                              selectionState.destinationLatLng != null
                                   ? loc.map_select_location_destination_tip
                                   : loc.map_select_location_tip,
                               style: theme.textTheme.bodyMedium?.copyWith(
@@ -567,6 +568,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     return switch (widget.sheetType) {
       MapOverlaySheetType.chat => const [0.32, 0.5, 0.92],
       MapOverlaySheetType.explore => const [0.32, 0.5, 0.92],
+      MapOverlaySheetType.roadTripCreate => const [0.32, 0.7, 0.95],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.92],
     };
   }
@@ -576,6 +578,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     return switch (widget.sheetType) {
       MapOverlaySheetType.chat => snapSizes[1],
       MapOverlaySheetType.explore => snapSizes[1],
+      MapOverlaySheetType.roadTripCreate => snapSizes[1],
       MapOverlaySheetType.none => snapSizes.first,
     };
   }
@@ -670,6 +673,11 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
               case MapOverlaySheetType.chat:
                 effectiveContent = ChatSheet(scrollController: scrollController);
                 break;
+              case MapOverlaySheetType.roadTripCreate:
+                effectiveContent = CreateRoadTripSheet(
+                  scrollController: scrollController,
+                );
+                break;
               case MapOverlaySheetType.none:
                 effectiveContent = const SizedBox.shrink();
                 break;
@@ -728,6 +736,12 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                                   ref
                                       .read(mapOverlaySheetProvider.notifier)
                                       .state = MapOverlaySheetType.none;
+                                  if (widget.sheetType ==
+                                      MapOverlaySheetType.roadTripCreate) {
+                                    ref
+                                        .read(mapSelectionControllerProvider.notifier)
+                                        .resetSelection();
+                                  }
                                 },
                               ),
                             ),

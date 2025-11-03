@@ -17,6 +17,7 @@ import 'package:crew_app/features/events/presentation/pages/map/sheets/start_loc
 import 'package:crew_app/features/events/presentation/pages/map/sheets/destination_selection_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_place_details_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import '../state/map_overlay_sheet_provider.dart';
 
 /// 位置选择管理器
 class LocationSelectionManager {
@@ -31,22 +32,20 @@ class LocationSelectionManager {
 
   /// 处理地图长按
   Future<void> onMapLongPress(LatLng latlng, BuildContext context) async {
-    final selectionState = ref.read(mapSelectionControllerProvider);
-    if (selectionState.isSelectingDestination) {
-      await _handleDestinationSelection(latlng, context);
-      return;
-    }
-    
     if (_isHandlingLongPress) return;
-    
+
     _isHandlingLongPress = true;
     try {
-      await clearSelectedLocation();
-      ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(latlng);
-      
+      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+      selectionController.resetSelection();
+      selectionController.setSelectedLatLng(latlng);
+
       final mapController = ref.read(mapControllerProvider);
       await mapController.moveCamera(latlng, zoom: 17);
-      await _showLocationSelectionSheet(context);
+      HapticFeedback.lightImpact();
+
+      ref.read(mapOverlaySheetProvider.notifier).state =
+          MapOverlaySheetType.roadTripCreate;
     } finally {
       _isHandlingLongPress = false;
     }
@@ -54,6 +53,13 @@ class LocationSelectionManager {
 
   /// 处理地图点击
   Future<void> onMapTap(LatLng position, BuildContext context) async {
+    final currentSheet = ref.read(mapOverlaySheetProvider);
+    if (currentSheet == MapOverlaySheetType.roadTripCreate) {
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+      ref.read(mapSelectionControllerProvider.notifier).resetSelection();
+      return;
+    }
+
     final selectionState = ref.read(mapSelectionControllerProvider);
     if (selectionState.isSelectingDestination) {
       await _handleDestinationSelection(position, context);

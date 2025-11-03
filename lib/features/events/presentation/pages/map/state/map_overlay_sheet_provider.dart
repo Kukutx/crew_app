@@ -4,6 +4,7 @@ enum MapOverlaySheetType {
   none,
   explore,
   chat,
+  roadTripCreate,
 }
 
 final mapOverlaySheetProvider =

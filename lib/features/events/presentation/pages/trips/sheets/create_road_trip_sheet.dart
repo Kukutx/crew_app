@@ -76,7 +76,6 @@ class _PlannerSheetState extends State<_PlannerSheet>
   final List<String> _tags = [];
 
   // ==== 图集 ====
-  final List<RoadTripGalleryItem> _gallery = [];
   final ImagePicker _picker = ImagePicker();
 
   // ==== 文案 ====
@@ -159,16 +158,27 @@ class _PlannerSheetState extends State<_PlannerSheet>
   }
 
   void _onRemoveImage(int i) {
-    if (i >= 0 && i < _gallery.length) setState(() => _gallery.removeAt(i));
+    final items = _editorState.galleryItems;
+    if (i < 0 || i >= items.length) {
+      return;
+    }
+    setState(() {
+      final updated = List<RoadTripGalleryItem>.of(items)..removeAt(i);
+      _editorState = _editorState.copyWith(galleryItems: updated);
+    });
   }
 
   void _onSetCover(int i) {
-    if (i > 0 && i < _gallery.length) {
-      setState(() {
-        final item = _gallery.removeAt(i);
-        _gallery.insert(0, item);
-      });
+    final items = _editorState.galleryItems;
+    if (i <= 0 || i >= items.length) {
+      return;
     }
+    setState(() {
+      final updated = List<RoadTripGalleryItem>.of(items);
+      final item = updated.removeAt(i);
+      updated.insert(0, item);
+      _editorState = _editorState.copyWith(galleryItems: updated);
+    });
   }
 
   void _showSnack(String message) {
@@ -240,7 +250,7 @@ class _PlannerSheetState extends State<_PlannerSheet>
         );
       case TripSection.gallery:
         return RoadTripGallerySection(
-          items: _gallery,
+          items: _editorState.galleryItems,
           onPickImages: _onPickImages,
           onRemoveImage: _onRemoveImage,
           onSetCover: _onSetCover,

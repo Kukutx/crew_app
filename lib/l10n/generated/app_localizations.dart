@@ -110,12 +110,6 @@ abstract class AppLocalizations {
   /// **'This is a universal settings page example.'**
   String get about_content;
 
-  /// No description provided for @about_section_version_details.
-  ///
-  /// In en, this message translates to:
-  /// **'Version information'**
-  String get about_section_version_details;
-
   /// No description provided for @about_current_version.
   ///
   /// In en, this message translates to:
@@ -127,12 +121,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Build number'**
   String get about_build_number;
-
-  /// No description provided for @about_latest_version.
-  ///
-  /// In en, this message translates to:
-  /// **'Latest version'**
-  String get about_latest_version;
 
   /// No description provided for @about_check_updates.
   ///
@@ -164,12 +152,6 @@ abstract class AppLocalizations {
   /// **'Unable to determine the latest version right now.'**
   String get about_update_status_unknown;
 
-  /// No description provided for @action_apply.
-  ///
-  /// In en, this message translates to:
-  /// **'Apply'**
-  String get action_apply;
-
   /// No description provided for @action_cancel.
   ///
   /// In en, this message translates to:
@@ -194,12 +176,6 @@ abstract class AppLocalizations {
   /// **'Following'**
   String get action_following;
 
-  /// No description provided for @action_login.
-  ///
-  /// In en, this message translates to:
-  /// **'Log in'**
-  String get action_login;
-
   /// No description provided for @action_logout.
   ///
   /// In en, this message translates to:
@@ -218,30 +194,6 @@ abstract class AppLocalizations {
   /// **'Register Now'**
   String get action_register_now;
 
-  /// No description provided for @action_replace.
-  ///
-  /// In en, this message translates to:
-  /// **'Replace'**
-  String get action_replace;
-
-  /// No description provided for @action_reset.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset'**
-  String get action_reset;
-
-  /// No description provided for @action_restore_defaults.
-  ///
-  /// In en, this message translates to:
-  /// **'Restore default'**
-  String get action_restore_defaults;
-
-  /// No description provided for @action_retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get action_retry;
-
   /// No description provided for @chinese.
   ///
   /// In en, this message translates to:
@@ -259,18 +211,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading…'**
   String get city_loading;
-
-  /// No description provided for @dark_mode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get dark_mode;
-
-  /// No description provided for @user_display_name_fallback.
-  ///
-  /// In en, this message translates to:
-  /// **'User'**
-  String get user_display_name_fallback;
 
   /// No description provided for @english.
   ///
@@ -380,96 +320,6 @@ abstract class AppLocalizations {
   /// **'Free'**
   String get event_fee_free;
 
-  /// No description provided for @event_cost_calculator_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Cost calculator'**
-  String get event_cost_calculator_title;
-
-  /// No description provided for @event_cost_calculator_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Estimate participant fees, carpool costs and commission splits.'**
-  String get event_cost_calculator_description;
-
-  /// No description provided for @event_cost_calculator_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculator'**
-  String get event_cost_calculator_button;
-
-  /// No description provided for @event_cost_calculator_participants_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Participants'**
-  String get event_cost_calculator_participants_label;
-
-  /// No description provided for @event_cost_calculator_fee_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Fee per person (¥)'**
-  String get event_cost_calculator_fee_label;
-
-  /// No description provided for @event_cost_calculator_carpool_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Total carpool cost (¥)'**
-  String get event_cost_calculator_carpool_label;
-
-  /// No description provided for @event_cost_calculator_commission_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Commission rate (%)'**
-  String get event_cost_calculator_commission_label;
-
-  /// No description provided for @event_cost_calculator_total_income.
-  ///
-  /// In en, this message translates to:
-  /// **'Total registration income'**
-  String get event_cost_calculator_total_income;
-
-  /// No description provided for @event_cost_calculator_commission_total.
-  ///
-  /// In en, this message translates to:
-  /// **'Commission payout'**
-  String get event_cost_calculator_commission_total;
-
-  /// No description provided for @event_cost_calculator_carpool_share.
-  ///
-  /// In en, this message translates to:
-  /// **'Carpool cost per person'**
-  String get event_cost_calculator_carpool_share;
-
-  /// No description provided for @event_cost_calculator_net_total.
-  ///
-  /// In en, this message translates to:
-  /// **'Net income after costs'**
-  String get event_cost_calculator_net_total;
-
-  /// No description provided for @event_cost_calculator_net_per_person.
-  ///
-  /// In en, this message translates to:
-  /// **'Net income per person'**
-  String get event_cost_calculator_net_per_person;
-
-  /// No description provided for @event_cost_calculator_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Adjust any number to match the actual expenses for this trip.'**
-  String get event_cost_calculator_hint;
-
-  /// No description provided for @event_expense_section_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Expense calculation'**
-  String get event_expense_section_title;
-
-  /// No description provided for @event_expense_section_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Keep track of shared costs with your crew and settle up easily after the trip.'**
-  String get event_expense_section_description;
-
   /// No description provided for @event_expense_calculate_button.
   ///
   /// In en, this message translates to:
@@ -530,29 +380,11 @@ abstract class AppLocalizations {
   /// **'Ended'**
   String get event_status_ended;
 
-  /// No description provided for @event_distance_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Distance'**
-  String get event_distance_title;
-
-  /// No description provided for @event_distance_value.
-  ///
-  /// In en, this message translates to:
-  /// **'{kilometers} km'**
-  String event_distance_value(String kilometers);
-
   /// No description provided for @event_title_field_label.
   ///
   /// In en, this message translates to:
   /// **'Event Title'**
   String get event_title_field_label;
-
-  /// No description provided for @events_open_chat.
-  ///
-  /// In en, this message translates to:
-  /// **'Open messages'**
-  String get events_open_chat;
 
   /// No description provided for @messages_tab_private.
   ///
@@ -614,35 +446,17 @@ abstract class AppLocalizations {
   /// **'Moment type'**
   String get create_moment_type_section_title;
 
-  /// No description provided for @create_moment_type_section_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Decide whether to publish a quick inspiration or tie it to your current activity.'**
-  String get create_moment_type_section_description;
-
   /// No description provided for @create_moment_type_instant.
   ///
   /// In en, this message translates to:
   /// **'Instant moment'**
   String get create_moment_type_instant;
 
-  /// No description provided for @create_moment_type_instant_desc.
-  ///
-  /// In en, this message translates to:
-  /// **'Share freely without linking to any activity.'**
-  String get create_moment_type_instant_desc;
-
   /// No description provided for @create_moment_type_event.
   ///
   /// In en, this message translates to:
   /// **'Activity moment'**
   String get create_moment_type_event;
-
-  /// No description provided for @create_moment_type_event_desc.
-  ///
-  /// In en, this message translates to:
-  /// **'Link to your ongoing road trip so the crew stays in sync.'**
-  String get create_moment_type_event_desc;
 
   /// No description provided for @create_moment_event_link_label.
   ///
@@ -668,12 +482,6 @@ abstract class AppLocalizations {
   /// **'{featureName} is coming soon'**
   String create_moment_preview_message(Object featureName);
 
-  /// No description provided for @events_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Events'**
-  String get events_title;
-
   /// No description provided for @create_event_title.
   ///
   /// In en, this message translates to:
@@ -692,54 +500,6 @@ abstract class AppLocalizations {
   /// **'Filter'**
   String get filter;
 
-  /// No description provided for @filter_category.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get filter_category;
-
-  /// No description provided for @filter_date.
-  ///
-  /// In en, this message translates to:
-  /// **'Date'**
-  String get filter_date;
-
-  /// No description provided for @filter_date_any.
-  ///
-  /// In en, this message translates to:
-  /// **'Any time'**
-  String get filter_date_any;
-
-  /// No description provided for @filter_date_this_month.
-  ///
-  /// In en, this message translates to:
-  /// **'This month'**
-  String get filter_date_this_month;
-
-  /// No description provided for @filter_date_this_week.
-  ///
-  /// In en, this message translates to:
-  /// **'This week'**
-  String get filter_date_this_week;
-
-  /// No description provided for @filter_date_today.
-  ///
-  /// In en, this message translates to:
-  /// **'Today'**
-  String get filter_date_today;
-
-  /// No description provided for @filter_distance.
-  ///
-  /// In en, this message translates to:
-  /// **'Distance'**
-  String get filter_distance;
-
-  /// No description provided for @filter_only_free.
-  ///
-  /// In en, this message translates to:
-  /// **'Only show free events'**
-  String get filter_only_free;
-
   /// No description provided for @followed.
   ///
   /// In en, this message translates to:
@@ -751,24 +511,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No favorites yet~'**
   String get favorites_empty;
-
-  /// No description provided for @favorites_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Favorites'**
-  String get favorites_title;
-
-  /// No description provided for @industry_label_optional.
-  ///
-  /// In en, this message translates to:
-  /// **'Industry (optional)'**
-  String get industry_label_optional;
-
-  /// No description provided for @interest_tags_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Interest tags'**
-  String get interest_tags_title;
 
   /// No description provided for @language.
   ///
@@ -788,12 +530,6 @@ abstract class AppLocalizations {
   /// **'Location: {lat}, {lng}'**
   String location_coordinates(Object lat, Object lng);
 
-  /// No description provided for @location_unavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to get location'**
-  String get location_unavailable;
-
   /// No description provided for @login_footer.
   ///
   /// In en, this message translates to:
@@ -806,12 +542,6 @@ abstract class AppLocalizations {
   /// **'Tap the button above to sign in and explore more features.'**
   String get login_prompt;
 
-  /// No description provided for @login_side_info.
-  ///
-  /// In en, this message translates to:
-  /// **'Discover nearby events · Host quickly · Subscribe for advanced features'**
-  String get login_side_info;
-
   /// No description provided for @login_subtitle.
   ///
   /// In en, this message translates to:
@@ -823,30 +553,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome to Crew'**
   String get login_title;
-
-  /// No description provided for @login_other_options.
-  ///
-  /// In en, this message translates to:
-  /// **'Other sign-in options'**
-  String get login_other_options;
-
-  /// No description provided for @login_other_options_hide.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide additional options'**
-  String get login_other_options_hide;
-
-  /// No description provided for @login_other_options_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose a sign-in method'**
-  String get login_other_options_title;
-
-  /// No description provided for @login_other_options_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a provider below to continue.'**
-  String get login_other_options_description;
 
   /// No description provided for @login_agreement_prefix.
   ///
@@ -974,42 +680,6 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0 {No reviews} =1 {1 review} other {{count} reviews}}'**
   String map_place_details_reviews(int count);
 
-  /// No description provided for @map_place_details_price_free.
-  ///
-  /// In en, this message translates to:
-  /// **'Price level: Free'**
-  String get map_place_details_price_free;
-
-  /// No description provided for @map_place_details_price_inexpensive.
-  ///
-  /// In en, this message translates to:
-  /// **'Price level: \$'**
-  String get map_place_details_price_inexpensive;
-
-  /// No description provided for @map_place_details_price_moderate.
-  ///
-  /// In en, this message translates to:
-  /// **'Price level: \$\$'**
-  String get map_place_details_price_moderate;
-
-  /// No description provided for @map_place_details_price_expensive.
-  ///
-  /// In en, this message translates to:
-  /// **'Price level: \$\$\$'**
-  String get map_place_details_price_expensive;
-
-  /// No description provided for @map_place_details_price_very_expensive.
-  ///
-  /// In en, this message translates to:
-  /// **'Price level: \$\$\$\$'**
-  String get map_place_details_price_very_expensive;
-
-  /// No description provided for @map_place_details_price_unknown.
-  ///
-  /// In en, this message translates to:
-  /// **'Price level: unknown'**
-  String get map_place_details_price_unknown;
-
   /// No description provided for @map_select_location_title.
   ///
   /// In en, this message translates to:
@@ -1027,24 +697,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Messages'**
   String get messages;
-
-  /// No description provided for @max_interest_selection.
-  ///
-  /// In en, this message translates to:
-  /// **'You can select up to 5 interest tags.'**
-  String get max_interest_selection;
-
-  /// No description provided for @my_events.
-  ///
-  /// In en, this message translates to:
-  /// **'My events'**
-  String get my_events;
-
-  /// No description provided for @my_favorites.
-  ///
-  /// In en, this message translates to:
-  /// **'My favorites'**
-  String get my_favorites;
 
   /// No description provided for @chat_members_count.
   ///
@@ -1159,12 +811,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Emojis'**
   String get chat_composer_emoji_tooltip;
-
-  /// No description provided for @chat_composer_attach_tooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Files'**
-  String get chat_composer_attach_tooltip;
 
   /// No description provided for @chat_composer_more_tooltip.
   ///
@@ -1369,12 +1015,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No events found'**
   String get no_events_found;
-
-  /// No description provided for @not_logged_in.
-  ///
-  /// In en, this message translates to:
-  /// **'Not logged in'**
-  String get not_logged_in;
 
   /// No description provided for @preferences_title.
   ///
@@ -1598,36 +1238,6 @@ abstract class AppLocalizations {
   /// **'Please enter an event title.'**
   String get please_enter_event_title;
 
-  /// No description provided for @profile_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile'**
-  String get profile_title;
-
-  /// No description provided for @profile_roles_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Roles'**
-  String get profile_roles_label;
-
-  /// No description provided for @profile_subscription_status_active.
-  ///
-  /// In en, this message translates to:
-  /// **'Subscription active'**
-  String get profile_subscription_status_active;
-
-  /// No description provided for @profile_subscription_status_inactive.
-  ///
-  /// In en, this message translates to:
-  /// **'No active subscription'**
-  String get profile_subscription_status_inactive;
-
-  /// No description provided for @profile_sync_error.
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to sync profile details'**
-  String get profile_sync_error;
-
   /// No description provided for @registration_not_implemented.
   ///
   /// In en, this message translates to:
@@ -1657,12 +1267,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scan to view the event details'**
   String get share_card_qr_caption;
-
-  /// No description provided for @share_action_copy_link.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy link'**
-  String get share_action_copy_link;
 
   /// No description provided for @share_action_save_image.
   ///
@@ -1694,23 +1298,11 @@ abstract class AppLocalizations {
   /// **'Couldn\'t save share card'**
   String get share_save_failure;
 
-  /// No description provided for @school_label_optional.
-  ///
-  /// In en, this message translates to:
-  /// **'School (optional)'**
-  String get school_label_optional;
-
   /// No description provided for @search_hint.
   ///
   /// In en, this message translates to:
   /// **'Search events'**
   String get search_hint;
-
-  /// No description provided for @search_tags_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search tags...'**
-  String get search_tags_hint;
 
   /// No description provided for @settings.
   ///
@@ -1742,12 +1334,6 @@ abstract class AppLocalizations {
   /// **'Privacy & safety'**
   String get settings_section_privacy;
 
-  /// No description provided for @settings_section_account.
-  ///
-  /// In en, this message translates to:
-  /// **'Account'**
-  String get settings_section_account;
-
   /// No description provided for @settings_section_notifications.
   ///
   /// In en, this message translates to:
@@ -1766,35 +1352,17 @@ abstract class AppLocalizations {
   /// **'Help & feedback'**
   String get settings_help_feedback;
 
-  /// No description provided for @settings_help_feedback_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'FAQ, contact support'**
-  String get settings_help_feedback_subtitle;
-
   /// No description provided for @settings_app_version.
   ///
   /// In en, this message translates to:
   /// **'About Crew'**
   String get settings_app_version;
 
-  /// No description provided for @settings_app_version_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'View Crew version details and legal documents'**
-  String get settings_app_version_subtitle;
-
   /// No description provided for @settings_subscription_current_plan.
   ///
   /// In en, this message translates to:
   /// **'Current plan'**
   String get settings_subscription_current_plan;
-
-  /// No description provided for @settings_subscription_current_plan_value.
-  ///
-  /// In en, this message translates to:
-  /// **'{plan} plan'**
-  String settings_subscription_current_plan_value(Object plan);
 
   /// No description provided for @settings_subscription_plan_free.
   ///
@@ -1813,18 +1381,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pro'**
   String get settings_subscription_plan_pro;
-
-  /// No description provided for @settings_subscription_upgrade.
-  ///
-  /// In en, this message translates to:
-  /// **'Upgrade subscription'**
-  String get settings_subscription_upgrade;
-
-  /// No description provided for @settings_subscription_cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel subscription'**
-  String get settings_subscription_cancel;
 
   /// No description provided for @subscription_plan_title.
   ///
@@ -1951,12 +1507,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Detailed performance insights'**
   String get subscription_plan_pro_feature_insights;
-
-  /// No description provided for @settings_subscription_payment_methods.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage payment methods'**
-  String get settings_subscription_payment_methods;
 
   /// No description provided for @settings_location_permission.
   ///
@@ -2114,12 +1664,6 @@ abstract class AppLocalizations {
   /// **'Push notifications'**
   String get settings_notifications_push;
 
-  /// No description provided for @settings_notifications_push_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable push notifications on this device'**
-  String get settings_notifications_push_subtitle;
-
   /// No description provided for @settings_saved_toast.
   ///
   /// In en, this message translates to:
@@ -2186,12 +1730,6 @@ abstract class AppLocalizations {
   /// **'Provide more information so our team can review this.'**
   String get report_event_content_hint;
 
-  /// No description provided for @report_event_content_required.
-  ///
-  /// In en, this message translates to:
-  /// **'Please describe the issue.'**
-  String get report_event_content_required;
-
   /// No description provided for @report_event_attachment_label.
   ///
   /// In en, this message translates to:
@@ -2221,12 +1759,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No file selected'**
   String get report_event_attachment_empty;
-
-  /// No description provided for @report_event_attachment_error.
-  ///
-  /// In en, this message translates to:
-  /// **'We couldn\'t load that photo. Please try again.'**
-  String get report_event_attachment_error;
 
   /// No description provided for @report_event_submit.
   ///
@@ -2378,18 +1910,6 @@ abstract class AppLocalizations {
   /// **'Choose photo'**
   String get support_feedback_add_photo;
 
-  /// No description provided for @support_feedback_add_video.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose video'**
-  String get support_feedback_add_video;
-
-  /// No description provided for @student_verification.
-  ///
-  /// In en, this message translates to:
-  /// **'Student verification'**
-  String get student_verification;
-
   /// No description provided for @tag_city_explore.
   ///
   /// In en, this message translates to:
@@ -2401,54 +1921,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Casual social'**
   String get tag_easy_social;
-
-  /// No description provided for @tag_free.
-  ///
-  /// In en, this message translates to:
-  /// **'Free'**
-  String get tag_free;
-
-  /// No description provided for @tag_friends.
-  ///
-  /// In en, this message translates to:
-  /// **'Friends joined'**
-  String get tag_friends;
-
-  /// No description provided for @tag_music.
-  ///
-  /// In en, this message translates to:
-  /// **'Music'**
-  String get tag_music;
-
-  /// No description provided for @tag_nearby.
-  ///
-  /// In en, this message translates to:
-  /// **'Nearby'**
-  String get tag_nearby;
-
-  /// No description provided for @tag_party.
-  ///
-  /// In en, this message translates to:
-  /// **'Party'**
-  String get tag_party;
-
-  /// No description provided for @tag_sports.
-  ///
-  /// In en, this message translates to:
-  /// **'Sports'**
-  String get tag_sports;
-
-  /// No description provided for @tag_today.
-  ///
-  /// In en, this message translates to:
-  /// **'Today'**
-  String get tag_today;
-
-  /// No description provided for @tag_trending.
-  ///
-  /// In en, this message translates to:
-  /// **'Trending'**
-  String get tag_trending;
 
   /// No description provided for @tag_walk_friendly.
   ///
@@ -2474,18 +1946,6 @@ abstract class AppLocalizations {
   /// **'Unfollowed'**
   String get unfollowed;
 
-  /// No description provided for @verification_preferences.
-  ///
-  /// In en, this message translates to:
-  /// **'Verification & preferences'**
-  String get verification_preferences;
-
-  /// No description provided for @version_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Version {version}'**
-  String version_label(Object version);
-
   /// No description provided for @disclaimer_acknowledge.
   ///
   /// In en, this message translates to:
@@ -2503,48 +1963,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Agree'**
   String get disclaimer_accept;
-
-  /// No description provided for @map_quick_trip_default_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Road trip'**
-  String get map_quick_trip_default_title;
-
-  /// No description provided for @map_quick_trip_description.
-  ///
-  /// In en, this message translates to:
-  /// **'From {start} to {destination}.'**
-  String map_quick_trip_description(Object start, Object destination);
-
-  /// No description provided for @map_quick_trip_created.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick trip created.'**
-  String get map_quick_trip_created;
-
-  /// No description provided for @map_quick_trip_create_failed.
-  ///
-  /// In en, this message translates to:
-  /// **'We couldn\'t create this trip.'**
-  String get map_quick_trip_create_failed;
-
-  /// No description provided for @map_quick_actions_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick actions'**
-  String get map_quick_actions_title;
-
-  /// No description provided for @map_quick_actions_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick what you\'d like to do next.'**
-  String get map_quick_actions_subtitle;
-
-  /// No description provided for @map_quick_actions_create_moment.
-  ///
-  /// In en, this message translates to:
-  /// **'Share a moment'**
-  String get map_quick_actions_create_moment;
 
   /// No description provided for @map_quick_actions_my_moments.
   ///
@@ -2564,29 +1982,11 @@ abstract class AppLocalizations {
   /// **'Add friends'**
   String get map_quick_actions_add_friend;
 
-  /// No description provided for @map_quick_actions_add_friend_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Invite friends to explore events with you'**
-  String get map_quick_actions_add_friend_subtitle;
-
   /// No description provided for @map_quick_actions_my_event.
   ///
   /// In en, this message translates to:
   /// **'My activities'**
   String get map_quick_actions_my_event;
-
-  /// No description provided for @map_quick_actions_my_event_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'See everything I\'m joining or hosting'**
-  String get map_quick_actions_my_event_subtitle;
-
-  /// No description provided for @map_quick_actions_my_moments_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Keep up with likes and comments'**
-  String get map_quick_actions_my_moments_subtitle;
 
   /// No description provided for @map_quick_actions_my_ledger.
   ///
@@ -2594,59 +1994,11 @@ abstract class AppLocalizations {
   /// **'My ledger'**
   String get map_quick_actions_my_ledger;
 
-  /// No description provided for @map_quick_actions_my_ledger_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Log expenses in seconds'**
-  String get map_quick_actions_my_ledger_subtitle;
-
   /// No description provided for @map_quick_actions_wallet.
   ///
   /// In en, this message translates to:
   /// **'My wallet'**
   String get map_quick_actions_wallet;
-
-  /// No description provided for @map_quick_actions_wallet_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage balance and cards'**
-  String get map_quick_actions_wallet_subtitle;
-
-  /// No description provided for @map_quick_actions_my_drafts_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick up where you left off'**
-  String get map_quick_actions_my_drafts_subtitle;
-
-  /// No description provided for @map_quick_actions_section_connect.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect'**
-  String get map_quick_actions_section_connect;
-
-  /// No description provided for @map_quick_actions_section_personal.
-  ///
-  /// In en, this message translates to:
-  /// **'My space'**
-  String get map_quick_actions_section_personal;
-
-  /// No description provided for @map_quick_actions_section_workspace.
-  ///
-  /// In en, this message translates to:
-  /// **'Workspace'**
-  String get map_quick_actions_section_workspace;
-
-  /// No description provided for @map_quick_actions_empty_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing to show yet'**
-  String get map_quick_actions_empty_title;
-
-  /// No description provided for @map_quick_actions_empty_message.
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ll add shortcuts here as soon as they\'re ready.'**
-  String get map_quick_actions_empty_message;
 
   /// No description provided for @map_quick_actions_bottom_scan.
   ///
@@ -2714,209 +2066,11 @@ abstract class AppLocalizations {
   /// **'Saved drafts'**
   String get my_drafts_section_saved;
 
-  /// No description provided for @my_drafts_last_edited.
-  ///
-  /// In en, this message translates to:
-  /// **'Edited {time}'**
-  String my_drafts_last_edited(Object time);
-
   /// No description provided for @my_drafts_resume_button.
   ///
   /// In en, this message translates to:
   /// **'Continue editing'**
   String get my_drafts_resume_button;
-
-  /// No description provided for @add_friend_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Add friends'**
-  String get add_friend_title;
-
-  /// No description provided for @add_friend_search_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search by name or Crew ID'**
-  String get add_friend_search_hint;
-
-  /// No description provided for @add_friend_quick_action_scan.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan QR code'**
-  String get add_friend_quick_action_scan;
-
-  /// No description provided for @add_friend_quick_action_scan_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Quickly add someone nearby'**
-  String get add_friend_quick_action_scan_description;
-
-  /// No description provided for @add_friend_quick_action_invite.
-  ///
-  /// In en, this message translates to:
-  /// **'Share invite link'**
-  String get add_friend_quick_action_invite;
-
-  /// No description provided for @add_friend_quick_action_invite_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Send a Crew invite link'**
-  String get add_friend_quick_action_invite_description;
-
-  /// No description provided for @add_friend_quick_action_import_contacts.
-  ///
-  /// In en, this message translates to:
-  /// **'Find from contacts'**
-  String get add_friend_quick_action_import_contacts;
-
-  /// No description provided for @add_friend_quick_action_import_contacts_description.
-  ///
-  /// In en, this message translates to:
-  /// **'See who is already on Crew'**
-  String get add_friend_quick_action_import_contacts_description;
-
-  /// No description provided for @add_friend_interest_section_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Popular interests'**
-  String get add_friend_interest_section_title;
-
-  /// No description provided for @add_friend_suggestions_section_title.
-  ///
-  /// In en, this message translates to:
-  /// **'People you may know'**
-  String get add_friend_suggestions_section_title;
-
-  /// No description provided for @add_friend_contacts_section_title.
-  ///
-  /// In en, this message translates to:
-  /// **'From your contacts'**
-  String get add_friend_contacts_section_title;
-
-  /// No description provided for @add_friend_mutual_count.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} mutual friends'**
-  String add_friend_mutual_count(Object count);
-
-  /// No description provided for @add_friend_invite_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Add friend'**
-  String get add_friend_invite_button;
-
-  /// No description provided for @add_friend_contact_status_joined.
-  ///
-  /// In en, this message translates to:
-  /// **'Joined {time}'**
-  String add_friend_contact_status_joined(Object time);
-
-  /// No description provided for @add_friend_contact_status_pending.
-  ///
-  /// In en, this message translates to:
-  /// **'Invite pending'**
-  String get add_friend_contact_status_pending;
-
-  /// No description provided for @my_activities_title.
-  ///
-  /// In en, this message translates to:
-  /// **'My activities'**
-  String get my_activities_title;
-
-  /// No description provided for @my_activities_joining_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Currently joining'**
-  String get my_activities_joining_title;
-
-  /// No description provided for @my_activities_joining_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Events I\'m counting down to'**
-  String get my_activities_joining_subtitle;
-
-  /// No description provided for @my_activities_hosting_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Recruiting now'**
-  String get my_activities_hosting_title;
-
-  /// No description provided for @my_activities_hosting_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Activities I\'m organizing'**
-  String get my_activities_hosting_subtitle;
-
-  /// No description provided for @my_activities_status_registered.
-  ///
-  /// In en, this message translates to:
-  /// **'Registered'**
-  String get my_activities_status_registered;
-
-  /// No description provided for @my_activities_status_hosting.
-  ///
-  /// In en, this message translates to:
-  /// **'Hosting'**
-  String get my_activities_status_hosting;
-
-  /// No description provided for @my_activities_card_participants.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} joined'**
-  String my_activities_card_participants(Object count);
-
-  /// No description provided for @my_activities_sample_yoga_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Sunrise yoga flow'**
-  String get my_activities_sample_yoga_title;
-
-  /// No description provided for @my_activities_sample_yoga_details.
-  ///
-  /// In en, this message translates to:
-  /// **'Apr 22 · 7:00 AM · Riverside Studio'**
-  String get my_activities_sample_yoga_details;
-
-  /// No description provided for @my_activities_sample_market_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekend creative market'**
-  String get my_activities_sample_market_title;
-
-  /// No description provided for @my_activities_sample_market_details.
-  ///
-  /// In en, this message translates to:
-  /// **'Apr 27 · 1:30 PM · Old Town Plaza'**
-  String get my_activities_sample_market_details;
-
-  /// No description provided for @my_activities_sample_cleanup_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Lakeside cleanup crew'**
-  String get my_activities_sample_cleanup_title;
-
-  /// No description provided for @my_activities_sample_cleanup_details.
-  ///
-  /// In en, this message translates to:
-  /// **'Apr 20 · 9:00 AM · West Lake Pier'**
-  String get my_activities_sample_cleanup_details;
-
-  /// No description provided for @my_activities_sample_bake_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Community bake night'**
-  String get my_activities_sample_bake_title;
-
-  /// No description provided for @my_activities_sample_bake_details.
-  ///
-  /// In en, this message translates to:
-  /// **'Apr 24 · 6:30 PM · Maple Street Hub'**
-  String get my_activities_sample_bake_details;
-
-  /// No description provided for @map_quick_trip_select_start_tip.
-  ///
-  /// In en, this message translates to:
-  /// **'Long press on the map to pick a starting point.'**
-  String get map_quick_trip_select_start_tip;
 
   /// No description provided for @map_selection_sheet_tap_to_expand.
   ///
@@ -2983,12 +2137,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wallet'**
   String get wallet_title;
-
-  /// No description provided for @wallet_overview_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'View balance, rewards and statements'**
-  String get wallet_overview_subtitle;
 
   /// No description provided for @wallet_balance_label.
   ///
@@ -3151,96 +2299,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stripe payment test'**
   String get settings_developer_stripe_test;
-
-  /// No description provided for @settings_developer_stripe_test_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Open the Stripe payment sheet with test data'**
-  String get settings_developer_stripe_test_subtitle;
-
-  /// No description provided for @developer_test_stripe_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Stripe payment test'**
-  String get developer_test_stripe_title;
-
-  /// No description provided for @developer_test_stripe_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Use Stripe\'s test environment to simulate payments before integrating the real flow.'**
-  String get developer_test_stripe_description;
-
-  /// No description provided for @developer_test_stripe_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Start test payment'**
-  String get developer_test_stripe_button;
-
-  /// No description provided for @developer_test_stripe_last_status.
-  ///
-  /// In en, this message translates to:
-  /// **'Last status'**
-  String get developer_test_stripe_last_status;
-
-  /// No description provided for @developer_test_stripe_reset.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear status'**
-  String get developer_test_stripe_reset;
-
-  /// No description provided for @developer_test_stripe_success.
-  ///
-  /// In en, this message translates to:
-  /// **'Payment completed successfully.'**
-  String get developer_test_stripe_success;
-
-  /// No description provided for @developer_test_stripe_cancelled.
-  ///
-  /// In en, this message translates to:
-  /// **'Payment cancelled.'**
-  String get developer_test_stripe_cancelled;
-
-  /// No description provided for @developer_test_stripe_option_registration_sponsor.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration fee + sponsorship (€1.00)'**
-  String get developer_test_stripe_option_registration_sponsor;
-
-  /// No description provided for @developer_test_stripe_option_registration_sponsor_detail.
-  ///
-  /// In en, this message translates to:
-  /// **'Combines the sample registration fee and an optional sponsorship add-on.'**
-  String get developer_test_stripe_option_registration_sponsor_detail;
-
-  /// No description provided for @developer_test_stripe_option_registration_only.
-  ///
-  /// In en, this message translates to:
-  /// **'Registration fee (€0.50)'**
-  String get developer_test_stripe_option_registration_only;
-
-  /// No description provided for @developer_test_stripe_option_registration_only_detail.
-  ///
-  /// In en, this message translates to:
-  /// **'Only includes the base registration fee.'**
-  String get developer_test_stripe_option_registration_only_detail;
-
-  /// No description provided for @developer_test_stripe_option_sponsor_only.
-  ///
-  /// In en, this message translates to:
-  /// **'Sponsorship (€0.75)'**
-  String get developer_test_stripe_option_sponsor_only;
-
-  /// No description provided for @developer_test_stripe_option_sponsor_only_detail.
-  ///
-  /// In en, this message translates to:
-  /// **'Only includes the sponsorship add-on.'**
-  String get developer_test_stripe_option_sponsor_only_detail;
-
-  /// No description provided for @developer_test_stripe_failure.
-  ///
-  /// In en, this message translates to:
-  /// **'Payment failed: {error}'**
-  String developer_test_stripe_failure(Object error);
 }
 
 class _AppLocalizationsDelegate

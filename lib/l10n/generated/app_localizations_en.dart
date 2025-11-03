@@ -15,16 +15,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_content => 'This is a universal settings page example.';
 
   @override
-  String get about_section_version_details => 'Version information';
-
-  @override
   String get about_current_version => 'Current version';
 
   @override
   String get about_build_number => 'Build number';
-
-  @override
-  String get about_latest_version => 'Latest version';
 
   @override
   String get about_check_updates => 'Check latest version';
@@ -47,9 +41,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unable to determine the latest version right now.';
 
   @override
-  String get action_apply => 'Apply';
-
-  @override
   String get action_cancel => 'Cancel';
 
   @override
@@ -62,9 +53,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_following => 'Following';
 
   @override
-  String get action_login => 'Log in';
-
-  @override
   String get action_logout => 'Log out';
 
   @override
@@ -74,18 +62,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get action_register_now => 'Register Now';
 
   @override
-  String get action_replace => 'Replace';
-
-  @override
-  String get action_reset => 'Reset';
-
-  @override
-  String get action_restore_defaults => 'Restore default';
-
-  @override
-  String get action_retry => 'Retry';
-
-  @override
   String get chinese => 'Chinese';
 
   @override
@@ -93,12 +69,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get city_loading => 'Loading…';
-
-  @override
-  String get dark_mode => 'Dark Mode';
-
-  @override
-  String get user_display_name_fallback => 'User';
 
   @override
   String get english => 'English';
@@ -155,52 +125,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get event_fee_free => 'Free';
 
-  @override
-  String get event_cost_calculator_title => 'Cost calculator';
-
-  @override
-  String get event_cost_calculator_description =>
       'Estimate participant fees, carpool costs and commission splits.';
 
-  @override
-  String get event_cost_calculator_button => 'Calculator';
-
-  @override
-  String get event_cost_calculator_participants_label => 'Participants';
-
-  @override
-  String get event_cost_calculator_fee_label => 'Fee per person (¥)';
-
-  @override
-  String get event_cost_calculator_carpool_label => 'Total carpool cost (¥)';
-
-  @override
-  String get event_cost_calculator_commission_label => 'Commission rate (%)';
-
-  @override
-  String get event_cost_calculator_total_income => 'Total registration income';
-
-  @override
-  String get event_cost_calculator_commission_total => 'Commission payout';
-
-  @override
-  String get event_cost_calculator_carpool_share => 'Carpool cost per person';
-
-  @override
-  String get event_cost_calculator_net_total => 'Net income after costs';
-
-  @override
-  String get event_cost_calculator_net_per_person => 'Net income per person';
-
-  @override
-  String get event_cost_calculator_hint =>
       'Adjust any number to match the actual expenses for this trip.';
 
-  @override
-  String get event_expense_section_title => 'Expense calculation';
-
-  @override
-  String get event_expense_section_description =>
       'Keep track of shared costs with your crew and settle up easily after the trip.';
 
   @override
@@ -234,18 +162,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_status_ended => 'Ended';
 
   @override
-  String get event_distance_title => 'Distance';
-
-  @override
-  String event_distance_value(String kilometers) {
-    return '$kilometers km';
-  }
-
-  @override
   String get event_title_field_label => 'Event Title';
-
-  @override
-  String get events_open_chat => 'Open messages';
 
   @override
   String get messages_tab_private => 'Private';
@@ -278,22 +195,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get create_moment_type_section_title => 'Moment type';
 
-  @override
-  String get create_moment_type_section_description =>
       'Decide whether to publish a quick inspiration or tie it to your current activity.';
 
   @override
   String get create_moment_type_instant => 'Instant moment';
 
-  @override
-  String get create_moment_type_instant_desc =>
       'Share freely without linking to any activity.';
 
   @override
   String get create_moment_type_event => 'Activity moment';
 
-  @override
-  String get create_moment_type_event_desc =>
       'Link to your ongoing road trip so the crew stays in sync.';
 
   @override
@@ -311,9 +222,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get events_title => 'Events';
-
-  @override
   String get create_event_title => 'Create Event';
 
   @override
@@ -323,43 +231,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filter => 'Filter';
 
   @override
-  String get filter_category => 'Category';
-
-  @override
-  String get filter_date => 'Date';
-
-  @override
-  String get filter_date_any => 'Any time';
-
-  @override
-  String get filter_date_this_month => 'This month';
-
-  @override
-  String get filter_date_this_week => 'This week';
-
-  @override
-  String get filter_date_today => 'Today';
-
-  @override
-  String get filter_distance => 'Distance';
-
-  @override
-  String get filter_only_free => 'Only show free events';
-
-  @override
   String get followed => 'Followed';
 
   @override
   String get favorites_empty => 'No favorites yet~';
-
-  @override
-  String get favorites_title => 'Favorites';
-
-  @override
-  String get industry_label_optional => 'Industry (optional)';
-
-  @override
-  String get interest_tags_title => 'Interest tags';
 
   @override
   String get language => 'Language';
@@ -373,9 +248,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get location_unavailable => 'Unable to get location';
-
-  @override
   String get login_footer =>
       'By continuing, you agree to our Terms of Service and Privacy Policy.';
 
@@ -383,8 +255,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_prompt =>
       'Tap the button above to sign in and explore more features.';
 
-  @override
-  String get login_side_info =>
       'Discover nearby events · Host quickly · Subscribe for advanced features';
 
   @override
@@ -394,17 +264,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get login_title => 'Welcome to Crew';
 
-  @override
-  String get login_other_options => 'Other sign-in options';
-
-  @override
-  String get login_other_options_hide => 'Hide additional options';
-
-  @override
-  String get login_other_options_title => 'Choose a sign-in method';
-
-  @override
-  String get login_other_options_description =>
       'Select a provider below to continue.';
 
   @override
@@ -485,24 +344,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get map_place_details_price_free => 'Price level: Free';
-
-  @override
-  String get map_place_details_price_inexpensive => 'Price level: \$';
-
-  @override
-  String get map_place_details_price_moderate => 'Price level: \$\$';
-
-  @override
-  String get map_place_details_price_expensive => 'Price level: \$\$\$';
-
-  @override
-  String get map_place_details_price_very_expensive => 'Price level: \$\$\$\$';
-
-  @override
-  String get map_place_details_price_unknown => 'Price level: unknown';
-
-  @override
   String get map_select_location_title => 'Choose a start location';
 
   @override
@@ -511,15 +352,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messages => 'Messages';
-
-  @override
-  String get max_interest_selection => 'You can select up to 5 interest tags.';
-
-  @override
-  String get my_events => 'My events';
-
-  @override
-  String get my_favorites => 'My favorites';
 
   @override
   String chat_members_count(Object count) {
@@ -585,9 +417,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chat_composer_emoji_tooltip => 'Emojis';
-
-  @override
-  String get chat_composer_attach_tooltip => 'Files';
 
   @override
   String get chat_composer_more_tooltip => 'More';
@@ -703,9 +532,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_events_found => 'No events found';
-
-  @override
-  String get not_logged_in => 'Not logged in';
 
   @override
   String get preferences_title => 'Profile info';
@@ -824,21 +650,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get please_enter_event_title => 'Please enter an event title.';
 
   @override
-  String get profile_title => 'Profile';
-
-  @override
-  String get profile_roles_label => 'Roles';
-
-  @override
-  String get profile_subscription_status_active => 'Subscription active';
-
-  @override
-  String get profile_subscription_status_inactive => 'No active subscription';
-
-  @override
-  String get profile_sync_error => 'Unable to sync profile details';
-
-  @override
   String get registration_not_implemented =>
       'Registration feature is not available yet.';
 
@@ -853,9 +664,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get share_card_qr_caption => 'Scan to view the event details';
-
-  @override
-  String get share_action_copy_link => 'Copy link';
 
   @override
   String get share_action_save_image => 'Save Event';
@@ -873,13 +681,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_save_failure => 'Couldn\'t save share card';
 
   @override
-  String get school_label_optional => 'School (optional)';
-
-  @override
   String get search_hint => 'Search events';
-
-  @override
-  String get search_tags_hint => 'Search tags...';
 
   @override
   String get settings => 'Settings';
@@ -897,9 +699,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_section_privacy => 'Privacy & safety';
 
   @override
-  String get settings_section_account => 'Account';
-
-  @override
   String get settings_section_notifications => 'Notifications';
 
   @override
@@ -909,22 +708,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_help_feedback => 'Help & feedback';
 
   @override
-  String get settings_help_feedback_subtitle => 'FAQ, contact support';
-
-  @override
   String get settings_app_version => 'About Crew';
 
-  @override
-  String get settings_app_version_subtitle =>
       'View Crew version details and legal documents';
 
   @override
   String get settings_subscription_current_plan => 'Current plan';
-
-  @override
-  String settings_subscription_current_plan_value(Object plan) {
-    return '$plan plan';
-  }
 
   @override
   String get settings_subscription_plan_free => 'Free';
@@ -934,12 +723,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_subscription_plan_pro => 'Pro';
-
-  @override
-  String get settings_subscription_upgrade => 'Upgrade subscription';
-
-  @override
-  String get settings_subscription_cancel => 'Cancel subscription';
 
   @override
   String get subscription_plan_title => 'Subscription plans';
@@ -1019,9 +802,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get subscription_plan_pro_feature_insights =>
       'Detailed performance insights';
-
-  @override
-  String get settings_subscription_payment_methods => 'Manage payment methods';
 
   @override
   String get settings_location_permission => 'Location permission';
@@ -1110,8 +890,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_notifications_push => 'Push notifications';
 
-  @override
-  String get settings_notifications_push_subtitle =>
       'Enable push notifications on this device';
 
   @override
@@ -1151,9 +929,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Provide more information so our team can review this.';
 
   @override
-  String get report_event_content_required => 'Please describe the issue.';
-
-  @override
   String get report_event_attachment_label => 'Photo evidence';
 
   @override
@@ -1169,8 +944,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get report_event_attachment_empty => 'No file selected';
 
-  @override
-  String get report_event_attachment_error =>
       'We couldn\'t load that photo. Please try again.';
 
   @override
@@ -1255,40 +1028,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get support_feedback_add_photo => 'Choose photo';
 
   @override
-  String get support_feedback_add_video => 'Choose video';
-
-  @override
-  String get student_verification => 'Student verification';
-
-  @override
   String get tag_city_explore => 'City exploration';
 
   @override
   String get tag_easy_social => 'Casual social';
-
-  @override
-  String get tag_free => 'Free';
-
-  @override
-  String get tag_friends => 'Friends joined';
-
-  @override
-  String get tag_music => 'Music';
-
-  @override
-  String get tag_nearby => 'Nearby';
-
-  @override
-  String get tag_party => 'Party';
-
-  @override
-  String get tag_sports => 'Sports';
-
-  @override
-  String get tag_today => 'Today';
-
-  @override
-  String get tag_trending => 'Trending';
 
   @override
   String get tag_walk_friendly => 'Walk friendly';
@@ -1303,14 +1046,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unfollowed => 'Unfollowed';
 
   @override
-  String get verification_preferences => 'Verification & preferences';
-
-  @override
-  String version_label(Object version) {
-    return 'Version $version';
-  }
-
-  @override
   String get disclaimer_acknowledge =>
       'I have read and agree to the terms above.';
 
@@ -1321,29 +1056,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disclaimer_accept => 'Agree';
 
   @override
-  String get map_quick_trip_default_title => 'Road trip';
-
-  @override
-  String map_quick_trip_description(Object start, Object destination) {
-    return 'From $start to $destination.';
-  }
-
-  @override
-  String get map_quick_trip_created => 'Quick trip created.';
-
-  @override
-  String get map_quick_trip_create_failed => 'We couldn\'t create this trip.';
-
-  @override
-  String get map_quick_actions_title => 'Quick actions';
-
-  @override
-  String get map_quick_actions_subtitle => 'Pick what you\'d like to do next.';
-
-  @override
-  String get map_quick_actions_create_moment => 'Share a moment';
-
-  @override
   String get map_quick_actions_my_moments => 'My moments';
 
   @override
@@ -1352,51 +1064,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get map_quick_actions_add_friend => 'Add friends';
 
-  @override
-  String get map_quick_actions_add_friend_subtitle =>
       'Invite friends to explore events with you';
 
   @override
   String get map_quick_actions_my_event => 'My activities';
 
-  @override
-  String get map_quick_actions_my_event_subtitle =>
       'See everything I\'m joining or hosting';
 
-  @override
-  String get map_quick_actions_my_moments_subtitle =>
       'Keep up with likes and comments';
 
   @override
   String get map_quick_actions_my_ledger => 'My ledger';
 
   @override
-  String get map_quick_actions_my_ledger_subtitle => 'Log expenses in seconds';
-
-  @override
   String get map_quick_actions_wallet => 'My wallet';
 
-  @override
-  String get map_quick_actions_wallet_subtitle => 'Manage balance and cards';
-
-  @override
-  String get map_quick_actions_my_drafts_subtitle =>
       'Pick up where you left off';
 
-  @override
-  String get map_quick_actions_section_connect => 'Connect';
-
-  @override
-  String get map_quick_actions_section_personal => 'My space';
-
-  @override
-  String get map_quick_actions_section_workspace => 'Workspace';
-
-  @override
-  String get map_quick_actions_empty_title => 'Nothing to show yet';
-
-  @override
-  String get map_quick_actions_empty_message =>
       'We\'ll add shortcuts here as soon as they\'re ready.';
 
   @override
@@ -1434,121 +1118,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get my_drafts_section_saved => 'Saved drafts';
 
   @override
-  String my_drafts_last_edited(Object time) {
-    return 'Edited $time';
-  }
-
-  @override
   String get my_drafts_resume_button => 'Continue editing';
 
-  @override
-  String get add_friend_title => 'Add friends';
-
-  @override
-  String get add_friend_search_hint => 'Search by name or Crew ID';
-
-  @override
-  String get add_friend_quick_action_scan => 'Scan QR code';
-
-  @override
-  String get add_friend_quick_action_scan_description =>
       'Quickly add someone nearby';
 
-  @override
-  String get add_friend_quick_action_invite => 'Share invite link';
-
-  @override
-  String get add_friend_quick_action_invite_description =>
       'Send a Crew invite link';
 
-  @override
-  String get add_friend_quick_action_import_contacts => 'Find from contacts';
-
-  @override
-  String get add_friend_quick_action_import_contacts_description =>
       'See who is already on Crew';
 
-  @override
-  String get add_friend_interest_section_title => 'Popular interests';
-
-  @override
-  String get add_friend_suggestions_section_title => 'People you may know';
-
-  @override
-  String get add_friend_contacts_section_title => 'From your contacts';
-
-  @override
-  String add_friend_mutual_count(Object count) {
-    return '$count mutual friends';
-  }
-
-  @override
-  String get add_friend_invite_button => 'Add friend';
-
-  @override
-  String add_friend_contact_status_joined(Object time) {
-    return 'Joined $time';
-  }
-
-  @override
-  String get add_friend_contact_status_pending => 'Invite pending';
-
-  @override
-  String get my_activities_title => 'My activities';
-
-  @override
-  String get my_activities_joining_title => 'Currently joining';
-
-  @override
-  String get my_activities_joining_subtitle => 'Events I\'m counting down to';
-
-  @override
-  String get my_activities_hosting_title => 'Recruiting now';
-
-  @override
-  String get my_activities_hosting_subtitle => 'Activities I\'m organizing';
-
-  @override
-  String get my_activities_status_registered => 'Registered';
-
-  @override
-  String get my_activities_status_hosting => 'Hosting';
-
-  @override
-  String my_activities_card_participants(Object count) {
-    return '$count joined';
-  }
-
-  @override
-  String get my_activities_sample_yoga_title => 'Sunrise yoga flow';
-
-  @override
-  String get my_activities_sample_yoga_details =>
       'Apr 22 · 7:00 AM · Riverside Studio';
 
-  @override
-  String get my_activities_sample_market_title => 'Weekend creative market';
-
-  @override
-  String get my_activities_sample_market_details =>
       'Apr 27 · 1:30 PM · Old Town Plaza';
 
-  @override
-  String get my_activities_sample_cleanup_title => 'Lakeside cleanup crew';
-
-  @override
-  String get my_activities_sample_cleanup_details =>
       'Apr 20 · 9:00 AM · West Lake Pier';
 
-  @override
-  String get my_activities_sample_bake_title => 'Community bake night';
-
-  @override
-  String get my_activities_sample_bake_details =>
       'Apr 24 · 6:30 PM · Maple Street Hub';
 
-  @override
-  String get map_quick_trip_select_start_tip =>
       'Long press on the map to pick a starting point.';
 
   @override
@@ -1585,9 +1170,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wallet_title => 'Wallet';
-
-  @override
-  String get wallet_overview_subtitle => 'View balance, rewards and statements';
 
   @override
   String get wallet_balance_label => 'Available balance';
@@ -1677,57 +1259,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_developer_stripe_test => 'Stripe payment test';
 
-  @override
-  String get settings_developer_stripe_test_subtitle =>
       'Open the Stripe payment sheet with test data';
 
-  @override
-  String get developer_test_stripe_title => 'Stripe payment test';
-
-  @override
-  String get developer_test_stripe_description =>
       'Use Stripe\'s test environment to simulate payments before integrating the real flow.';
 
-  @override
-  String get developer_test_stripe_button => 'Start test payment';
-
-  @override
-  String get developer_test_stripe_last_status => 'Last status';
-
-  @override
-  String get developer_test_stripe_reset => 'Clear status';
-
-  @override
-  String get developer_test_stripe_success => 'Payment completed successfully.';
-
-  @override
-  String get developer_test_stripe_cancelled => 'Payment cancelled.';
-
-  @override
-  String get developer_test_stripe_option_registration_sponsor =>
       'Registration fee + sponsorship (€1.00)';
 
-  @override
-  String get developer_test_stripe_option_registration_sponsor_detail =>
       'Combines the sample registration fee and an optional sponsorship add-on.';
 
-  @override
-  String get developer_test_stripe_option_registration_only =>
       'Registration fee (€0.50)';
 
-  @override
-  String get developer_test_stripe_option_registration_only_detail =>
       'Only includes the base registration fee.';
 
-  @override
-  String get developer_test_stripe_option_sponsor_only => 'Sponsorship (€0.75)';
-
-  @override
-  String get developer_test_stripe_option_sponsor_only_detail =>
       'Only includes the sponsorship add-on.';
 
-  @override
-  String developer_test_stripe_failure(Object error) {
-    return 'Payment failed: $error';
-  }
 }

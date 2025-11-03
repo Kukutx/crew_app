@@ -15,16 +15,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get about_content => '这是一个通用设置页示例';
 
   @override
-  String get about_section_version_details => '版本信息';
-
-  @override
   String get about_current_version => '当前版本';
 
   @override
   String get about_build_number => '构建号';
-
-  @override
-  String get about_latest_version => '最新版本';
 
   @override
   String get about_check_updates => '查看最新版本';
@@ -46,9 +40,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get about_update_status_unknown => '暂时无法获取最新版本信息。';
 
   @override
-  String get action_apply => '应用';
-
-  @override
   String get action_cancel => '取消';
 
   @override
@@ -61,9 +52,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_following => '已关注';
 
   @override
-  String get action_login => '登录';
-
-  @override
   String get action_logout => '退出登录';
 
   @override
@@ -73,18 +61,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get action_register_now => '立即报名';
 
   @override
-  String get action_replace => '替换';
-
-  @override
-  String get action_reset => '重置';
-
-  @override
-  String get action_restore_defaults => '恢复默认';
-
-  @override
-  String get action_retry => '重试';
-
-  @override
   String get chinese => '中文';
 
   @override
@@ -92,12 +68,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get city_loading => '正在获取…';
-
-  @override
-  String get dark_mode => '深色模式';
-
-  @override
-  String get user_display_name_fallback => '用户';
 
   @override
   String get english => '英文';
@@ -154,51 +124,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_fee_free => '免费';
 
   @override
-  String get event_cost_calculator_title => '费用计算器';
-
-  @override
-  String get event_cost_calculator_description => '估算报名费用、拼车成本和佣金分成。';
-
-  @override
-  String get event_cost_calculator_button => '开始计算';
-
-  @override
-  String get event_cost_calculator_participants_label => '参与人数';
-
-  @override
-  String get event_cost_calculator_fee_label => '人均报名费 (¥)';
-
-  @override
-  String get event_cost_calculator_carpool_label => '拼车总费用 (¥)';
-
-  @override
-  String get event_cost_calculator_commission_label => '佣金比例 (%)';
-
-  @override
-  String get event_cost_calculator_total_income => '报名总收入';
-
-  @override
-  String get event_cost_calculator_commission_total => '佣金支出';
-
-  @override
-  String get event_cost_calculator_carpool_share => '人均拼车成本';
-
-  @override
-  String get event_cost_calculator_net_total => '扣除成本后净收入';
-
-  @override
-  String get event_cost_calculator_net_per_person => '人均净收入';
-
-  @override
-  String get event_cost_calculator_hint => '根据实际情况调整各项费用即可。';
-
-  @override
-  String get event_expense_section_title => '费用计算';
-
-  @override
-  String get event_expense_section_description => '和小伙伴一起记录旅途中的花费，活动结束后轻松结算。';
-
-  @override
   String get event_expense_calculate_button => '计算费用';
 
   @override
@@ -229,18 +154,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_status_ended => '已结束';
 
   @override
-  String get event_distance_title => '总里程';
-
-  @override
-  String event_distance_value(String kilometers) {
-    return '$kilometers 公里';
-  }
-
-  @override
   String get event_title_field_label => '活动标题';
-
-  @override
-  String get events_open_chat => '进入消息';
 
   @override
   String get messages_tab_private => '私聊';
@@ -273,19 +187,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get create_moment_type_section_title => '选择瞬间类型';
 
   @override
-  String get create_moment_type_section_description => '决定是随手记录，还是关联当前活动一起分享。';
-
-  @override
   String get create_moment_type_instant => '即时瞬间';
 
   @override
-  String get create_moment_type_instant_desc => '独立发布，不与任何活动关联。';
-
-  @override
   String get create_moment_type_event => '活动瞬间';
-
-  @override
-  String get create_moment_type_event_desc => '默认关联正在进行的自驾游活动，让队友及时掌握动态。';
 
   @override
   String get create_moment_event_link_label => '已关联活动';
@@ -302,9 +207,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get events_title => '活动';
-
-  @override
   String get create_event_title => '创建活动';
 
   @override
@@ -314,43 +216,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filter => '筛选';
 
   @override
-  String get filter_category => '分类';
-
-  @override
-  String get filter_date => '日期';
-
-  @override
-  String get filter_date_any => '不限';
-
-  @override
-  String get filter_date_this_month => '本月';
-
-  @override
-  String get filter_date_this_week => '本周';
-
-  @override
-  String get filter_date_today => '今天';
-
-  @override
-  String get filter_distance => '距离';
-
-  @override
-  String get filter_only_free => '仅显示免费活动';
-
-  @override
   String get followed => '已关注';
 
   @override
   String get favorites_empty => '暂无收藏~';
-
-  @override
-  String get favorites_title => '收藏';
-
-  @override
-  String get industry_label_optional => '行业（选填）';
-
-  @override
-  String get interest_tags_title => '兴趣标签';
 
   @override
   String get language => '语言';
@@ -364,34 +233,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get location_unavailable => '无法获取定位';
-
-  @override
   String get login_footer => '继续即表示同意我们的服务条款与隐私政策';
 
   @override
   String get login_prompt => '点击上方按钮登录体验更多功能';
 
   @override
-  String get login_side_info => '发现周边活动 · 快速组局 · 订阅解锁高级玩法';
-
-  @override
   String get login_subtitle => '基于地理位置组织活动，一键加入你的 Crew';
 
   @override
   String get login_title => '欢迎来到 Crew';
-
-  @override
-  String get login_other_options => '其他登录方式';
-
-  @override
-  String get login_other_options_hide => '收起其他方式';
-
-  @override
-  String get login_other_options_title => '选择登录方式';
-
-  @override
-  String get login_other_options_description => '请选择下方任意第三方服务继续';
 
   @override
   String get login_agreement_prefix => '我已阅读并同意';
@@ -468,24 +319,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get map_place_details_price_free => '价格等级：免费';
-
-  @override
-  String get map_place_details_price_inexpensive => '价格等级：\$';
-
-  @override
-  String get map_place_details_price_moderate => '价格等级：\$\$';
-
-  @override
-  String get map_place_details_price_expensive => '价格等级：\$\$\$';
-
-  @override
-  String get map_place_details_price_very_expensive => '价格等级：\$\$\$\$';
-
-  @override
-  String get map_place_details_price_unknown => '价格等级：未知';
-
-  @override
   String get map_select_location_title => '选择起点位置';
 
   @override
@@ -493,15 +326,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messages => '消息';
-
-  @override
-  String get max_interest_selection => '最多只能选择 5 个兴趣标签喵~';
-
-  @override
-  String get my_events => '我的活动';
-
-  @override
-  String get my_favorites => '我的收藏';
 
   @override
   String chat_members_count(Object count) {
@@ -567,9 +391,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chat_composer_emoji_tooltip => '表情';
-
-  @override
-  String get chat_composer_attach_tooltip => '文件';
 
   @override
   String get chat_composer_more_tooltip => '更多';
@@ -679,9 +500,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get no_events_found => '没有找到活动';
-
-  @override
-  String get not_logged_in => '未登录';
 
   @override
   String get preferences_title => '个人资料';
@@ -797,21 +615,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get please_enter_event_title => '请输入活动标题';
 
   @override
-  String get profile_title => '个人中心';
-
-  @override
-  String get profile_roles_label => '角色';
-
-  @override
-  String get profile_subscription_status_active => '订阅已激活';
-
-  @override
-  String get profile_subscription_status_inactive => '暂无订阅';
-
-  @override
-  String get profile_sync_error => '无法同步个人信息';
-
-  @override
   String get registration_not_implemented => '报名功能尚未实现';
 
   @override
@@ -825,9 +628,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get share_card_qr_caption => '扫描二维码查看活动详情';
-
-  @override
-  String get share_action_copy_link => '复制链接';
 
   @override
   String get share_action_save_image => '保存活动';
@@ -845,13 +645,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get share_save_failure => '保存分享卡片失败';
 
   @override
-  String get school_label_optional => '学校（选填）';
-
-  @override
   String get search_hint => '搜索活动';
-
-  @override
-  String get search_tags_hint => '搜索标签...';
 
   @override
   String get settings => '设置';
@@ -869,9 +663,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_section_privacy => '隐私与安全';
 
   @override
-  String get settings_section_account => '账号信息';
-
-  @override
   String get settings_section_notifications => '通知设置';
 
   @override
@@ -881,21 +672,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_help_feedback => '帮助与反馈';
 
   @override
-  String get settings_help_feedback_subtitle => 'FAQ，联系支持';
-
-  @override
   String get settings_app_version => '关于 Crew';
 
   @override
-  String get settings_app_version_subtitle => '查看 Crew 的版本详情与相关协议';
-
-  @override
   String get settings_subscription_current_plan => '当前订阅计划';
-
-  @override
-  String settings_subscription_current_plan_value(Object plan) {
-    return '$plan 计划';
-  }
 
   @override
   String get settings_subscription_plan_free => 'Free';
@@ -905,12 +685,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_subscription_plan_pro => 'Pro';
-
-  @override
-  String get settings_subscription_upgrade => '升级订阅';
-
-  @override
-  String get settings_subscription_cancel => '取消订阅';
 
   @override
   String get subscription_plan_title => '订阅计划';
@@ -980,9 +754,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get subscription_plan_pro_feature_insights => '详细数据洞察';
-
-  @override
-  String get settings_subscription_payment_methods => '支付方式管理';
 
   @override
   String get settings_location_permission => '位置权限';
@@ -1071,9 +842,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_notifications_push => '推送开关';
 
   @override
-  String get settings_notifications_push_subtitle => '在此设备接收推送通知';
-
-  @override
   String get settings_saved_toast => '设置已更新';
 
   @override
@@ -1107,9 +875,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get report_event_content_hint => '请补充详细情况，方便我们尽快处理。';
 
   @override
-  String get report_event_content_required => '请填写举报内容';
-
-  @override
   String get report_event_attachment_label => '上传图片';
 
   @override
@@ -1123,9 +888,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get report_event_attachment_empty => '未选择文件';
-
-  @override
-  String get report_event_attachment_error => '图片加载失败，请重试。';
 
   @override
   String get report_event_submit => '提交举报';
@@ -1203,40 +965,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get support_feedback_add_photo => '选择图片';
 
   @override
-  String get support_feedback_add_video => '选择视频';
-
-  @override
-  String get student_verification => '学生认证';
-
-  @override
   String get tag_city_explore => '城市探索';
 
   @override
   String get tag_easy_social => '轻松社交';
-
-  @override
-  String get tag_free => '免费';
-
-  @override
-  String get tag_friends => '朋友在';
-
-  @override
-  String get tag_music => '音乐';
-
-  @override
-  String get tag_nearby => '附近';
-
-  @override
-  String get tag_party => '派对';
-
-  @override
-  String get tag_sports => '运动';
-
-  @override
-  String get tag_today => '今天';
-
-  @override
-  String get tag_trending => '热门';
 
   @override
   String get tag_walk_friendly => '步行友好';
@@ -1251,14 +983,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unfollowed => '已取消关注';
 
   @override
-  String get verification_preferences => '认证和偏好';
-
-  @override
-  String version_label(Object version) {
-    return '版本 $version';
-  }
-
-  @override
   String get disclaimer_acknowledge => '我已阅读并同意上述条款';
 
   @override
@@ -1266,29 +990,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get disclaimer_accept => '同意';
-
-  @override
-  String get map_quick_trip_default_title => '自驾游';
-
-  @override
-  String map_quick_trip_description(Object start, Object destination) {
-    return '从 $start 出发前往 $destination。';
-  }
-
-  @override
-  String get map_quick_trip_created => '快速行程已创建。';
-
-  @override
-  String get map_quick_trip_create_failed => '创建行程失败。';
-
-  @override
-  String get map_quick_actions_title => '快捷操作';
-
-  @override
-  String get map_quick_actions_subtitle => '选择你想要进行的操作。';
-
-  @override
-  String get map_quick_actions_create_moment => '分享瞬间';
 
   @override
   String get map_quick_actions_my_moments => '我的瞬间';
@@ -1300,46 +1001,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_add_friend => '添加好友';
 
   @override
-  String get map_quick_actions_add_friend_subtitle => '邀请好友一起探索精彩活动';
-
-  @override
   String get map_quick_actions_my_event => '我的活动';
-
-  @override
-  String get map_quick_actions_my_event_subtitle => '查看我报名或招募的活动';
-
-  @override
-  String get map_quick_actions_my_moments_subtitle => '及时掌握点赞与评论';
 
   @override
   String get map_quick_actions_my_ledger => '我的账本';
 
   @override
-  String get map_quick_actions_my_ledger_subtitle => '随手快速记账';
-
-  @override
   String get map_quick_actions_wallet => '我的钱包';
-
-  @override
-  String get map_quick_actions_wallet_subtitle => '管理余额和卡片';
-
-  @override
-  String get map_quick_actions_my_drafts_subtitle => '随时继续编辑';
-
-  @override
-  String get map_quick_actions_section_connect => '好友';
-
-  @override
-  String get map_quick_actions_section_personal => '我的天地';
-
-  @override
-  String get map_quick_actions_section_workspace => '创作工作台';
-
-  @override
-  String get map_quick_actions_empty_title => '暂无快捷操作';
-
-  @override
-  String get map_quick_actions_empty_message => '有新的快捷工具时会在这里显示。';
 
   @override
   String get map_quick_actions_bottom_scan => '扫一扫';
@@ -1375,115 +1043,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get my_drafts_section_saved => '已保存的草稿';
 
   @override
-  String my_drafts_last_edited(Object time) {
-    return '$time前编辑';
-  }
-
-  @override
   String get my_drafts_resume_button => '继续编辑';
 
-  @override
-  String get add_friend_title => '添加好友';
-
-  @override
-  String get add_friend_search_hint => '按姓名或 Crew ID 搜索';
-
-  @override
-  String get add_friend_quick_action_scan => '扫描二维码';
-
-  @override
-  String get add_friend_quick_action_scan_description => '快速添加身边的朋友';
-
-  @override
-  String get add_friend_quick_action_invite => '分享邀请链接';
-
-  @override
-  String get add_friend_quick_action_invite_description => '发送 Crew 邀请链接';
-
-  @override
-  String get add_friend_quick_action_import_contacts => '在通讯录中查找';
-
-  @override
-  String get add_friend_quick_action_import_contacts_description =>
       '看看谁已经在 Crew 上';
-
-  @override
-  String get add_friend_interest_section_title => '热门兴趣';
-
-  @override
-  String get add_friend_suggestions_section_title => '可能认识的人';
-
-  @override
-  String get add_friend_contacts_section_title => '来自你的联系人';
-
-  @override
-  String add_friend_mutual_count(Object count) {
-    return '$count 个共同好友';
-  }
-
-  @override
-  String get add_friend_invite_button => '添加好友';
-
-  @override
-  String add_friend_contact_status_joined(Object time) {
-    return '在 $time 加入';
-  }
-
-  @override
-  String get add_friend_contact_status_pending => '邀请待接受';
-
-  @override
-  String get my_activities_title => '我的活动';
-
-  @override
-  String get my_activities_joining_title => '我正在参加';
-
-  @override
-  String get my_activities_joining_subtitle => '正在倒计时的活动';
-
-  @override
-  String get my_activities_hosting_title => '我正在招募';
-
-  @override
-  String get my_activities_hosting_subtitle => '由我发起的活动';
-
-  @override
-  String get my_activities_status_registered => '已报名';
-
-  @override
-  String get my_activities_status_hosting => '主办中';
-
-  @override
-  String my_activities_card_participants(Object count) {
-    return '已有$count人参加';
-  }
-
-  @override
-  String get my_activities_sample_yoga_title => '日出瑜伽课';
-
-  @override
-  String get my_activities_sample_yoga_details => '4月22日 · 07:00 · 江畔瑜伽馆';
-
-  @override
-  String get my_activities_sample_market_title => '周末创意市集';
-
-  @override
-  String get my_activities_sample_market_details => '4月27日 · 13:30 · 老城广场';
-
-  @override
-  String get my_activities_sample_cleanup_title => '湖畔环保行动';
-
-  @override
-  String get my_activities_sample_cleanup_details => '4月20日 · 09:00 · 西湖码头';
-
-  @override
-  String get my_activities_sample_bake_title => '社区烘焙夜';
-
-  @override
-  String get my_activities_sample_bake_details => '4月24日 · 18:30 · 枫叶街社群中心';
-
-  @override
-  String get map_quick_trip_select_start_tip => '在地图上长按选择起点。';
 
   @override
   String get map_selection_sheet_tap_to_expand => '点击展开';
@@ -1517,9 +1079,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get wallet_title => '我的钱包';
-
-  @override
-  String get wallet_overview_subtitle => '查看余额、积分与账单';
 
   @override
   String get wallet_balance_label => '可用余额';
@@ -1604,54 +1163,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_developer_stripe_test => 'Stripe 支付测试';
 
-  @override
-  String get settings_developer_stripe_test_subtitle => '使用测试数据打开 Stripe 支付面板';
-
-  @override
-  String get developer_test_stripe_title => 'Stripe 支付测试';
-
-  @override
-  String get developer_test_stripe_description =>
       '使用 Stripe 的测试环境来模拟支付流程，方便在正式接入前验证。';
 
-  @override
-  String get developer_test_stripe_button => '开始测试支付';
-
-  @override
-  String get developer_test_stripe_last_status => '最近状态';
-
-  @override
-  String get developer_test_stripe_reset => '清除状态';
-
-  @override
-  String get developer_test_stripe_success => '支付已成功完成。';
-
-  @override
-  String get developer_test_stripe_cancelled => '支付已取消。';
-
-  @override
-  String get developer_test_stripe_option_registration_sponsor =>
       '报名费 + 赞助费（€1.00）';
 
-  @override
-  String get developer_test_stripe_option_registration_sponsor_detail =>
       '包含示例报名费以及可选的赞助费用。';
 
-  @override
-  String get developer_test_stripe_option_registration_only => '报名费（€0.50）';
-
-  @override
-  String get developer_test_stripe_option_registration_only_detail =>
       '仅包含基础报名费用。';
 
-  @override
-  String get developer_test_stripe_option_sponsor_only => '赞助费（€0.75）';
-
-  @override
-  String get developer_test_stripe_option_sponsor_only_detail => '仅包含赞助附加费用。';
-
-  @override
-  String developer_test_stripe_failure(Object error) {
-    return '支付失败：$error';
-  }
 }

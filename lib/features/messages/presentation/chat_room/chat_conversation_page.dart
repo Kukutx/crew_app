@@ -1,18 +1,14 @@
-import 'dart:async';
-
+import 'package:chatview/chatview.dart';
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/chat_room_settings_page.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_attachment_sheet.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_message_search_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_header_actions.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_message_search_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_app_bar.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_composer.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_list.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
@@ -56,49 +52,63 @@ class ChatConversationPage extends StatefulWidget {
 }
 
 class _ChatConversationPageState extends State<ChatConversationPage> {
-  late final TextEditingController _composerController;
-  late final ScrollController _scrollController;
-  late final FocusNode _composerFocusNode;
   late final List<ChatMessage> _messages;
-  final Map<String, GlobalKey> _messageKeys = <String, GlobalKey>{};
-  String? _highlightedMessageId;
-  Timer? _highlightTimer;
-  bool _isEmojiPickerVisible = false;
+  late final Map<String, DateTime> _messageTimestamps;
+  late final Map<String, ChatUser> _chatUsersById;
+  late final ChatUser _currentChatUser;
+  late final ChatController _chatController;
+  late final ScrollController _chatScrollController;
+  late List<Message> _chatMessages;
 
   bool get _isGroup => widget.type == ChatConversationType.group;
 
   @override
   void initState() {
     super.initState();
-    _composerController = TextEditingController();
-    _scrollController = ScrollController();
-    _composerFocusNode = FocusNode();
     _messages = List<ChatMessage>.of(widget.initialMessages);
-    _ensureMessageKeys();
-    _composerFocusNode.addListener(() {
-      if (_composerFocusNode.hasFocus && _isEmojiPickerVisible) {
-        setState(() => _isEmojiPickerVisible = false);
-      }
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    _messageTimestamps = <String, DateTime>{};
+    _chatScrollController = ScrollController();
+    _initializeChatViewController();
   }
 
   @override
   void dispose() {
-    _highlightTimer?.cancel();
-    _composerController.dispose();
-    _scrollController.dispose();
-    _composerFocusNode.dispose();
+    _chatController.dispose();
+    _chatScrollController.dispose();
     super.dispose();
   }
 
-  void _handleSend() {
-    final raw = _composerController.text.trim();
-    if (raw.isEmpty) return;
+  void _initializeChatViewController() {
+    final participants = _buildParticipants();
+    _chatUsersById = {
+      for (final participant in participants)
+        participant.id: _toChatUser(participant),
+    };
+    _currentChatUser =
+        _chatUsersById[widget.currentUser.id] ?? _toChatUser(widget.currentUser);
+
+    _chatMessages = _messages
+        .map(
+          (chatMessage) => _toChatViewMessage(
+            chatMessage,
+            createdAt: _resolveTimestamp(chatMessage),
+          ),
+        )
+        .toList(growable: true);
+
+    _chatController = ChatController(
+      initialMessageList: _chatMessages,
+      initialChatUsers: _chatUsersById.values.toList(growable: false),
+      scrollController: _chatScrollController,
+    );
+  }
+
+  void _handleSend(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return;
 
     final timeLabel = MaterialLocalizations.of(context)
         .formatTimeOfDay(TimeOfDay.fromDateTime(DateTime.now()));
-
     final prefix = _isGroup ? 'group-temp' : 'direct-temp';
 
     final newMessage = ChatMessage(
@@ -110,147 +120,29 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
 
     setState(() {
       _messages.add(newMessage);
-      _messageKeys[newMessage.id] = GlobalKey();
-      _isEmojiPickerVisible = false;
+      _messageTimestamps[newMessage.id] = DateTime.now();
     });
-    _composerController.clear();
-    _scrollToBottom();
-  }
-
-  void _toggleEmojiPicker() {
-    setState(() {
-      _isEmojiPickerVisible = !_isEmojiPickerVisible;
-    });
-
-    if (_isEmojiPickerVisible) {
-      FocusScope.of(context).unfocus();
-    } else {
-      _composerFocusNode.requestFocus();
-    }
-  }
-
-  void _hideEmojiPicker() {
-    if (!_isEmojiPickerVisible) return;
-    setState(() => _isEmojiPickerVisible = false);
-  }
-
-  void _handleEmojiSelected(Category? category, Emoji emoji) {
-    final text = _composerController.text;
-    final selection = _composerController.selection;
-    final start = selection.start >= 0 ? selection.start : text.length;
-    final end = selection.end >= 0 ? selection.end : start;
-
-    final newText = text.replaceRange(start, end, emoji.emoji);
-    final newSelectionIndex = start + emoji.emoji.length;
-
-    _composerController.value = TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newSelectionIndex),
-    );
-  }
-
-  void _handleBackspacePressed() {
-    final text = _composerController.text;
-    final selection = _composerController.selection;
-    final start = selection.start >= 0 ? selection.start : text.length;
-    final end = selection.end >= 0 ? selection.end : start;
-
-    if (start != end) {
-      final newText = text.replaceRange(start, end, '');
-      _composerController.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: start),
-      );
-      return;
-    }
-
-    if (start <= 0) {
-      return;
-    }
-
-    final prefix = text.substring(0, start);
-    final trimmedPrefix = prefix.characters.skipLast(1).toString();
-    final suffix = text.substring(start);
-    final newText = trimmedPrefix + suffix;
-    _composerController.value = TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: trimmedPrefix.length),
-    );
-  }
-
-  void _scrollToBottom() {
-    if (!_scrollController.hasClients) return;
-
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent + 72,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
-
-  void _ensureMessageKeys() {
-    for (final message in _messages) {
-      _messageKeys.putIfAbsent(message.id, () => GlobalKey());
-    }
+    final chatMessage = _toChatViewMessage(newMessage);
+    _chatMessages.add(chatMessage);
+    _chatController.addMessage(chatMessage);
+    _scrollToLatestMessage();
   }
 
   Future<void> _scrollToMessage(String messageId) async {
-    if (!_scrollController.hasClients) return;
+    if (!_chatScrollController.hasClients) return;
 
-    final key = _messageKeys[messageId];
-    final index = _messages.indexWhere((message) => message.id == messageId);
+    final index = _chatMessages.indexWhere((message) => message.id == messageId);
     if (index == -1) return;
 
-    if (key?.currentContext == null) {
-      final targetOffset = _estimateScrollOffsetForIndex(index);
-      try {
-        await _scrollController.animateTo(
-          targetOffset,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      } catch (_) {
-        // Ignore scroll errors when the controller is no longer attached.
-      }
-      await Future<void>.delayed(const Duration(milliseconds: 16));
-    }
+    final maxExtent = _chatScrollController.position.maxScrollExtent;
+    final estimatedOffset =
+        maxExtent * (index / (_chatMessages.length + 1));
 
-    final context = key?.currentContext;
-    if (context != null) {
-      await Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 300),
-        alignment: 0.1,
-        curve: Curves.easeOut,
-      );
-    }
-  }
-
-  double _estimateScrollOffsetForIndex(int index) {
-    if (!_scrollController.hasClients) {
-      return 0;
-    }
-
-    final position = _scrollController.position;
-    final maxExtent = position.maxScrollExtent;
-    if (maxExtent <= 0 || _messages.length <= 1) {
-      return maxExtent;
-    }
-
-    final averageExtent = maxExtent / (_messages.length - 1);
-    final estimatedOffset = averageExtent * index;
-    return estimatedOffset.clamp(0, maxExtent).toDouble();
-  }
-
-  void _highlightMessage(String messageId) {
-    _highlightTimer?.cancel();
-    setState(() => _highlightedMessageId = messageId);
-    _highlightTimer = Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      if (_highlightedMessageId == messageId) {
-        setState(() => _highlightedMessageId = null);
-      }
-    });
+    await _chatScrollController.animateTo(
+      estimatedOffset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   void _showFeatureComingSoon(String featureName) {
@@ -325,7 +217,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
 
     if (selectedMessage == null) return;
 
-    _highlightMessage(selectedMessage.id);
     await _scrollToMessage(selectedMessage.id);
   }
 
@@ -437,46 +328,21 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: _buildAppBar(loc, colorScheme, participants),
-      body: Column(
-        children: [
-          Expanded(
-            child: ChatRoomMessageList(
-              messages: _messages,
-              scrollController: _scrollController,
-              youLabel: loc.chat_you_label,
-              repliesLabelBuilder: loc.chat_reply_count,
-              messageKeys: _messageKeys,
-              highlightedMessageId: _highlightedMessageId,
-              onAvatarTap: _openUserProfile,
+      body: ChatView(
+        currentUser: _currentChatUser,
+        chatController: _chatController,
+        type: ChatViewType.light,
+        messageBar: MessageBar(
+          onSend: _handleSend,
+          hintText: loc.chat_message_input_hint,
+          actions: [
+            IconButton(
+              tooltip: loc.chat_action_more,
+              onPressed: _showAttachmentSheet,
+              icon: const Icon(Icons.attach_file_rounded),
             ),
-          ),
-          ChatRoomMessageComposer(
-            controller: _composerController,
-            hintText: loc.chat_message_input_hint,
-            onSend: _handleSend,
-            onMoreOptionsTap: _showAttachmentSheet,
-            onEmojiTap: _toggleEmojiPicker,
-            focusNode: _composerFocusNode,
-            onTextFieldTap: _hideEmojiPicker,
-            isEmojiPickerVisible: _isEmojiPickerVisible,
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            child: _isEmojiPickerVisible
-                ? SizedBox(
-                    key: const ValueKey('emoji_picker'),
-                    height: 320,
-                  child: EmojiPicker(
-                    onEmojiSelected: _handleEmojiSelected,
-                    onBackspacePressed: _handleBackspacePressed,
-                    config: const Config(),
-                  ),
-                )
-                : const SizedBox.shrink(),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -492,5 +358,54 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     }
 
     return participants;
+  }
+
+  Message _toChatViewMessage(
+    ChatMessage chatMessage, {
+    DateTime? createdAt,
+  }) {
+    final timestamp = createdAt ?? _resolveTimestamp(chatMessage);
+    final chatUser =
+        _chatUsersById[chatMessage.sender.id] ?? _toChatUser(chatMessage.sender);
+
+    return Message(
+      id: chatMessage.id,
+      message: chatMessage.body,
+      createdAt: timestamp,
+      sendBy: chatUser,
+    );
+  }
+
+  DateTime _resolveTimestamp(ChatMessage message) {
+    final existing = _messageTimestamps[message.id];
+    if (existing != null) {
+      return existing;
+    }
+
+    final baseTime = DateTime.now();
+    final index = _messages.indexOf(message);
+    final resolved =
+        baseTime.subtract(Duration(minutes: (_messages.length - index) * 3));
+    _messageTimestamps[message.id] = resolved;
+    return resolved;
+  }
+
+  ChatUser _toChatUser(ChatParticipant participant) {
+    return ChatUser(
+      id: participant.id,
+      name: participant.displayName,
+      profilePicture: null,
+    );
+  }
+
+  void _scrollToLatestMessage() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_chatScrollController.hasClients) return;
+      _chatScrollController.animateTo(
+        _chatScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    });
   }
 }

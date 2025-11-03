@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../data/road_trip_editor_models.dart';
-import 'road_trip_form_decorations.dart';
 import 'road_trip_section_card.dart';
 
 class RoadTripRouteSection extends StatelessWidget {
   const RoadTripRouteSection({
     super.key,
-    required this.startController,
-    required this.endController,
-    required this.meetingController,
     required this.routeType,
     required this.onRouteTypeChanged,
     required this.onAddWaypoint,
@@ -17,9 +13,6 @@ class RoadTripRouteSection extends StatelessWidget {
     required this.waypoints,
   });
 
-  final TextEditingController startController;
-  final TextEditingController endController;
-  final TextEditingController meetingController;
   final RoadTripRouteType routeType;
   final ValueChanged<RoadTripRouteType> onRouteTypeChanged;
   final VoidCallback onAddWaypoint;
@@ -31,35 +24,9 @@ class RoadTripRouteSection extends StatelessWidget {
     final theme = Theme.of(context);
     return RoadTripSectionCard(
       icon: Icons.route_outlined,
-      title: '路线设定',
-      subtitle: '规划起终点与集合点',
+      title: '路线类型',
+      subtitle: '',
       children: [
-        TextFormField(
-          controller: startController,
-          decoration:
-              roadTripInputDecoration(context, '起点', '如：Milan Duomo 或地标'),
-          validator: (v) => (v == null || v.trim().isEmpty) ? '请输入起点' : null,
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: endController,
-          decoration:
-              roadTripInputDecoration(context, '终点', '如：La Spezia 或景点'),
-          validator: (v) => (v == null || v.trim().isEmpty) ? '请输入终点' : null,
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: meetingController,
-          decoration:
-              roadTripInputDecoration(context, '集合地点', '如：停车场、地铁口'),
-          validator: (v) => (v == null || v.trim().isEmpty) ? '请输入集合地点' : null,
-        ),
-        const SizedBox(height: 16),
-        Text(
-          '路线类型',
-          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
         SegmentedButton<RoadTripRouteType>(
           showSelectedIcon: false,
           segments: const [

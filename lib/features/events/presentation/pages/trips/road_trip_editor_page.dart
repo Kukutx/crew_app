@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -301,9 +302,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 onPickDateRange: _pickDateRange,
               ),
               RoadTripRouteSection(
-                startController: _startLocationCtrl,
-                endController: _endLocationCtrl,
-                meetingController: _meetingLocationCtrl,
                 routeType: _state.routeType,
                 onRouteTypeChanged: (type) => setState(() {
                   _state = _state.copyWith(routeType: type);

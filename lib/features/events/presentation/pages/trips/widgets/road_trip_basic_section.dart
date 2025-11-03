@@ -1,6 +1,6 @@
+import 'package:crew_app/shared/utils/formatted_date.dart';
 import 'package:flutter/material.dart';
 
-import 'road_trip_form_decorations.dart';
 import 'road_trip_section_card.dart';
 
 class RoadTripBasicSection extends StatelessWidget {
@@ -40,16 +40,12 @@ class RoadTripBasicSection extends StatelessWidget {
           subtitle: Text(
             dateRange == null
                 ? '点击选择日期范围'
-                : '${_formatDate(dateRange!.start)} → ${_formatDate(dateRange!.end)}',
+                : '${FormattedDate.formatDate(dateRange!.start)} → ${FormattedDate.formatDate(dateRange!.end)}',
           ),
           trailing: const Icon(Icons.chevron_right_rounded),
           onTap: onPickDateRange,
         ),
       ],
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
   }
 }

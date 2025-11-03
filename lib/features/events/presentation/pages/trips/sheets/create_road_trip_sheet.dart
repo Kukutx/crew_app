@@ -51,9 +51,6 @@ class _PlannerSheetState extends State<_PlannerSheet>
   final _titleCtrl = TextEditingController();
 
   // ==== 路线 ====
-  final _startCtrl = TextEditingController();
-  final _endCtrl = TextEditingController();
-  final _meetingCtrl = TextEditingController();
   RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
   final List<String> _waypoints = [];
 
@@ -197,9 +194,6 @@ class _PlannerSheetState extends State<_PlannerSheet>
         );
       case TripSection.route:
         return RoadTripRouteSection(
-          startController: _startCtrl,
-          endController: _endCtrl,
-          meetingController: _meetingCtrl,
           routeType: _routeType,
           onRouteTypeChanged: _onRouteTypeChanged,
           onAddWaypoint: _onAddWaypoint,
@@ -241,9 +235,6 @@ class _PlannerSheetState extends State<_PlannerSheet>
   @override
   void dispose() {
     _titleCtrl.dispose();
-    _startCtrl.dispose();
-    _endCtrl.dispose();
-    _meetingCtrl.dispose();
     _maxParticipantsCtrl.dispose();
     _priceCtrl.dispose();
     _tagInputCtrl.dispose();
@@ -344,7 +335,7 @@ class _PlannerSheetState extends State<_PlannerSheet>
                         labelPadding: EdgeInsets.symmetric(vertical: 10),
                         tabs: [
                           Tab(text: 'Connection'),
-                          Tab(text: 'Station / Location'),
+                          Tab(text: 'Test'),
                         ],
                       ),
                     ),
@@ -444,15 +435,15 @@ class _ConnectionStart extends StatelessWidget {
             children: [
               _CardTile(
                 leading: const Icon(Icons.radio_button_checked),
-                title: 'My Location',
-                subtitle: 'Use current location',
+                title: 'Departure address',
+                subtitle: 'Coordinates longitude and latitude',
                 onTap: () {},
               ),
               const SizedBox(height: 12),
               _CardTile(
                 leading: const Icon(Icons.place_outlined),
                 title: 'Destination Address',
-                subtitle: 'Search destination',
+                subtitle: 'Coordinates longitude and latitude',
                 onTap: () {},
               ),
               const SizedBox(height: 40),
@@ -467,7 +458,7 @@ class _ConnectionStart extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  '附近的POI',
+                  'Nearby places',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),

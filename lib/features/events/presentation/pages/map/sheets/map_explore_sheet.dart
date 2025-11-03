@@ -200,7 +200,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
           padding: EdgeInsets.symmetric(vertical: 40),
           child: Center(child: CircularProgressIndicator()),
         ),
-        error: (error, __) => _CenteredMessage(text: _errorMessage(error)),
+        error: (error, _) => _CenteredMessage(text: _errorMessage(error)),
       );
     }
 

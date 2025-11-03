@@ -36,7 +36,6 @@ class _ExpensesPageState extends State<ExpensesPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final backgroundGradient = isDark
         ? const [Color(0xFF0F1424), Color(0xFF070910)]

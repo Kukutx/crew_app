@@ -557,7 +557,7 @@ class _ChatSheetState extends State<ChatSheet> {
               firstLabel: loc.messages_tab_private,
               secondLabel: loc.messages_tab_groups,
               onChanged: (value) => setState(() => _tab = value),
-              trailingBuilder: (_, __) {
+              trailingBuilder: (_, _) {
                 final hasUnreadNotifications = _systemPrivateConversations
                     .any((conversation) => conversation.hasUnread);
                 final canOpenNotifications =

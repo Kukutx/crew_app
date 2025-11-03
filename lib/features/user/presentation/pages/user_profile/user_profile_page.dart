@@ -416,8 +416,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       imageUrl: sanitizedUrl,
       fit: BoxFit.cover,
       memCacheHeight: 512,
-      placeholder: (_, __) => placeholder,
-      errorWidget: (_, __, ___) => placeholder,
+      placeholder: (_, _) => placeholder,
+      errorWidget: (_, _, _) => placeholder,
     );
   }
 }

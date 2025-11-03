@@ -185,14 +185,14 @@ class ProfileHeaderCard extends StatelessWidget {
                           : null,
                       backgroundColor: Colors.white.withValues(alpha: 0.12),
                       foregroundColor: Colors.white,
-                      child: avatarUrl == null
-                          ? const Icon(Icons.person_outline, size: 32)
-                          : null,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.2),
                         width: 2,
                       ),
+                      child: avatarUrl == null
+                          ? const Icon(Icons.person_outline, size: 32)
+                          : null,
                     ),
                     if (userProfile.countryFlag != null)
                       Positioned(

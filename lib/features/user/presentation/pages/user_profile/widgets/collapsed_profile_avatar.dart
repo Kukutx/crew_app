@@ -36,9 +36,9 @@ class CollapsedProfileAvatar extends StatelessWidget {
                   avatarUrl != null ? CachedNetworkImageProvider(avatarUrl) : null,
               backgroundColor: Colors.white.withValues(alpha: 0.12),
               foregroundColor: Colors.white,
+              borderRadius: BorderRadius.circular(18),
               child:
                   avatarUrl == null ? const Icon(Icons.person_outline) : null,
-              borderRadius: BorderRadius.circular(18),
             ),
             if (user.countryFlag != null)
               Positioned(

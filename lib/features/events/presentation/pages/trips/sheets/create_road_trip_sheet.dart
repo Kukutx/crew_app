@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
@@ -9,6 +10,7 @@ import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_t
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_route_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
+import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/location_selection_sheets.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +19,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // ===== 1) imports：把你的分段组件引入 =====
 
@@ -33,19 +34,19 @@ Future<void> showCreateRoadTripSheet(
   );
 }
 
-class _PlannerSheet extends StatefulWidget {
+class _PlannerSheet extends ConsumerStatefulWidget {
   const _PlannerSheet({this.initialRoute});
 
   final QuickRoadTripResult? initialRoute;
 
   @override
-  State<_PlannerSheet> createState() => _PlannerSheetState();
+  ConsumerState<_PlannerSheet> createState() => _PlannerSheetState();
 }
 
 // 1) 定义 Section 锚点
 enum TripSection { basic, route, team, prefs, gallery, story, disclaimer }
 
-class _PlannerSheetState extends State<_PlannerSheet>
+class _PlannerSheetState extends ConsumerState<_PlannerSheet>
     with TickerProviderStateMixin {
   final _dragCtrl = DraggableScrollableController();
   final _pageCtrl = PageController();
@@ -60,6 +61,10 @@ class _PlannerSheetState extends State<_PlannerSheet>
   LatLng? _destinationLatLng;
   String? _startAddress;
   String? _destinationAddress;
+  Future<String?>? _startAddressFuture;
+  Future<String?>? _destinationAddressFuture;
+  Future<List<NearbyPlace>>? _startNearbyFuture;
+  Future<List<NearbyPlace>>? _destinationNearbyFuture;
 
   // ==== 路线 ====
   RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
@@ -194,6 +199,48 @@ class _PlannerSheetState extends State<_PlannerSheet>
   bool get _basicValid =>
       _titleCtrl.text.trim().isNotEmpty && _editorState.dateRange != null;
 
+  Future<String?> _loadAddress(LatLng latLng, {required bool isStart}) {
+    final manager = ref.read(locationSelectionManagerProvider);
+    final future = manager.reverseGeocode(latLng);
+    future.then((value) {
+      if (!mounted) {
+        return;
+      }
+      final trimmed = value?.trim();
+      if (isStart) {
+        setState(() {
+          _startAddress = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+        });
+      } else {
+        setState(() {
+          _destinationAddress =
+              (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+        });
+      }
+    });
+    return future;
+  }
+
+  Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng latLng) {
+    final manager = ref.read(locationSelectionManagerProvider);
+    return manager.fetchNearbyPlaces(latLng);
+  }
+
+  Future<void> _restartSelectionFlow({required bool skipStart}) async {
+    final navigator = Navigator.of(context);
+    final navContext = navigator.context;
+    final manager = ref.read(locationSelectionManagerProvider);
+    navigator.pop();
+    await Future<void>.microtask(
+      () => manager.startRouteSelectionFlow(
+        navContext,
+        initialStart: _startLatLng,
+        initialDestination: _destinationLatLng,
+        skipStart: skipStart && _startLatLng != null,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -207,6 +254,21 @@ class _PlannerSheetState extends State<_PlannerSheet>
       if (trimmedTitle.isNotEmpty) {
         _titleCtrl.text = trimmedTitle;
       }
+    }
+    if (_startLatLng != null) {
+      final hasAddress = _startAddress != null && _startAddress!.trim().isNotEmpty;
+      _startAddressFuture = hasAddress
+          ? Future<String?>.value(_startAddress)
+          : _loadAddress(_startLatLng!, isStart: true);
+      _startNearbyFuture = _loadNearbyPlaces(_startLatLng!);
+    }
+    if (_destinationLatLng != null) {
+      final hasAddress =
+          _destinationAddress != null && _destinationAddress!.trim().isNotEmpty;
+      _destinationAddressFuture = hasAddress
+          ? Future<String?>.value(_destinationAddress)
+          : _loadAddress(_destinationLatLng!, isStart: false);
+      _destinationNearbyFuture = _loadNearbyPlaces(_destinationLatLng!);
     }
     _pageCtrl.addListener(() {
       final p = _pageCtrl.hasClients ? _pageCtrl.page?.round() ?? 0 : 0;
@@ -430,6 +492,18 @@ class _PlannerSheetState extends State<_PlannerSheet>
                                 departureSubtitle: startSubtitle,
                                 destinationTitle: destinationTitle,
                                 destinationSubtitle: destinationSubtitle,
+                                onEditDeparture: () =>
+                                    _restartSelectionFlow(skipStart: false),
+                                onEditDestination: () => _restartSelectionFlow(
+                                  skipStart:
+                                      _destinationLatLng != null && _startLatLng != null,
+                                ),
+                                departurePosition: _startLatLng,
+                                departureAddressFuture: _startAddressFuture,
+                                departureNearbyFuture: _startNearbyFuture,
+                                destinationPosition: _destinationLatLng,
+                                destinationAddressFuture: _destinationAddressFuture,
+                                destinationNearbyFuture: _destinationNearbyFuture,
                               ),
                               ..._sectionsOrder.map(_buildSectionPage),
                             ],
@@ -497,6 +571,14 @@ class _ConnectionStart extends StatelessWidget {
     required this.departureSubtitle,
     required this.destinationTitle,
     required this.destinationSubtitle,
+    required this.onEditDeparture,
+    required this.onEditDestination,
+    this.departurePosition,
+    this.departureAddressFuture,
+    this.departureNearbyFuture,
+    this.destinationPosition,
+    this.destinationAddressFuture,
+    this.destinationNearbyFuture,
   });
   final ScrollController scrollCtrl;
   final VoidCallback onContinue;
@@ -504,10 +586,19 @@ class _ConnectionStart extends StatelessWidget {
   final String departureSubtitle;
   final String destinationTitle;
   final String destinationSubtitle;
+  final VoidCallback onEditDeparture;
+  final VoidCallback onEditDestination;
+  final LatLng? departurePosition;
+  final Future<String?>? departureAddressFuture;
+  final Future<List<NearbyPlace>>? departureNearbyFuture;
+  final LatLng? destinationPosition;
+  final Future<String?>? destinationAddressFuture;
+  final Future<List<NearbyPlace>>? destinationNearbyFuture;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     return CustomScrollView(
       controller: scrollCtrl,
       slivers: [
@@ -519,7 +610,7 @@ class _ConnectionStart extends StatelessWidget {
                 leading: const Icon(Icons.radio_button_checked),
                 title: departureTitle,
                 subtitle: departureSubtitle.isEmpty ? null : departureSubtitle,
-                onTap: () {},
+                onTap: onEditDeparture,
               ),
               const SizedBox(height: 12),
               _CardTile(
@@ -527,30 +618,116 @@ class _ConnectionStart extends StatelessWidget {
                 title: destinationTitle,
                 subtitle:
                     destinationSubtitle.isEmpty ? null : destinationSubtitle,
-                onTap: () {},
+                onTap: onEditDestination,
               ),
               const SizedBox(height: 40),
-              // 空态占位（用简单容器代替插画）
-              Container(
-                height: 180,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
-                    0.4,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'Nearby places',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
+              _LocationDetails(
+                label: loc.map_select_location_start_label,
+                tip: loc.map_select_location_tip,
+                position: departurePosition,
+                addressFuture: departureAddressFuture,
+                nearbyFuture: departureNearbyFuture,
+              ),
+              const SizedBox(height: 24),
+              _LocationDetails(
+                label: loc.map_select_location_destination_label,
+                tip: loc.map_select_location_destination_tip,
+                position: destinationPosition,
+                addressFuture: destinationAddressFuture,
+                nearbyFuture: destinationNearbyFuture,
               ),
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _LocationDetails extends StatelessWidget {
+  const _LocationDetails({
+    required this.label,
+    required this.tip,
+    this.position,
+    this.addressFuture,
+    this.nearbyFuture,
+  });
+
+  final String label;
+  final String tip;
+  final LatLng? position;
+  final Future<String?>? addressFuture;
+  final Future<List<NearbyPlace>>? nearbyFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        if (position == null) ...[
+          Text(
+            tip,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: .75),
+            ),
+          ),
+        ] else ...[
+          LocationSheetRow(
+            icon: const Icon(
+              Icons.place_outlined,
+            ),
+            child: Text(
+              loc.location_coordinates(
+                position!.latitude.toStringAsFixed(6),
+                position!.longitude.toStringAsFixed(6),
+              ),
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (addressFuture != null)
+            FutureBuilder<String?>(
+              future: addressFuture,
+              builder: (context, snapshot) {
+                final icon = Icon(
+                  Icons.home_outlined,
+                  color: theme.colorScheme.onSurface.withValues(alpha: .7),
+                );
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return LocationSheetRow(
+                    icon: icon,
+                    child: Text(loc.map_location_info_address_loading),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return LocationSheetRow(
+                    icon: icon,
+                    child: Text(loc.map_location_info_address_unavailable),
+                  );
+                }
+                final address = snapshot.data;
+                final display = (address == null || address.trim().isEmpty)
+                    ? loc.map_location_info_address_unavailable
+                    : address;
+                return LocationSheetRow(
+                  icon: icon,
+                  child: Text(display),
+                );
+              },
+            ),
+          if (nearbyFuture != null) ...[
+            const SizedBox(height: 16),
+            NearbyPlacesPreview(future: nearbyFuture!),
+          ],
+        ],
       ],
     );
   }

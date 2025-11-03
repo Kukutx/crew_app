@@ -8,6 +8,7 @@ import 'package:crew_app/features/events/presentation/pages/map/sheets/create_ro
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/playgound/show_planner_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -354,6 +355,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+            Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: AppFloatingActionButton(
+              heroTag: 'events_map_test_fab',
+              backgroundColor: theme.colorScheme.secondary,
+              foregroundColor: theme.colorScheme.onSecondary,
+              onPressed: () => showPlannerSheet(context),
+              child: const Icon(Icons.add),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 6),
             child: AppFloatingActionButton(

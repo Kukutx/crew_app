@@ -68,7 +68,8 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
 
   // ==== 路线 ====
   RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
-  final List<String> _waypoints = [];
+  final List<String> _forwardWps = []; // 去程
+  final List<String> _returnWps = []; // 返程
 
   // ==== 团队/费用 ====
   final _maxParticipantsCtrl = TextEditingController(text: '4');
@@ -123,13 +124,30 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
     Navigator.of(context).maybePop();
   }
 
-  void _onRouteTypeChanged(RoadTripRouteType t) =>
-      setState(() => _routeType = t);
-  void _onAddWaypoint() =>
-      setState(() => _waypoints.add('途经点 ${_waypoints.length + 1}'));
-  void _onRemoveWaypoint(int i) {
-    if (i >= 0 && i < _waypoints.length) setState(() => _waypoints.removeAt(i));
+  void _onRouteTypeChanged(RoadTripRouteType t) {
+    setState(() => _routeType = t);
+    // 可选：从往返切到单程时，仅保留去程；反之保持现状
   }
+
+  void _onAddForward() =>
+      setState(() => _forwardWps.add('途经点 ${_forwardWps.length + 1}'));
+  void _onRemoveForward(int i) => setState(() {
+    if (i >= 0 && i < _forwardWps.length) _forwardWps.removeAt(i);
+  });
+  void _onReorderForward(int oldIndex, int newIndex) => setState(() {
+    final item = _forwardWps.removeAt(oldIndex);
+    _forwardWps.insert(newIndex, item);
+  });
+
+  void _onAddReturn() =>
+      setState(() => _returnWps.add('返程点 ${_returnWps.length + 1}'));
+  void _onRemoveReturn(int i) => setState(() {
+    if (i >= 0 && i < _returnWps.length) _returnWps.removeAt(i);
+  });
+  void _onReorderReturn(int oldIndex, int newIndex) => setState(() {
+    final item = _returnWps.removeAt(oldIndex);
+    _returnWps.insert(newIndex, item);
+  });
 
   void _onCarTypeChanged(String? v) => setState(() => _carType = v);
   void _onSubmitTag() {
@@ -213,8 +231,9 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
         });
       } else {
         setState(() {
-          _destinationAddress =
-              (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+          _destinationAddress = (trimmed == null || trimmed.isEmpty)
+              ? null
+              : trimmed;
         });
       }
     });
@@ -256,7 +275,8 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
       }
     }
     if (_startLatLng != null) {
-      final hasAddress = _startAddress != null && _startAddress!.trim().isNotEmpty;
+      final hasAddress =
+          _startAddress != null && _startAddress!.trim().isNotEmpty;
       _startAddressFuture = hasAddress
           ? Future<String?>.value(_startAddress)
           : _loadAddress(_startLatLng!, isStart: true);
@@ -290,9 +310,16 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
         return RoadTripRouteSection(
           routeType: _routeType,
           onRouteTypeChanged: _onRouteTypeChanged,
-          onAddWaypoint: _onAddWaypoint,
-          onRemoveWaypoint: _onRemoveWaypoint,
-          waypoints: _waypoints,
+
+          forwardWaypoints: _forwardWps,
+          onAddForward: _onAddForward,
+          onRemoveForward: _onRemoveForward,
+          onReorderForward: _onReorderForward,
+
+          returnWaypoints: _returnWps,
+          onAddReturn: _onAddReturn,
+          onRemoveReturn: _onRemoveReturn,
+          onReorderReturn: _onReorderReturn,
         );
       case TripSection.team:
         return RoadTripTeamSection(
@@ -386,38 +413,39 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
     final radius = const Radius.circular(24);
     final canScroll = _canSwipe && !(_isBasicPage && !_basicValid); // ✅ 关键
 
-    final hasStartAddress = _startAddress != null && _startAddress!.trim().isNotEmpty;
+    final hasStartAddress =
+        _startAddress != null && _startAddress!.trim().isNotEmpty;
     final hasDestinationAddress =
         _destinationAddress != null && _destinationAddress!.trim().isNotEmpty;
     final startCoords = _startLatLng != null
         ? '${_startLatLng!.latitude.toStringAsFixed(6)}, '
-            '${_startLatLng!.longitude.toStringAsFixed(6)}'
+              '${_startLatLng!.longitude.toStringAsFixed(6)}'
         : null;
     final startTitle = hasStartAddress
         ? _startAddress!.trim()
         : (startCoords ?? loc.map_select_location_title);
     final startSubtitle = _startLatLng != null
         ? (hasStartAddress
-            ? loc.location_coordinates(
-                _startLatLng!.latitude.toStringAsFixed(6),
-                _startLatLng!.longitude.toStringAsFixed(6),
-              )
-            : '')
+              ? loc.location_coordinates(
+                  _startLatLng!.latitude.toStringAsFixed(6),
+                  _startLatLng!.longitude.toStringAsFixed(6),
+                )
+              : '')
         : loc.map_select_location_tip;
     final destinationCoords = _destinationLatLng != null
         ? '${_destinationLatLng!.latitude.toStringAsFixed(6)}, '
-            '${_destinationLatLng!.longitude.toStringAsFixed(6)}'
+              '${_destinationLatLng!.longitude.toStringAsFixed(6)}'
         : null;
     final destinationTitle = hasDestinationAddress
         ? _destinationAddress!.trim()
         : (destinationCoords ?? loc.map_select_location_destination_label);
     final destinationSubtitle = _destinationLatLng != null
         ? (hasDestinationAddress
-            ? loc.location_coordinates(
-                _destinationLatLng!.latitude.toStringAsFixed(6),
-                _destinationLatLng!.longitude.toStringAsFixed(6),
-              )
-            : '')
+              ? loc.location_coordinates(
+                  _destinationLatLng!.latitude.toStringAsFixed(6),
+                  _destinationLatLng!.longitude.toStringAsFixed(6),
+                )
+              : '')
         : loc.map_select_location_destination_tip;
 
     return ClipRRect(
@@ -496,14 +524,17 @@ class _PlannerSheetState extends ConsumerState<_PlannerSheet>
                                     _restartSelectionFlow(skipStart: false),
                                 onEditDestination: () => _restartSelectionFlow(
                                   skipStart:
-                                      _destinationLatLng != null && _startLatLng != null,
+                                      _destinationLatLng != null &&
+                                      _startLatLng != null,
                                 ),
                                 departurePosition: _startLatLng,
                                 departureAddressFuture: _startAddressFuture,
                                 departureNearbyFuture: _startNearbyFuture,
                                 destinationPosition: _destinationLatLng,
-                                destinationAddressFuture: _destinationAddressFuture,
-                                destinationNearbyFuture: _destinationNearbyFuture,
+                                destinationAddressFuture:
+                                    _destinationAddressFuture,
+                                destinationNearbyFuture:
+                                    _destinationNearbyFuture,
                               ),
                               ..._sectionsOrder.map(_buildSectionPage),
                             ],
@@ -616,8 +647,9 @@ class _ConnectionStart extends StatelessWidget {
               _CardTile(
                 leading: const Icon(Icons.place_outlined),
                 title: destinationTitle,
-                subtitle:
-                    destinationSubtitle.isEmpty ? null : destinationSubtitle,
+                subtitle: destinationSubtitle.isEmpty
+                    ? null
+                    : destinationSubtitle,
                 onTap: onEditDestination,
               ),
               const SizedBox(height: 40),
@@ -667,10 +699,7 @@ class _LocationDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: theme.textTheme.titleMedium,
-        ),
+        Text(label, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         if (position == null) ...[
           Text(
@@ -681,9 +710,7 @@ class _LocationDetails extends StatelessWidget {
           ),
         ] else ...[
           LocationSheetRow(
-            icon: const Icon(
-              Icons.place_outlined,
-            ),
+            icon: const Icon(Icons.place_outlined),
             child: Text(
               loc.location_coordinates(
                 position!.latitude.toStringAsFixed(6),
@@ -717,10 +744,7 @@ class _LocationDetails extends StatelessWidget {
                 final display = (address == null || address.trim().isEmpty)
                     ? loc.map_location_info_address_unavailable
                     : address;
-                return LocationSheetRow(
-                  icon: icon,
-                  child: Text(display),
-                );
+                return LocationSheetRow(icon: icon, child: Text(display));
               },
             ),
           if (nearbyFuture != null) ...[

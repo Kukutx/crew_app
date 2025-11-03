@@ -7,12 +7,14 @@ class RoadTripSectionCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.children,
+    this.headerTrailing, 
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final List<Widget> children;
+  final Widget? headerTrailing; 
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +31,10 @@ class RoadTripSectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: 42, height: 42,
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
@@ -44,19 +46,31 @@ class RoadTripSectionCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                      // 标题行（标题 + 右侧插槽）
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          if (headerTrailing != null) ...[
+                            const SizedBox(width: 12),
+                            headerTrailing!,
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                      if (subtitle.isNotEmpty)
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -70,6 +84,7 @@ class RoadTripSectionCard extends StatelessWidget {
     );
   }
 }
+
 
 InputDecoration roadTripInputDecoration(
   BuildContext context,

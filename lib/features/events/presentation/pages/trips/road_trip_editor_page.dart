@@ -79,9 +79,12 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
 
       final initialState = RoadTripEditorState(
         dateRange: initial.dateRange,
-        routeType:
-            initial.isRoundTrip ? RoadTripRouteType.roundTrip : RoadTripRouteType.oneWay,
-        pricingType: initial.isFree ? RoadTripPricingType.free : RoadTripPricingType.paid,
+        routeType: initial.isRoundTrip
+            ? RoadTripRouteType.roundTrip
+            : RoadTripRouteType.oneWay,
+        pricingType: initial.isFree
+            ? RoadTripPricingType.free
+            : RoadTripPricingType.paid,
         carType: initial.carType,
         waypoints: List.of(initial.waypoints),
         tags: List.of(initial.tags),
@@ -115,7 +118,8 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       firstDate: now,
       lastDate: DateTime(now.year + 2),
       initialDateRange:
-          _state.dateRange ?? DateTimeRange(start: now, end: now.add(const Duration(days: 1))),
+          _state.dateRange ??
+          DateTimeRange(start: now, end: now.add(const Duration(days: 1))),
     );
     if (picked != null) {
       setState(() {
@@ -128,8 +132,12 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     final picked = await _picker.pickMultiImage(imageQuality: 85);
     if (picked.isEmpty) return;
     setState(() {
-      final newItems = picked.map((x) => RoadTripGalleryItem.file(File(x.path))).toList();
-      _state = _state.copyWith(galleryItems: [..._state.galleryItems, ...newItems]);
+      final newItems = picked
+          .map((x) => RoadTripGalleryItem.file(File(x.path)))
+          .toList();
+      _state = _state.copyWith(
+        galleryItems: [..._state.galleryItems, ...newItems],
+      );
     });
   }
 
@@ -197,8 +205,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_state.dateRange == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('请选择活动日期范围')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('请选择活动日期范围')));
       return;
     }
 
@@ -206,8 +215,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     if (_state.pricingType == RoadTripPricingType.paid) {
       price = double.tryParse(_priceCtrl.text.trim());
       if (price == null) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('请输入正确的人均费用')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('请输入正确的人均费用')));
         return;
       }
     }
@@ -254,11 +264,35 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       Navigator.pop(context, id);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('创建失败：$e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('创建失败：$e')));
       }
     }
   }
+
+  final List<String> _forwardWps = []; // 去程
+  final List<String> _returnWps = []; // 返程
+
+  void _onAddForward() =>
+      setState(() => _forwardWps.add('途经点 ${_forwardWps.length + 1}'));
+  void _onRemoveForward(int i) => setState(() {
+    if (i >= 0 && i < _forwardWps.length) _forwardWps.removeAt(i);
+  });
+  void _onReorderForward(int oldIndex, int newIndex) => setState(() {
+    final item = _forwardWps.removeAt(oldIndex);
+    _forwardWps.insert(newIndex, item);
+  });
+
+  void _onAddReturn() =>
+      setState(() => _returnWps.add('返程点 ${_returnWps.length + 1}'));
+  void _onRemoveReturn(int i) => setState(() {
+    if (i >= 0 && i < _returnWps.length) _returnWps.removeAt(i);
+  });
+  void _onReorderReturn(int oldIndex, int newIndex) => setState(() {
+    final item = _returnWps.removeAt(oldIndex);
+    _returnWps.insert(newIndex, item);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -301,17 +335,21 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 dateRange: _state.dateRange,
                 onPickDateRange: _pickDateRange,
               ),
+
               RoadTripRouteSection(
                 routeType: _state.routeType,
                 onRouteTypeChanged: (type) => setState(() {
                   _state = _state.copyWith(routeType: type);
                 }),
-                onAddWaypoint: _showAddWaypointDialog,
-                onRemoveWaypoint: (index) => setState(() {
-                  final updated = [..._state.waypoints]..removeAt(index);
-                  _state = _state.copyWith(waypoints: updated);
-                }),
-                waypoints: _state.waypoints,
+                forwardWaypoints: _forwardWps,
+                onAddForward: _onAddForward,
+                onRemoveForward: _onRemoveForward,
+                onReorderForward: _onReorderForward,
+
+                returnWaypoints: _returnWps,
+                onAddReturn: _onAddReturn,
+                onRemoveReturn: _onRemoveReturn,
+                onReorderReturn: _onReorderReturn,
               ),
               RoadTripTeamSection(
                 maxParticipantsController: _maxParticipantsCtrl,
@@ -327,7 +365,10 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
               RoadTripPreferencesSection(
                 carType: _state.carType,
                 onCarTypeChanged: (value) => setState(() {
-                  _state = _state.copyWith(carType: value, clearCarType: value == null);
+                  _state = _state.copyWith(
+                    carType: value,
+                    clearCarType: value == null,
+                  );
                 }),
                 tagInputController: _tagInputCtrl,
                 onSubmitTag: _addTagFromInput,

@@ -1045,8 +1045,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get my_drafts_resume_button => '继续编辑';
 
-      '看看谁已经在 Crew 上';
-
   @override
   String get map_selection_sheet_tap_to_expand => '点击展开';
 
@@ -1162,13 +1160,4 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_developer_stripe_test => 'Stripe 支付测试';
-
-      '使用 Stripe 的测试环境来模拟支付流程，方便在正式接入前验证。';
-
-      '报名费 + 赞助费（€1.00）';
-
-      '包含示例报名费以及可选的赞助费用。';
-
-      '仅包含基础报名费用。';
-
 }

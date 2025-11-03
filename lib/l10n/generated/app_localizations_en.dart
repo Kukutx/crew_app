@@ -125,12 +125,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get event_fee_free => 'Free';
 
-      'Estimate participant fees, carpool costs and commission splits.';
-
-      'Adjust any number to match the actual expenses for this trip.';
-
-      'Keep track of shared costs with your crew and settle up easily after the trip.';
-
   @override
   String get event_expense_calculate_button => 'Calculate';
 
@@ -195,17 +189,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get create_moment_type_section_title => 'Moment type';
 
-      'Decide whether to publish a quick inspiration or tie it to your current activity.';
-
   @override
   String get create_moment_type_instant => 'Instant moment';
 
-      'Share freely without linking to any activity.';
-
   @override
   String get create_moment_type_event => 'Activity moment';
-
-      'Link to your ongoing road trip so the crew stays in sync.';
 
   @override
   String get create_moment_event_link_label => 'Linked activity';
@@ -255,16 +243,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_prompt =>
       'Tap the button above to sign in and explore more features.';
 
-      'Discover nearby events · Host quickly · Subscribe for advanced features';
-
   @override
   String get login_subtitle =>
       'Organize events by location and join your crew with one tap.';
 
   @override
   String get login_title => 'Welcome to Crew';
-
-      'Select a provider below to continue.';
 
   @override
   String get login_agreement_prefix => 'I have read and agree to';
@@ -710,8 +694,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_app_version => 'About Crew';
 
-      'View Crew version details and legal documents';
-
   @override
   String get settings_subscription_current_plan => 'Current plan';
 
@@ -890,8 +872,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_notifications_push => 'Push notifications';
 
-      'Enable push notifications on this device';
-
   @override
   String get settings_saved_toast => 'Settings updated';
 
@@ -943,8 +923,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get report_event_attachment_empty => 'No file selected';
-
-      'We couldn\'t load that photo. Please try again.';
 
   @override
   String get report_event_submit => 'Submit report';
@@ -1064,24 +1042,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get map_quick_actions_add_friend => 'Add friends';
 
-      'Invite friends to explore events with you';
-
   @override
   String get map_quick_actions_my_event => 'My activities';
-
-      'See everything I\'m joining or hosting';
-
-      'Keep up with likes and comments';
 
   @override
   String get map_quick_actions_my_ledger => 'My ledger';
 
   @override
   String get map_quick_actions_wallet => 'My wallet';
-
-      'Pick up where you left off';
-
-      'We\'ll add shortcuts here as soon as they\'re ready.';
 
   @override
   String get map_quick_actions_bottom_scan => 'Scan';
@@ -1119,22 +1087,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get my_drafts_resume_button => 'Continue editing';
-
-      'Quickly add someone nearby';
-
-      'Send a Crew invite link';
-
-      'See who is already on Crew';
-
-      'Apr 22 · 7:00 AM · Riverside Studio';
-
-      'Apr 27 · 1:30 PM · Old Town Plaza';
-
-      'Apr 20 · 9:00 AM · West Lake Pier';
-
-      'Apr 24 · 6:30 PM · Maple Street Hub';
-
-      'Long press on the map to pick a starting point.';
 
   @override
   String get map_selection_sheet_tap_to_expand => 'Tap to expand';
@@ -1258,19 +1210,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_developer_stripe_test => 'Stripe payment test';
-
-      'Open the Stripe payment sheet with test data';
-
-      'Use Stripe\'s test environment to simulate payments before integrating the real flow.';
-
-      'Registration fee + sponsorship (€1.00)';
-
-      'Combines the sample registration fee and an optional sponsorship add-on.';
-
-      'Registration fee (€0.50)';
-
-      'Only includes the base registration fee.';
-
-      'Only includes the sponsorship add-on.';
-
 }

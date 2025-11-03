@@ -43,20 +43,29 @@ class EventsMapPage extends ConsumerStatefulWidget {
 class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ProviderSubscription<Event?>? _mapFocusSubscription;
-  ProviderSubscription<EventCarouselManager>? _carouselSubscription;
   bool _isDrawerOpen = false;
   final ClusterManagerId _eventsClusterManagerId =
       const ClusterManagerId('events_cluster_manager');
   late final ClusterManager _eventsClusterManager;
+  late final MapController _mapController;
+  late final EventCarouselManager _carouselManager;
+  late final SearchManager _searchManager;
+  late final LocationSelectionManager _locationSelectionManager;
+  bool _isCarouselVisible = false;
 
   @override
   void initState() {
     super.initState();
+    _mapController = ref.read(mapControllerProvider);
+    _carouselManager = ref.read(eventCarouselManagerProvider);
+    _searchManager = ref.read(searchManagerProvider);
+    _locationSelectionManager = ref.read(locationSelectionManagerProvider);
+    _isCarouselVisible =
+        _carouselManager.isVisible && _carouselManager.events.isNotEmpty;
     _eventsClusterManager = ClusterManager(
       clusterManagerId: _eventsClusterManagerId,
       onClusterTap: (cluster) {
-        final controller = ref.read(mapControllerProvider);
-        unawaited(controller.moveCamera(cluster.position, zoom: 14));
+        unawaited(_mapController.moveCamera(cluster.position, zoom: 14));
       },
     );
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
@@ -67,40 +76,89 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       if (event == null) {
         return;
       }
-      final mapController = ref.read(mapControllerProvider);
-      mapController.focusOnEvent(event);
-      final carouselManager = ref.read(eventCarouselManagerProvider);
-      carouselManager.showEventCard(event);
+      _mapController.focusOnEvent(event);
+      _carouselManager.showEventCard(event);
       ref.read(mapFocusEventProvider.notifier).state = null;
     });
-    _carouselSubscription = ref.listenManual(eventCarouselManagerProvider, (
-      _,
-      manager,
-    ) {
-      if (!mounted) {
-        return;
-      }
-      _updateBottomNavigation(!_isDrawerOpen && !manager.isVisible);
-    });
+    ref.listen<bool>(
+      eventCarouselManagerProvider.select(
+        (manager) => manager.isVisible && manager.events.isNotEmpty,
+      ),
+      (_, isVisible) {
+        if (!mounted) {
+          return;
+        }
+        if (_isCarouselVisible != isVisible) {
+          setState(() => _isCarouselVisible = isVisible);
+        }
+        _updateBottomNavigation(!_isDrawerOpen && !isVisible);
+      },
+    );
+    ref.listen<MapOverlaySheetType>(
+      mapOverlaySheetProvider,
+      (previous, next) {
+        if (next != MapOverlaySheetType.none || !mounted) {
+          return;
+        }
+        final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
+        if (notifier.state != MapOverlaySheetStage.collapsed) {
+          notifier.state = MapOverlaySheetStage.collapsed;
+        }
+      },
+    );
+    ref.listen<MapSelectionState>(
+      mapSelectionControllerProvider,
+      (previous, next) {
+        final shouldHide = _shouldHideSearchBar(next);
+        final wasHidden = previous != null && _shouldHideSearchBar(previous);
+        if (!shouldHide || wasHidden) {
+          return;
+        }
+        if (_searchManager.searchFocusNode.hasFocus) {
+          _searchManager.searchFocusNode.unfocus();
+        }
+        final searchState = ref.read(eventsMapSearchControllerProvider);
+        if (searchState.showResults) {
+          ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
+        }
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
       _updateBottomNavigation(true);
+      if (widget.selectedEvent != null && !_mapController.movedToSelected) {
+        _mapController.focusOnEvent(widget.selectedEvent!);
+        _carouselManager.showEventCard(widget.selectedEvent!);
+      }
     });
   }
 
   @override
   void dispose() {
     _mapFocusSubscription?.close();
-    _carouselSubscription?.close();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
-      if (controller.state) {
-        controller.state = false;
-      }
-    });
+    final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
+    if (controller.state) {
+      controller.state = false;
+    }
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant EventsMapPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedEvent == null ||
+        widget.selectedEvent == oldWidget.selectedEvent) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _mapController.focusOnEvent(widget.selectedEvent!);
+      _carouselManager.showEventCard(widget.selectedEvent!);
+    });
   }
 
   @override
@@ -108,34 +166,18 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final theme = Theme.of(context);
     final safeBottom = MediaQuery.of(context).viewPadding.bottom;
 
-    // 获取各个管理器
-    final mapController = ref.watch(mapControllerProvider);
-    final carouselManager = ref.watch(eventCarouselManagerProvider);
-    final searchManager = ref.watch(searchManagerProvider);
-    final locationSelectionManager = ref.watch(
-      locationSelectionManagerProvider,
-    );
+    final mapController = _mapController;
+    final carouselManager = _carouselManager;
+    final searchManager = _searchManager;
+    final locationSelectionManager = _locationSelectionManager;
     final mapSheetType = ref.watch(mapOverlaySheetProvider);
-    final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
+    final isSheetExpanded = ref.watch(
+      mapOverlaySheetStageProvider
+          .select((stage) => stage == MapOverlaySheetStage.expanded),
+    );
     final showBottomNavigation = ref.watch(bottomNavigationVisibilityProvider);
 
-    if (mapSheetType == MapOverlaySheetType.none &&
-        mapSheetStage != MapOverlaySheetStage.collapsed) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
-        if (notifier.state != MapOverlaySheetStage.collapsed) {
-          notifier.state = MapOverlaySheetStage.collapsed;
-        }
-      });
-    }
-
-    final cardVisible =
-        carouselManager.isVisible && carouselManager.events.isNotEmpty;
-    final bottomPadding = (cardVisible ? 240 : 120) + safeBottom;
-    final searchState = ref.watch(eventsMapSearchControllerProvider);
+    final bottomPadding = (_isCarouselVisible ? 240 : 120) + safeBottom;
     final loc = AppLocalizations.of(context)!;
 
     final events = ref.watch(eventsProvider);
@@ -205,34 +247,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       );
     }
 
-    // 页面首帧跳转至选中事件
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.selectedEvent != null && !mapController.movedToSelected) {
-        mapController.focusOnEvent(widget.selectedEvent!);
-        carouselManager.showEventCard(widget.selectedEvent!);
-      }
-    });
-
     final hideSearchBar =
         selectionState.isSelectionSheetOpen ||
         selectionState.isSelectingDestination ||
         selectionState.selectedLatLng != null;
     final showClearSelectionInAppBar =
         !hideSearchBar && selectionState.selectedLatLng != null;
-
-    if (hideSearchBar &&
-        (searchManager.searchFocusNode.hasFocus || searchState.showResults)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        final manager = ref.read(searchManagerProvider);
-        if (manager.searchFocusNode.hasFocus) {
-          manager.searchFocusNode.unfocus();
-        }
-        ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
-      });
-    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -246,22 +266,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ? null
           : _SlidingAppBar(
               hidden: !showBottomNavigation ||
-                  (mapSheetType != MapOverlaySheetType.none &&
-                      mapSheetStage == MapOverlaySheetStage.expanded),
-              child: SearchEventAppBar(
-                controller: searchManager.searchController,
-                focusNode: searchManager.searchFocusNode,
-                onSearch: searchManager.onSearchSubmitted,
-                onChanged: searchManager.onQueryChanged,
-                onClear: searchManager.clearSearch,
+                  (mapSheetType != MapOverlaySheetType.none && isSheetExpanded),
+              child: _SearchAppBar(
+                searchManager: searchManager,
                 onQuickActionsTap: _openQuickActionsDrawer,
                 onAvatarTap: _onAvatarTap,
-                onResultTap: (event) =>
-                    searchManager.onSearchResultTap(event, context),
-                showResults: searchState.showResults,
-                isLoading: searchState.isLoading,
-                results: searchState.results,
-                errorText: searchState.errorText,
                 showClearSelectionAction: showClearSelectionInAppBar,
                 onClearSelection: showClearSelectionInAppBar
                     ? () => unawaited(
@@ -295,16 +304,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               mapPadding: selectionState.mapPadding,
             ),
           ),
-          EventsMapEventCarousel(
-            events: carouselManager.events,
-            visible:
-                carouselManager.isVisible && carouselManager.events.isNotEmpty,
-            controller: carouselManager.pageController,
+          _EventCarousel(
+            manager: carouselManager,
             safeBottom: safeBottom,
-            onPageChanged: carouselManager.onPageChanged,
-            onOpenDetails: (event) =>
-                carouselManager.openEventDetails(event, context),
-            onClose: carouselManager.hideEventCard,
             onRegister: () => _showSnackBar(loc.registration_not_implemented),
             onFavorite: () => _showSnackBar(loc.feature_not_ready),
           ),
@@ -392,9 +394,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _openQuickActionsDrawer() {
-    final searchManager = ref.read(searchManagerProvider);
-    if (searchManager.searchFocusNode.hasFocus) {
-      searchManager.searchFocusNode.unfocus();
+    if (_searchManager.searchFocusNode.hasFocus) {
+      _searchManager.searchFocusNode.unfocus();
     }
     final searchController = ref.read(
       eventsMapSearchControllerProvider.notifier,
@@ -420,9 +421,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _onAvatarTap(bool authed) {
-    final searchManager = ref.read(searchManagerProvider);
-    if (searchManager.searchFocusNode.hasFocus) {
-      searchManager.searchFocusNode.unfocus();
+    if (_searchManager.searchFocusNode.hasFocus) {
+      _searchManager.searchFocusNode.unfocus();
     }
     ref.read(eventsMapSearchControllerProvider.notifier).hideResults();
     if (!authed) {
@@ -433,6 +433,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     ref.read(appOverlayIndexProvider.notifier).state = 1;
+  }
+
+  bool _shouldHideSearchBar(MapSelectionState state) {
+    return state.isSelectionSheetOpen ||
+        state.isSelectingDestination ||
+        state.selectedLatLng != null;
   }
 }
 
@@ -759,6 +765,86 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _SearchAppBar extends ConsumerWidget {
+  const _SearchAppBar({
+    required this.searchManager,
+    required this.onQuickActionsTap,
+    required this.onAvatarTap,
+    required this.showClearSelectionAction,
+    required this.onClearSelection,
+  });
+
+  final SearchManager searchManager;
+  final VoidCallback onQuickActionsTap;
+  final void Function(bool authed) onAvatarTap;
+  final bool showClearSelectionAction;
+  final VoidCallback? onClearSelection;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchState = ref.watch(eventsMapSearchControllerProvider);
+
+    return SearchEventAppBar(
+      controller: searchManager.searchController,
+      focusNode: searchManager.searchFocusNode,
+      onSearch: searchManager.onSearchSubmitted,
+      onChanged: searchManager.onQueryChanged,
+      onClear: searchManager.clearSearch,
+      onQuickActionsTap: onQuickActionsTap,
+      onAvatarTap: onAvatarTap,
+      onResultTap: (event) => searchManager.onSearchResultTap(event, context),
+      showResults: searchState.showResults,
+      isLoading: searchState.isLoading,
+      results: searchState.results,
+      errorText: searchState.errorText,
+      showClearSelectionAction: showClearSelectionAction,
+      onClearSelection: onClearSelection,
+    );
+  }
+}
+
+class _EventCarousel extends ConsumerWidget {
+  const _EventCarousel({
+    required this.manager,
+    required this.safeBottom,
+    required this.onRegister,
+    required this.onFavorite,
+  });
+
+  final EventCarouselManager manager;
+  final double safeBottom;
+  final VoidCallback onRegister;
+  final VoidCallback onFavorite;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final events = ref.watch(
+      eventCarouselManagerProvider.select((manager) => manager.events),
+    );
+    final visible = ref.watch(
+      eventCarouselManagerProvider.select(
+        (manager) => manager.isVisible && manager.events.isNotEmpty,
+      ),
+    );
+
+    if (events.isEmpty && !visible) {
+      return const SizedBox.shrink();
+    }
+
+    return EventsMapEventCarousel(
+      events: events,
+      visible: visible,
+      controller: manager.pageController,
+      safeBottom: safeBottom,
+      onPageChanged: manager.onPageChanged,
+      onOpenDetails: (event) => manager.openEventDetails(event, context),
+      onClose: manager.hideEventCard,
+      onRegister: onRegister,
+      onFavorite: onFavorite,
     );
   }
 }

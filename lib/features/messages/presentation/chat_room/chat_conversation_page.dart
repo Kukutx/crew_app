@@ -58,7 +58,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   late final ChatUser _currentChatUser;
   late final ChatController _chatController;
   late final ScrollController _chatScrollController;
-  late List<Message> _chatMessages;
+  late final List<Message> _chatMessages;
 
   bool get _isGroup => widget.type == ChatConversationType.group;
 
@@ -67,14 +67,12 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     super.initState();
     _messages = List<ChatMessage>.of(widget.initialMessages);
     _messageTimestamps = <String, DateTime>{};
-    _chatScrollController = ScrollController();
     _initializeChatViewController();
   }
 
   @override
   void dispose() {
     _chatController.dispose();
-    _chatScrollController.dispose();
     super.dispose();
   }
 
@@ -99,30 +97,41 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     _chatController = ChatController(
       initialMessageList: _chatMessages,
       initialChatUsers: _chatUsersById.values.toList(growable: false),
-      scrollController: _chatScrollController,
     );
+    _chatScrollController = _chatController.scrollController;
   }
 
-  void _handleSend(String raw) {
+  void _handleSend(
+    String raw,
+    ReplyMessage reply,
+    MessageType messageType,
+  ) {
     final text = raw.trim();
-    if (text.isEmpty) return;
+    final isTextMessage = messageType == MessageType.text;
+    if (isTextMessage && text.isEmpty) return;
 
     final timeLabel = MaterialLocalizations.of(context)
         .formatTimeOfDay(TimeOfDay.fromDateTime(DateTime.now()));
     final prefix = _isGroup ? 'group-temp' : 'direct-temp';
+    final createdAt = DateTime.now();
 
     final newMessage = ChatMessage(
       id: '$prefix-${DateTime.now().millisecondsSinceEpoch}',
       sender: widget.currentUser,
-      body: raw,
+      body: isTextMessage ? raw : text,
       sentAtLabel: timeLabel,
     );
 
     setState(() {
       _messages.add(newMessage);
-      _messageTimestamps[newMessage.id] = DateTime.now();
+      _messageTimestamps[newMessage.id] = createdAt;
     });
-    final chatMessage = _toChatViewMessage(newMessage);
+    final chatMessage = _toChatViewMessage(
+      newMessage,
+      createdAt: createdAt,
+      reply: reply,
+      messageType: messageType,
+    );
     _chatMessages.add(chatMessage);
     _chatController.addMessage(chatMessage);
     _scrollToLatestMessage();
@@ -325,15 +334,21 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final participants = _buildParticipants();
 
+    final chatViewState = _chatMessages.isEmpty
+        ? ChatViewState.noData
+        : ChatViewState.hasMessages;
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: _buildAppBar(loc, colorScheme, participants),
       body: ChatView(
         currentUser: _currentChatUser,
         chatController: _chatController,
+        chatViewState: chatViewState,
         type: ChatViewType.light,
-        messageBar: MessageBar(
-          onSend: _handleSend,
+        onSendTap: _handleSend,
+        messageBarConfig: MessageBarConfiguration(
+          sendButtonIcon: const Icon(Icons.send_rounded),
           hintText: loc.chat_message_input_hint,
           actions: [
             IconButton(
@@ -363,16 +378,18 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   Message _toChatViewMessage(
     ChatMessage chatMessage, {
     DateTime? createdAt,
+    ReplyMessage reply = const ReplyMessage(),
+    MessageType messageType = MessageType.text,
   }) {
     final timestamp = createdAt ?? _resolveTimestamp(chatMessage);
-    final chatUser =
-        _chatUsersById[chatMessage.sender.id] ?? _toChatUser(chatMessage.sender);
 
     return Message(
       id: chatMessage.id,
       message: chatMessage.body,
       createdAt: timestamp,
-      sendBy: chatUser,
+      sendBy: chatMessage.sender.id,
+      messageType: messageType,
+      replyMessage: reply,
     );
   }
 
@@ -394,7 +411,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     return ChatUser(
       id: participant.id,
       name: participant.displayName,
-      profilePicture: null,
     );
   }
 

@@ -1,0 +1,541 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_host_disclaimer_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_preferences_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_route_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+// ===== 1) imports：把你的分段组件引入 =====
+
+Future<void> showCreateRoadTripSheet(BuildContext context) async {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const _PlannerSheet(),
+  );
+}
+
+class _PlannerSheet extends StatefulWidget {
+  const _PlannerSheet();
+
+  @override
+  State<_PlannerSheet> createState() => _PlannerSheetState();
+}
+
+// 1) 定义 Section 锚点
+enum TripSection { basic, route, team, prefs, gallery, story, disclaimer }
+
+class _PlannerSheetState extends State<_PlannerSheet>
+    with TickerProviderStateMixin {
+  final _dragCtrl = DraggableScrollableController();
+  final _pageCtrl = PageController();
+  bool _canSwipe = false; // 初始仅展示第一页，不可横滑
+
+  RoadTripEditorState _editorState = const RoadTripEditorState();
+
+  // ==== 基本信息 ====
+  final _titleCtrl = TextEditingController();
+
+  // ==== 路线 ====
+  final _startCtrl = TextEditingController();
+  final _endCtrl = TextEditingController();
+  final _meetingCtrl = TextEditingController();
+  RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
+  final List<String> _waypoints = [];
+
+  // ==== 团队/费用 ====
+  final _maxParticipantsCtrl = TextEditingController(text: '4');
+  final _priceCtrl = TextEditingController();
+  RoadTripPricingType _pricingType = RoadTripPricingType.free;
+
+  // ==== 偏好 ====
+  String? _carType;
+  final _tagInputCtrl = TextEditingController();
+  final List<String> _tags = [];
+
+  // ==== 图集 ====
+  final List<RoadTripGalleryItem> _gallery = [];
+  final ImagePicker _picker = ImagePicker();
+
+  // ==== 文案 ====
+  final _storyCtrl = TextEditingController();
+  final _disclaimerCtrl = TextEditingController();
+
+  // ==== 分页顺序（除启动页） ====
+  static const List<TripSection> _sectionsOrder = [
+    TripSection.basic,
+    TripSection.route,
+    TripSection.team,
+    TripSection.prefs,
+    TripSection.gallery,
+    TripSection.story,
+    TripSection.disclaimer,
+  ];
+  int get _totalPages => 1 + _sectionsOrder.length;
+
+  // ==== 必要回调 ====
+  Future<void> _pickDateRange() async {
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: now,
+      lastDate: DateTime(now.year + 2),
+      initialDateRange:
+          _editorState.dateRange ??
+          DateTimeRange(start: now, end: now.add(const Duration(days: 1))),
+    );
+    if (picked != null) {
+      setState(() {
+        _editorState = _editorState.copyWith(dateRange: picked);
+      });
+    }
+  }
+
+  // 点击创建
+  Future<void> _onCreatePressed() async {
+    // TODO: 收集数据并执行创建
+    Navigator.of(context).maybePop();
+  }
+
+  void _onRouteTypeChanged(RoadTripRouteType t) =>
+      setState(() => _routeType = t);
+  void _onAddWaypoint() =>
+      setState(() => _waypoints.add('途经点 ${_waypoints.length + 1}'));
+  void _onRemoveWaypoint(int i) {
+    if (i >= 0 && i < _waypoints.length) setState(() => _waypoints.removeAt(i));
+  }
+
+  void _onCarTypeChanged(String? v) => setState(() => _carType = v);
+  void _onSubmitTag() {
+    final t = _tagInputCtrl.text.trim();
+    if (t.isNotEmpty && !_tags.contains(t)) setState(() => _tags.add(t));
+    _tagInputCtrl.clear();
+  }
+
+  void _onRemoveTag(String t) => setState(() => _tags.remove(t));
+
+  Future<void> _onPickImages() async {
+    try {
+      final picked = await _picker.pickMultiImage(imageQuality: 80);
+      if (picked.isEmpty) {
+        return;
+      }
+      setState(() {
+        final newItems = picked
+            .map((x) => RoadTripGalleryItem.file(File(x.path)))
+            .toList();
+        _editorState = _editorState.copyWith(
+          galleryItems: [..._editorState.galleryItems, ...newItems],
+        );
+      });
+    } on PlatformException catch (_) {
+      if (!mounted) {
+        return;
+      }
+      _showSnack('选择图片失败，请检查权限设置');
+    }
+  }
+
+  void _onRemoveImage(int i) {
+    if (i >= 0 && i < _gallery.length) setState(() => _gallery.removeAt(i));
+  }
+
+  void _onSetCover(int i) {
+    if (i > 0 && i < _gallery.length) {
+      setState(() {
+        final item = _gallery.removeAt(i);
+        _gallery.insert(0, item);
+      });
+    }
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // 删掉：DateTimeRange? _dateRange;
+  int _currentPage = 0;
+
+  bool get _isBasicPage => _currentPage == 1; // 0是启动页，1是basic
+  bool get _basicValid =>
+      _titleCtrl.text.trim().isNotEmpty && _editorState.dateRange != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageCtrl.addListener(() {
+      final p = _pageCtrl.hasClients ? _pageCtrl.page?.round() ?? 0 : 0;
+      if (p != _currentPage) setState(() => _currentPage = p);
+    });
+    _titleCtrl.addListener(() => setState(() {})); // 标题变更触发校验
+  }
+
+  // ==== 构建各分段页 ====
+  Widget _buildSectionPage(TripSection s) {
+    switch (s) {
+      case TripSection.basic:
+        return RoadTripBasicSection(
+          titleController: _titleCtrl,
+          dateRange: _editorState.dateRange,
+          onPickDateRange: _pickDateRange,
+        );
+      case TripSection.route:
+        return RoadTripRouteSection(
+          startController: _startCtrl,
+          endController: _endCtrl,
+          meetingController: _meetingCtrl,
+          routeType: _routeType,
+          onRouteTypeChanged: _onRouteTypeChanged,
+          onAddWaypoint: _onAddWaypoint,
+          onRemoveWaypoint: _onRemoveWaypoint,
+          waypoints: _waypoints,
+        );
+      case TripSection.team:
+        return RoadTripTeamSection(
+          maxParticipantsController: _maxParticipantsCtrl,
+          priceController: _priceCtrl,
+          pricingType: _pricingType,
+          onPricingTypeChanged: (v) => setState(() => _pricingType = v),
+        );
+      case TripSection.prefs:
+        return RoadTripPreferencesSection(
+          carType: _carType,
+          onCarTypeChanged: _onCarTypeChanged,
+          tagInputController: _tagInputCtrl,
+          onSubmitTag: _onSubmitTag,
+          tags: _tags,
+          onRemoveTag: _onRemoveTag,
+        );
+      case TripSection.gallery:
+        return RoadTripGallerySection(
+          items: _gallery,
+          onPickImages: _onPickImages,
+          onRemoveImage: _onRemoveImage,
+          onSetCover: _onSetCover,
+        );
+      case TripSection.story:
+        return RoadTripStorySection(descriptionController: _storyCtrl);
+      case TripSection.disclaimer:
+        return RoadTripHostDisclaimerSection(
+          disclaimerController: _disclaimerCtrl,
+        );
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _startCtrl.dispose();
+    _endCtrl.dispose();
+    _meetingCtrl.dispose();
+    _maxParticipantsCtrl.dispose();
+    _priceCtrl.dispose();
+    _tagInputCtrl.dispose();
+    _storyCtrl.dispose();
+    _disclaimerCtrl.dispose();
+    _dragCtrl.dispose();
+    _pageCtrl.dispose();
+    super.dispose();
+  }
+
+  // 便捷：根据锚点跳页（会跳到对应分段页）
+  Future<void> goToSection(TripSection s) async {
+    final idx = _sectionsOrder.indexOf(s);
+    if (idx < 0) return;
+    setState(() => _canSwipe = true); // 确保可横滑
+    try {
+      await _dragCtrl.animateTo(
+        1.0,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+    } catch (_) {}
+    try {
+      await _pageCtrl.animateToPage(
+        1 + idx, // 0 是启动页，所以 +1
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOut,
+      );
+    } catch (_) {}
+  }
+
+  void _enableWizard() async {
+    setState(() => _canSwipe = true);
+    try {
+      await _dragCtrl.animateTo(
+        1.0,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+    } catch (_) {}
+    // 跳到第二页（index=1）
+    try {
+      await _pageCtrl.animateToPage(
+        1,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOut,
+      );
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radius = const Radius.circular(24);
+    final canScroll = _canSwipe && !(_isBasicPage && !_basicValid); // ✅ 关键
+
+    return ClipRRect(
+      borderRadius: BorderRadius.only(topLeft: radius, topRight: radius),
+      child: DraggableScrollableSheet(
+        controller: _dragCtrl,
+        initialChildSize: 0.45,
+        minChildSize: 0.35,
+        maxChildSize: 0.95,
+        snap: true,
+        snapSizes: const [0.45, 0.95],
+        builder: (context, scrollCtrl) {
+          return Material(
+            color: theme.colorScheme.surface,
+            child: DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  // Grabber
+                  const SizedBox(height: 10),
+                  Container(
+                    width: 44,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.15,
+                      ),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // TabBar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withValues(alpha: .6),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const TabBar(
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelPadding: EdgeInsets.symmetric(vertical: 10),
+                        tabs: [
+                          Tab(text: 'Connection'),
+                          Tab(text: 'Station / Location'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // ===== 4) PageView：第0页仍为启动页，其后每页对应一个 section =====
+                  Expanded(
+                    child:
+                        NotificationListener<OverscrollIndicatorNotification>(
+                          onNotification: (n) {
+                            n.disallowIndicator();
+                            return true;
+                          },
+                          child: PageView(
+                            controller: _pageCtrl,
+                            physics: canScroll
+                                ? const PageScrollPhysics()
+                                : const NeverScrollableScrollPhysics(),
+                            children: [
+                              _ConnectionStart(
+                                scrollCtrl: scrollCtrl,
+                                onContinue: _enableWizard,
+                              ),
+                              ..._sectionsOrder.map(_buildSectionPage),
+                            ],
+                          ),
+                        ),
+                  ),
+                  // ===== 5) 底部进度 + 按钮：保持原逻辑，count 改为总页数 =====
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: _canSwipe
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Center(
+                                  child: SmoothPageIndicator(
+                                    controller: _pageCtrl,
+                                    count: _totalPages, // 包含启动页
+                                    effect: const WormEffect(
+                                      dotHeight: 8,
+                                      dotWidth: 8,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: FilledButton(
+                                    onPressed: !canScroll
+                                        ? null // 第二页没填完 -> 禁用
+                                        : _onCreatePressed, // 填完或其他页 -> 可创建
+                                    child: const Text('创建'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                onPressed: _enableWizard,
+                                child: const Text('继续'),
+                              ),
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ConnectionStart extends StatelessWidget {
+  const _ConnectionStart({required this.scrollCtrl, required this.onContinue});
+  final ScrollController scrollCtrl;
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CustomScrollView(
+      controller: scrollCtrl,
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverList.list(
+            children: [
+              _CardTile(
+                leading: const Icon(Icons.radio_button_checked),
+                title: 'My Location',
+                subtitle: 'Use current location',
+                onTap: () {},
+              ),
+              const SizedBox(height: 12),
+              _CardTile(
+                leading: const Icon(Icons.place_outlined),
+                title: 'Destination Address',
+                subtitle: 'Search destination',
+                onTap: () {},
+              ),
+              const SizedBox(height: 40),
+              // 空态占位（用简单容器代替插画）
+              Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
+                    0.4,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '附近的POI',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CardTile extends StatelessWidget {
+  const _CardTile({
+    required this.leading,
+    required this.title,
+    this.subtitle,
+    this.onTap,
+  });
+  final Widget leading;
+  final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+          child: Row(
+            children: [
+              leading,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

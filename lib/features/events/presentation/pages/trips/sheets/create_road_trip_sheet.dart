@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
@@ -10,6 +9,8 @@ import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_t
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_route_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
+import 'package:crew_app/features/events/presentation/pages/map/sheets/location_selection_sheets.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -20,17 +21,22 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // ===== 1) imports：把你的分段组件引入 =====
 
-Future<void> showCreateRoadTripSheet(BuildContext context) async {
-  showModalBottomSheet(
+Future<void> showCreateRoadTripSheet(
+  BuildContext context, {
+  QuickRoadTripResult? initialRoute,
+}) {
+  return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => const _PlannerSheet(),
+    builder: (_) => _PlannerSheet(initialRoute: initialRoute),
   );
 }
 
 class _PlannerSheet extends StatefulWidget {
-  const _PlannerSheet();
+  const _PlannerSheet({this.initialRoute});
+
+  final QuickRoadTripResult? initialRoute;
 
   @override
   State<_PlannerSheet> createState() => _PlannerSheetState();
@@ -49,6 +55,11 @@ class _PlannerSheetState extends State<_PlannerSheet>
 
   // ==== 基本信息 ====
   final _titleCtrl = TextEditingController();
+
+  LatLng? _startLatLng;
+  LatLng? _destinationLatLng;
+  String? _startAddress;
+  String? _destinationAddress;
 
   // ==== 路线 ====
   RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
@@ -176,6 +187,17 @@ class _PlannerSheetState extends State<_PlannerSheet>
   @override
   void initState() {
     super.initState();
+    final initialRoute = widget.initialRoute;
+    if (initialRoute != null) {
+      _startLatLng = initialRoute.start;
+      _destinationLatLng = initialRoute.destination;
+      _startAddress = initialRoute.startAddress;
+      _destinationAddress = initialRoute.destinationAddress;
+      final trimmedTitle = initialRoute.title.trim();
+      if (trimmedTitle.isNotEmpty) {
+        _titleCtrl.text = trimmedTitle;
+      }
+    }
     _pageCtrl.addListener(() {
       final p = _pageCtrl.hasClients ? _pageCtrl.page?.round() ?? 0 : 0;
       if (p != _currentPage) setState(() => _currentPage = p);
@@ -288,8 +310,43 @@ class _PlannerSheetState extends State<_PlannerSheet>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final radius = const Radius.circular(24);
     final canScroll = _canSwipe && !(_isBasicPage && !_basicValid); // ✅ 关键
+
+    final hasStartAddress = _startAddress != null && _startAddress!.trim().isNotEmpty;
+    final hasDestinationAddress =
+        _destinationAddress != null && _destinationAddress!.trim().isNotEmpty;
+    final startCoords = _startLatLng != null
+        ? '${_startLatLng!.latitude.toStringAsFixed(6)}, '
+            '${_startLatLng!.longitude.toStringAsFixed(6)}'
+        : null;
+    final startTitle = hasStartAddress
+        ? _startAddress!.trim()
+        : (startCoords ?? loc.map_select_location_title);
+    final startSubtitle = _startLatLng != null
+        ? (hasStartAddress
+            ? loc.location_coordinates(
+                _startLatLng!.latitude.toStringAsFixed(6),
+                _startLatLng!.longitude.toStringAsFixed(6),
+              )
+            : '')
+        : loc.map_select_location_tip;
+    final destinationCoords = _destinationLatLng != null
+        ? '${_destinationLatLng!.latitude.toStringAsFixed(6)}, '
+            '${_destinationLatLng!.longitude.toStringAsFixed(6)}'
+        : null;
+    final destinationTitle = hasDestinationAddress
+        ? _destinationAddress!.trim()
+        : (destinationCoords ?? loc.map_select_location_destination_label);
+    final destinationSubtitle = _destinationLatLng != null
+        ? (hasDestinationAddress
+            ? loc.location_coordinates(
+                _destinationLatLng!.latitude.toStringAsFixed(6),
+                _destinationLatLng!.longitude.toStringAsFixed(6),
+              )
+            : '')
+        : loc.map_select_location_destination_tip;
 
     return ClipRRect(
       borderRadius: BorderRadius.only(topLeft: radius, topRight: radius),
@@ -359,6 +416,10 @@ class _PlannerSheetState extends State<_PlannerSheet>
                               _ConnectionStart(
                                 scrollCtrl: scrollCtrl,
                                 onContinue: _enableWizard,
+                                departureTitle: startTitle,
+                                departureSubtitle: startSubtitle,
+                                destinationTitle: destinationTitle,
+                                destinationSubtitle: destinationSubtitle,
                               ),
                               ..._sectionsOrder.map(_buildSectionPage),
                             ],
@@ -419,9 +480,20 @@ class _PlannerSheetState extends State<_PlannerSheet>
 }
 
 class _ConnectionStart extends StatelessWidget {
-  const _ConnectionStart({required this.scrollCtrl, required this.onContinue});
+  const _ConnectionStart({
+    required this.scrollCtrl,
+    required this.onContinue,
+    required this.departureTitle,
+    required this.departureSubtitle,
+    required this.destinationTitle,
+    required this.destinationSubtitle,
+  });
   final ScrollController scrollCtrl;
   final VoidCallback onContinue;
+  final String departureTitle;
+  final String departureSubtitle;
+  final String destinationTitle;
+  final String destinationSubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -435,15 +507,16 @@ class _ConnectionStart extends StatelessWidget {
             children: [
               _CardTile(
                 leading: const Icon(Icons.radio_button_checked),
-                title: 'Departure address',
-                subtitle: 'Coordinates longitude and latitude',
+                title: departureTitle,
+                subtitle: departureSubtitle.isEmpty ? null : departureSubtitle,
                 onTap: () {},
               ),
               const SizedBox(height: 12),
               _CardTile(
                 leading: const Icon(Icons.place_outlined),
-                title: 'Destination Address',
-                subtitle: 'Coordinates longitude and latitude',
+                title: destinationTitle,
+                subtitle:
+                    destinationSubtitle.isEmpty ? null : destinationSubtitle,
                 onTap: () {},
               ),
               const SizedBox(height: 40),

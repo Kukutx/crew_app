@@ -17,6 +17,7 @@ import 'package:crew_app/features/events/presentation/pages/map/sheets/start_loc
 import 'package:crew_app/features/events/presentation/pages/map/sheets/destination_selection_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_place_details_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
 
 /// 位置选择管理器
 class LocationSelectionManager {
@@ -190,8 +191,11 @@ class LocationSelectionManager {
     }
 
     if (result.openDetailed) {
-      // 打开详细编辑器
       await _finishDestinationFlow();
+      await showCreateRoadTripSheet(
+        context,
+        initialRoute: result,
+      );
       return;
     }
 

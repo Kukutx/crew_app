@@ -1270,10 +1270,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_preferences_section_title => '个性设置';
 
   @override
-  String get road_trip_preferences_section_subtitle => '车辆与标签';
-
-  @override
-  String get road_trip_preferences_car_type_label => '车辆类型（可选）';
+  String get road_trip_preferences_car_type_label => 'Vehicle type (optional)';
 
   @override
   String get road_trip_preferences_car_sedan => 'Sedan';

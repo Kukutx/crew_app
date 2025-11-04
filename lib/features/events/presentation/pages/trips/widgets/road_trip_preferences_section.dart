@@ -26,36 +26,8 @@ class RoadTripPreferencesSection extends StatelessWidget {
     return RoadTripSectionCard(
       icon: Icons.tune,
       title: loc.road_trip_preferences_section_title,
-      subtitle: loc.road_trip_preferences_section_subtitle,
+      subtitle: "",
       children: [
-        DropdownButtonFormField<String>(
-          initialValue: carType,
-          decoration: roadTripInputDecoration(
-            context,
-            loc.road_trip_preferences_car_type_label,
-            null,
-          ),
-          items: [
-            DropdownMenuItem(
-              value: 'Sedan',
-              child: Text(loc.road_trip_preferences_car_sedan),
-            ),
-            DropdownMenuItem(
-              value: 'SUV',
-              child: Text(loc.road_trip_preferences_car_suv),
-            ),
-            DropdownMenuItem(
-              value: 'Hatchback',
-              child: Text(loc.road_trip_preferences_car_hatchback),
-            ),
-            DropdownMenuItem(
-              value: 'Van',
-              child: Text(loc.road_trip_preferences_car_van),
-            ),
-          ],
-          onChanged: onCarTypeChanged,
-        ),
-        const SizedBox(height: 12),
         TextField(
           controller: tagInputController,
           decoration: roadTripInputDecoration(

@@ -527,7 +527,6 @@
   "road_trip_team_price_free_hint": "Free event",
   "road_trip_team_price_paid_hint": "e.g., 29.5",
   "road_trip_preferences_section_title": "Preferences",
-  "road_trip_preferences_section_subtitle": "Vehicle & tags",
   "road_trip_preferences_car_type_label": "Vehicle type (optional)",
   "road_trip_preferences_car_sedan": "Sedan",
   "road_trip_preferences_car_suv": "SUV",

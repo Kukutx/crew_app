@@ -48,9 +48,6 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (isLoading) return 72 + padding;
     if (errorText != null || results.isEmpty) return 64 + padding;
 
-    // ListTile 的实际高度：minHeight 56 + 可能的 padding
-    // 加上 Divider 的高度 1
-    const itemHeight = 57.0; // 56 (ListTile) + 1 (Divider)
     const maxVisible = 4;
     final visibleCount = results.length > maxVisible
         ? maxVisible

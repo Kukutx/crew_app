@@ -6,7 +6,6 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_meeting_point_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_moments_section.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

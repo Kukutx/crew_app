@@ -2504,12 +2504,6 @@ abstract class AppLocalizations {
   /// **'Preferences'**
   String get road_trip_preferences_section_title;
 
-  /// No description provided for @road_trip_preferences_section_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Vehicle & tags'**
-  String get road_trip_preferences_section_subtitle;
-
   /// No description provided for @road_trip_preferences_car_type_label.
   ///
   /// In en, this message translates to:

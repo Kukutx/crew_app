@@ -725,9 +725,11 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       MapOverlaySheetType.chat => const [0.32, 0.5, 0.92],
       MapOverlaySheetType.explore => const [0.23, 0.5, 0.92],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.92],
-      MapOverlaySheetType.createRoadTrip => const [0.23,0.45, 0.95],
+      MapOverlaySheetType.createRoadTrip => const [0.28, 0.45, 0.95],
     };
   }
+  
+  bool get _shouldSnap => true;
 
   double get _initialSize {
     final snapSizes = _snapSizes;
@@ -735,7 +737,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       MapOverlaySheetType.chat => snapSizes[1],
       MapOverlaySheetType.explore => snapSizes[1],
       MapOverlaySheetType.none => snapSizes.first,
-      MapOverlaySheetType.createRoadTrip => snapSizes.first,
+      MapOverlaySheetType.createRoadTrip => snapSizes.length > 1 ? snapSizes[1] : snapSizes.first,
     };
   }
 
@@ -819,8 +821,8 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
           minChildSize: snapSizes.first,
           maxChildSize: snapSizes.last,
           initialChildSize: initialSize,
-          snap: true,
-          snapSizes: snapSizes,
+          snap: _shouldSnap,
+          snapSizes: _shouldSnap ? snapSizes : null,
           builder: (context, scrollController) {
             final Widget effectiveContent;
             switch (widget.sheetType) {
@@ -945,13 +947,15 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                                 icon: Icon(actionIcon),
                                 onPressed: () {
                                   if (isExpanded) {
-                                    _controller.animateTo(
-                                      snapSizes[snapSizes.length - 2],
-                                      duration: const Duration(
-                                        milliseconds: 220,
-                                      ),
-                                      curve: Curves.easeOutCubic,
-                                    );
+                                    if (_attached && _controller.isAttached) {
+                                      _controller.animateTo(
+                                        snapSizes[snapSizes.length - 2],
+                                        duration: const Duration(
+                                          milliseconds: 220,
+                                        ),
+                                        curve: Curves.easeOutCubic,
+                                      );
+                                    }
                                     return;
                                   }
                                   // 关闭 overlay 时，如果是 CreateRoadTripSheet，需要清理状态

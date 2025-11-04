@@ -326,11 +326,19 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       // 起点确认模式：调用 onConfirm
       widget.onConfirm?.call();
     } else {
-      // 完整创建模式：关闭 sheet
+      // 完整创建模式：清理所有选择状态并关闭 sheet
       if (!widget.embeddedMode) {
         Navigator.of(context).maybePop();
         return;
       }
+      
+      // 清理所有地图选择状态（起点、终点、途经点、选择模式等）
+      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+      selectionController.resetSelection(); // 清除所有选择状态（起点、终点、途经点、路线类型等）
+      selectionController.setSelectionSheetOpen(false); // 清除 sheet 状态
+      selectionController.setPendingWaypoint(null); // 清除待添加的途经点
+      selectionController.resetMapPadding(); // 重置地图 padding
+      
       // 关闭 overlay
       ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
     }
@@ -587,15 +595,21 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     } catch (_) {}
   }
 
-  void _enableWizard() async {
+  void _enableWizard() {
+    // 先更新状态，然后在下一帧执行动画，确保 PageView 的 physics 已经更新
     setState(() => _canSwipe = true);
-    try {
-      await _pageCtrl.animateToPage(
-        1,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOut,
-      );
-    } catch (_) {}
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
+        if (_pageCtrl.hasClients) {
+          _pageCtrl.animateToPage(
+            1,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOut,
+          );
+        }
+      } catch (_) {}
+    });
   }
 
   // ===== UI 构建 =====
@@ -659,11 +673,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     }
     
     // 包装在可滚动容器中，适配 overlay sheet 的高度限制
-    // 注意：只有第一个页面（_ConnectionStart）使用 scrollController
-    // 其他页面不使用 scrollController，避免与 DraggableScrollableSheet 冲突
     return SingleChildScrollView(
       controller: null, // 其他页面不使用 controller
-      physics: const ClampingScrollPhysics(), // 使用 ClampingScrollPhysics 避免过度滚动
+      physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: content,
     );
@@ -840,9 +852,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         length: 2,
         child: Column(
           children: [
-            // PageView
-            // 在 overlay 模式下，使用 DraggableScrollableSheet 的 scrollController
-            // PageView 本身不应该可滚动，让内部的滚动视图处理
             Expanded(
               child: NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (n) {
@@ -850,32 +859,30 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                   return true;
                 },
                 child: PageView(
-                        controller: _pageCtrl,
-                        physics: canScroll
-                            ? const PageScrollPhysics()
-                            : const NeverScrollableScrollPhysics(),
-                        children: [
-                          // 第一个页面使用 scrollController，让 DraggableScrollableSheet 可以拖动
-                          _ConnectionStart(
-                            scrollCtrl: widget.scrollCtrl,
-                            onContinue: _enableWizard,
-                            departureTitle: startTitle,
-                            departureSubtitle: startSubtitle,
-                            destinationTitle: destinationTitle,
-                            destinationSubtitle: destinationSubtitle,
-                            onEditDeparture: _onEditDeparture,
-                            onEditDestination: _onEditDestination,
-                            departurePosition: _startLatLng,
-                            departureAddressFuture: _startAddressFuture,
-                            departureNearbyFuture: _startNearbyFuture,
-                            destinationPosition: _destinationLatLng,
-                            destinationAddressFuture: _destinationAddressFuture,
-                            destinationNearbyFuture: _destinationNearbyFuture,
-                          ),
-                          // 其他页面不使用 scrollController，避免冲突
-                          ..._sectionsOrder.map(_buildSectionPage),
-                        ],
-                      ),
+                  controller: _pageCtrl,
+                  physics: canScroll
+                      ? const PageScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  children: [
+                    _ConnectionStart(
+                      scrollCtrl: widget.scrollCtrl,
+                      onContinue: _enableWizard,
+                      departureTitle: startTitle,
+                      departureSubtitle: startSubtitle,
+                      destinationTitle: destinationTitle,
+                      destinationSubtitle: destinationSubtitle,
+                      onEditDeparture: _onEditDeparture,
+                      onEditDestination: _onEditDestination,
+                      departurePosition: _startLatLng,
+                      departureAddressFuture: _startAddressFuture,
+                      departureNearbyFuture: _startNearbyFuture,
+                      destinationPosition: _destinationLatLng,
+                      destinationAddressFuture: _destinationAddressFuture,
+                      destinationNearbyFuture: _destinationNearbyFuture,
+                    ),
+                    ..._sectionsOrder.map(_buildSectionPage),
+                  ],
+                ),
               ),
             ),
             // 底部进度 + 按钮

@@ -60,7 +60,7 @@ class ToggleTabBar extends StatelessWidget {
               if (leading != null)
                 Padding(
                   padding: const EdgeInsets.only(left: 8, right: 4),
-                  child: leading!,
+                  child: leading,
                 ),
               Expanded(
                 child: Center(child: tabs),
@@ -68,7 +68,7 @@ class ToggleTabBar extends StatelessWidget {
               if (trailing != null)
                 Padding(
                   padding: const EdgeInsets.only(left: 4, right: 8),
-                  child: trailing!,
+                  child: trailing,
                 ),
             ],
           ),

@@ -1323,9 +1323,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get road_trip_preferences_section_title => 'Preferences';
 
   @override
-  String get road_trip_preferences_section_subtitle => 'Vehicle & tags';
-
-  @override
   String get road_trip_preferences_car_type_label => 'Vehicle type (optional)';
 
   @override

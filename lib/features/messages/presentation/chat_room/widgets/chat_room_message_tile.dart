@@ -41,20 +41,20 @@ class ChatRoomMessageTile extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsetsDirectional.only(
-        start: isMine ? 80 : 16,
-        end: isMine ? 16 : 80,
-        top: 6,
-        bottom: 6,
+        start: isMine ? 72 : 16,
+        end: isMine ? 16 : 72,
+        top: 4,
+        bottom: 4,
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: highlightColor,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24),
         ),
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             if (!isMine)
@@ -67,53 +67,66 @@ class ChatRoomMessageTile extends StatelessWidget {
                             ? null
                             : () => onAvatarTap!(message.sender),
                         child: CrewAvatar(
-                          radius: 18,
+                          radius: 16,
                           backgroundColor: senderColor.withValues(alpha: .15),
                           foregroundColor: senderColor,
                           child: Text(
                             senderInitials,
                             style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
                       )
-                    : const SizedBox(width: 36),
+                    : const SizedBox(width: 32),
               )
             else
-              const SizedBox(width: 36),
-            const SizedBox(width: 12),
+              const SizedBox(width: 32),
+            const SizedBox(width: 10),
             Flexible(
             child: Column(
               crossAxisAlignment:
                   isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                Text(
-                  isMine
-                      ? '$youLabel · ${message.sentAtLabel}'
-                      : '${message.sender.displayName} · ${message.sentAtLabel}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: captionColor,
-                    fontWeight: FontWeight.w500,
+                Padding(
+                  padding: EdgeInsetsDirectional.only(
+                    start: isMine ? 0 : 4,
+                    end: isMine ? 4 : 0,
+                    bottom: 4,
+                  ),
+                  child: Text(
+                    isMine
+                        ? '$youLabel · ${message.sentAtLabel}'
+                        : '${message.sender.displayName} · ${message.sentAtLabel}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: captionColor,
+                      fontWeight: FontWeight.w500,
+                      height: 1.3,
+                      letterSpacing: 0,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.75,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: bubbleColor,
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(20),
-                      topRight: const Radius.circular(20),
-                      bottomLeft: Radius.circular(isMine ? 20 : 8),
-                      bottomRight: Radius.circular(isMine ? 8 : 20),
+                      topLeft: const Radius.circular(18),
+                      topRight: const Radius.circular(18),
+                      bottomLeft: Radius.circular(isMine ? 18 : 4),
+                      bottomRight: Radius.circular(isMine ? 4 : 18),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.shadow.withValues(alpha: .04),
-                        blurRadius: 6,
+                        color: colorScheme.shadow.withValues(alpha: .06),
+                        blurRadius: 8,
                         offset: const Offset(0, 2),
+                        spreadRadius: 0,
                       ),
                     ],
                   ),
@@ -125,27 +138,29 @@ class ChatRoomMessageTile extends StatelessWidget {
                         message.body,
                         style: TextStyle(
                           fontSize: 15,
-                          height: 1.4,
+                          height: 1.5,
                           color: textColor,
+                          letterSpacing: 0.2,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                       if (message.attachmentLabels.isNotEmpty) ...[
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
+                          spacing: 6,
+                          runSpacing: 6,
                           children: message.attachmentLabels
                               .map(
                                 (chip) => Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
-                                    vertical: 6,
+                                    vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isMine
-                                        ? colorScheme.onPrimary.withValues(alpha: .12)
+                                        ? colorScheme.onPrimary.withValues(alpha: .15)
                                         : colorScheme.surfaceContainerHighest,
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -162,6 +177,7 @@ class ChatRoomMessageTile extends StatelessWidget {
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                           color: textColor,
+                                          height: 1.3,
                                         ),
                                       ),
                                     ],
@@ -177,22 +193,23 @@ class ChatRoomMessageTile extends StatelessWidget {
                 if (message.replyCount != null && message.replyCount! > 0)
                   Container(
                     margin: const EdgeInsets.only(top: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withValues(alpha: .3),
-                      borderRadius: BorderRadius.circular(12),
+                      color: colorScheme.surfaceContainerHighest.withValues(alpha: .4),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.reply_all, size: 16, color: colorScheme.primary),
+                        Icon(Icons.reply_all, size: 14, color: colorScheme.primary),
                         const SizedBox(width: 6),
                         Text(
                           message.replyPreview ?? repliesLabelBuilder(message.replyCount!),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             color: colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
+                            height: 1.3,
                           ),
                         ),
                       ],
@@ -200,11 +217,11 @@ class ChatRoomMessageTile extends StatelessWidget {
                   ),
                 if (isMine)
                   Padding(
-                    padding: const EdgeInsets.only(top: 4),
+                    padding: const EdgeInsets.only(top: 3, left: 4),
                     child: Icon(
                       Icons.done_all,
-                      size: 16,
-                      color: colorScheme.primary,
+                      size: 14,
+                      color: colorScheme.primary.withValues(alpha: 0.8),
                     ),
                   ),
               ],

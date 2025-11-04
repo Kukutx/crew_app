@@ -37,7 +37,7 @@ class ChatRoomMessageList extends StatelessWidget {
       ),
       child: ListView.builder(
         controller: scrollController,
-        padding: const EdgeInsets.only(bottom: 24, top: 16),
+        padding: const EdgeInsets.only(bottom: 20, top: 12),
         itemCount: messages.length,
         itemBuilder: (context, index) {
           final message = messages[index];

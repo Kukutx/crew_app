@@ -101,17 +101,21 @@ class _AppBarTitle extends StatelessWidget {
         Text(
           channelTitle,
           style: const TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
+            height: 1.3,
+            letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Text(
           membersLabel,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             color: color,
             fontWeight: FontWeight.w500,
+            height: 1.3,
+            letterSpacing: 0,
           ),
         ),
       ],

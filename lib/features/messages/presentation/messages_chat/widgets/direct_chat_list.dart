@@ -128,46 +128,64 @@ class _DirectChatTile extends StatelessWidget {
 
     final titleStyle = isSystem
         ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: FontWeight.w600,
               color: colorScheme.onSurfaceVariant,
+              height: 1.3,
+              letterSpacing: 0,
             ) ??
             TextStyle(
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: FontWeight.w600,
               color: colorScheme.onSurfaceVariant,
+              height: 1.3,
+              letterSpacing: 0,
             )
-        : const TextStyle(
+        : TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
+            height: 1.3,
+            letterSpacing: -0.2,
           );
 
     final subtitleStyle = isSystem
         ? Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontSize: 12,
+              fontSize: 13,
               color: colorScheme.onSurfaceVariant.withValues(alpha: .8),
+              height: 1.4,
+              letterSpacing: 0,
             ) ??
             TextStyle(
-              fontSize: 12,
+              fontSize: 13,
               color: colorScheme.onSurfaceVariant.withValues(alpha: .8),
+              height: 1.4,
+              letterSpacing: 0,
             )
         : TextStyle(
-            fontSize: 13,
+            fontSize: 14,
             color: subtitleColor,
+            height: 1.4,
+            letterSpacing: 0,
           );
 
     final timeStyle = isSystem
         ? Theme.of(context).textTheme.labelSmall?.copyWith(
               fontSize: 11,
               color: colorScheme.onSurfaceVariant.withValues(alpha: .7),
+              height: 1.3,
+              letterSpacing: 0,
             ) ??
             TextStyle(
               fontSize: 11,
               color: colorScheme.onSurfaceVariant.withValues(alpha: .7),
+              height: 1.3,
+              letterSpacing: 0,
             )
         : TextStyle(
             fontSize: 12,
             color: colorScheme.onSurfaceVariant,
+            height: 1.3,
+            letterSpacing: 0,
           );
 
     final effectiveOnTap = (conversation.isSystem || isSystem)
@@ -186,12 +204,12 @@ class _DirectChatTile extends StatelessWidget {
       color: effectiveTileColor,
       elevation: isSystem ? 0 : 2,
       shadowColor: effectiveShadowColor,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(20),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: effectiveOnTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
               Stack(

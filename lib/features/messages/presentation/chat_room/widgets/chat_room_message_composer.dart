@@ -89,21 +89,23 @@ class ChatRoomMessageComposer extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.shadow.withValues(alpha: .06),
+                color: colorScheme.shadow.withValues(alpha: .08),
                 blurRadius: 12,
-                offset: const Offset(0, 4),
+                offset: const Offset(0, 2),
+                spreadRadius: 0,
               ),
             ],
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
                 tooltip: loc.chat_composer_emoji_tooltip,
@@ -112,13 +114,30 @@ class ChatRoomMessageComposer extends StatelessWidget {
                       ? Icons.keyboard_alt_rounded
                       : Icons.emoji_emotions_outlined,
                   color: colorScheme.primary,
+                  size: 22,
                 ),
+                padding: const EdgeInsets.all(8),
+                constraints: const BoxConstraints(
+                  minWidth: 36,
+                  minHeight: 36,
+                ),
+                visualDensity: VisualDensity.compact,
                 onPressed:
                     withFallback(onEmojiTap, loc.chat_composer_emoji_tooltip),
               ),
               IconButton(
                 tooltip: loc.chat_composer_more_tooltip,
-                icon: Icon(Icons.add_circle_outline, color: colorScheme.primary),
+                icon: Icon(
+                  Icons.add_circle_outline,
+                  color: colorScheme.primary,
+                  size: 22,
+                ),
+                padding: const EdgeInsets.all(8),
+                constraints: const BoxConstraints(
+                  minWidth: 36,
+                  minHeight: 36,
+                ),
+                visualDensity: VisualDensity.compact,
                 onPressed:
                     withFallback(onMoreOptionsTap, loc.chat_composer_more_tooltip),
               ),
@@ -129,9 +148,25 @@ class ChatRoomMessageComposer extends StatelessWidget {
                   maxLines: 4,
                   focusNode: focusNode,
                   textCapitalization: TextCapitalization.sentences,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.5,
+                    color: colorScheme.onSurface,
+                    letterSpacing: 0.2,
+                  ),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: hintText,
+                    hintStyle: TextStyle(
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 10,
+                    ),
+                    isDense: true,
                   ),
                   onTap: onTextFieldTap,
                   onSubmitted: (_) => onSend(),
@@ -192,7 +227,16 @@ class _SendMessageButton extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        icon: Icon(Icons.send_rounded, color: colorScheme.onPrimary),
+        icon: Icon(
+          Icons.send_rounded,
+          color: colorScheme.onPrimary,
+          size: 20,
+        ),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(
+          minWidth: 40,
+          minHeight: 40,
+        ),
         tooltip: tooltip,
         onPressed: onPressed,
       ),
@@ -220,7 +264,16 @@ class _VoiceMessageButton extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        icon: Icon(Icons.mic_rounded, color: colorScheme.onPrimary),
+        icon: Icon(
+          Icons.mic_rounded,
+          color: colorScheme.onPrimary,
+          size: 20,
+        ),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(
+          minWidth: 40,
+          minHeight: 40,
+        ),
         tooltip: tooltip,
         onPressed: onPressed,
       ),

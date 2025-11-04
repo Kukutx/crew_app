@@ -176,7 +176,7 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
         title: Text(loc.chat_settings_title),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
         children: [
           _ChatSettingsHeader(
             title: widget.title,
@@ -184,16 +184,30 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
             isGroup: widget.isGroup,
             partner: widget.partner,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           Wrap(
-            spacing: 12,
-            runSpacing: 12,
+            spacing: 10,
+            runSpacing: 10,
             alignment: WrapAlignment.center,
             children: [
               FilledButton.icon(
                 onPressed: () => _showFeatureComingSoon(loc.chat_settings_share),
-                icon: const Icon(Icons.ios_share_outlined),
-                label: Text(loc.chat_settings_share),
+                icon: const Icon(Icons.ios_share_outlined, size: 18),
+                label: Text(
+                  loc.chat_settings_share,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    letterSpacing: 0,
+                  ),
+                ),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
               OutlinedButton.icon(
                 onPressed: () {
@@ -214,19 +228,56 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                   widget.isGroup
                       ? Icons.exit_to_app
                       : Icons.person_remove_alt_1_outlined,
+                  size: 18,
                 ),
-                label: Text(exitLabel),
+                label: Text(
+                  exitLabel,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    letterSpacing: 0,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
               OutlinedButton.icon(
                 onPressed: () => _showReportSheet(loc),
-                icon: const Icon(Icons.flag_outlined),
-                label: Text(loc.chat_settings_report),
+                icon: const Icon(Icons.flag_outlined, size: 18),
+                label: Text(
+                  loc.chat_settings_report,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    letterSpacing: 0,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           Card(
             clipBehavior: Clip.antiAlias,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color: colorScheme.outline.withValues(alpha: 0.1),
+                width: 1,
+              ),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -235,14 +286,64 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                   onChanged: (value) {
                     setState(() => _notificationsEnabled = value);
                   },
-                  title: Text(loc.chat_settings_notifications),
-                  subtitle: Text(loc.chat_settings_notifications_subtitle),
+                  title: Text(
+                    loc.chat_settings_notifications,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  subtitle: Text(
+                    loc.chat_settings_notifications_subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.4,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 ),
-                const Divider(height: 0),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: colorScheme.outline.withValues(alpha: 0.1),
+                ),
                 ListTile(
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: Text(loc.chat_settings_shared_files),
-                  subtitle: Text(loc.chat_settings_shared_files_subtitle),
+                  leading: Icon(
+                    Icons.photo_library_outlined,
+                    color: colorScheme.primary,
+                    size: 22,
+                  ),
+                  title: Text(
+                    loc.chat_settings_shared_files,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  subtitle: Text(
+                    loc.chat_settings_shared_files_subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.4,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -256,18 +357,19 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
           const SizedBox(height: 32),
           Text(
             widget.isGroup
                 ? loc.chat_settings_members_section
                 : loc.chat_settings_contact_section,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 17,
+                  height: 1.3,
+                  letterSpacing: -0.2,
+                ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           if (widget.isGroup)
             ...participants.map(
               (participant) => _ChatParticipantTile(
@@ -322,7 +424,7 @@ class _ChatSettingsHeader extends StatelessWidget {
 
     Widget avatarChild;
     if (isGroup) {
-      avatarChild = Icon(Icons.groups_2, color: primary, size: 42);
+      avatarChild = Icon(Icons.groups_2, color: primary, size: 48);
     } else {
       final initials = (partner?.initials ??
               partner?.displayName.characters.take(2).toString() ??
@@ -333,6 +435,9 @@ class _ChatSettingsHeader extends StatelessWidget {
         style: theme.textTheme.headlineMedium?.copyWith(
           color: primary,
           fontWeight: FontWeight.w700,
+          fontSize: 32,
+          height: 1.2,
+          letterSpacing: -0.5,
         ),
       );
     }
@@ -340,24 +445,30 @@ class _ChatSettingsHeader extends StatelessWidget {
     return Column(
       children: [
         CrewAvatar(
-          radius: 44,
+          radius: 48,
           backgroundColor: primary.withValues(alpha: .12),
           foregroundColor: primary,
           child: avatarChild,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Text(
           title,
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
+            fontSize: 22,
+            height: 1.3,
+            letterSpacing: -0.3,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           overviewText,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
+            fontSize: 14,
+            height: 1.4,
+            letterSpacing: 0,
           ),
           textAlign: TextAlign.center,
         ),
@@ -391,35 +502,67 @@ class _ChatParticipantTile extends StatelessWidget {
     );
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
       child: ListTile(
         leading: CrewAvatar(
-          radius: 20,
+          radius: 22,
           backgroundColor: avatarColor.withValues(alpha: .12),
           foregroundColor: avatarColor,
           child: Text(
             initials,
             style: const TextStyle(
+              fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        title: Text(participant.displayName),
-        subtitle: subtitle != null ? Text(subtitle!) : null,
+        title: Text(
+          participant.displayName,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            height: 1.3,
+            letterSpacing: 0,
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle!,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.4,
+                  letterSpacing: 0,
+                ),
+              )
+            : null,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
         trailing: isYou
             ? Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: colorScheme.primary.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   youLabel,
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
-                    fontSize: 12,
+                    fontSize: 11,
+                    height: 1.3,
+                    letterSpacing: 0,
                   ),
                 ),
               )

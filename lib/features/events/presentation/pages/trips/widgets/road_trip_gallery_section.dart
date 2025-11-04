@@ -1,4 +1,5 @@
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_section_card.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import '../data/road_trip_editor_models.dart';
@@ -19,10 +20,11 @@ class RoadTripGallerySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return RoadTripSectionCard(
       icon: Icons.photo_library_outlined,
-      title: '旅程影像',
-      subtitle: '可选择多张，首张默认为封面',
+      title: loc.road_trip_gallery_section_title,
+      subtitle: loc.road_trip_gallery_section_subtitle,
       children: [
         RoadTripGalleryGrid(
           items: items,
@@ -33,7 +35,9 @@ class RoadTripGallerySection extends StatelessWidget {
         FilledButton.icon(
           onPressed: onPickImages,
           icon: const Icon(Icons.collections_outlined),
-          label: Text(items.isEmpty ? '选择图片' : '追加图片'),
+          label: Text(items.isEmpty
+              ? loc.road_trip_gallery_select_images
+              : loc.road_trip_gallery_add_more),
         ),
       ],
     );
@@ -56,6 +60,7 @@ class RoadTripGalleryGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     if (items.isEmpty) {
       return Container(
@@ -67,7 +72,7 @@ class RoadTripGalleryGrid extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            '还没有选择图片，点击下方按钮添加',
+            loc.road_trip_gallery_empty_hint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -115,6 +120,7 @@ class _GalleryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final loc = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onSetCover,
       child: Stack(
@@ -140,7 +146,9 @@ class _GalleryTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                index == 0 ? '封面' : '第 ${index + 1} 张',
+                index == 0
+                    ? loc.road_trip_gallery_cover_label
+                    : loc.road_trip_gallery_image_label(index + 1),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: index == 0
                       ? colorScheme.onPrimaryContainer
@@ -181,7 +189,7 @@ class _GalleryTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '设为封面',
+                  loc.road_trip_gallery_set_cover,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurface,
                   ),

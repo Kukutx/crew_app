@@ -2311,6 +2311,348 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stripe payment test'**
   String get settings_developer_stripe_test;
+
+  /// No description provided for @road_trip_create_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get road_trip_create_button;
+
+  /// No description provided for @road_trip_continue_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get road_trip_continue_button;
+
+  /// No description provided for @road_trip_image_picker_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick images. Please check permission settings.'**
+  String get road_trip_image_picker_failed;
+
+  /// No description provided for @road_trip_basic_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic info'**
+  String get road_trip_basic_section_title;
+
+  /// No description provided for @road_trip_basic_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your trip and set dates'**
+  String get road_trip_basic_section_subtitle;
+
+  /// No description provided for @road_trip_basic_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip title'**
+  String get road_trip_basic_title_label;
+
+  /// No description provided for @road_trip_basic_title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Cinque Terre coastal drive'**
+  String get road_trip_basic_title_hint;
+
+  /// No description provided for @road_trip_basic_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a title'**
+  String get road_trip_basic_title_required;
+
+  /// No description provided for @road_trip_basic_date_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Event dates'**
+  String get road_trip_basic_date_label;
+
+  /// No description provided for @road_trip_basic_date_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to select date range'**
+  String get road_trip_basic_date_hint;
+
+  /// No description provided for @road_trip_route_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Route type'**
+  String get road_trip_route_section_title;
+
+  /// No description provided for @road_trip_route_add_waypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add waypoint'**
+  String get road_trip_route_add_waypoint;
+
+  /// No description provided for @road_trip_route_add_to_forward.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to outbound'**
+  String get road_trip_route_add_to_forward;
+
+  /// No description provided for @road_trip_route_add_to_return.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to return'**
+  String get road_trip_route_add_to_return;
+
+  /// No description provided for @road_trip_route_type_round.
+  ///
+  /// In en, this message translates to:
+  /// **'Round trip'**
+  String get road_trip_route_type_round;
+
+  /// No description provided for @road_trip_route_type_one_way.
+  ///
+  /// In en, this message translates to:
+  /// **'One-way'**
+  String get road_trip_route_type_one_way;
+
+  /// No description provided for @road_trip_route_waypoints_one_way.
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoints (one-way) · {count} total'**
+  String road_trip_route_waypoints_one_way(int count);
+
+  /// No description provided for @road_trip_route_forward_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Outbound'**
+  String get road_trip_route_forward_label;
+
+  /// No description provided for @road_trip_route_return_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Return'**
+  String get road_trip_route_return_label;
+
+  /// No description provided for @road_trip_route_waypoints_count.
+  ///
+  /// In en, this message translates to:
+  /// **' · {count} total'**
+  String road_trip_route_waypoints_count(int count);
+
+  /// No description provided for @road_trip_route_waypoint_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoint {index}'**
+  String road_trip_route_waypoint_label(int index);
+
+  /// No description provided for @road_trip_team_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Team settings'**
+  String get road_trip_team_section_title;
+
+  /// No description provided for @road_trip_team_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Participant limit & pricing'**
+  String get road_trip_team_section_subtitle;
+
+  /// No description provided for @road_trip_team_pricing_free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get road_trip_team_pricing_free;
+
+  /// No description provided for @road_trip_team_pricing_paid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get road_trip_team_pricing_paid;
+
+  /// No description provided for @road_trip_team_max_participants_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Max participants'**
+  String get road_trip_team_max_participants_label;
+
+  /// No description provided for @road_trip_team_max_participants_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 4'**
+  String get road_trip_team_max_participants_hint;
+
+  /// No description provided for @road_trip_team_max_participants_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an integer ≥ 1'**
+  String get road_trip_team_max_participants_error;
+
+  /// No description provided for @road_trip_team_price_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per person (€)'**
+  String get road_trip_team_price_label;
+
+  /// No description provided for @road_trip_team_price_free_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Free event'**
+  String get road_trip_team_price_free_hint;
+
+  /// No description provided for @road_trip_team_price_paid_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 29.5'**
+  String get road_trip_team_price_paid_hint;
+
+  /// No description provided for @road_trip_preferences_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get road_trip_preferences_section_title;
+
+  /// No description provided for @road_trip_preferences_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle & tags'**
+  String get road_trip_preferences_section_subtitle;
+
+  /// No description provided for @road_trip_preferences_car_type_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle type (optional)'**
+  String get road_trip_preferences_car_type_label;
+
+  /// No description provided for @road_trip_preferences_car_sedan.
+  ///
+  /// In en, this message translates to:
+  /// **'Sedan'**
+  String get road_trip_preferences_car_sedan;
+
+  /// No description provided for @road_trip_preferences_car_suv.
+  ///
+  /// In en, this message translates to:
+  /// **'SUV'**
+  String get road_trip_preferences_car_suv;
+
+  /// No description provided for @road_trip_preferences_car_hatchback.
+  ///
+  /// In en, this message translates to:
+  /// **'Hatchback'**
+  String get road_trip_preferences_car_hatchback;
+
+  /// No description provided for @road_trip_preferences_car_van.
+  ///
+  /// In en, this message translates to:
+  /// **'Van'**
+  String get road_trip_preferences_car_van;
+
+  /// No description provided for @road_trip_preferences_tag_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get road_trip_preferences_tag_label;
+
+  /// No description provided for @road_trip_preferences_tag_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get road_trip_preferences_tag_hint;
+
+  /// No description provided for @road_trip_gallery_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get road_trip_gallery_section_title;
+
+  /// No description provided for @road_trip_gallery_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select multiple photos; first one is cover'**
+  String get road_trip_gallery_section_subtitle;
+
+  /// No description provided for @road_trip_gallery_select_images.
+  ///
+  /// In en, this message translates to:
+  /// **'Select photos'**
+  String get road_trip_gallery_select_images;
+
+  /// No description provided for @road_trip_gallery_add_more.
+  ///
+  /// In en, this message translates to:
+  /// **'Add more'**
+  String get road_trip_gallery_add_more;
+
+  /// No description provided for @road_trip_gallery_empty_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos selected yet. Tap the button below to add.'**
+  String get road_trip_gallery_empty_hint;
+
+  /// No description provided for @road_trip_gallery_cover_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get road_trip_gallery_cover_label;
+
+  /// No description provided for @road_trip_gallery_image_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {index}'**
+  String road_trip_gallery_image_label(int index);
+
+  /// No description provided for @road_trip_gallery_set_cover.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as cover'**
+  String get road_trip_gallery_set_cover;
+
+  /// No description provided for @road_trip_story_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlights'**
+  String get road_trip_story_section_title;
+
+  /// No description provided for @road_trip_story_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell others why they should join'**
+  String get road_trip_story_section_subtitle;
+
+  /// No description provided for @road_trip_story_description_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed description'**
+  String get road_trip_story_description_label;
+
+  /// No description provided for @road_trip_story_description_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Route highlights, notes, gear suggestions…'**
+  String get road_trip_story_description_hint;
+
+  /// No description provided for @road_trip_story_description_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a description'**
+  String get road_trip_story_description_required;
+
+  /// No description provided for @road_trip_disclaimer_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Host disclaimer'**
+  String get road_trip_disclaimer_section_title;
+
+  /// No description provided for @road_trip_disclaimer_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain risks, special requirements…'**
+  String get road_trip_disclaimer_section_subtitle;
+
+  /// No description provided for @road_trip_disclaimer_content_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer content'**
+  String get road_trip_disclaimer_content_label;
+
+  /// No description provided for @road_trip_disclaimer_content_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., risk warnings, special notes'**
+  String get road_trip_disclaimer_content_hint;
 }
 
 class _AppLocalizationsDelegate

@@ -1166,4 +1166,183 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_developer_stripe_test => 'Stripe 支付测试';
+
+  @override
+  String get road_trip_create_button => '创建';
+
+  @override
+  String get road_trip_continue_button => '继续';
+
+  @override
+  String get road_trip_image_picker_failed => '选择图片失败，请检查权限设置';
+
+  @override
+  String get road_trip_basic_section_title => '基础信息';
+
+  @override
+  String get road_trip_basic_section_subtitle => '命名旅程并锁定时间';
+
+  @override
+  String get road_trip_basic_title_label => '旅程标题';
+
+  @override
+  String get road_trip_basic_title_hint => '如：五渔村海岸线一日自驾';
+
+  @override
+  String get road_trip_basic_title_required => '请输入标题';
+
+  @override
+  String get road_trip_basic_date_label => '活动日期';
+
+  @override
+  String get road_trip_basic_date_hint => '点击选择日期范围';
+
+  @override
+  String get road_trip_route_section_title => '路线类型';
+
+  @override
+  String get road_trip_route_add_waypoint => '添加途经点';
+
+  @override
+  String get road_trip_route_add_to_forward => '添加到去程';
+
+  @override
+  String get road_trip_route_add_to_return => '添加到返程';
+
+  @override
+  String get road_trip_route_type_round => '往返路线';
+
+  @override
+  String get road_trip_route_type_one_way => '单程路线';
+
+  @override
+  String road_trip_route_waypoints_one_way(int count) {
+    return '途经点（单程） · 共 $count 个';
+  }
+
+  @override
+  String get road_trip_route_forward_label => '去程';
+
+  @override
+  String get road_trip_route_return_label => '返程';
+
+  @override
+  String road_trip_route_waypoints_count(int count) {
+    return ' · 共 $count 个';
+  }
+
+  @override
+  String road_trip_route_waypoint_label(int index) {
+    return '途经点 $index';
+  }
+
+  @override
+  String get road_trip_team_section_title => '团队配置';
+
+  @override
+  String get road_trip_team_section_subtitle => '人数限制与费用模式';
+
+  @override
+  String get road_trip_team_pricing_free => '免费';
+
+  @override
+  String get road_trip_team_pricing_paid => '收费';
+
+  @override
+  String get road_trip_team_max_participants_label => '人数上限';
+
+  @override
+  String get road_trip_team_max_participants_hint => '例如 4';
+
+  @override
+  String get road_trip_team_max_participants_error => '请输入≥1的整数';
+
+  @override
+  String get road_trip_team_price_label => '人均费用 (€)';
+
+  @override
+  String get road_trip_team_price_free_hint => '免费活动';
+
+  @override
+  String get road_trip_team_price_paid_hint => '例如 29.5';
+
+  @override
+  String get road_trip_preferences_section_title => '个性设置';
+
+  @override
+  String get road_trip_preferences_section_subtitle => '车辆与标签';
+
+  @override
+  String get road_trip_preferences_car_type_label => '车辆类型（可选）';
+
+  @override
+  String get road_trip_preferences_car_sedan => 'Sedan';
+
+  @override
+  String get road_trip_preferences_car_suv => 'SUV';
+
+  @override
+  String get road_trip_preferences_car_hatchback => 'Hatchback';
+
+  @override
+  String get road_trip_preferences_car_van => 'Van';
+
+  @override
+  String get road_trip_preferences_tag_label => '添加标签';
+
+  @override
+  String get road_trip_preferences_tag_hint => '添加';
+
+  @override
+  String get road_trip_gallery_section_title => '旅程影像';
+
+  @override
+  String get road_trip_gallery_section_subtitle => '可选择多张，首张默认为封面';
+
+  @override
+  String get road_trip_gallery_select_images => '选择图片';
+
+  @override
+  String get road_trip_gallery_add_more => '追加图片';
+
+  @override
+  String get road_trip_gallery_empty_hint => '还没有选择图片，点击下方按钮添加';
+
+  @override
+  String get road_trip_gallery_cover_label => '封面';
+
+  @override
+  String road_trip_gallery_image_label(int index) {
+    return '第 $index 张';
+  }
+
+  @override
+  String get road_trip_gallery_set_cover => '设为封面';
+
+  @override
+  String get road_trip_story_section_title => '活动亮点';
+
+  @override
+  String get road_trip_story_section_subtitle => '告诉伙伴们为什么要来';
+
+  @override
+  String get road_trip_story_description_label => '详细描述';
+
+  @override
+  String get road_trip_story_description_hint => '路线亮点、注意事项、装备建议…';
+
+  @override
+  String get road_trip_story_description_required => '请输入描述';
+
+  @override
+  String get road_trip_disclaimer_section_title => '发起者免责声明';
+
+  @override
+  String get road_trip_disclaimer_section_subtitle => '向伙伴说明风险、特殊要求…';
+
+  @override
+  String get road_trip_disclaimer_content_label => '免责声明内容';
+
+  @override
+  String get road_trip_disclaimer_content_hint => '例如风险提示、特殊说明等';
 }

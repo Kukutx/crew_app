@@ -473,5 +473,90 @@
   "wallet_transaction_refund_subtitle": "Coastal camp · Trip cancelled",
   "wallet_transaction_subscription_title": "Crew Plus subscription",
   "wallet_transaction_subscription_subtitle": "Auto renewal",
-  "settings_developer_stripe_test": "Stripe payment test"
+  "settings_developer_stripe_test": "Stripe payment test",
+  "road_trip_create_button": "Create",
+  "road_trip_continue_button": "Continue",
+  "road_trip_image_picker_failed": "Failed to pick images. Please check permission settings.",
+  "road_trip_basic_section_title": "Basic info",
+  "road_trip_basic_section_subtitle": "Name your trip and set dates",
+  "road_trip_basic_title_label": "Trip title",
+  "road_trip_basic_title_hint": "e.g., Cinque Terre coastal drive",
+  "road_trip_basic_title_required": "Please enter a title",
+  "road_trip_basic_date_label": "Event dates",
+  "road_trip_basic_date_hint": "Tap to select date range",
+  "road_trip_route_section_title": "Route type",
+  "road_trip_route_add_waypoint": "Add waypoint",
+  "road_trip_route_add_to_forward": "Add to outbound",
+  "road_trip_route_add_to_return": "Add to return",
+  "road_trip_route_type_round": "Round trip",
+  "road_trip_route_type_one_way": "One-way",
+  "road_trip_route_waypoints_one_way": "Waypoints (one-way) · {count} total",
+  "@road_trip_route_waypoints_one_way": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "road_trip_route_forward_label": "Outbound",
+  "road_trip_route_return_label": "Return",
+  "road_trip_route_waypoints_count": " · {count} total",
+  "@road_trip_route_waypoints_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "road_trip_route_waypoint_label": "Waypoint {index}",
+  "@road_trip_route_waypoint_label": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "road_trip_team_section_title": "Team settings",
+  "road_trip_team_section_subtitle": "Participant limit & pricing",
+  "road_trip_team_pricing_free": "Free",
+  "road_trip_team_pricing_paid": "Paid",
+  "road_trip_team_max_participants_label": "Max participants",
+  "road_trip_team_max_participants_hint": "e.g., 4",
+  "road_trip_team_max_participants_error": "Please enter an integer ≥ 1",
+  "road_trip_team_price_label": "Price per person (€)",
+  "road_trip_team_price_free_hint": "Free event",
+  "road_trip_team_price_paid_hint": "e.g., 29.5",
+  "road_trip_preferences_section_title": "Preferences",
+  "road_trip_preferences_section_subtitle": "Vehicle & tags",
+  "road_trip_preferences_car_type_label": "Vehicle type (optional)",
+  "road_trip_preferences_car_sedan": "Sedan",
+  "road_trip_preferences_car_suv": "SUV",
+  "road_trip_preferences_car_hatchback": "Hatchback",
+  "road_trip_preferences_car_van": "Van",
+  "road_trip_preferences_tag_label": "Add tag",
+  "road_trip_preferences_tag_hint": "Add",
+  "road_trip_gallery_section_title": "Gallery",
+  "road_trip_gallery_section_subtitle": "Select multiple photos; first one is cover",
+  "road_trip_gallery_select_images": "Select photos",
+  "road_trip_gallery_add_more": "Add more",
+  "road_trip_gallery_empty_hint": "No photos selected yet. Tap the button below to add.",
+  "road_trip_gallery_cover_label": "Cover",
+  "road_trip_gallery_image_label": "Photo {index}",
+  "@road_trip_gallery_image_label": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "road_trip_gallery_set_cover": "Set as cover",
+  "road_trip_story_section_title": "Highlights",
+  "road_trip_story_section_subtitle": "Tell others why they should join",
+  "road_trip_story_description_label": "Detailed description",
+  "road_trip_story_description_hint": "Route highlights, notes, gear suggestions…",
+  "road_trip_story_description_required": "Please enter a description",
+  "road_trip_disclaimer_section_title": "Host disclaimer",
+  "road_trip_disclaimer_section_subtitle": "Explain risks, special requirements…",
+  "road_trip_disclaimer_content_label": "Disclaimer content",
+  "road_trip_disclaimer_content_hint": "e.g., risk warnings, special notes"
 }

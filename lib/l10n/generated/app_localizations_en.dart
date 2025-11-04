@@ -1217,4 +1217,192 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_developer_stripe_test => 'Stripe payment test';
+
+  @override
+  String get road_trip_create_button => 'Create';
+
+  @override
+  String get road_trip_continue_button => 'Continue';
+
+  @override
+  String get road_trip_image_picker_failed =>
+      'Failed to pick images. Please check permission settings.';
+
+  @override
+  String get road_trip_basic_section_title => 'Basic info';
+
+  @override
+  String get road_trip_basic_section_subtitle => 'Name your trip and set dates';
+
+  @override
+  String get road_trip_basic_title_label => 'Trip title';
+
+  @override
+  String get road_trip_basic_title_hint => 'e.g., Cinque Terre coastal drive';
+
+  @override
+  String get road_trip_basic_title_required => 'Please enter a title';
+
+  @override
+  String get road_trip_basic_date_label => 'Event dates';
+
+  @override
+  String get road_trip_basic_date_hint => 'Tap to select date range';
+
+  @override
+  String get road_trip_route_section_title => 'Route type';
+
+  @override
+  String get road_trip_route_add_waypoint => 'Add waypoint';
+
+  @override
+  String get road_trip_route_add_to_forward => 'Add to outbound';
+
+  @override
+  String get road_trip_route_add_to_return => 'Add to return';
+
+  @override
+  String get road_trip_route_type_round => 'Round trip';
+
+  @override
+  String get road_trip_route_type_one_way => 'One-way';
+
+  @override
+  String road_trip_route_waypoints_one_way(int count) {
+    return 'Waypoints (one-way) · $count total';
+  }
+
+  @override
+  String get road_trip_route_forward_label => 'Outbound';
+
+  @override
+  String get road_trip_route_return_label => 'Return';
+
+  @override
+  String road_trip_route_waypoints_count(int count) {
+    return ' · $count total';
+  }
+
+  @override
+  String road_trip_route_waypoint_label(int index) {
+    return 'Waypoint $index';
+  }
+
+  @override
+  String get road_trip_team_section_title => 'Team settings';
+
+  @override
+  String get road_trip_team_section_subtitle => 'Participant limit & pricing';
+
+  @override
+  String get road_trip_team_pricing_free => 'Free';
+
+  @override
+  String get road_trip_team_pricing_paid => 'Paid';
+
+  @override
+  String get road_trip_team_max_participants_label => 'Max participants';
+
+  @override
+  String get road_trip_team_max_participants_hint => 'e.g., 4';
+
+  @override
+  String get road_trip_team_max_participants_error =>
+      'Please enter an integer ≥ 1';
+
+  @override
+  String get road_trip_team_price_label => 'Price per person (€)';
+
+  @override
+  String get road_trip_team_price_free_hint => 'Free event';
+
+  @override
+  String get road_trip_team_price_paid_hint => 'e.g., 29.5';
+
+  @override
+  String get road_trip_preferences_section_title => 'Preferences';
+
+  @override
+  String get road_trip_preferences_section_subtitle => 'Vehicle & tags';
+
+  @override
+  String get road_trip_preferences_car_type_label => 'Vehicle type (optional)';
+
+  @override
+  String get road_trip_preferences_car_sedan => 'Sedan';
+
+  @override
+  String get road_trip_preferences_car_suv => 'SUV';
+
+  @override
+  String get road_trip_preferences_car_hatchback => 'Hatchback';
+
+  @override
+  String get road_trip_preferences_car_van => 'Van';
+
+  @override
+  String get road_trip_preferences_tag_label => 'Add tag';
+
+  @override
+  String get road_trip_preferences_tag_hint => 'Add';
+
+  @override
+  String get road_trip_gallery_section_title => 'Gallery';
+
+  @override
+  String get road_trip_gallery_section_subtitle =>
+      'Select multiple photos; first one is cover';
+
+  @override
+  String get road_trip_gallery_select_images => 'Select photos';
+
+  @override
+  String get road_trip_gallery_add_more => 'Add more';
+
+  @override
+  String get road_trip_gallery_empty_hint =>
+      'No photos selected yet. Tap the button below to add.';
+
+  @override
+  String get road_trip_gallery_cover_label => 'Cover';
+
+  @override
+  String road_trip_gallery_image_label(int index) {
+    return 'Photo $index';
+  }
+
+  @override
+  String get road_trip_gallery_set_cover => 'Set as cover';
+
+  @override
+  String get road_trip_story_section_title => 'Highlights';
+
+  @override
+  String get road_trip_story_section_subtitle =>
+      'Tell others why they should join';
+
+  @override
+  String get road_trip_story_description_label => 'Detailed description';
+
+  @override
+  String get road_trip_story_description_hint =>
+      'Route highlights, notes, gear suggestions…';
+
+  @override
+  String get road_trip_story_description_required =>
+      'Please enter a description';
+
+  @override
+  String get road_trip_disclaimer_section_title => 'Host disclaimer';
+
+  @override
+  String get road_trip_disclaimer_section_subtitle =>
+      'Explain risks, special requirements…';
+
+  @override
+  String get road_trip_disclaimer_content_label => 'Disclaimer content';
+
+  @override
+  String get road_trip_disclaimer_content_hint =>
+      'e.g., risk warnings, special notes';
 }

@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'road_trip_section_card.dart';
 
@@ -21,26 +22,47 @@ class RoadTripPreferencesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return RoadTripSectionCard(
       icon: Icons.tune,
-      title: '个性设置',
-      subtitle: '车辆与标签',
+      title: loc.road_trip_preferences_section_title,
+      subtitle: loc.road_trip_preferences_section_subtitle,
       children: [
         DropdownButtonFormField<String>(
-          initialValue : carType,
-          decoration: roadTripInputDecoration(context, '车辆类型（可选）', null),
-          items: const [
-            DropdownMenuItem(value: 'Sedan', child: Text('Sedan')),
-            DropdownMenuItem(value: 'SUV', child: Text('SUV')),
-            DropdownMenuItem(value: 'Hatchback', child: Text('Hatchback')),
-            DropdownMenuItem(value: 'Van', child: Text('Van')),
+          initialValue: carType,
+          decoration: roadTripInputDecoration(
+            context,
+            loc.road_trip_preferences_car_type_label,
+            null,
+          ),
+          items: [
+            DropdownMenuItem(
+              value: 'Sedan',
+              child: Text(loc.road_trip_preferences_car_sedan),
+            ),
+            DropdownMenuItem(
+              value: 'SUV',
+              child: Text(loc.road_trip_preferences_car_suv),
+            ),
+            DropdownMenuItem(
+              value: 'Hatchback',
+              child: Text(loc.road_trip_preferences_car_hatchback),
+            ),
+            DropdownMenuItem(
+              value: 'Van',
+              child: Text(loc.road_trip_preferences_car_van),
+            ),
           ],
           onChanged: onCarTypeChanged,
         ),
         const SizedBox(height: 12),
         TextField(
           controller: tagInputController,
-          decoration: roadTripInputDecoration(context, '添加标签', '添加').copyWith(
+          decoration: roadTripInputDecoration(
+            context,
+            loc.road_trip_preferences_tag_label,
+            loc.road_trip_preferences_tag_hint,
+          ).copyWith(
             suffixIcon: IconButton(
               icon: const Icon(Icons.add_circle_outline),
               onPressed: onSubmitTag,

@@ -438,7 +438,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       });
     } on PlatformException {
       if (!mounted) return;
-      _showSnack('选择图片失败，请检查权限设置');
+      final loc = AppLocalizations.of(context)!;
+      _showSnack(loc.road_trip_image_picker_failed);
     }
   }
 
@@ -898,7 +899,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                             width: double.infinity,
                             child: FilledButton(
                               onPressed: !canScroll ? null : _onCreatePressed,
-                              child: const Text('创建'),
+                              child: Text(loc.road_trip_create_button),
                             ),
                           ),
                         ],
@@ -913,7 +914,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           onPressed: (_startLatLng != null && _destinationLatLng != null)
                               ? _enableWizard
                               : null,
-                          child: const Text('继续'),
+                          child: Text(loc.road_trip_continue_button),
                         ),
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import '../data/road_trip_editor_models.dart';
@@ -19,22 +20,23 @@ class RoadTripTeamSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return RoadTripSectionCard(
       icon: Icons.groups_3_outlined,
-      title: '团队配置',
-      subtitle: '人数限制与费用模式',
+      title: loc.road_trip_team_section_title,
+      subtitle: loc.road_trip_team_section_subtitle,
       headerTrailing: SegmentedButton<RoadTripPricingType>(
         showSelectedIcon: false,
-        segments: const [
+        segments: [
           ButtonSegment(
             value: RoadTripPricingType.free,
-            label: Text('免费'),
-            icon: Icon(Icons.favorite_outline),
+            label: Text(loc.road_trip_team_pricing_free),
+            icon: const Icon(Icons.favorite_outline),
           ),
           ButtonSegment(
             value: RoadTripPricingType.paid,
-            label: Text('收费'),
-            icon: Icon(Icons.payments_outlined),
+            label: Text(loc.road_trip_team_pricing_paid),
+            icon: const Icon(Icons.payments_outlined),
           ),
         ],
         selected: {pricingType},
@@ -46,12 +48,16 @@ class RoadTripTeamSection extends StatelessWidget {
             Expanded(
               child: TextFormField(
                 controller: maxParticipantsController,
-                decoration: roadTripInputDecoration(context, '人数上限', '例如 4'),
+                decoration: roadTripInputDecoration(
+                  context,
+                  loc.road_trip_team_max_participants_label,
+                  loc.road_trip_team_max_participants_hint,
+                ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final n = int.tryParse(v ?? '');
                   if (n == null || n < 1) {
-                    return '请输入≥1的整数';
+                    return loc.road_trip_team_max_participants_error;
                   }
                   return null;
                 },
@@ -63,8 +69,10 @@ class RoadTripTeamSection extends StatelessWidget {
                 controller: priceController,
                 decoration: roadTripInputDecoration(
                   context,
-                  '人均费用 (€)',
-                  pricingType == RoadTripPricingType.free ? '免费活动' : '例如 29.5',
+                  loc.road_trip_team_price_label,
+                  pricingType == RoadTripPricingType.free
+                      ? loc.road_trip_team_price_free_hint
+                      : loc.road_trip_team_price_paid_hint,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,

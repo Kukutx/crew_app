@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'road_trip_section_card.dart';
 
@@ -11,17 +12,18 @@ class RoadTripHostDisclaimerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return RoadTripSectionCard(
       icon: Icons.shield_moon_outlined,
-      title: '发起者免责声明',
-      subtitle: '向伙伴说明风险、特殊要求…',
+      title: loc.road_trip_disclaimer_section_title,
+      subtitle: loc.road_trip_disclaimer_section_subtitle,
       children: [
         TextFormField(
           controller: disclaimerController,
           decoration: roadTripInputDecoration(
             context,
-            '免责声明内容',
-            '例如风险提示、特殊说明等',
+            loc.road_trip_disclaimer_content_label,
+            loc.road_trip_disclaimer_content_hint,
           ),
           minLines: 3,
           maxLines: 5,

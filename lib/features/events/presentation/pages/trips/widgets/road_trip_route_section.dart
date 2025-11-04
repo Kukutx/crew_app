@@ -1,3 +1,4 @@
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../data/road_trip_editor_models.dart';
@@ -40,31 +41,38 @@ class RoadTripRouteSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return RoadTripSectionCard(
       icon: Icons.route_outlined,
-      title: '路线类型',
+      title: loc.road_trip_route_section_title,
       subtitle: '',
-       headerTrailing: routeType == RoadTripRouteType.roundTrip
-      ? MenuAnchor(
-          builder: (context, ctrl, _) => FilledButton.icon(
-            style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
-            onPressed: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
-            icon: const Icon(Icons.add_road, size: 18),
-            label: const Text('添加途经点'),
-          ),
-          menuChildren: [
-            MenuItemButton(onPressed: onAddForward, child: const Text('添加到去程')),
-            MenuItemButton(onPressed: onAddReturn,  child: const Text('添加到返程')),
-          ],
-        )
-      : FilledButton.icon(
-          style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
-          onPressed: onAddForward,
-          icon: const Icon(Icons.add_road, size: 18),
-          label: const Text('添加途经点'),
-        ),
+      headerTrailing: routeType == RoadTripRouteType.roundTrip
+          ? MenuAnchor(
+              builder: (context, ctrl, _) => FilledButton.icon(
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
+                onPressed: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
+                icon: const Icon(Icons.add_road, size: 18),
+                label: Text(loc.road_trip_route_add_waypoint),
+              ),
+              menuChildren: [
+                MenuItemButton(
+                  onPressed: onAddForward,
+                  child: Text(loc.road_trip_route_add_to_forward),
+                ),
+                MenuItemButton(
+                  onPressed: onAddReturn,
+                  child: Text(loc.road_trip_route_add_to_return),
+                ),
+              ],
+            )
+          : FilledButton.icon(
+              style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
+              onPressed: onAddForward,
+              icon: const Icon(Icons.add_road, size: 18),
+              label: Text(loc.road_trip_route_add_waypoint),
+            ),
       children: [
-        // 顶部：中间 SegmentedButton + 右上“添加途经点”
+        // 顶部：中间 SegmentedButton + 右上"添加途经点"
         SizedBox(
           height: 48,
           child: Stack(
@@ -73,16 +81,16 @@ class RoadTripRouteSection extends StatelessWidget {
                 alignment: Alignment.center,
                 child: SegmentedButton<RoadTripRouteType>(
                   showSelectedIcon: false,
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: RoadTripRouteType.roundTrip,
-                      label: Text('往返路线'),
-                      icon: Icon(Icons.autorenew),
+                      label: Text(loc.road_trip_route_type_round),
+                      icon: const Icon(Icons.autorenew),
                     ),
                     ButtonSegment(
                       value: RoadTripRouteType.oneWay,
-                      label: Text('单程路线'),
-                      icon: Icon(Icons.route_outlined),
+                      label: Text(loc.road_trip_route_type_one_way),
+                      icon: const Icon(Icons.route_outlined),
                     ),
                   ],
                   selected: {routeType},
@@ -97,7 +105,7 @@ class RoadTripRouteSection extends StatelessWidget {
         // 列表区域
         if (routeType == RoadTripRouteType.oneWay)
           _ReorderableListSection(
-            title: '途经点（单程） · 共 ${forwardWaypoints.length} 个',
+            title: loc.road_trip_route_waypoints_one_way(forwardWaypoints.length),
             items: forwardWaypoints,
             onRemove: onRemoveForward,
             onReorder: onReorderForward,
@@ -105,7 +113,8 @@ class RoadTripRouteSection extends StatelessWidget {
           )
         else ...[
           _ReorderableListSection(
-            title: '去程 · 共 ${forwardWaypoints.length} 个',
+            title:
+                '${loc.road_trip_route_forward_label}${loc.road_trip_route_waypoints_count(forwardWaypoints.length)}',
             items: forwardWaypoints,
             onRemove: onRemoveForward,
             onReorder: onReorderForward,
@@ -113,7 +122,8 @@ class RoadTripRouteSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _ReorderableListSection(
-            title: '返程 · 共 ${returnWaypoints.length} 个',
+            title:
+                '${loc.road_trip_route_return_label}${loc.road_trip_route_waypoints_count(returnWaypoints.length)}',
             items: returnWaypoints,
             onRemove: onRemoveReturn,
             onReorder: onReorderReturn,
@@ -157,11 +167,12 @@ class _ReorderableListSection extends StatelessWidget {
             onReorder(oldIndex, newIndex);
           },
           buildDefaultDragHandles: false,
-              itemBuilder: (context, index) {
+          itemBuilder: (context, index) {
+            final loc = AppLocalizations.of(context)!;
             final item = items[index];
             final key = '${item.latitude}_${item.longitude}';
             final address = addressMap?[key];
-            final text = address ?? '途经点 ${index + 1}'; // 显示地址或编号
+            final text = address ?? loc.road_trip_route_waypoint_label(index + 1); // 显示地址或编号
             return Dismissible(
               key: ValueKey('wp-$index-${item.latitude}-${item.longitude}'),
               background: Container(

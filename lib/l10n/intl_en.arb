@@ -119,25 +119,6 @@
   "map_location_info_nearby_title": "Nearby places",
   "map_location_info_nearby_empty": "No places found within 100 m.",
   "map_location_info_nearby_error": "Unable to load nearby places.",
-  "map_place_details_title": "Place details",
-  "map_place_details_not_found": "We couldn't find details for this place.",
-  "map_place_details_error": "Unable to load place details right now.",
-  "map_place_details_missing_api_key": "Places search is unavailable: API key is not configured.",
-  "map_place_details_rating_value": "Rating {rating}",
-  "@map_place_details_rating_value": {
-    "placeholders": {
-      "rating": {}
-    }
-  },
-  "map_place_details_no_rating": "No rating yet",
-  "map_place_details_reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {{count} reviews}}",
-  "@map_place_details_reviews": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "map_select_location_title": "Choose a start location",
   "map_select_location_tip": "Long press on the map to fine-tune the position.",
   "messages": "Messages",

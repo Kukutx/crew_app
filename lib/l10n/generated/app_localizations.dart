@@ -686,48 +686,6 @@ abstract class AppLocalizations {
   /// **'Unable to load nearby places.'**
   String get map_location_info_nearby_error;
 
-  /// No description provided for @map_place_details_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Place details'**
-  String get map_place_details_title;
-
-  /// No description provided for @map_place_details_not_found.
-  ///
-  /// In en, this message translates to:
-  /// **'We couldn\'t find details for this place.'**
-  String get map_place_details_not_found;
-
-  /// No description provided for @map_place_details_error.
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to load place details right now.'**
-  String get map_place_details_error;
-
-  /// No description provided for @map_place_details_missing_api_key.
-  ///
-  /// In en, this message translates to:
-  /// **'Places search is unavailable: API key is not configured.'**
-  String get map_place_details_missing_api_key;
-
-  /// No description provided for @map_place_details_rating_value.
-  ///
-  /// In en, this message translates to:
-  /// **'Rating {rating}'**
-  String map_place_details_rating_value(Object rating);
-
-  /// No description provided for @map_place_details_no_rating.
-  ///
-  /// In en, this message translates to:
-  /// **'No rating yet'**
-  String get map_place_details_no_rating;
-
-  /// No description provided for @map_place_details_reviews.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0 {No reviews} =1 {1 review} other {{count} reviews}}'**
-  String map_place_details_reviews(int count);
-
   /// No description provided for @map_select_location_title.
   ///
   /// In en, this message translates to:

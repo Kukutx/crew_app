@@ -311,38 +311,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_location_info_nearby_error => '无法加载附近地点。';
 
   @override
-  String get map_place_details_title => '地点信息';
-
-  @override
-  String get map_place_details_not_found => '未找到该地点的详细信息。';
-
-  @override
-  String get map_place_details_error => '暂时无法加载地点详情。';
-
-  @override
-  String get map_place_details_missing_api_key => '地点搜索不可用：未配置 API 密钥。';
-
-  @override
-  String map_place_details_rating_value(Object rating) {
-    return '评分 $rating';
-  }
-
-  @override
-  String get map_place_details_no_rating => '暂无评分';
-
-  @override
-  String map_place_details_reviews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 条评论',
-      one: '1 条评论',
-      zero: '暂无评论',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get map_select_location_title => '选择起点位置';
 
   @override

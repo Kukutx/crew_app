@@ -324,41 +324,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_location_info_nearby_error => 'Unable to load nearby places.';
 
   @override
-  String get map_place_details_title => 'Place details';
-
-  @override
-  String get map_place_details_not_found =>
-      'We couldn\'t find details for this place.';
-
-  @override
-  String get map_place_details_error =>
-      'Unable to load place details right now.';
-
-  @override
-  String get map_place_details_missing_api_key =>
-      'Places search is unavailable: API key is not configured.';
-
-  @override
-  String map_place_details_rating_value(Object rating) {
-    return 'Rating $rating';
-  }
-
-  @override
-  String get map_place_details_no_rating => 'No rating yet';
-
-  @override
-  String map_place_details_reviews(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count reviews',
-      one: '1 review',
-      zero: 'No reviews',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get map_select_location_title => 'Choose a start location';
 
   @override

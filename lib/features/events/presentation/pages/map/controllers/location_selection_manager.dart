@@ -12,7 +12,6 @@ import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/sheets/map_place_details_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
@@ -75,34 +74,7 @@ class LocationSelectionManager {
       return;
     }
     
-    // 其他正常点击：显示地点详情
-    final loc = AppLocalizations.of(context)!;
-    final places = ref.read(placesServiceProvider);
-
-    try {
-      final placeId = await places.findPlaceId(position);
-      if (placeId == null) {
-        await showMapPlaceDetailsSheet(
-          context: context,
-          detailsFuture: Future<PlaceDetails?>.value(null),
-          emptyMessage: loc.map_place_details_not_found,
-        );
-        return;
-      }
-
-      await showMapPlaceDetailsSheet(
-        context: context,
-        detailsFuture: places.getPlaceDetails(placeId),
-        emptyMessage: loc.map_place_details_not_found,
-      );
-    } on PlacesApiException catch (error) {
-      final message = error.message.contains('not configured')
-          ? loc.map_place_details_missing_api_key
-          : error.message;
-      _showSnackBar(context, message.isEmpty ? loc.map_place_details_error : message);
-    } catch (_) {
-      _showSnackBar(context, loc.map_place_details_error);
-    }
+    // 其他正常点击：不做任何处理
   }
   
   /// 处理途经点选择

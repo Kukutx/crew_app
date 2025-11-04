@@ -205,25 +205,6 @@
   "map_location_info_nearby_title": "附近地点",
   "map_location_info_nearby_empty": "100 米内暂无兴趣点。",
   "map_location_info_nearby_error": "无法加载附近地点。",
-  "map_place_details_title": "地点信息",
-  "map_place_details_not_found": "未找到该地点的详细信息。",
-  "map_place_details_error": "暂时无法加载地点详情。",
-  "map_place_details_missing_api_key": "地点搜索不可用：未配置 API 密钥。",
-  "map_place_details_rating_value": "评分 {rating}",
-  "@map_place_details_rating_value": {
-    "placeholders": {
-      "rating": {}
-    }
-  },
-  "map_place_details_no_rating": "暂无评分",
-  "map_place_details_reviews": "{count, plural, =0 {暂无评论} =1 {1 条评论} other {{count} 条评论}}",
-  "@map_place_details_reviews": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "map_select_location_title": "选择起点位置",
   "map_select_location_tip": "在地图长按可精确调整位置。",
   "messages": "消息",

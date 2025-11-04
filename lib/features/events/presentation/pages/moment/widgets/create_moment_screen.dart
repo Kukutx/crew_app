@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
 
@@ -155,10 +156,10 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
     );
   }
 
-  void _onCreateStory() {
-    // TODO: 实现创建故事逻辑
+  void _onCreateMoment() {
+    // TODO: 实现创建瞬间逻辑
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('创建故事功能开发中')),
+      const SnackBar(content: Text('创建瞬间功能开发中')),
     );
   }
 
@@ -173,252 +174,280 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: _showTypeSelector,
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        title: TextButton(
+          onPressed: _showTypeSelector,
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _selectedType == MomentType.instant ? '即时瞬间' : '活动瞬间',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _selectedType == MomentType.instant ? '即时瞬间' : '活动瞬间',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: 6),
+              const Icon(Icons.keyboard_arrow_down, size: 20),
+            ],
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Media placeholder - 现代化的卡片设计
+                      GestureDetector(
+                        onTap: () {
+                          // 显示选择媒体对话框
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => Container(
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainerHighest,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(28),
+                                ),
+                              ),
+                              child: SafeArea(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: const Icon(Icons.videocam, color: Colors.white),
+                                      title: const Text('Video', style: TextStyle(color: Colors.white)),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _pickMedia(isVideo: true);
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.photo, color: Colors.white),
+                                      title: const Text('Photo', style: TextStyle(color: Colors.white)),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _pickMedia(isVideo: false);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 400,
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: colorScheme.outline.withValues(alpha: 0.1),
+                              width: 1,
+                            ),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: _selectedMedia == null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    FaIcon(
+                                      FontAwesomeIcons.photoVideo,
+                                      size: 100,
+                                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Text(
+                                      'Add Photo or Video Below.',
+                                      style: TextStyle(
+                                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : _isVideo
+                                  ? const Center(
+                                      child: Icon(
+                                        Icons.play_circle_filled,
+                                        size: 100,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Image.file(
+                                        _selectedMedia!,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                      ),
+                                    ),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      // Location input - 现代化的输入框
+                      Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: colorScheme.outline.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _locationController,
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 16,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: '位置',
+                                  hintStyle: TextStyle(
+                                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                                  ),
+                                  filled: false,
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 18,
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  // 用户可以手动修改地址
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: _isLoadingLocation || _isLoadingAddress
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : IconButton(
+                                      icon: Icon(
+                                        Icons.location_on_outlined,
+                                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                      ),
+                                      onPressed: _getCurrentLocation,
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Comment input - 现代化的多行输入框
+                      Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: colorScheme.outline.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: _commentController,
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Comment....',
+                            hintStyle: TextStyle(
+                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            ),
+                            filled: false,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 18,
+                            ),
+                          ),
+                          maxLines: 5,
+                          minLines: 4,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Create Moment button - 固定在底部
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: SafeArea(
+                top: false,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _onCreateMoment,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF9C27B0),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      'Create Moment',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.arrow_drop_down, size: 20),
-                ],
+                ),
               ),
             ),
           ],
         ),
-        actions: [
-          // AI/Brain icon placeholder
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              icon: const Icon(Icons.psychology_outlined, color: Colors.white),
-              onPressed: () {
-                // TODO: AI功能
-              },
-            ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Media placeholder
-                GestureDetector(
-                  onTap: () => _pickMedia(isVideo: false),
-                  child: Container(
-                    height: 300,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: _selectedMedia == null
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.photo_size_select_actual_outlined,
-                                size: 80,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Add Photo or Video Below.',
-                                style: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          )
-                        : _isVideo
-                            ? const Center(
-                                child: Icon(
-                                  Icons.play_circle_filled,
-                                  size: 80,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Image.file(
-                                _selectedMedia!,
-                                fit: BoxFit.cover,
-                              ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Location input
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _locationController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: '位置',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
-                          filled: true,
-                          fillColor: Colors.grey[800],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                        onChanged: (value) {
-                          // 用户可以手动修改地址
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: _isLoadingLocation || _isLoadingAddress
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : const Icon(Icons.location_on, color: Colors.white),
-                      onPressed: _isLoadingLocation || _isLoadingAddress
-                          ? null
-                          : _getCurrentLocation,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                // Comment input
-                TextField(
-                  controller: _commentController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Comment....',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                  maxLines: 4,
-                ),
-                const SizedBox(height: 32),
-                // Action buttons
-                Row(
-                  children: [
-                    // Video button
-                    Expanded(
-                      child: _MediaTypeButton(
-                        icon: Icons.videocam,
-                        label: 'Video',
-                        onTap: () => _pickMedia(isVideo: true),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Photo button
-                    Expanded(
-                      child: _MediaTypeButton(
-                        icon: Icons.photo,
-                        label: 'Photo',
-                        onTap: () => _pickMedia(isVideo: false),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Create Story button
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        onPressed: _onCreateStory,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF9C27B0),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'Create Story',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MediaTypeButton extends StatelessWidget {
-  const _MediaTypeButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: Colors.white,
-        side: const BorderSide(color: Colors.grey),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
-        ],
       ),
     );
   }

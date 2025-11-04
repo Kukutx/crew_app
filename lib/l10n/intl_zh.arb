@@ -538,5 +538,10 @@
   "road_trip_disclaimer_section_title": "发起者免责声明",
   "road_trip_disclaimer_section_subtitle": "向伙伴说明风险、特殊要求…",
   "road_trip_disclaimer_content_label": "免责声明内容",
-  "road_trip_disclaimer_content_hint": "例如风险提示、特殊说明等"
+  "road_trip_disclaimer_content_hint": "例如风险提示、特殊说明等",
+  "road_trip_create_success_title": "创建成功！",
+  "road_trip_create_success_message": "您的自驾游已成功创建，现在可以供其他人加入了。",
+  "road_trip_create_failed_title": "创建失败",
+  "road_trip_create_failed_message": "无法创建您的自驾游，请重试。",
+  "road_trip_create_done_button": "完成"
 }

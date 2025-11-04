@@ -1325,4 +1325,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get road_trip_disclaimer_content_hint => '例如风险提示、特殊说明等';
+
+  @override
+  String get road_trip_create_success_title => '创建成功！';
+
+  @override
+  String get road_trip_create_success_message => '您的自驾游已成功创建，现在可以供其他人加入了。';
+
+  @override
+  String get road_trip_create_failed_title => '创建失败';
+
+  @override
+  String get road_trip_create_failed_message => '无法创建您的自驾游，请重试。';
+
+  @override
+  String get road_trip_create_done_button => '完成';
 }

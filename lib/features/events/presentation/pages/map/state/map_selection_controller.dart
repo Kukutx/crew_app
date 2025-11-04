@@ -220,10 +220,10 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
   Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng position) async {
     final results = await _placesService.searchNearbyPlaces(
       position,
-      radius: 150,
-      maxResults: 6,
+      radius: 200,
+      maxResults: 10,
     );
-    return results.take(3).toList(growable: false);
+    return results;
   }
 
   @override

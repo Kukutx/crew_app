@@ -11,6 +11,7 @@ import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_t
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_route_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
@@ -160,6 +161,12 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   final _storyCtrl = TextEditingController();
   final _disclaimerCtrl = TextEditingController();
 
+  // ==== 创建状态 ====
+  bool _isCreating = false;
+  bool? _createSuccess;
+  String? _tripId;
+  String? _createErrorMessage;
+
   // ==== 分段顺序 ====
   static const List<TripSection> _sectionsOrder = [
     TripSection.basic,
@@ -170,8 +177,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     TripSection.story,
     TripSection.disclaimer,
   ];
-  int get _totalPages => 1 + _sectionsOrder.length;
+  int get _totalPages => 1 + _sectionsOrder.length + 1; // +1 为完成页
   bool get _isBasicPage => _currentPage == 1; // 0 是启动页，1 是 basic
+  bool get _isCompletionPage => _currentPage == _totalPages - 1; // 最后一页是完成页
   bool get _basicValid =>
       _titleCtrl.text.trim().isNotEmpty && _editorState.dateRange != null;
 
@@ -326,22 +334,118 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       // 起点确认模式：调用 onConfirm
       widget.onConfirm?.call();
     } else {
-      // 完整创建模式：清理所有选择状态并关闭 sheet
-      if (!widget.embeddedMode) {
-        Navigator.of(context).maybePop();
+      // 完整创建模式：验证并创建
+      if (!_basicValid) {
+        _showSnack('请填写完整的基本信息');
         return;
       }
+
+      if (_startLatLng == null || _destinationLatLng == null) {
+        _showSnack('请选择起点和终点');
+        return;
+      }
+
+      if (!mounted) return;
       
-      // 清理所有地图选择状态（起点、终点、途经点、选择模式等）
-      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-      selectionController.resetSelection(); // 清除所有选择状态（起点、终点、途经点、路线类型等）
-      selectionController.setSelectionSheetOpen(false); // 清除 sheet 状态
-      selectionController.setPendingWaypoint(null); // 清除待添加的途经点
-      selectionController.resetMapPadding(); // 重置地图 padding
+      // 设置创建状态
+      setState(() {
+        _isCreating = true;
+        _createSuccess = null;
+        _tripId = null;
+        _createErrorMessage = null;
+      });
       
-      // 关闭 overlay
-      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+      try {
+        // 构建 RoadTripDraft
+        double? price;
+        if (_pricingType == RoadTripPricingType.paid) {
+          price = double.tryParse(_priceCtrl.text.trim());
+        }
+
+        final maxParticipants = int.tryParse(_maxParticipantsCtrl.text.trim()) ?? 4;
+        
+        final draft = RoadTripDraft(
+          title: _titleCtrl.text.trim(),
+          dateRange: _editorState.dateRange!,
+          startLocation: _startAddress ?? 
+              '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
+          endLocation: _destinationAddress ?? 
+              '${_destinationLatLng!.latitude.toStringAsFixed(6)}, ${_destinationLatLng!.longitude.toStringAsFixed(6)}',
+          meetingPoint: _startAddress ?? 
+              '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
+          isRoundTrip: _routeType == RoadTripRouteType.roundTrip,
+          waypoints: [
+            ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
+            ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
+          ],
+          maxParticipants: maxParticipants,
+          isFree: _pricingType == RoadTripPricingType.free,
+          pricePerPerson: price,
+          carType: _carType,
+          tags: List.of(_tags),
+          description: _storyCtrl.text.trim(),
+          hostDisclaimer: _disclaimerCtrl.text.trim(),
+          galleryImages: _editorState.galleryItems
+              .where((item) => item.file != null)
+              .map((item) => item.file!)
+              .toList(),
+          existingImageUrls: _editorState.galleryItems
+              .where((item) => item.url != null)
+              .map((item) => item.url!)
+              .toList(),
+        );
+
+        // 调用API创建
+        final id = await ref.read(eventsApiProvider).createRoadTrip(draft);
+        
+        if (!mounted) return;
+        
+        // 设置成功状态并跳转到完成页
+        setState(() {
+          _isCreating = false;
+          _createSuccess = true;
+          _tripId = id;
+        });
+        
+        // 跳转到完成页
+        setState(() => _canSwipe = true);
+        await _pageCtrl.animateToPage(
+          _totalPages - 1,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+        
+      } catch (e) {
+        if (!mounted) return;
+        
+        // 设置失败状态并跳转到完成页
+        setState(() {
+          _isCreating = false;
+          _createSuccess = false;
+          _createErrorMessage = e.toString();
+        });
+        
+        // 跳转到完成页
+        setState(() => _canSwipe = true);
+        await _pageCtrl.animateToPage(
+          _totalPages - 1,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     }
+  }
+
+  void _onDonePressed() {
+    // 清理所有地图选择状态
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    selectionController.resetSelection();
+    selectionController.setSelectionSheetOpen(false);
+    selectionController.setPendingWaypoint(null);
+    selectionController.resetMapPadding();
+    
+    // 关闭 overlay
+    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
   }
 
   void _onRouteTypeChanged(RoadTripRouteType t) {
@@ -860,11 +964,11 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 },
                 child: PageView(
                   controller: _pageCtrl,
-                  physics: canScroll
-                      ? const PageScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
+                  physics: (_isCompletionPage || !canScroll)
+                      ? const NeverScrollableScrollPhysics()
+                      : const PageScrollPhysics(),
                   children: [
-                    _ConnectionStart(
+                    _RouteSelectionPage(
                       scrollCtrl: widget.scrollCtrl,
                       onContinue: _enableWizard,
                       departureTitle: startTitle,
@@ -881,6 +985,13 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                       destinationNearbyFuture: _destinationNearbyFuture,
                     ),
                     ..._sectionsOrder.map(_buildSectionPage),
+                    _CompletionPage(
+                      isSuccess: _createSuccess,
+                      tripId: _tripId,
+                      errorMessage: _createErrorMessage,
+                      isCreating: _isCreating,
+                      onDone: _onDonePressed,
+                    ),
                   ],
                 ),
               ),
@@ -888,43 +999,74 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
             // 底部进度 + 按钮
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
-              child: _canSwipe
+              child: _isCompletionPage
                   ? Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Center(
-                            child: SmoothPageIndicator(
-                              controller: _pageCtrl,
-                              count: _totalPages,
-                              effect: const WormEffect(dotHeight: 8, dotWidth: 8),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: !canScroll ? null : _onCreatePressed,
-                              child: Text(loc.road_trip_create_button),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Padding(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                       child: SizedBox(
                         width: double.infinity,
                         child: FilledButton(
-                          // 只有当起点和终点都选择了才能继续
-                          onPressed: (_startLatLng != null && _destinationLatLng != null)
-                              ? _enableWizard
+                          onPressed: (!_isCreating && _createSuccess != null)
+                              ? _onDonePressed
                               : null,
-                          child: Text(loc.road_trip_continue_button),
+                          child: _isCreating
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(loc.road_trip_create_done_button),
                         ),
                       ),
-                    ),
+                    )
+                  : _canSwipe
+                      ? Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Center(
+                                child: SmoothPageIndicator(
+                                  controller: _pageCtrl,
+                                  count: _totalPages,
+                                  effect: const WormEffect(dotHeight: 8, dotWidth: 8),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton(
+                                  onPressed: (!canScroll || _isCreating) 
+                                      ? null 
+                                      : _onCreatePressed,
+                                  child: _isCreating
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : Text(loc.road_trip_create_button),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              // 只有当起点和终点都选择了才能继续
+                              onPressed: (_startLatLng != null && _destinationLatLng != null)
+                                  ? _enableWizard
+                                  : null,
+                              child: Text(loc.road_trip_continue_button),
+                            ),
+                          ),
+                        ),
             ),
           ],
         ),
@@ -1082,8 +1224,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
 }
 
-class _ConnectionStart extends StatelessWidget {
-  const _ConnectionStart({
+class _RouteSelectionPage extends StatelessWidget {
+  const _RouteSelectionPage({
     this.scrollCtrl,
     required this.onContinue,
     required this.departureTitle,
@@ -1143,25 +1285,131 @@ class _ConnectionStart extends StatelessWidget {
                 enabled: departurePosition != null,
               ),
               const SizedBox(height: 24),
-              _LocationDetails(
-                label: loc.map_select_location_start_label,
-                tip: loc.map_select_location_tip,
-                position: departurePosition,
-                addressFuture: departureAddressFuture,
-                nearbyFuture: departureNearbyFuture,
-              ),
-              const SizedBox(height: 16),
-              _LocationDetails(
-                label: loc.map_select_location_destination_label,
-                tip: loc.map_select_location_destination_tip,
-                position: destinationPosition,
-                addressFuture: destinationAddressFuture,
-                nearbyFuture: destinationNearbyFuture,
+              _UnifiedNearbyPlacesList(
+                startNearbyFuture: departureNearbyFuture,
+                destinationNearbyFuture: destinationNearbyFuture,
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _UnifiedNearbyPlacesList extends StatelessWidget {
+  const _UnifiedNearbyPlacesList({
+    this.startNearbyFuture,
+    this.destinationNearbyFuture,
+  });
+
+  final Future<List<NearbyPlace>>? startNearbyFuture;
+  final Future<List<NearbyPlace>>? destinationNearbyFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    // 如果两个future都不存在，不显示任何内容
+    if (startNearbyFuture == null && destinationNearbyFuture == null) {
+      return const SizedBox.shrink();
+    }
+
+    // 使用 Future.wait 等待所有future完成
+    final futures = <Future<List<NearbyPlace>>>[];
+    if (startNearbyFuture != null) {
+      futures.add(startNearbyFuture!);
+    }
+    if (destinationNearbyFuture != null) {
+      futures.add(destinationNearbyFuture!);
+    }
+
+    return FutureBuilder<List<List<NearbyPlace>>>(
+      future: Future.wait(futures),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                loc.map_location_info_nearby_title,
+                style: theme.textTheme.labelLarge,
+              ),
+              const SizedBox(height: 8),
+              const SizedBox(
+                height: 56,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                loc.map_location_info_nearby_title,
+                style: theme.textTheme.labelLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                loc.map_location_info_nearby_error,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+          );
+        }
+
+        // 合并所有POI列表，去重（基于id）
+        final allPlaces = <String, NearbyPlace>{};
+        final results = snapshot.data ?? [];
+        for (final placeList in results) {
+          for (final place in placeList) {
+            allPlaces[place.id] = place;
+          }
+        }
+
+        final places = allPlaces.values.toList();
+
+        if (places.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                loc.map_location_info_nearby_title,
+                style: theme.textTheme.labelLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                loc.map_location_info_nearby_empty,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              loc.map_location_info_nearby_title,
+              style: theme.textTheme.labelLarge,
+            ),
+            const SizedBox(height: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < places.length; i++) ...[
+                  NearbyPlaceTile(place: places[i]),
+                  if (i < places.length - 1) const SizedBox(height: 8),
+                ],
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -1306,6 +1554,93 @@ class _CardTile extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// 创建完成页面
+class _CompletionPage extends StatelessWidget {
+  const _CompletionPage({
+    required this.isSuccess,
+    this.tripId,
+    this.errorMessage,
+    required this.isCreating,
+    required this.onDone,
+  });
+
+  final bool? isSuccess;
+  final String? tripId;
+  final String? errorMessage;
+  final bool isCreating;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
+    final colorScheme = theme.colorScheme;
+
+    return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          // 图标
+          if (isCreating)
+            const SizedBox(
+              width: 80,
+              height: 80,
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+              ),
+            )
+          else
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSuccess == true
+                    ? colorScheme.primaryContainer
+                    : colorScheme.errorContainer,
+              ),
+              child: Icon(
+                isSuccess == true ? Icons.check_circle : Icons.error_outline,
+                size: 48,
+                color: isSuccess == true
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onErrorContainer,
+              ),
+            ),
+          const SizedBox(height: 32),
+          // 标题
+          if (!isCreating)
+            Text(
+              isSuccess == true
+                  ? loc.road_trip_create_success_title
+                  : loc.road_trip_create_failed_title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          const SizedBox(height: 16),
+          // 消息
+          if (!isCreating)
+            Text(
+              isSuccess == true
+                  ? loc.road_trip_create_success_message
+                  : (errorMessage ?? loc.road_trip_create_failed_message),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }

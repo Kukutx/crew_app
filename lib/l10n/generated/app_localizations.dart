@@ -455,13 +455,13 @@ abstract class AppLocalizations {
   /// No description provided for @create_moment_type_event.
   ///
   /// In en, this message translates to:
-  /// **'Activity moment'**
+  /// **'Event moment'**
   String get create_moment_type_event;
 
   /// No description provided for @create_moment_event_link_label.
   ///
   /// In en, this message translates to:
-  /// **'Linked activity'**
+  /// **'Linked event'**
   String get create_moment_event_link_label;
 
   /// No description provided for @create_moment_event_link_value.
@@ -1469,7 +1469,7 @@ abstract class AppLocalizations {
   /// No description provided for @subscription_plan_free_feature_discover.
   ///
   /// In en, this message translates to:
-  /// **'Discover nearby activities and hosts'**
+  /// **'Discover nearby events and hosts'**
   String get subscription_plan_free_feature_discover;
 
   /// No description provided for @subscription_plan_free_feature_save.
@@ -1655,7 +1655,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_notifications_activity.
   ///
   /// In en, this message translates to:
-  /// **'Activity reminders'**
+  /// **'Event reminders'**
   String get settings_notifications_activity;
 
   /// No description provided for @settings_notifications_following.
@@ -1991,7 +1991,7 @@ abstract class AppLocalizations {
   /// No description provided for @map_quick_actions_my_event.
   ///
   /// In en, this message translates to:
-  /// **'My activities'**
+  /// **'My events'**
   String get map_quick_actions_my_event;
 
   /// No description provided for @map_quick_actions_my_ledger.
@@ -2635,6 +2635,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g., risk warnings, special notes'**
   String get road_trip_disclaimer_content_hint;
+
+  /// No description provided for @road_trip_create_success_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Created Successfully!'**
+  String get road_trip_create_success_title;
+
+  /// No description provided for @road_trip_create_success_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your road trip has been created and is now available for others to join.'**
+  String get road_trip_create_success_message;
+
+  /// No description provided for @road_trip_create_failed_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Create Trip'**
+  String get road_trip_create_failed_title;
+
+  /// No description provided for @road_trip_create_failed_message.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t create your road trip. Please try again.'**
+  String get road_trip_create_failed_message;
+
+  /// No description provided for @road_trip_create_done_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get road_trip_create_done_button;
 }
 
 class _AppLocalizationsDelegate

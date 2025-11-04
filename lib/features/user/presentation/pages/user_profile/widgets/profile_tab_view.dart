@@ -16,15 +16,15 @@ class ProfileTabView extends ConsumerWidget {
     return TabBarView(
       controller: controller,
       children: const [
-        _ActivitiesGrid(),
+        _EventsGrid(),
         _FavoritesGrid(),
       ],
     );
   }
 }
 
-class _ActivitiesGrid extends ConsumerWidget {
-  const _ActivitiesGrid();
+class _EventsGrid extends ConsumerWidget {
+  const _EventsGrid();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,7 +51,7 @@ class _ActivitiesGrid extends ConsumerWidget {
             final event = registered[index];
             return EventGridCard(
               event: event,
-              heroTag: 'profile_activity_${event.id}_$index',
+              heroTag: 'profile_event_${event.id}_$index',
             );
           },
         );

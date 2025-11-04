@@ -193,10 +193,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get create_moment_type_instant => 'Instant moment';
 
   @override
-  String get create_moment_type_event => 'Activity moment';
+  String get create_moment_type_event => 'Event moment';
 
   @override
-  String get create_moment_event_link_label => 'Linked activity';
+  String get create_moment_event_link_label => 'Linked event';
 
   @override
   String get create_moment_event_link_value => 'Road trip · Happening now';
@@ -751,7 +751,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscription_plan_free_feature_discover =>
-      'Discover nearby activities and hosts';
+      'Discover nearby events and hosts';
 
   @override
   String get subscription_plan_free_feature_save =>
@@ -860,7 +860,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_account_delete => 'Delete account';
 
   @override
-  String get settings_notifications_activity => 'Activity reminders';
+  String get settings_notifications_activity => 'Event reminders';
 
   @override
   String get settings_notifications_following => 'Followed users updates';
@@ -1039,7 +1039,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_add_friend => 'Add friends';
 
   @override
-  String get map_quick_actions_my_event => 'My activities';
+  String get map_quick_actions_my_event => 'My events';
 
   @override
   String get map_quick_actions_my_ledger => 'My ledger';
@@ -1387,4 +1387,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get road_trip_disclaimer_content_hint =>
       'e.g., risk warnings, special notes';
+
+  @override
+  String get road_trip_create_success_title => 'Trip Created Successfully!';
+
+  @override
+  String get road_trip_create_success_message =>
+      'Your road trip has been created and is now available for others to join.';
+
+  @override
+  String get road_trip_create_failed_title => 'Failed to Create Trip';
+
+  @override
+  String get road_trip_create_failed_message =>
+      'We couldn\'t create your road trip. Please try again.';
+
+  @override
+  String get road_trip_create_done_button => 'Done';
 }

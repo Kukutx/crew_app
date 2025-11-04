@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_stage_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -51,6 +52,11 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
             setState(() => _navigationIndex = 2);
           }
           break;
+        case MapOverlaySheetType.createRoadTrip:
+        // tips: 可能是隐患，需要确认
+          if (_navigationIndex != 1) {
+            setState(() => _navigationIndex = 1);
+          }
       }
     });
   }
@@ -110,7 +116,19 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
       );
     }
 
-    final showBottomNav = widget.show && ref.watch(bottomNavigationVisibilityProvider);
+  // ✅ 关注 Overlay 类型/阶段
+  final mapSheetType  = ref.watch(mapOverlaySheetProvider);
+  // 如果你已经在项目里用了 stage，可一起判断；没有就删掉下一行和相关逻辑
+  final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
+
+  // ✅ 出现创建行程时强制隐藏；（可选）其它 Sheet 在中/大展开时也隐藏
+  final hideForCreate = mapSheetType == MapOverlaySheetType.createRoadTrip;
+  final hideForOthers = mapSheetType != MapOverlaySheetType.none &&
+      mapSheetStage != MapOverlaySheetStage.collapsed;
+
+      
+    final baseVisible = widget.show && ref.watch(bottomNavigationVisibilityProvider);
+  final showBottomNav = baseVisible && !hideForCreate && !hideForOthers; // 👈 关键
 
     return SafeArea(
       child: AnimatedSlide(

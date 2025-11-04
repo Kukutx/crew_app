@@ -46,8 +46,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   ProviderSubscription<Event?>? _mapFocusSubscription;
   ProviderSubscription<EventCarouselManager>? _carouselSubscription;
   bool _isDrawerOpen = false;
-  final ClusterManagerId _eventsClusterManagerId =
-      const ClusterManagerId('events_cluster_manager');
+  final ClusterManagerId _eventsClusterManagerId = const ClusterManagerId(
+    'events_cluster_manager',
+  );
   late final ClusterManager _eventsClusterManager;
 
   @override
@@ -246,7 +247,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       appBar: hideSearchBar
           ? null
           : _SlidingAppBar(
-              hidden: !showBottomNavigation ||
+              hidden:
+                  !showBottomNavigation ||
                   (mapSheetType != MapOverlaySheetType.none &&
                       mapSheetStage == MapOverlaySheetStage.expanded),
               child: SearchEventAppBar(
@@ -266,8 +268,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 showClearSelectionAction: showClearSelectionInAppBar,
                 onClearSelection: showClearSelectionInAppBar
                     ? () => unawaited(
-                          locationSelectionManager.clearSelectedLocation(),
-                        )
+                        locationSelectionManager.clearSelectedLocation(),
+                      )
                     : null,
               ),
             ),
@@ -369,13 +371,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-              Padding(
+          Padding(
             padding: const EdgeInsets.only(right: 6),
             child: AppFloatingActionButton(
               heroTag: 'events_map_test_fab',
               backgroundColor: theme.colorScheme.secondary,
               foregroundColor: theme.colorScheme.onSecondary,
-              onPressed: () => showCreateRoadTripSheet(context),
+              onPressed: () {
+                ref.read(mapOverlaySheetProvider.notifier).state =
+                    MapOverlaySheetType.createRoadTrip;
+              },
               child: const Icon(Icons.add),
             ),
           ),
@@ -485,6 +490,8 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   late final DraggableScrollableController _controller;
   double _currentSize = 0;
 
+ bool get _attached => _controller.isAttached;
+
   @override
   void initState() {
     super.initState();
@@ -502,6 +509,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   }
 
   void _handleSizeChanged() {
+        if (!_attached || !mounted) return;  
     final size = _controller.size;
     if ((size - _currentSize).abs() < 1e-4 || !mounted) {
       return;
@@ -529,20 +537,22 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     double maxSize,
     double height,
   ) {
+        if (!_attached) return; 
     final delta = details.primaryDelta ?? 0;
     if (delta == 0) {
       return;
     }
-    final proposed = (_controller.size - delta / height).clamp(minSize, maxSize);
+    final proposed = (_controller.size - delta / height).clamp(
+      minSize,
+      maxSize,
+    );
     if (proposed != _controller.size) {
       _controller.jumpTo(proposed);
     }
   }
 
-  void _onDragEnd(
-    DragEndDetails details,
-    List<double> snapSizes,
-  ) {
+  void _onDragEnd(DragEndDetails details, List<double> snapSizes) {
+        if (!_attached) return; 
     final velocity = details.primaryVelocity ?? 0;
     final currentSize = _currentSize;
     final target = _targetSnapFor(currentSize, velocity, snapSizes);
@@ -594,6 +604,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       MapOverlaySheetType.chat => const [0.32, 0.5, 0.92],
       MapOverlaySheetType.explore => const [0.23, 0.5, 0.92],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.92],
+      MapOverlaySheetType.createRoadTrip => const [0.23,0.45, 0.95],
     };
   }
 
@@ -603,6 +614,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       MapOverlaySheetType.chat => snapSizes[1],
       MapOverlaySheetType.explore => snapSizes[1],
       MapOverlaySheetType.none => snapSizes.first,
+      MapOverlaySheetType.createRoadTrip => snapSizes.first,
     };
   }
 
@@ -637,7 +649,8 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     }
 
     final phase = SchedulerBinding.instance.schedulerPhase;
-    if (phase == SchedulerPhase.idle || phase == SchedulerPhase.postFrameCallbacks) {
+    if (phase == SchedulerPhase.idle ||
+        phase == SchedulerPhase.postFrameCallbacks) {
       updateStage();
       return;
     }
@@ -691,14 +704,23 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
             final Widget effectiveContent;
             switch (widget.sheetType) {
               case MapOverlaySheetType.explore:
-                effectiveContent = MapExploreSheet(scrollController: scrollController);
+                effectiveContent = MapExploreSheet(
+                  scrollController: scrollController,
+                );
                 break;
               case MapOverlaySheetType.chat:
-                effectiveContent = ChatSheet(scrollController: scrollController);
+                effectiveContent = ChatSheet(
+                  scrollController: scrollController,
+                );
                 break;
               case MapOverlaySheetType.none:
                 effectiveContent = const SizedBox.shrink();
                 break;
+              case MapOverlaySheetType.createRoadTrip:
+                effectiveContent = CreateRoadTripSheet(
+                  // ✅ 新的可复用“内容层”
+                  scrollController: scrollController,
+                );
             }
 
             return Padding(
@@ -707,7 +729,9 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                 color: colorScheme.surface,
                 elevation: 12,
                 shadowColor: colorScheme.shadow.withValues(alpha: 0.18),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
@@ -746,14 +770,17 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                                   if (isExpanded) {
                                     _controller.animateTo(
                                       snapSizes[snapSizes.length - 2],
-                                      duration: const Duration(milliseconds: 220),
+                                      duration: const Duration(
+                                        milliseconds: 220,
+                                      ),
                                       curve: Curves.easeOutCubic,
                                     );
                                     return;
                                   }
                                   ref
                                       .read(mapOverlaySheetProvider.notifier)
-                                      .state = MapOverlaySheetType.none;
+                                      .state = MapOverlaySheetType
+                                      .none;
                                 },
                               ),
                             ),

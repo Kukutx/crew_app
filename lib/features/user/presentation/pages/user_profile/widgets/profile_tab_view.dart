@@ -82,7 +82,7 @@ class _FavoritesGrid extends ConsumerWidget {
         }
 
         return AppMasonryGrid(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           crossAxisCount: 2,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -29,31 +30,30 @@ class ProfileHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Material(
-          elevation: 6,
-          color: Colors.white.withValues(alpha: 0.12),
+          elevation: 0,
+          color: Colors.white.withValues(alpha: 0.15),
           surfaceTintColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final isCompact = constraints.maxWidth < 420;
 
                 Widget buildProfileDetails() {
-                  final infoBadges = <Widget>[];
                   final locationLabel = userProfile.location?.trim();
-
-                  if (locationLabel?.isNotEmpty ?? false) {
-                    infoBadges.add(
-                      _ProfileInfoBadge(
-                        icon: Icons.place_outlined,
-                        label: locationLabel!,
-                      ),
-                    );
-                  }
+                  // 自动获取IP属地（基于设备locale）
+                  final ipLocation = _getIpLocationFromLocaleStatic();
 
                   return DefaultTextStyle(
                     style: t.bodyMedium!.copyWith(color: Colors.white),
@@ -68,7 +68,10 @@ class ProfileHeaderCard extends StatelessWidget {
                                 userProfile.name,
                                 style: t.titleMedium!.copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                  height: 1.3,
+                                  letterSpacing: -0.2,
                                 ),
                               ),
                             ),
@@ -93,24 +96,82 @@ class ProfileHeaderCard extends StatelessWidget {
                           ],
                         ),
                         if (userProfile.tags.isNotEmpty) ...[
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           _ProfileTagList(tags: userProfile.tags),
                         ],
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         Text(
                           userProfile.bio,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+                          style: t.bodyMedium!.copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 14,
+                            height: 1.4,
+                            letterSpacing: 0,
+                          ),
                         ),
-                        if (infoBadges.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: infoBadges,
+                        if (locationLabel?.isNotEmpty ?? false || ipLocation != null) ...[
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              if (locationLabel?.isNotEmpty ?? false) ...[
+                                Icon(
+                                  Icons.place_outlined,
+                                  size: 16,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  locationLabel!,
+                                  style: t.bodySmall!.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 13,
+                                    height: 1.3,
+                                    letterSpacing: 0,
+                                  ),
+                                ),
+                              ],
+                              if (ipLocation != null) ...[
+                                if (locationLabel?.isNotEmpty ?? false) ...[
+                                  const SizedBox(width: 12),
+                                  Icon(
+                                    Icons.public_outlined,
+                                    size: 16,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'IP属地：$ipLocation',
+                                    style: t.bodySmall!.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.7),
+                                      fontSize: 13,
+                                      height: 1.3,
+                                      letterSpacing: 0,
+                                    ),
+                                  ),
+                                ] else ...[
+                                  Icon(
+                                    Icons.public_outlined,
+                                    size: 16,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'IP属地：$ipLocation',
+                                    style: t.bodySmall!.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.7),
+                                      fontSize: 13,
+                                      height: 1.3,
+                                      letterSpacing: 0,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ],
                           ),
                         ],
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         Row(
                           children: [
                             _ProfileStat(
@@ -162,11 +223,16 @@ class ProfileHeaderCard extends StatelessWidget {
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const Text(
+                        child: Text(
                           '查看留言簿',
                           style: TextStyle(
                             decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.w500,
+                            decorationThickness: 1.5,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            height: 1.3,
+                            letterSpacing: 0,
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                       ),
@@ -204,8 +270,8 @@ class ProfileHeaderCard extends StatelessWidget {
                             fontSize: 24,
                             shadows: [
                               Shadow(
-                                blurRadius: 6,
                                 color: Colors.black45,
+                                blurRadius: 6,
                                 offset: Offset(0, 2),
                               ),
                             ],
@@ -266,6 +332,69 @@ class ProfileHeaderCard extends StatelessWidget {
       ),
     );
   }
+  
+  String? _getIpLocationFromLocaleStatic() {
+    final locale = ui.PlatformDispatcher.instance.locale;
+    final countryCode = locale.countryCode;
+    
+    // 根据国家代码返回对应的地区
+    if (countryCode == null) return null;
+    
+    // 简单的地区映射（可以根据需要扩展）
+    final locationMap = {
+      'CN': '中国',
+      'US': '美国',
+      'GB': '英国',
+      'JP': '日本',
+      'KR': '韩国',
+      'TW': '台湾',
+      'HK': '香港',
+      'MO': '澳门',
+      'SG': '新加坡',
+      'MY': '马来西亚',
+      'AU': '澳大利亚',
+      'CA': '加拿大',
+      'FR': '法国',
+      'DE': '德国',
+      'IT': '意大利',
+      'ES': '西班牙',
+      'NL': '荷兰',
+      'BE': '比利时',
+      'CH': '瑞士',
+      'AT': '奥地利',
+      'SE': '瑞典',
+      'NO': '挪威',
+      'DK': '丹麦',
+      'FI': '芬兰',
+      'PL': '波兰',
+      'RU': '俄罗斯',
+      'IN': '印度',
+      'BR': '巴西',
+      'MX': '墨西哥',
+      'AR': '阿根廷',
+      'ZA': '南非',
+      'NZ': '新西兰',
+      'IE': '爱尔兰',
+      'PT': '葡萄牙',
+      'GR': '希腊',
+      'TR': '土耳其',
+      'TH': '泰国',
+      'VN': '越南',
+      'PH': '菲律宾',
+      'ID': '印度尼西亚',
+    };
+    
+    final country = locationMap[countryCode];
+    if (country == null) return countryCode;
+    
+    // 对于中国，可以进一步细化到省份（这里简化处理）
+    if (countryCode == 'CN') {
+      // 可以根据语言环境或其他因素进一步细化
+      return '中国';
+    }
+    
+    return country;
+  }
 }
 
 class _ProfileTagList extends StatelessWidget {
@@ -275,20 +404,10 @@ class _ProfileTagList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 30,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(right: 4),
-        child: Row(
-          children: [
-            for (var i = 0; i < tags.length; i++) ...[
-              if (i != 0) const SizedBox(width: 8),
-              _ProfileTag(label: tags[i]),
-            ],
-          ],
-        ),
-      ),
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: tags.map((tag) => _ProfileTag(label: tag)).toList(),
     );
   }
 }
@@ -311,12 +430,20 @@ class _ProfileStat extends StatelessWidget {
           style: theme.textTheme.titleSmall!.copyWith(
             color: color,
             fontWeight: FontWeight.w700,
+            fontSize: 15,
+            height: 1.3,
+            letterSpacing: 0,
           ),
         ),
         const SizedBox(width: 4),
         Text(
           label,
-          style: theme.textTheme.bodySmall!.copyWith(color: color),
+          style: theme.textTheme.bodySmall!.copyWith(
+            color: color.withValues(alpha: 0.9),
+            fontSize: 13,
+            height: 1.3,
+            letterSpacing: 0,
+          ),
         ),
       ],
     );
@@ -350,54 +477,30 @@ class _ProfileTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Text(
         label,
-        style: Theme.of(context)
-            .textTheme
-            .labelSmall!
-            .copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+        style: Theme.of(context).textTheme.labelSmall!.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              height: 1.3,
+              letterSpacing: 0,
+            ),
       ),
     );
   }
-}
 
-class _ProfileInfoBadge extends StatelessWidget {
-  const _ProfileInfoBadge({required this.icon, required this.label});
+  // 根据设备locale自动获取IP属地（静态方法，可在嵌套函数中使用）
 
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.white),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall!
-                .copyWith(color: Colors.white, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _FollowButton extends StatelessWidget {
@@ -410,12 +513,28 @@ class _FollowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: followed ? Colors.white10 : Colors.white,
-        foregroundColor: followed ? Colors.white : Colors.black,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: followed
+            ? Colors.white.withValues(alpha: 0.15)
+            : Colors.white,
+        foregroundColor: followed
+            ? Colors.white
+            : Colors.black87,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: followed ? 0 : 2,
       ),
       onPressed: onPressed,
-      child: Text(followed ? '已关注' : '关注'),
+      child: Text(
+        followed ? '已关注' : '关注',
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          height: 1.3,
+          letterSpacing: 0,
+        ),
+      ),
     );
   }
 }
@@ -431,11 +550,25 @@ class _MessageButton extends StatelessWidget {
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
-        side: const BorderSide(color: Colors.white70),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.8),
+          width: 1.5,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
       icon: const Icon(Icons.mail_outline, size: 18),
-      label: const Text('私信'),
+      label: const Text(
+        '私信',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          height: 1.3,
+          letterSpacing: 0,
+        ),
+      ),
     );
   }
 }

@@ -295,10 +295,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final titleStyle = theme.textTheme.headlineSmall?.copyWith(
-      fontWeight: FontWeight.w700,
-      letterSpacing: 0.3,
-    );
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -316,18 +312,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 120),
             children: [
-              Text(
-                widget.isEditing ? '更新旅程，焕新体验' : '让灵感变成下一次旅程',
-                style: titleStyle,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '完成关卡式表单，召集伙伴一起上！',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 24),
               RoadTripBasicSection(
                 titleController: _titleCtrl,
                 dateRange: _state.dateRange,

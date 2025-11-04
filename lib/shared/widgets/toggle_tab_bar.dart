@@ -40,7 +40,7 @@ class ToggleTabBar extends StatelessWidget {
           selected: selectedIndex == 0,
           onTap: () => onChanged(0),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 6),
         ToggleTabChip(
           label: secondLabel,
           icon: secondIcon,
@@ -57,15 +57,19 @@ class ToggleTabBar extends StatelessWidget {
           width: double.infinity,
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: leading ?? const SizedBox.shrink(),
+              if (leading != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 4),
+                  child: leading!,
+                ),
+              Expanded(
+                child: Center(child: tabs),
               ),
-              Expanded(child: Center(child: tabs)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: trailing ?? const SizedBox.shrink(),
-              ),
+              if (trailing != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, right: 8),
+                  child: trailing!,
+                ),
             ],
           ),
         ),
@@ -96,37 +100,43 @@ class ToggleTabChip extends StatelessWidget {
         : colorScheme.onSurface;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected
-              ? colorScheme.primary
-              : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: selected
-                  ? colorScheme.onPrimary
-                  : colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: foregroundColor,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 17,
+                color: selected
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               ),
-            ),
-          ],
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: foregroundColor,
+                    height: 1.3,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
     );
   }
 }

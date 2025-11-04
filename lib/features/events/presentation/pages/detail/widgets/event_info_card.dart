@@ -29,22 +29,35 @@ class EventInfoCard extends StatelessWidget {
     final titleStyle = theme.textTheme.titleMedium?.copyWith(
       color: colorScheme.onSurface,
       fontWeight: FontWeight.w700,
+      fontSize: 18,
+      height: 1.3,
+      letterSpacing: -0.2,
     );
     final detailTitleStyle = theme.textTheme.bodyMedium?.copyWith(
       color: colorScheme.onSurface,
       fontWeight: FontWeight.w600,
+      fontSize: 14,
+      height: 1.3,
+      letterSpacing: 0,
     );
     final fallbackDetailTitleStyle = TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w600,
       color: colorScheme.onSurface,
+      height: 1.3,
+      letterSpacing: 0,
     );
     final valueTextStyle = theme.textTheme.bodyMedium?.copyWith(
       color: colorScheme.onSurfaceVariant,
+      fontSize: 14,
+      height: 1.4,
+      letterSpacing: 0,
     );
     final fallbackValueStyle = TextStyle(
       fontSize: 14,
       color: colorScheme.onSurfaceVariant,
+      height: 1.4,
+      letterSpacing: 0,
     );
     final chipBackground = colorScheme.primaryContainer;
     final chipTextColor = colorScheme.onPrimaryContainer;
@@ -52,11 +65,16 @@ class EventInfoCard extends StatelessWidget {
     final chipTextStyle = theme.textTheme.labelMedium?.copyWith(
       color: chipTextColor,
       fontWeight: FontWeight.w600,
+      fontSize: 12,
+      height: 1.3,
+      letterSpacing: 0,
     );
     final fallbackChipTextStyle = TextStyle(
-      fontSize: 13,
+      fontSize: 12,
       color: chipTextColor,
       fontWeight: FontWeight.w600,
+      height: 1.3,
+      letterSpacing: 0,
     );
 
     final startPoint = event.address?.isNotEmpty == true
@@ -67,25 +85,32 @@ class EventInfoCard extends StatelessWidget {
         : event.location;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       color: colorScheme.surfaceContainerHighest,
-      shadowColor: Colors.black.withValues(alpha: 0.45),
+      elevation: 0,
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               loc.event_details_title,
-              style:
-                  titleStyle ??
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: titleStyle ??
+                  const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                    letterSpacing: -0.2,
+                  ),
             ),
+            const SizedBox(height: 16),
             Divider(
-              height: 24,
-              color: colorScheme.outline.withValues(alpha: 0.4),
+              height: 1,
+              thickness: 1,
+              color: colorScheme.outline.withValues(alpha: 0.2),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             _timeRow(
               startTimeText,
               endTimeText,
@@ -160,22 +185,36 @@ class EventInfoCard extends StatelessWidget {
     required TextStyle valueStyle,
     Widget? trailing,
   }) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: iconColor),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            icon,
+            size: 18,
+            color: iconColor.withValues(alpha: 0.9),
+          ),
+        ),
         const SizedBox(width: 12),
-        Text(title, style: titleStyle),
-        const Spacer(),
+        Expanded(
+          child: Text(
+            title,
+            style: titleStyle,
+          ),
+        ),
+        const SizedBox(width: 12),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.right,
             overflow: TextOverflow.ellipsis,
+            maxLines: 2,
             style: valueStyle,
           ),
         ),
-        if (trailing != null) ...[const SizedBox(width: 4), trailing],
+        if (trailing != null) ...[const SizedBox(width: 8), trailing],
       ],
     ),
   );
@@ -189,34 +228,50 @@ class EventInfoCard extends StatelessWidget {
     Color chipBorderColor,
     TextStyle chipTextStyle,
   ) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.alt_route, size: 20, color: iconColor),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            Icons.alt_route,
+            size: 18,
+            color: iconColor.withValues(alpha: 0.9),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(loc.event_waypoints_title, style: titleStyle),
-              const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: waypoints
-                      .map(
-                        (point) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Chip(
-                            label: Text(point, style: chipTextStyle),
-                            backgroundColor: chipBackground,
-                            side: BorderSide(color: chipBorderColor),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: waypoints
+                    .map(
+                      (point) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: chipBackground,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: chipBorderColor,
+                            width: 1,
                           ),
                         ),
-                      )
-                      .toList(growable: false),
-                ),
+                        child: Text(
+                          point,
+                          style: chipTextStyle,
+                        ),
+                      ),
+                    )
+                    .toList(growable: false),
               ),
             ],
           ),
@@ -232,24 +287,34 @@ class EventInfoCard extends StatelessWidget {
     required TextStyle titleStyle,
     required TextStyle valueStyle,
   }) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.calendar_today, size: 20, color: iconColor),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            Icons.calendar_today,
+            size: 18,
+            color: iconColor.withValues(alpha: 0.9),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(loc.event_time_title, style: titleStyle),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 '${loc.event_start_time_label}: $startText',
                 style: valueStyle,
               ),
               const SizedBox(height: 4),
-              Text('${loc.event_end_time_label}: $endText', style: valueStyle),
+              Text(
+                '${loc.event_end_time_label}: $endText',
+                style: valueStyle,
+              ),
             ],
           ),
         ),

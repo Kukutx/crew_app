@@ -71,14 +71,18 @@ class ProfilePreviewSection extends StatelessWidget {
       ));
     }
 
-    return MediaQuery(
-  data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(0.9)),
-  child:Card(
+    return Card(
       clipBehavior: Clip.antiAlias,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
       child: SizedBox(
-        height: 220,
+        height: 240,
         child: Stack(
           children: [
             Positioned.fill(
@@ -103,12 +107,26 @@ class ProfilePreviewSection extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: 16,
-              right: 16,
+              top: 12,
+              right: 12,
               child: FilledButton.tonalIcon(
                 onPressed: onEditCover,
-                icon: const Icon(Icons.photo_outlined),
-                label: Text(loc.preferences_cover_action),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.photo_outlined, size: 18),
+                label: Text(
+                  loc.preferences_cover_action,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    letterSpacing: 0,
+                  ),
+                ),
               ),
             ),
             Positioned(
@@ -136,21 +154,19 @@ class ProfilePreviewSection extends StatelessWidget {
                       ),
                       if (flagEmoji != null)
                         Positioned(
-                          bottom: -4,
-                          left: -4,
-                          child: Padding(
-                            padding: const EdgeInsets.all(2),
-                            child: Text(
-                              flagEmoji,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black45,
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                              ),
+                          bottom: -6,
+                          left: -6,
+                          child: Text(
+                            flagEmoji,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black45,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -160,11 +176,12 @@ class ProfilePreviewSection extends StatelessWidget {
                         child: Material(
                           shape: const CircleBorder(),
                           color: theme.colorScheme.primary,
+                          elevation: 2,
                           child: InkWell(
                             onTap: onEditAvatar,
                             customBorder: const CircleBorder(),
                             child: Padding(
-                              padding: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(7),
                               child: Icon(
                                 Icons.camera_alt_outlined,
                                 size: 18,
@@ -189,7 +206,10 @@ class ProfilePreviewSection extends StatelessWidget {
                                 displayName,
                                 style: textTheme.titleMedium?.copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                  height: 1.3,
+                                  letterSpacing: -0.2,
                                 ),
                               ),
                             ),
@@ -213,35 +233,47 @@ class ProfilePreviewSection extends StatelessWidget {
                             ],
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         Text(
                           bio,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.bodyMedium?.copyWith(
                             color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 14,
+                            height: 1.4,
+                            letterSpacing: 0,
                           ),
                         ),
                         if (tags.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
+                            spacing: 8,
+                            runSpacing: 8,
                             children: [
                               for (final tag in tags)
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
+                                    horizontal: 12,
+                                    vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.16),
-                                    borderRadius: BorderRadius.circular(999),
+                                    color: Colors.white.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      width: 1,
+                                    ),
                                   ),
                                   child: Text(
                                     tag,
-                                    style: textTheme.labelMedium
-                                        ?.copyWith(color: Colors.white),
+                                    style: textTheme.labelMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.3,
+                                      letterSpacing: 0,
+                                    ),
                                   ),
                                 ),
                             ],
@@ -264,7 +296,6 @@ class ProfilePreviewSection extends StatelessWidget {
           ],
         ),
       ),
-      ),
     );
   }
 }
@@ -278,23 +309,36 @@ class _InfoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle =
-        theme.textTheme.labelMedium?.copyWith(color: Colors.white) ??
-            const TextStyle(color: Colors.white);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.white),
+          Icon(
+            icon,
+            size: 16,
+            color: Colors.white.withValues(alpha: 0.9),
+          ),
           const SizedBox(width: 6),
-          Text(label, style: textStyle),
+          Text(
+            label,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.3,
+              letterSpacing: 0,
+            ),
+          ),
         ],
       ),
     );

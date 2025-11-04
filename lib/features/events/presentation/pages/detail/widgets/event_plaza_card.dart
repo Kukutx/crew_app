@@ -135,25 +135,6 @@ class EventPlazaCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Row(
-            children: [
-              Text(
-                loc.events_tab_moments,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: colorScheme.primary,
-              ),
-            ],
-          ),
-        ),
         for (var i = 0; i < _posts.length; i++)
           PlazaPostCard(
             post: _posts[i],

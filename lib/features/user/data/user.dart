@@ -41,6 +41,7 @@ class User {
   final DateTime? birthday;
   final String? school;
   final String? location;
+  final String? ipLocation; // IP属地
 
   String? get countryFlag => countryCodeToEmoji(countryCode);
 
@@ -61,6 +62,7 @@ class User {
     this.birthday,
     this.school,
     this.location,
+    this.ipLocation,
   });
 
   User copyWith({
@@ -79,6 +81,7 @@ class User {
     Object? birthday = _sentinel,
     Object? school = _sentinel,
     Object? location = _sentinel,
+    Object? ipLocation = _sentinel,
   }) =>
       User(
         uid: uid,
@@ -100,6 +103,9 @@ class User {
         school: school == _sentinel ? this.school : school as String?,
         location:
             location == _sentinel ? this.location : location as String?,
+        ipLocation: ipLocation == _sentinel
+            ? this.ipLocation
+            : ipLocation as String?,
       );
 }
 

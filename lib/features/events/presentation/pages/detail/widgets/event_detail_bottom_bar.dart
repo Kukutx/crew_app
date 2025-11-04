@@ -39,55 +39,74 @@ class EventDetailBottomBar extends StatelessWidget {
       alpha: 0.35,
     );
     final chatForegroundColor = colorScheme.onSurfaceVariant;
-    return SafeArea(
+      return SafeArea(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           border: Border(
-            top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
+            top: BorderSide(
+              color: colorScheme.outline.withValues(alpha: 0.15),
+              width: 1,
+            ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.35),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 12,
+              offset: const Offset(0, -2),
+              spreadRadius: 0,
             ),
           ],
         ),
         child: Row(
           children: [
-            _PillActionButton(
-              onPressed: onFavorite,
-              backgroundColor: favoriteBackgroundColor,
-              foregroundColor: favoriteColor,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(isFavorite ? Icons.star : Icons.star_border),
-                  const SizedBox(width: 6),
-                  Text(
-                    countLabel,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+            // 前三个按钮组合，更紧凑
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _PillActionButton(
+                  onPressed: onFavorite,
+                  backgroundColor: favoriteBackgroundColor,
+                  foregroundColor: favoriteColor,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        countLabel,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 6),
+                _PillActionButton(
+                  onPressed: onOpenPrivateChat,
+                  backgroundColor: chatBackgroundColor,
+                  foregroundColor: chatForegroundColor,
+                  child: const Icon(Icons.chat_bubble_outline, size: 20),
+                ),
+                const SizedBox(width: 6),
+                _PillActionButton(
+                  onPressed: onOpenGroupChat,
+                  backgroundColor: chatBackgroundColor,
+                  foregroundColor: chatForegroundColor,
+                  child: const Icon(Icons.groups_2_outlined, size: 20),
+                ),
+              ],
             ),
-            _PillActionButton(
-              onPressed: onOpenPrivateChat,
-              backgroundColor: chatBackgroundColor,
-              foregroundColor: chatForegroundColor,
-              child: const Icon(Icons.chat_bubble_outline),
-            ),
-            _PillActionButton(
-              onPressed: onOpenGroupChat,
-              backgroundColor: chatBackgroundColor,
-              foregroundColor: chatForegroundColor,
-              child: const Icon(Icons.groups_2_outlined),
-            ),
+            const SizedBox(width: 12),
+            // 注册按钮
             Expanded(
               child: SizedBox(
                 height: 48,
@@ -99,8 +118,17 @@ class EventDetailBottomBar extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 0,
                   ),
-                  child: Text(loc.action_register),
+                  child: Text(
+                    loc.action_register,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                      letterSpacing: 0,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -129,15 +157,25 @@ class _PillActionButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        minimumSize: const Size(0, 40),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: IconTheme(
-        data: IconThemeData(color: foregroundColor, size: 22),
+        data: IconThemeData(color: foregroundColor, size: 20),
         child: DefaultTextStyle(
-          style: TextStyle(color: foregroundColor, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: foregroundColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+            height: 1.3,
+            letterSpacing: 0,
+          ),
           child: child,
         ),
       ),

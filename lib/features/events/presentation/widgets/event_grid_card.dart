@@ -37,8 +37,15 @@ class EventGridCard extends StatelessWidget {
     final imageUrl = event.firstAvailableImageUrl;
 
     return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(12),
+      elevation: 0,
+      shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () async {
@@ -107,13 +114,13 @@ class EventGridCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withValues(alpha: 0.85),
-                    borderRadius: BorderRadius.circular(8),
+                    ).colorScheme.primary.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 4,
+                      vertical: 5,
                     ),
                     child: Text(
                       "招募中",
@@ -122,24 +129,52 @@ class EventGridCard extends StatelessWidget {
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        height: 1.2,
+                        letterSpacing: 0,
                       ),
                     ),
                   ),
                 ),
               ),
 
+              // 标题
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  color: Colors.black54,
-                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.85),
+                      ],
+                      stops: const [0.0, 0.6, 1.0],
+                    ),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                   child: Text(
                     event.title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                      letterSpacing: -0.2,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          offset: const Offset(0, 1),
+                          blurRadius: 3,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -255,7 +255,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
           ProfilePreviewSection(
             coverUrl: profile.cover,
@@ -287,9 +287,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           const SizedBox(height: 24),
           Text(
             loc.preferences_basic_info_title,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              height: 1.3,
+              letterSpacing: -0.2,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           BasicInfoSection(
             nameController: _nameController,
             gender: _gender,
@@ -315,9 +320,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           const SizedBox(height: 24),
           Text(
             loc.preferences_tags_title,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              height: 1.3,
+              letterSpacing: -0.2,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           TagSection(
             tags: _tags,
             tagInputController: _tagInputController,

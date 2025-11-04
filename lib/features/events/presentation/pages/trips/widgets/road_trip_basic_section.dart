@@ -23,7 +23,7 @@ class RoadTripBasicSection extends StatelessWidget {
     return RoadTripSectionCard(
       icon: Icons.rocket_launch_outlined,
       title: loc.road_trip_basic_section_title,
-      subtitle: loc.road_trip_basic_section_subtitle,
+      subtitle: '',
       children: [
         TextFormField(
           controller: titleController,
@@ -43,10 +43,9 @@ class RoadTripBasicSection extends StatelessWidget {
             Icons.calendar_month,
             color: theme.colorScheme.primary,
           ),
-          title: Text(loc.road_trip_basic_date_label),
-          subtitle: Text(
+          title: Text(
             dateRange == null
-                ? loc.road_trip_basic_date_hint
+                ? loc.road_trip_basic_date_label
                 : '${FormattedDate.formatDate(dateRange!.start)} → ${FormattedDate.formatDate(dateRange!.end)}',
           ),
           trailing: const Icon(Icons.chevron_right_rounded),

@@ -524,26 +524,48 @@ class _ChatSheetState extends State<ChatSheet> {
               controller: _searchController,
               onChanged: (value) => setState(() => _searchQuery = value),
               textInputAction: TextInputAction.search,
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.5,
+                color: colorScheme.onSurface,
+                letterSpacing: 0.2,
+              ),
               decoration: InputDecoration(
                 hintText: loc.chat_search_hint,
-                prefixIcon: const Icon(Icons.search),
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                  size: 20,
+                ),
                 suffixIcon: _searchQuery.trim().isEmpty
                     ? null
                     : IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: Icon(
+                          Icons.clear,
+                          size: 20,
+                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                        ),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
                         },
                       ),
                 filled: true,
-                fillColor: colorScheme.surfaceContainerHighest,
+                fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                isDense: true,
               ),
             ),
           ),

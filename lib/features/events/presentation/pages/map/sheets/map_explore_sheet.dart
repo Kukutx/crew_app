@@ -234,7 +234,14 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                     for (final filter in _filters)
                       PopupMenuItem<String>(
                         value: filter,
-                        child: Text(filter),
+                        child: Text(
+                          filter,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 1.3,
+                            letterSpacing: 0,
+                          ),
+                        ),
                       ),
                   ],
                   child: Container(
@@ -243,14 +250,22 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: buttonColor,
+                      color: buttonColor.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(_selectedFilter ?? _filters.first),
-                        const SizedBox(width: 4),
+                        Text(
+                          _selectedFilter ?? _filters.first,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
                         const Icon(Icons.keyboard_arrow_down, size: 18),
                       ],
                     ),
@@ -258,6 +273,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                 );
               },
               trailingBuilder: (context, selectedIndex) {
+                final theme = Theme.of(context);
                 final isInvitesTab = selectedIndex == 0;
                 final onPressed = isInvitesTab
                     ? () {
@@ -270,12 +286,16 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                         );
                       }
                     : () => showCreateMomentSheet(context);
-                return InkWell(
+                return Material(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(16),
-                  onTap: onPressed,
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Icon(Icons.add),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: onPressed,
+                    child: const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Icon(Icons.add, size: 20),
+                    ),
                   ),
                 );
               },

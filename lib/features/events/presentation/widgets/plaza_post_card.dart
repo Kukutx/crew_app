@@ -80,7 +80,14 @@ class PlazaPostCard extends StatelessWidget {
 
     return Card(
       margin: margin ?? EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
       clipBehavior: Clip.antiAlias,
       color: backgroundColor,
       child: Padding(
@@ -95,14 +102,15 @@ class PlazaPostCard extends StatelessWidget {
                     onTap: onAuthorTap,
                     borderRadius: BorderRadius.circular(16),
                     child: CrewAvatar(
-                      radius: 20,
+                      radius: 22,
                       backgroundColor:
                           post.accentColor.withValues(alpha: 0.15),
                       foregroundColor: post.accentColor,
                       child: Text(
                         post.authorInitials,
                         style: const TextStyle(
-                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -115,14 +123,20 @@ class PlazaPostCard extends StatelessWidget {
                         Text(
                           post.author,
                           style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            height: 1.3,
+                            letterSpacing: -0.2,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Text(
                           post.timeLabel,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
+                            fontSize: 12,
+                            height: 1.3,
+                            letterSpacing: 0,
                           ),
                         ),
                       ],
@@ -133,7 +147,12 @@ class PlazaPostCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 post.content,
-                style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 15,
+                  height: 1.5,
+                  letterSpacing: 0.2,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               if (post.mediaAssets.isNotEmpty) ...[
                 const SizedBox(height: 12),
@@ -152,15 +171,15 @@ class PlazaPostCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.location_on_outlined,
-                        size: 18,
-                        color: colorScheme.onSurfaceVariant,
+                        size: 16,
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -168,6 +187,9 @@ class PlazaPostCard extends StatelessWidget {
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          height: 1.3,
+                          letterSpacing: 0,
                         ),
                       ),
                     ],
@@ -308,20 +330,27 @@ class _PlazaPostAction extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: colorScheme.onSurfaceVariant),
+              Icon(
+                icon,
+                size: 18,
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  height: 1.3,
+                  letterSpacing: 0,
                 ),
               ),
             ],

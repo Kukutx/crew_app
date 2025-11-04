@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment_post_card.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,29 +6,29 @@ import 'package:flutter/services.dart';
 
 import '../edit_moment_page.dart';
 
-import '../sheets/plaza_post_comments_sheet.dart';
+import '../sheets/moment_post_comments_sheet.dart';
 
-class PlazaPostDetailScreen extends StatefulWidget {
-  const PlazaPostDetailScreen({
+class MomentPostDetailScreen extends StatefulWidget {
+  const MomentPostDetailScreen({
     super.key,
     required this.post,
     this.initialPage = 0,
     this.heroTag,
   });
 
-  final PlazaPost post;
+  final MomentPost post;
   final int initialPage;
   final String? heroTag;
 
   static PageRoute<int> route({
-    required PlazaPost post,
+    required MomentPost post,
     int initialPage = 0,
     String? heroTag,
   }) {
     return PageRouteBuilder<int>(
       pageBuilder: (_, animation, _) => FadeTransition(
         opacity: animation,
-        child: PlazaPostDetailScreen(
+        child: MomentPostDetailScreen(
           post: post,
           initialPage: initialPage,
           heroTag: heroTag,
@@ -40,10 +40,10 @@ class PlazaPostDetailScreen extends StatefulWidget {
   }
 
   @override
-  State<PlazaPostDetailScreen> createState() => _PlazaPostDetailPageState();
+  State<MomentPostDetailScreen> createState() => _MomentPostDetailPageState();
 }
 
-class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
+class _MomentPostDetailPageState extends State<MomentPostDetailScreen> {
   late final List<String> _mediaAssets;
   late final PageController _pageController;
   int _currentPage = 0;
@@ -103,7 +103,7 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
   }
 
   void _showComments() {
-    showPlazaPostCommentsSheet(context, widget.post);
+    showMomentPostCommentsSheet(context, widget.post);
   }
 
   Future<void> _showMomentActions() async {
@@ -231,7 +231,7 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
     final mediaAssets = _mediaAssets;
 
     final viewer = mediaAssets.isEmpty
-        ? _EmptyPlazaMediaPlaceholder(post: widget.post)
+        ? _EmptyMomentMediaPlaceholder(post: widget.post)
         : PageView.builder(
             controller: _pageController,
             onPageChanged: _handlePageChanged,
@@ -330,7 +330,7 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
                       ),
                       const SizedBox(height: 12),
                       if (mediaAssets.length > 1)
-                        _PlazaFullscreenPageIndicator(
+                        _MomentFullscreenPageIndicator(
                           current: _currentPage,
                           total: mediaAssets.length,
                         ),
@@ -359,8 +359,8 @@ class _PlazaPostDetailPageState extends State<PlazaPostDetailScreen> {
 
 enum _MomentAction { edit, delete }
 
-class _PlazaFullscreenPageIndicator extends StatelessWidget {
-  const _PlazaFullscreenPageIndicator({
+class _MomentFullscreenPageIndicator extends StatelessWidget {
+  const _MomentFullscreenPageIndicator({
     required this.current,
     required this.total,
   });
@@ -389,10 +389,10 @@ class _PlazaFullscreenPageIndicator extends StatelessWidget {
   }
 }
 
-class _EmptyPlazaMediaPlaceholder extends StatelessWidget {
-  const _EmptyPlazaMediaPlaceholder({required this.post});
+class _EmptyMomentMediaPlaceholder extends StatelessWidget {
+  const _EmptyMomentMediaPlaceholder({required this.post});
 
-  final PlazaPost post;
+  final MomentPost post;
 
   @override
   Widget build(BuildContext context) {
@@ -425,3 +425,4 @@ class _EmptyPlazaMediaPlaceholder extends StatelessWidget {
     );
   }
 }
+

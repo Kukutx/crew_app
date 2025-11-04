@@ -1,11 +1,11 @@
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
-import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment_post_card.dart';
 
-Future<void> showPlazaPostCommentsSheet(
+Future<void> showMomentPostCommentsSheet(
   BuildContext context,
-  PlazaPost post,
+  MomentPost post,
 ) {
   final theme = Theme.of(context);
 

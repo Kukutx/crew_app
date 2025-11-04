@@ -6,7 +6,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/sheets/event_share_sheet.dart';
-import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
@@ -408,9 +408,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         onOpenPrivateChat: () => _showFeatureNotReadyMessage(loc),
         onOpenGroupChat: () => _showFeatureNotReadyMessage(loc),
       ),
-      floatingActionButton: _PlazaPostFab(
+      floatingActionButton: _MomentPostFab(
         label: loc.event_detail_publish_plaza,
-        onPressed: () => showCreateMomentSheet(context),
+        onPressed: () => showCreateContentOptionsSheet(context),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: EventDetailBody(
@@ -444,11 +444,11 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   }
 }
 
-class _PlazaPostFab extends StatelessWidget {
+class _MomentPostFab extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const _PlazaPostFab({required this.label, required this.onPressed});
+  const _MomentPostFab({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

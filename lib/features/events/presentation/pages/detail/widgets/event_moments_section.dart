@@ -1,5 +1,5 @@
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_members_list.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_plaza_card.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_moment_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -96,7 +96,7 @@ class _EventMomentsSectionState extends State<EventMomentsSection> {
             children: [
               // 第一页：Moments
               SingleChildScrollView(
-                child: EventPlazaCard(loc: widget.loc),
+                child: EventMomentCard(loc: widget.loc),
               ),
               // 第二页：成员列表
               EventMembersList(loc: widget.loc),

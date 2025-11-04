@@ -1,9 +1,9 @@
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/pages/plaza/sheets/plaza_post_comments_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/plaza/widgets/plaza_post_detail_screen.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/sheets/moment_post_comments_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/widgets/moment_post_detail_screen.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
-import 'package:crew_app/features/events/presentation/widgets/plaza_post_card.dart';
-import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment_post_card.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -38,8 +38,8 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
     _selectedFilter = _filters.first;
   }
 
-  static const List<PlazaPost> _plazaPosts = [
-    PlazaPost(
+  static const List<MomentPost> _momentPosts = [
+    MomentPost(
       author: '阿里',
       authorInitials: 'AL',
       timeLabel: '15分钟前',
@@ -49,7 +49,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       likes: 36,
       comments: 12,
       accentColor: Color(0xFF6750A4),
-      momentType: PlazaMomentType.event,
+      momentType: MomentType.event,
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
@@ -57,19 +57,19 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
         'assets/images/crew.png',
       ],
       commentItems: [
-        PlazaComment(
+        MomentComment(
           author: 'Lydia',
           message: '带上我最爱的野餐布和小蛋糕，一起享受日落吧～',
           timeLabel: '10分钟前',
         ),
-        PlazaComment(
+        MomentComment(
           author: '橙子汽水',
           message: '天气不错的话我可以带飞盘，顺便拍点照片。',
           timeLabel: '刚刚',
         ),
       ],
     ),
-    PlazaPost(
+    MomentPost(
       author: '阿黑',
       authorInitials: 'AL',
       timeLabel: '15分钟前',
@@ -79,21 +79,21 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       likes: 36,
       comments: 12,
       accentColor: Color(0xFF6750A4),
-      momentType: PlazaMomentType.event,
+      momentType: MomentType.event,
       commentItems: [
-        PlazaComment(
+        MomentComment(
           author: 'Lydia',
           message: '带上我最爱的野餐布和小蛋糕，一起享受日落吧～',
           timeLabel: '10分钟前',
         ),
-        PlazaComment(
+        MomentComment(
           author: '橙子汽水',
           message: '天气不错的话我可以带飞盘，顺便拍点照片。',
           timeLabel: '刚刚',
         ),
       ],
     ),
-    PlazaPost(
+    MomentPost(
       author: '米兰小巷',
       authorInitials: 'ML',
       timeLabel: '1小时前',
@@ -103,26 +103,26 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       likes: 52,
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
-      momentType: PlazaMomentType.instant,
+      momentType: MomentType.instant,
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
         'assets/images/crew.png',
       ],
       commentItems: [
-        PlazaComment(
+        MomentComment(
           author: '阿毛',
           message: '推荐一家藏在巷子里的手冲店，豆子超香！',
           timeLabel: '45分钟前',
         ),
-        PlazaComment(
+        MomentComment(
           author: '蓝莓司康',
           message: '我可以带胶片机一起去取景～',
           timeLabel: '30分钟前',
         ),
       ],
     ),
-    PlazaPost(
+    MomentPost(
       author: '夏栀',
       authorInitials: 'XZ',
       timeLabel: '昨天',
@@ -132,15 +132,15 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       likes: 21,
       comments: 7,
       accentColor: Color(0xFF377D71),
-      momentType: PlazaMomentType.instant,
+      momentType: MomentType.instant,
       mediaAssets: ['assets/images/crew.png', 'assets/images/crew.png'],
       commentItems: [
-        PlazaComment(
+        MomentComment(
           author: '晨跑小队',
           message: '夜跑完可以去河对岸那家椰子店，超级解暑。',
           timeLabel: '20小时前',
         ),
-        PlazaComment(
+        MomentComment(
           author: '夏天的风',
           message: '我带上音响，跑完拉伸顺便听会儿歌。',
           timeLabel: '18小时前',
@@ -285,7 +285,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                           ),
                         );
                       }
-                    : () => showCreateMomentSheet(context);
+                    : () => showCreateContentOptionsSheet(context);
                 return Material(
                   color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(16),
@@ -315,8 +315,8 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
                       child: buildInvitesContent(),
                     )
                   : KeyedSubtree(
-                      key: const ValueKey('plaza'),
-                      child: _MapEventsPlazaFeed(posts: _plazaPosts),
+                      key: const ValueKey('moment'),
+                      child: _MapEventsMomentFeed(posts: _momentPosts),
                     ),
             ),
           ),
@@ -340,10 +340,10 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   }
 }
 
-class _MapEventsPlazaFeed extends StatelessWidget {
-  final List<PlazaPost> posts;
+class _MapEventsMomentFeed extends StatelessWidget {
+  final List<MomentPost> posts;
 
-  const _MapEventsPlazaFeed({required this.posts});
+  const _MapEventsMomentFeed({required this.posts});
 
   @override
   Widget build(BuildContext context) {
@@ -354,12 +354,12 @@ class _MapEventsPlazaFeed extends StatelessWidget {
       primary: false,
       itemBuilder: (context, index) {
         final post = posts[index];
-        return PlazaPostCard(
+        return MomentPostCard(
           post: post,
           onMediaTap: () => Navigator.of(
             context,
-          ).push(PlazaPostDetailScreen.route(post: post)),
-          onCommentTap: () => showPlazaPostCommentsSheet(context, post),
+          ).push(MomentPostDetailScreen.route(post: post)),
+          onCommentTap: () => showMomentPostCommentsSheet(context, post),
           onAuthorTap: () => Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const UserProfilePage())),

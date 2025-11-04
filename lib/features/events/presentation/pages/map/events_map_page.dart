@@ -7,7 +7,7 @@ import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
-import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -413,23 +413,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           Padding(
             padding: const EdgeInsets.only(right: 6),
             child: AppFloatingActionButton(
-              heroTag: 'events_map_test_fab',
-              backgroundColor: theme.colorScheme.secondary,
-              foregroundColor: theme.colorScheme.onSecondary,
-              onPressed: () {
-                ref.read(mapOverlaySheetProvider.notifier).state =
-                    MapOverlaySheetType.createRoadTrip;
-              },
-              child: const Icon(Icons.add),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: AppFloatingActionButton(
               heroTag: 'events_map_add_fab',
               backgroundColor: theme.colorScheme.secondary,
               foregroundColor: theme.colorScheme.onSecondary,
-              onPressed: () => showCreateMomentSheet(context),
+              onPressed: () => showCreateContentOptionsSheet(context),
               child: const Icon(Icons.add),
             ),
           ),

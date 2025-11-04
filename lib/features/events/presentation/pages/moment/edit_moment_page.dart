@@ -3,14 +3,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../widgets/plaza_post_card.dart';
+import '../../widgets/moment_post_card.dart';
 
 class EditMomentPage extends StatefulWidget {
   const EditMomentPage({super.key, required this.post});
 
-  final PlazaPost post;
+  final MomentPost post;
 
-  static MaterialPageRoute<bool> route({required PlazaPost post}) {
+  static MaterialPageRoute<bool> route({required MomentPost post}) {
     return MaterialPageRoute<bool>(
       builder: (_) => EditMomentPage(post: post),
     );
@@ -416,3 +416,4 @@ class _MomentImage {
     );
   }
 }
+

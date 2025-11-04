@@ -2,7 +2,7 @@ import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
-class PlazaPost {
+class MomentPost {
   final String author;
   final String authorInitials;
   final String timeLabel;
@@ -13,10 +13,10 @@ class PlazaPost {
   final int comments;
   final Color accentColor;
   final List<String> mediaAssets;
-  final List<PlazaComment> commentItems;
-  final PlazaMomentType momentType;
+  final List<MomentComment> commentItems;
+  final MomentType momentType;
 
-  const PlazaPost({
+  const MomentPost({
     required this.author,
     required this.authorInitials,
     required this.timeLabel,
@@ -28,16 +28,16 @@ class PlazaPost {
     required this.accentColor,
     this.mediaAssets = const [],
     this.commentItems = const [],
-    this.momentType = PlazaMomentType.event,
+    this.momentType = MomentType.event,
   });
 }
 
-class PlazaComment {
+class MomentComment {
   final String author;
   final String message;
   final String timeLabel;
 
-  const PlazaComment({
+  const MomentComment({
     required this.author,
     required this.message,
     required this.timeLabel,
@@ -54,14 +54,14 @@ class PlazaComment {
   }
 }
 
-class PlazaPostCard extends StatelessWidget {
-  final PlazaPost post;
+class MomentPostCard extends StatelessWidget {
+  final MomentPost post;
   final EdgeInsetsGeometry? margin;
   final VoidCallback? onMediaTap;
   final VoidCallback? onCommentTap;
   final VoidCallback? onAuthorTap;
 
-  const PlazaPostCard({
+  const MomentPostCard({
     super.key,
     required this.post,
     this.margin,
@@ -156,7 +156,7 @@ class PlazaPostCard extends StatelessWidget {
               ),
               if (post.mediaAssets.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                _PlazaPostMedia(
+                _MomentPostMedia(
                   mediaAssets: post.mediaAssets,
                   accentColor: post.accentColor,
                   onTap: onMediaTap,
@@ -199,12 +199,12 @@ class PlazaPostCard extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  _PlazaPostAction(
+                  _MomentPostAction(
                     icon: Icons.favorite_border,
                     label: post.likes.toCompactString(),
                   ),
                   const SizedBox(width: 16),
-                  _PlazaPostAction(
+                  _MomentPostAction(
                     icon: Icons.chat_bubble_outline,
                     label: post.comments.toCompactString(),
                     onTap: onCommentTap,
@@ -218,14 +218,14 @@ class PlazaPostCard extends StatelessWidget {
   }
 }
 
-enum PlazaMomentType { instant, event }
+enum MomentType { instant, event }
 
-class _PlazaPostMedia extends StatelessWidget {
+class _MomentPostMedia extends StatelessWidget {
   final List<String> mediaAssets;
   final Color accentColor;
   final VoidCallback? onTap;
 
-  const _PlazaPostMedia({
+  const _MomentPostMedia({
     required this.mediaAssets,
     required this.accentColor,
     this.onTap,
@@ -248,7 +248,7 @@ class _PlazaPostMedia extends StatelessWidget {
           width: double.infinity,
           child: ClipRRect(
             borderRadius: borderRadius,
-            child: _PlazaPostMediaPreview(
+            child: _MomentPostMediaPreview(
               mediaAssets: mediaAssets,
               accentColor: accentColor,
             ),
@@ -259,11 +259,11 @@ class _PlazaPostMedia extends StatelessWidget {
   }
 }
 
-class _PlazaPostMediaPreview extends StatelessWidget {
+class _MomentPostMediaPreview extends StatelessWidget {
   final List<String> mediaAssets;
   final Color accentColor;
 
-  const _PlazaPostMediaPreview({
+  const _MomentPostMediaPreview({
     required this.mediaAssets,
     required this.accentColor,
   });
@@ -315,12 +315,12 @@ class _PlazaPostMediaPreview extends StatelessWidget {
   }
 }
 
-class _PlazaPostAction extends StatelessWidget {
+class _MomentPostAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
 
-  const _PlazaPostAction({required this.icon, required this.label, this.onTap});
+  const _MomentPostAction({required this.icon, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {

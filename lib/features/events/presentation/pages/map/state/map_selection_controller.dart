@@ -8,6 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+/// 正在拖拽的标记点类型
+enum DraggingMarkerType {
+  start, // 起点
+  destination, // 终点
+  forwardWaypoint, // 去程途经点
+  returnWaypoint, // 返程途经点
+}
+
 @immutable
 class MapSelectionState {
   const MapSelectionState({
@@ -22,6 +30,8 @@ class MapSelectionState {
     this.forwardWaypoints = const [],
     this.returnWaypoints = const [],
     this.routeType,
+    this.draggingMarkerPosition,
+    this.draggingMarkerType,
   });
 
   final LatLng? selectedLatLng;
@@ -35,6 +45,8 @@ class MapSelectionState {
   final List<LatLng> forwardWaypoints; // 去程途经点
   final List<LatLng> returnWaypoints; // 返程途经点
   final RoadTripRouteType? routeType; // 路线类型
+  final LatLng? draggingMarkerPosition; // 正在拖拽的标记点位置
+  final DraggingMarkerType? draggingMarkerType; // 正在拖拽的标记点类型
 
   MapSelectionState copyWith({
     LatLng? selectedLatLng,
@@ -51,6 +63,9 @@ class MapSelectionState {
     List<LatLng>? forwardWaypoints,
     List<LatLng>? returnWaypoints,
     RoadTripRouteType? routeType,
+    LatLng? draggingMarkerPosition,
+    DraggingMarkerType? draggingMarkerType,
+    bool clearDraggingMarker = false,
   }) {
     return MapSelectionState(
       selectedLatLng:
@@ -68,6 +83,8 @@ class MapSelectionState {
       forwardWaypoints: forwardWaypoints ?? this.forwardWaypoints,
       returnWaypoints: returnWaypoints ?? this.returnWaypoints,
       routeType: routeType ?? this.routeType,
+      draggingMarkerPosition: clearDraggingMarker ? null : (draggingMarkerPosition ?? this.draggingMarkerPosition),
+      draggingMarkerType: clearDraggingMarker ? null : (draggingMarkerType ?? this.draggingMarkerType),
     );
   }
 }
@@ -160,6 +177,18 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
     setForwardWaypoints([]);
     setReturnWaypoints([]);
     setRouteType(null);
+    clearDraggingMarker();
+  }
+
+  void setDraggingMarker(LatLng position, DraggingMarkerType type) {
+    state = state.copyWith(
+      draggingMarkerPosition: position,
+      draggingMarkerType: type,
+    );
+  }
+
+  void clearDraggingMarker() {
+    state = state.copyWith(clearDraggingMarker: true);
   }
 
   Future<List<NearbyPlace>> getNearbyPlaces(LatLng position) {

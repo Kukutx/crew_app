@@ -25,6 +25,7 @@ import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
+import 'widgets/breathing_marker_overlay.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
 import 'controllers/map_controller.dart';
@@ -51,6 +52,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     'events_cluster_manager',
   );
   late final ClusterManager _eventsClusterManager;
+  CameraPosition? _currentCameraPosition;
 
   @override
   void initState() {
@@ -179,13 +181,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ),
           onTap: () =>
               unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) => ref
-              .read(mapSelectionControllerProvider.notifier)
-              .setSelectedLatLng(pos),
+          onDrag: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            // 设置或更新拖拽状态
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.start);
+            selectionController.setSelectedLatLng(pos);
+          },
           onDragEnd: (pos) {
-            ref
-                .read(mapSelectionControllerProvider.notifier)
-                .setSelectedLatLng(pos);
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setSelectedLatLng(pos);
+            selectionController.clearDraggingMarker();
             HapticFeedback.lightImpact();
           },
         ),
@@ -204,13 +209,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           ),
           onTap: () =>
               unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) => ref
-              .read(mapSelectionControllerProvider.notifier)
-              .setDestinationLatLng(pos),
+          onDrag: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            // 设置或更新拖拽状态
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.destination);
+            selectionController.setDestinationLatLng(pos);
+          },
           onDragEnd: (pos) {
-            ref
-                .read(mapSelectionControllerProvider.notifier)
-                .setDestinationLatLng(pos);
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDestinationLatLng(pos);
+            selectionController.clearDraggingMarker();
             HapticFeedback.lightImpact();
           },
         ),
@@ -233,6 +241,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onDrag: (pos) {
             // 拖动过程中实时更新位置
             final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            // 设置或更新拖拽状态
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.forwardWaypoint);
             final currentWaypoints = List<LatLng>.from(forwardWaypoints);
             currentWaypoints[i] = pos;
             selectionController.setForwardWaypoints(currentWaypoints);
@@ -243,6 +253,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             final currentWaypoints = List<LatLng>.from(forwardWaypoints);
             currentWaypoints[i] = pos;
             selectionController.setForwardWaypoints(currentWaypoints);
+            selectionController.clearDraggingMarker();
             HapticFeedback.lightImpact();
           },
         ),
@@ -261,6 +272,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           onDrag: (pos) {
             // 拖动过程中实时更新位置
             final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            // 设置或更新拖拽状态
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.returnWaypoint);
             final currentWaypoints = List<LatLng>.from(returnWaypoints);
             currentWaypoints[i] = pos;
             selectionController.setReturnWaypoints(currentWaypoints);
@@ -271,6 +284,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             final currentWaypoints = List<LatLng>.from(returnWaypoints);
             currentWaypoints[i] = pos;
             selectionController.setReturnWaypoints(currentWaypoints);
+            selectionController.clearDraggingMarker();
             HapticFeedback.lightImpact();
           },
         ),
@@ -387,7 +401,23 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             child: MapCanvas(
               initialCenter: startCenter,
               onMapCreated: mapController.onMapCreated,
-              onMapReady: mapController.onMapReady,
+              onMapReady: () {
+                mapController.onMapReady();
+                // 设置初始相机位置
+                if (_currentCameraPosition == null) {
+                  setState(() {
+                    _currentCameraPosition = CameraPosition(
+                      target: startCenter,
+                      zoom: 5,
+                    );
+                  });
+                }
+              },
+              onCameraMove: (position) {
+                setState(() {
+                  _currentCameraPosition = position;
+                });
+              },
               onTap: (pos) {
                 carouselManager.hideEventCard();
                 unawaited(locationSelectionManager.onMapTap(pos, context));
@@ -417,6 +447,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             onClose: carouselManager.hideEventCard,
             onRegister: () => _showSnackBar(loc.registration_not_implemented),
             onFavorite: () => _showSnackBar(loc.feature_not_ready),
+          ),
+          // 呼吸动画覆盖层
+          BreathingMarkerOverlay(
+            draggingPosition: selectionState.draggingMarkerPosition,
+            draggingType: selectionState.draggingMarkerType,
+            cameraPosition: _currentCameraPosition,
           ),
           if (hideSearchBar)
             SafeArea(

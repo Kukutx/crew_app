@@ -152,11 +152,11 @@ class _BreathingMarkerPainter extends CustomPainter {
     ];
 
     for (final circle in circles) {
-      final radius = circle['radius']! as double;
-      final circleOpacity = circle['opacity']! as double;
+      final radius = circle['radius'] as double;
+      final circleOpacity = circle['opacity'] as double;
 
       final paint = Paint()
-        ..color = color.withOpacity(circleOpacity)
+        ..color = color.withValues(alpha: circleOpacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
 
@@ -206,10 +206,41 @@ class _BreathingMarkerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_BreathingMarkerPainter oldDelegate) {
-    return oldDelegate.position != position ||
-        oldDelegate.cameraPosition != cameraPosition ||
+    // 优化：只在关键属性变化时重绘
+    // 对于相机位置，只在变化超过阈值时重绘
+    if (oldDelegate.position != position ||
         oldDelegate.scale != scale ||
-        oldDelegate.opacity != opacity;
+        oldDelegate.opacity != opacity) {
+      return true;
+    }
+    
+    // 相机位置变化时，只在变化超过阈值时重绘
+    if (cameraPosition != null && oldDelegate.cameraPosition != null) {
+      final oldPos = oldDelegate.cameraPosition!;
+      final newPos = cameraPosition!;
+      // 只在缩放级别或位置变化超过阈值时重绘
+      if ((newPos.zoom - oldPos.zoom).abs() > 0.1 ||
+          _calculateDistance(newPos.target, oldPos.target) > 5) {
+        return true;
+      }
+      return false;
+    }
+    
+    return oldDelegate.cameraPosition != cameraPosition;
+  }
+
+  // 计算两个经纬度之间的距离（米）
+  double _calculateDistance(LatLng a, LatLng b) {
+    const double earthRadius = 6371000; // 地球半径（米）
+    final double dLat = (b.latitude - a.latitude) * math.pi / 180.0;
+    final double dLon = (b.longitude - a.longitude) * math.pi / 180.0;
+    final double a1 = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(a.latitude * math.pi / 180.0) *
+            math.cos(b.latitude * math.pi / 180.0) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
+    return earthRadius * c;
   }
 }
 

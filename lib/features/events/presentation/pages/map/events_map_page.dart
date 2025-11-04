@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
@@ -53,6 +54,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   );
   late final ClusterManager _eventsClusterManager;
   CameraPosition? _currentCameraPosition;
+  CameraPosition? _lastNotifiedCameraPosition;
+  
+  // 缓存 markers 和 polylines，避免重复创建
+  Set<Marker>? _cachedMarkers;
+  Set<Polyline>? _cachedPolylines;
+  MapSelectionState? _lastSelectionState;
+  List<Event>? _lastEventsList;
 
   @override
   void initState() {
@@ -147,184 +155,34 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final startCenter = mapController.getInitialCenter();
     final selectionState = ref.watch(mapSelectionControllerProvider);
 
-    final markersLayer = events.when(
-      loading: () => const MarkersLayer(markers: <Marker>{}),
-      error: (_, _) => const MarkersLayer(markers: <Marker>{}),
-      data: (list) => MarkersLayer.fromEvents(
-        events: list,
-        onEventTap: (event) {
-          mapController.focusOnEvent(event);
-          carouselManager.showEventCard(event);
-        },
-        clusterManagerId: _eventsClusterManagerId,
-      ),
-    );
-
+    // 构建 markers 和 polylines
+    // 使用缓存策略：只在选择状态或事件列表变化时重新创建
+    final currentEventsList = events.hasValue ? events.value : null;
+    final shouldRebuildMarkers = _lastSelectionState != selectionState ||
+        _lastEventsList != currentEventsList;
+    
+    if (shouldRebuildMarkers || _cachedMarkers == null) {
+      _lastSelectionState = selectionState;
+      _lastEventsList = currentEventsList;
+      _cachedMarkers = _buildMarkers(
+        events,
+        selectionState,
+        mapController,
+        carouselManager,
+        locationSelectionManager,
+      );
+      _cachedPolylines = _buildPolylines(selectionState);
+    }
+    
+    final markers = _cachedMarkers!;
+    final polylines = _cachedPolylines!;
+    
     final shouldHideEventMarkers =
         selectionState.selectedLatLng != null ||
         selectionState.isSelectingDestination;
-    final markers = <Marker>{
-      if (!shouldHideEventMarkers) ...markersLayer.markers,
-    };
     final clusterManagers = <ClusterManager>{
       if (!shouldHideEventMarkers) _eventsClusterManager,
     };
-    final selected = selectionState.selectedLatLng;
-    if (selected != null) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('selected_location'),
-          position: selected,
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueAzure,
-          ),
-          onTap: () =>
-              unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            // 设置或更新拖拽状态
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.start);
-            selectionController.setSelectedLatLng(pos);
-          },
-          onDragEnd: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setSelectedLatLng(pos);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-
-    final destination = selectionState.destinationLatLng;
-    if (destination != null) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('destination_location'),
-          position: destination,
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueGreen,
-          ),
-          onTap: () =>
-              unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            // 设置或更新拖拽状态
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.destination);
-            selectionController.setDestinationLatLng(pos);
-          },
-          onDragEnd: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setDestinationLatLng(pos);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-
-    // 添加途经点 markers（黄色，可拖动）
-    final forwardWaypoints = selectionState.forwardWaypoints;
-    final returnWaypoints = selectionState.returnWaypoints;
-    
-    for (int i = 0; i < forwardWaypoints.length; i++) {
-      markers.add(
-        Marker(
-          markerId: MarkerId('forward_waypoint_$i'),
-          position: forwardWaypoints[i],
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueYellow,
-          ),
-          onDrag: (pos) {
-            // 拖动过程中实时更新位置
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            // 设置或更新拖拽状态
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.forwardWaypoint);
-            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setForwardWaypoints(currentWaypoints);
-          },
-          onDragEnd: (pos) {
-            // 拖动结束，更新位置并触发触觉反馈
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setForwardWaypoints(currentWaypoints);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-    
-    for (int i = 0; i < returnWaypoints.length; i++) {
-      markers.add(
-        Marker(
-          markerId: MarkerId('return_waypoint_$i'),
-          position: returnWaypoints[i],
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueYellow,
-          ),
-          onDrag: (pos) {
-            // 拖动过程中实时更新位置
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            // 设置或更新拖拽状态
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.returnWaypoint);
-            final currentWaypoints = List<LatLng>.from(returnWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setReturnWaypoints(currentWaypoints);
-          },
-          onDragEnd: (pos) {
-            // 拖动结束，更新位置并触发触觉反馈
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            final currentWaypoints = List<LatLng>.from(returnWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setReturnWaypoints(currentWaypoints);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-
-    // 构建 polyline 路径
-    final polylines = <Polyline>{};
-    if (selected != null && destination != null) {
-      final routeType = selectionState.routeType;
-      final points = <LatLng>[];
-      
-      // 起点
-      points.add(selected);
-      
-      // 根据路线类型添加途经点和终点
-      if (routeType == RoadTripRouteType.roundTrip) {
-        // 往返路线：起点 -> 去程途经点 -> 终点 -> 返程途经点 -> 起点
-        points.addAll(forwardWaypoints);
-        points.add(destination);
-        points.addAll(returnWaypoints.reversed);
-        points.add(selected); // 回到起点
-      } else {
-        // 单程路线：起点 -> 去程途经点 -> 终点
-        points.addAll(forwardWaypoints);
-        points.add(destination);
-      }
-      
-      if (points.length > 1) {
-        polylines.add(
-          Polyline(
-            polylineId: const PolylineId('route_polyline'),
-            points: points,
-            color: Colors.blue,
-            width: 4,
-            geodesic: true,
-          ),
-        );
-      }
-    }
 
     // 页面首帧跳转至选中事件
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -398,121 +256,145 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
           Listener(
             behavior: HitTestBehavior.translucent,
             onPointerDown: (_) => searchManager.onOutsideTap(),
-            child: MapCanvas(
-              initialCenter: startCenter,
-              onMapCreated: mapController.onMapCreated,
-              onMapReady: () {
-                mapController.onMapReady();
-                // 设置初始相机位置
-                if (_currentCameraPosition == null) {
-                  setState(() {
-                    _currentCameraPosition = CameraPosition(
-                      target: startCenter,
-                      zoom: 5,
-                    );
-                  });
-                }
-              },
-              onCameraMove: (position) {
-                setState(() {
+            child: RepaintBoundary(
+              child: MapCanvas(
+                initialCenter: startCenter,
+                onMapCreated: mapController.onMapCreated,
+                onMapReady: () {
+                  mapController.onMapReady();
+                  // 设置初始相机位置
+                  if (_currentCameraPosition == null) {
+                    setState(() {
+                      _currentCameraPosition = CameraPosition(
+                        target: startCenter,
+                        zoom: 5,
+                      );
+                    });
+                  }
+                },
+                onCameraMove: (position) {
+                  // 只更新相机位置，不触发 setState
+                  // 这样可以避免每次相机移动时重建整个 widget 树
                   _currentCameraPosition = position;
-                });
-              },
-              onTap: (pos) {
-                carouselManager.hideEventCard();
-                unawaited(locationSelectionManager.onMapTap(pos, context));
-              },
-              onLongPress: (pos) {
-                carouselManager.hideEventCard();
-                unawaited(
-                  locationSelectionManager.onMapLongPress(pos, context),
-                );
-              },
-              markers: markers,
-              clusterManagers: clusterManagers,
-              polylines: polylines,
-              showUserLocation: true,
-              mapPadding: selectionState.mapPadding,
+                  // 只在需要更新 BreathingMarkerOverlay 时才通知
+                  // 使用节流：只在相机位置变化超过阈值时才更新
+                  if (_lastNotifiedCameraPosition == null ||
+                      _shouldUpdateCameraPosition(position, _lastNotifiedCameraPosition!)) {
+                    _lastNotifiedCameraPosition = position;
+                    // 使用 SchedulerBinding 来延迟更新，避免阻塞手势
+                    // 只在需要更新 BreathingMarkerOverlay 时才触发 setState
+                    if (mounted) {
+                      setState(() {
+                        // 只更新需要相机位置的 widget
+                      });
+                    }
+                  }
+                },
+                onTap: (pos) {
+                  carouselManager.hideEventCard();
+                  unawaited(locationSelectionManager.onMapTap(pos, context));
+                },
+                onLongPress: (pos) {
+                  carouselManager.hideEventCard();
+                  unawaited(
+                    locationSelectionManager.onMapLongPress(pos, context),
+                  );
+                },
+                markers: markers,
+                clusterManagers: clusterManagers,
+                polylines: polylines,
+                showUserLocation: true,
+                mapPadding: selectionState.mapPadding,
+              ),
+            ),
+          ), // Listener 结束
+          // 使用 RepaintBoundary 隔离事件轮播，避免地图移动时重绘
+          RepaintBoundary(
+            child: EventsMapEventCarousel(
+              events: carouselManager.events,
+              visible:
+                  carouselManager.isVisible && carouselManager.events.isNotEmpty,
+              controller: carouselManager.pageController,
+              safeBottom: safeBottom,
+              onPageChanged: carouselManager.onPageChanged,
+              onOpenDetails: (event) =>
+                  carouselManager.openEventDetails(event, context),
+              onClose: carouselManager.hideEventCard,
+              onRegister: () => _showSnackBar(loc.registration_not_implemented),
+              onFavorite: () => _showSnackBar(loc.feature_not_ready),
             ),
           ),
-          EventsMapEventCarousel(
-            events: carouselManager.events,
-            visible:
-                carouselManager.isVisible && carouselManager.events.isNotEmpty,
-            controller: carouselManager.pageController,
-            safeBottom: safeBottom,
-            onPageChanged: carouselManager.onPageChanged,
-            onOpenDetails: (event) =>
-                carouselManager.openEventDetails(event, context),
-            onClose: carouselManager.hideEventCard,
-            onRegister: () => _showSnackBar(loc.registration_not_implemented),
-            onFavorite: () => _showSnackBar(loc.feature_not_ready),
-          ),
           // 呼吸动画覆盖层
-          BreathingMarkerOverlay(
-            draggingPosition: selectionState.draggingMarkerPosition,
-            draggingType: selectionState.draggingMarkerType,
-            cameraPosition: _currentCameraPosition,
+          // 使用 RepaintBoundary 隔离，只在需要时重绘
+          RepaintBoundary(
+            child: BreathingMarkerOverlay(
+              draggingPosition: selectionState.draggingMarkerPosition,
+              draggingType: selectionState.draggingMarkerType,
+              cameraPosition: _currentCameraPosition,
+            ),
           ),
+          // 使用 RepaintBoundary 隔离搜索栏，避免地图移动时重绘
           if (hideSearchBar)
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Material(
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(16),
-                    color: theme.colorScheme.surface,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: theme.colorScheme.primary,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              selectionState.isAddingWaypoint
-                                  ? loc.map_add_waypoint_tip
-                                  : selectionState.isSelectingDestination
-                                      ? loc.map_select_location_destination_tip
-                                      : loc.map_select_location_tip,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(
-                                  alpha: .8,
+            RepaintBoundary(
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Material(
+                      elevation: 4,
+                      borderRadius: BorderRadius.circular(16),
+                      color: theme.colorScheme.surface,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: theme.colorScheme.primary,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                selectionState.isAddingWaypoint
+                                    ? loc.map_add_waypoint_tip
+                                    : selectionState.isSelectingDestination
+                                        ? loc.map_select_location_destination_tip
+                                        : loc.map_select_location_tip,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: .8,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          TextButton.icon(
-                            onPressed: () {
-                              if (selectionState.isAddingWaypoint) {
-                                // 在途经点阶段，只清除途经点选择状态，保留起点和终点
-                                locationSelectionManager.clearWaypointSelection();
-                              } else {
-                                // 其他阶段，清除所有选择
-                                unawaited(
-                                  locationSelectionManager.clearSelectedLocation(),
-                                );
-                              }
-                            },
-                            icon: const Icon(Icons.close),
-                            label: Text(
-                              selectionState.isAddingWaypoint
-                                  ? loc.map_clear_waypoint
-                                  : loc.map_clear_selected_point,
+                            const SizedBox(width: 12),
+                            TextButton.icon(
+                              onPressed: () {
+                                if (selectionState.isAddingWaypoint) {
+                                  // 在途经点阶段，只清除途经点选择状态，保留起点和终点
+                                  locationSelectionManager.clearWaypointSelection();
+                                } else {
+                                  // 其他阶段，清除所有选择
+                                  unawaited(
+                                    locationSelectionManager.clearSelectedLocation(),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.close),
+                              label: Text(
+                                selectionState.isAddingWaypoint
+                                    ? loc.map_clear_waypoint
+                                    : loc.map_clear_selected_point,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -606,6 +488,224 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       return;
     }
     ref.read(appOverlayIndexProvider.notifier).state = 1;
+  }
+
+  // 判断是否需要更新相机位置（节流）
+  // 只在相机位置变化超过阈值时才返回 true
+  bool _shouldUpdateCameraPosition(
+    CameraPosition current,
+    CameraPosition last,
+  ) {
+    // 计算位置距离（米）
+    final distance = _calculateDistance(
+      current.target,
+      last.target,
+    );
+    // 如果距离超过 10 米或缩放级别变化超过 0.5，则更新
+    return distance > 10 || (current.zoom - last.zoom).abs() > 0.5;
+  }
+
+  // 计算两个经纬度之间的距离（米）
+  double _calculateDistance(LatLng a, LatLng b) {
+    const double earthRadius = 6371000; // 地球半径（米）
+    final double dLat = (b.latitude - a.latitude) * math.pi / 180.0;
+    final double dLon = (b.longitude - a.longitude) * math.pi / 180.0;
+    final double a1 = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(a.latitude * math.pi / 180.0) *
+            math.cos(b.latitude * math.pi / 180.0) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
+    return earthRadius * c;
+  }
+
+  // 构建 markers
+  Set<Marker> _buildMarkers(
+    AsyncValue<List<Event>> events,
+    MapSelectionState selectionState,
+    MapController mapController,
+    EventCarouselManager carouselManager,
+    LocationSelectionManager locationSelectionManager,
+  ) {
+    final markersLayer = events.when(
+      loading: () => const MarkersLayer(markers: <Marker>{}),
+      error: (_, _) => const MarkersLayer(markers: <Marker>{}),
+      data: (list) => MarkersLayer.fromEvents(
+        events: list,
+        onEventTap: (event) {
+          mapController.focusOnEvent(event);
+          carouselManager.showEventCard(event);
+        },
+        clusterManagerId: _eventsClusterManagerId,
+      ),
+    );
+
+    final shouldHideEventMarkers =
+        selectionState.selectedLatLng != null ||
+        selectionState.isSelectingDestination;
+    final markers = <Marker>{
+      if (!shouldHideEventMarkers) ...markersLayer.markers,
+    };
+    
+    final selected = selectionState.selectedLatLng;
+    if (selected != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId('selected_location'),
+          position: selected,
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
+          onTap: () =>
+              unawaited(locationSelectionManager.clearSelectedLocation()),
+          onDrag: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.start);
+            selectionController.setSelectedLatLng(pos);
+          },
+          onDragEnd: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setSelectedLatLng(pos);
+            selectionController.clearDraggingMarker();
+            HapticFeedback.lightImpact();
+          },
+        ),
+      );
+    }
+
+    final destination = selectionState.destinationLatLng;
+    if (destination != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId('destination_location'),
+          position: destination,
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueGreen,
+          ),
+          onTap: () =>
+              unawaited(locationSelectionManager.clearSelectedLocation()),
+          onDrag: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.destination);
+            selectionController.setDestinationLatLng(pos);
+          },
+          onDragEnd: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDestinationLatLng(pos);
+            selectionController.clearDraggingMarker();
+            HapticFeedback.lightImpact();
+          },
+        ),
+      );
+    }
+
+    // 添加途经点 markers
+    final forwardWaypoints = selectionState.forwardWaypoints;
+    final returnWaypoints = selectionState.returnWaypoints;
+    
+    for (int i = 0; i < forwardWaypoints.length; i++) {
+      markers.add(
+        Marker(
+          markerId: MarkerId('forward_waypoint_$i'),
+          position: forwardWaypoints[i],
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueYellow,
+          ),
+          onDrag: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.forwardWaypoint);
+            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setForwardWaypoints(currentWaypoints);
+          },
+          onDragEnd: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setForwardWaypoints(currentWaypoints);
+            selectionController.clearDraggingMarker();
+            HapticFeedback.lightImpact();
+          },
+        ),
+      );
+    }
+    
+    for (int i = 0; i < returnWaypoints.length; i++) {
+      markers.add(
+        Marker(
+          markerId: MarkerId('return_waypoint_$i'),
+          position: returnWaypoints[i],
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueYellow,
+          ),
+          onDrag: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDraggingMarker(pos, DraggingMarkerType.returnWaypoint);
+            final currentWaypoints = List<LatLng>.from(returnWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setReturnWaypoints(currentWaypoints);
+          },
+          onDragEnd: (pos) {
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            final currentWaypoints = List<LatLng>.from(returnWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setReturnWaypoints(currentWaypoints);
+            selectionController.clearDraggingMarker();
+            HapticFeedback.lightImpact();
+          },
+        ),
+      );
+    }
+
+    return markers;
+  }
+
+  // 构建 polylines
+  Set<Polyline> _buildPolylines(MapSelectionState selectionState) {
+    final polylines = <Polyline>{};
+    final selected = selectionState.selectedLatLng;
+    final destination = selectionState.destinationLatLng;
+    
+    if (selected != null && destination != null) {
+      final routeType = selectionState.routeType;
+      final forwardWaypoints = selectionState.forwardWaypoints;
+      final returnWaypoints = selectionState.returnWaypoints;
+      final points = <LatLng>[];
+      
+      // 起点
+      points.add(selected);
+      
+      // 根据路线类型添加途经点和终点
+      if (routeType == RoadTripRouteType.roundTrip) {
+        // 往返路线：起点 -> 去程途经点 -> 终点 -> 返程途经点 -> 起点
+        points.addAll(forwardWaypoints);
+        points.add(destination);
+        points.addAll(returnWaypoints.reversed);
+        points.add(selected); // 回到起点
+      } else {
+        // 单程路线：起点 -> 去程途经点 -> 终点
+        points.addAll(forwardWaypoints);
+        points.add(destination);
+      }
+      
+      if (points.length > 1) {
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('route_polyline'),
+            points: points,
+            color: Colors.blue,
+            width: 4,
+            geodesic: true,
+          ),
+        );
+      }
+    }
+
+    return polylines;
   }
 }
 

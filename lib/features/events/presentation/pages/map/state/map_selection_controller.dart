@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -15,6 +16,12 @@ class MapSelectionState {
     this.isSelectingDestination = false,
     this.isSelectionSheetOpen = false,
     this.mapPadding = EdgeInsets.zero,
+    this.isAddingWaypoint = false,
+    this.isAddingForwardWaypoint = true,
+    this.pendingWaypoint,
+    this.forwardWaypoints = const [],
+    this.returnWaypoints = const [],
+    this.routeType,
   });
 
   final LatLng? selectedLatLng;
@@ -22,6 +29,12 @@ class MapSelectionState {
   final bool isSelectingDestination;
   final bool isSelectionSheetOpen;
   final EdgeInsets mapPadding;
+  final bool isAddingWaypoint;
+  final bool isAddingForwardWaypoint;
+  final LatLng? pendingWaypoint; // 临时存储新添加的途经点
+  final List<LatLng> forwardWaypoints; // 去程途经点
+  final List<LatLng> returnWaypoints; // 返程途经点
+  final RoadTripRouteType? routeType; // 路线类型
 
   MapSelectionState copyWith({
     LatLng? selectedLatLng,
@@ -31,6 +44,13 @@ class MapSelectionState {
     bool? isSelectingDestination,
     bool? isSelectionSheetOpen,
     EdgeInsets? mapPadding,
+    bool? isAddingWaypoint,
+    bool? isAddingForwardWaypoint,
+    LatLng? pendingWaypoint,
+    bool clearPendingWaypoint = false,
+    List<LatLng>? forwardWaypoints,
+    List<LatLng>? returnWaypoints,
+    RoadTripRouteType? routeType,
   }) {
     return MapSelectionState(
       selectedLatLng:
@@ -42,6 +62,12 @@ class MapSelectionState {
       isSelectionSheetOpen:
           isSelectionSheetOpen ?? this.isSelectionSheetOpen,
       mapPadding: mapPadding ?? this.mapPadding,
+      isAddingWaypoint: isAddingWaypoint ?? this.isAddingWaypoint,
+      isAddingForwardWaypoint: isAddingForwardWaypoint ?? this.isAddingForwardWaypoint,
+      pendingWaypoint: clearPendingWaypoint ? null : (pendingWaypoint ?? this.pendingWaypoint),
+      forwardWaypoints: forwardWaypoints ?? this.forwardWaypoints,
+      returnWaypoints: returnWaypoints ?? this.returnWaypoints,
+      routeType: routeType ?? this.routeType,
     );
   }
 }
@@ -100,10 +126,40 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
     state = state.copyWith(mapPadding: EdgeInsets.zero);
   }
 
+  void setAddingWaypoint(bool value, {bool isForward = true}) {
+    state = state.copyWith(
+      isAddingWaypoint: value,
+      isAddingForwardWaypoint: isForward,
+    );
+  }
+
+  void setPendingWaypoint(LatLng? waypoint) {
+    state = state.copyWith(
+      pendingWaypoint: waypoint,
+      clearPendingWaypoint: waypoint == null,
+    );
+  }
+
+  void setForwardWaypoints(List<LatLng> waypoints) {
+    state = state.copyWith(forwardWaypoints: waypoints);
+  }
+
+  void setReturnWaypoints(List<LatLng> waypoints) {
+    state = state.copyWith(returnWaypoints: waypoints);
+  }
+
+  void setRouteType(RoadTripRouteType? routeType) {
+    state = state.copyWith(routeType: routeType);
+  }
+
   void resetSelection() {
     setSelectingDestination(false);
+    setAddingWaypoint(false);
     setSelectedLatLng(null);
     setDestinationLatLng(null);
+    setForwardWaypoints([]);
+    setReturnWaypoints([]);
+    setRouteType(null);
   }
 
   Future<List<NearbyPlace>> getNearbyPlaces(LatLng position) {

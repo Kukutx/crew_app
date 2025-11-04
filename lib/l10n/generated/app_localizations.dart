@@ -596,6 +596,24 @@ abstract class AppLocalizations {
   /// **'Clear selected point'**
   String get map_clear_selected_point;
 
+  /// No description provided for @map_clear_waypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear waypoint'**
+  String get map_clear_waypoint;
+
+  /// No description provided for @map_add_waypoint_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to add a waypoint, long press to adjust start and destination'**
+  String get map_add_waypoint_tip;
+
+  /// No description provided for @map_select_location_destination_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to choose a destination.'**
+  String get map_select_location_destination_tip;
+
   /// No description provided for @map_location_info_title.
   ///
   /// In en, this message translates to:
@@ -2077,12 +2095,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap to expand'**
   String get map_selection_sheet_tap_to_expand;
-
-  /// No description provided for @map_select_location_destination_tip.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap the map to choose a destination.'**
-  String get map_select_location_destination_tip;
 
   /// No description provided for @map_select_location_destination_missing.
   ///

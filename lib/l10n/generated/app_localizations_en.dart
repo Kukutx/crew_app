@@ -272,6 +272,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_clear_selected_point => 'Clear selected point';
 
   @override
+  String get map_clear_waypoint => 'Clear waypoint';
+
+  @override
+  String get map_add_waypoint_tip =>
+      'Tap the map to add a waypoint, long press to adjust start and destination';
+
+  @override
+  String get map_select_location_destination_tip =>
+      'Tap the map to choose a destination.';
+
+  @override
   String get map_location_info_title => 'Location info';
 
   @override
@@ -1090,10 +1101,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_selection_sheet_tap_to_expand => 'Tap to expand';
-
-  @override
-  String get map_select_location_destination_tip =>
-      'Tap the map to choose a destination.';
 
   @override
   String get map_select_location_destination_missing =>

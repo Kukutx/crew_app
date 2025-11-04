@@ -137,8 +137,11 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
   // ==== 路线 ====
   RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
-  final List<String> _forwardWps = []; // 去程
-  final List<String> _returnWps = [];  // 返程
+  final List<LatLng> _forwardWps = []; // 去程途经点
+  final List<LatLng> _returnWps = [];  // 返程途经点
+  // 途经点地址缓存：key 为 '${lat}_${lng}'，value 为地址
+  final Map<String, String> _waypointAddressCache = {};
+  final Map<String, Future<String?>> _waypointAddressFutures = {};
 
   // ==== 团队/费用 ====
   final _maxParticipantsCtrl = TextEditingController(text: '4');
@@ -335,21 +338,83 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
   void _onRouteTypeChanged(RoadTripRouteType t) {
     setState(() => _routeType = t);
+    // 更新 MapSelectionController 中的路线类型
+    ref.read(mapSelectionControllerProvider.notifier).setRouteType(t);
   }
 
-  void _onAddForward() =>
-      setState(() => _forwardWps.add('途经点 ${_forwardWps.length + 1}'));
-  void _onRemoveForward(int i) =>
-      setState(() { if (i >= 0 && i < _forwardWps.length) _forwardWps.removeAt(i); });
-  void _onReorderForward(int oldIndex, int newIndex) =>
-      setState(() { final item = _forwardWps.removeAt(oldIndex); _forwardWps.insert(newIndex, item); });
+  // 进入添加途经点模式
+  void _onAddForward() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    selectionController.setAddingWaypoint(true, isForward: true);
+    // 如果已经有起点，定位到起点；否则保持当前视图
+    if (_startLatLng != null) {
+      final mapController = ref.read(mapControllerProvider);
+      unawaited(mapController.moveCamera(_startLatLng!, zoom: 12));
+    }
+  }
+  void _onRemoveForward(int i) {
+    if (i >= 0 && i < _forwardWps.length) {
+      final removed = _forwardWps[i];
+      final key = '${removed.latitude}_${removed.longitude}';
+      setState(() { 
+        _forwardWps.removeAt(i);
+        _waypointAddressCache.remove(key);
+        _waypointAddressFutures.remove(key);
+      });
+      // 更新 MapSelectionController（延迟到下一帧）
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(mapSelectionControllerProvider.notifier).setForwardWaypoints(_forwardWps);
+        }
+      });
+    }
+  }
+  
+  void _onReorderForward(int oldIndex, int newIndex) {
+    setState(() { final item = _forwardWps.removeAt(oldIndex); _forwardWps.insert(newIndex, item); });
+    // 更新 MapSelectionController（延迟到下一帧）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(mapSelectionControllerProvider.notifier).setForwardWaypoints(_forwardWps);
+      }
+    });
+  }
 
-  void _onAddReturn() =>
-      setState(() => _returnWps.add('返程点 ${_returnWps.length + 1}'));
-  void _onRemoveReturn(int i) =>
-      setState(() { if (i >= 0 && i < _returnWps.length) _returnWps.removeAt(i); });
-  void _onReorderReturn(int oldIndex, int newIndex) =>
-      setState(() { final item = _returnWps.removeAt(oldIndex); _returnWps.insert(newIndex, item); });
+  void _onAddReturn() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    selectionController.setAddingWaypoint(true, isForward: false);
+    if (_destinationLatLng != null) {
+      final mapController = ref.read(mapControllerProvider);
+      unawaited(mapController.moveCamera(_destinationLatLng!, zoom: 12));
+    }
+  }
+  void _onRemoveReturn(int i) {
+    if (i >= 0 && i < _returnWps.length) {
+      final removed = _returnWps[i];
+      final key = '${removed.latitude}_${removed.longitude}';
+      setState(() { 
+        _returnWps.removeAt(i);
+        _waypointAddressCache.remove(key);
+        _waypointAddressFutures.remove(key);
+      });
+      // 更新 MapSelectionController（延迟到下一帧）
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(mapSelectionControllerProvider.notifier).setReturnWaypoints(_returnWps);
+        }
+      });
+    }
+  }
+  
+  void _onReorderReturn(int oldIndex, int newIndex) {
+    setState(() { final item = _returnWps.removeAt(oldIndex); _returnWps.insert(newIndex, item); });
+    // 更新 MapSelectionController（延迟到下一帧）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(mapSelectionControllerProvider.notifier).setReturnWaypoints(_returnWps);
+      }
+    });
+  }
 
   void _onCarTypeChanged(String? v) => setState(() => _carType = v);
 
@@ -534,15 +599,17 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
   // ===== UI 构建 =====
   Widget _buildSectionPage(TripSection s) {
+    Widget content;
     switch (s) {
       case TripSection.basic:
-        return RoadTripBasicSection(
+        content = RoadTripBasicSection(
           titleController: _titleCtrl,
           dateRange: _editorState.dateRange,
           onPickDateRange: _pickDateRange,
         );
-      case TripSection.route:
-        return RoadTripRouteSection(
+        break;
+        case TripSection.route:
+        content = RoadTripRouteSection(
           routeType: _routeType,
           onRouteTypeChanged: _onRouteTypeChanged,
           forwardWaypoints: _forwardWps,
@@ -553,16 +620,19 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           onAddReturn: _onAddReturn,
           onRemoveReturn: _onRemoveReturn,
           onReorderReturn: _onReorderReturn,
+          waypointAddressMap: _waypointAddressCache,
         );
+        break;
       case TripSection.team:
-        return RoadTripTeamSection(
+        content = RoadTripTeamSection(
           maxParticipantsController: _maxParticipantsCtrl,
           priceController: _priceCtrl,
           pricingType: _pricingType,
           onPricingTypeChanged: (v) => setState(() => _pricingType = v),
         );
+        break;
       case TripSection.prefs:
-        return RoadTripPreferencesSection(
+        content = RoadTripPreferencesSection(
           carType: _carType,
           onCarTypeChanged: _onCarTypeChanged,
           tagInputController: _tagInputCtrl,
@@ -570,24 +640,153 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           tags: _tags,
           onRemoveTag: _onRemoveTag,
         );
+        break;
       case TripSection.gallery:
-        return RoadTripGallerySection(
+        content = RoadTripGallerySection(
           items: _editorState.galleryItems,
           onPickImages: _onPickImages,
           onRemoveImage: _onRemoveImage,
           onSetCover: _onSetCover,
         );
+        break;
       case TripSection.story:
-        return RoadTripStorySection(descriptionController: _storyCtrl);
+        content = RoadTripStorySection(descriptionController: _storyCtrl);
+        break;
       case TripSection.disclaimer:
-        return RoadTripHostDisclaimerSection(disclaimerController: _disclaimerCtrl);
+        content = RoadTripHostDisclaimerSection(disclaimerController: _disclaimerCtrl);
+        break;
     }
+    
+    // 包装在可滚动容器中，适配 overlay sheet 的高度限制
+    // 注意：只有第一个页面（_ConnectionStart）使用 scrollController
+    // 其他页面不使用 scrollController，避免与 DraggableScrollableSheet 冲突
+    return SingleChildScrollView(
+      controller: null, // 其他页面不使用 controller
+      physics: const ClampingScrollPhysics(), // 使用 ClampingScrollPhysics 避免过度滚动
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: content,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
+
+    // 监听途经点变化（必须在 build 方法中使用 ref.listen）
+    ref.listen<MapSelectionState>(mapSelectionControllerProvider, (previous, next) {
+      // 处理新途经点添加
+      if (next.pendingWaypoint != null && previous?.pendingWaypoint != next.pendingWaypoint) {
+        // 有新途经点添加
+        final isForward = previous?.isAddingForwardWaypoint ?? true;
+        final newWaypoint = next.pendingWaypoint!;
+        setState(() {
+          if (isForward) {
+            _forwardWps.add(newWaypoint);
+          } else {
+            _returnWps.add(newWaypoint);
+          }
+        });
+        // 异步加载途经点地址
+        final key = '${newWaypoint.latitude}_${newWaypoint.longitude}';
+        if (!_waypointAddressFutures.containsKey(key)) {
+          _waypointAddressFutures[key] = _loadAddress(newWaypoint, isStart: false);
+          _waypointAddressFutures[key]!.then((address) {
+            if (!mounted) return;
+            if (address != null && address.trim().isNotEmpty) {
+              setState(() {
+                _waypointAddressCache[key] = address.trim();
+              });
+            }
+          });
+        }
+        // 更新 MapSelectionController 中的途经点列表（延迟到下一帧，避免在监听器中直接更新状态）
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+          selectionController.setForwardWaypoints(_forwardWps);
+          selectionController.setReturnWaypoints(_returnWps);
+          selectionController.setRouteType(_routeType);
+          // 清除临时途经点
+          selectionController.setPendingWaypoint(null);
+        });
+      }
+      
+      // 处理途经点位置变化（来自拖动）
+      // 检查 forwardWaypoints 是否发生变化
+      if (previous?.forwardWaypoints != next.forwardWaypoints) {
+        final newForwardWps = next.forwardWaypoints;
+        if (newForwardWps.length == _forwardWps.length) {
+          // 长度相同，可能是位置更新
+          bool hasChange = false;
+          for (int i = 0; i < newForwardWps.length; i++) {
+            if (newForwardWps[i] != _forwardWps[i]) {
+              hasChange = true;
+              break;
+            }
+          }
+          if (hasChange) {
+            setState(() {
+              _forwardWps.clear();
+              _forwardWps.addAll(newForwardWps);
+              // 清除旧地址缓存，重新加载
+              _waypointAddressCache.clear();
+              _waypointAddressFutures.clear();
+              // 为每个途经点加载新地址
+              for (final wp in newForwardWps) {
+                final key = '${wp.latitude}_${wp.longitude}';
+                _waypointAddressFutures[key] = _loadAddress(wp, isStart: false);
+                _waypointAddressFutures[key]!.then((address) {
+                  if (!mounted) return;
+                  if (address != null && address.trim().isNotEmpty) {
+                    setState(() {
+                      _waypointAddressCache[key] = address.trim();
+                    });
+                  }
+                });
+              }
+            });
+          }
+        }
+      }
+      
+      // 检查 returnWaypoints 是否发生变化
+      if (previous?.returnWaypoints != next.returnWaypoints) {
+        final newReturnWps = next.returnWaypoints;
+        if (newReturnWps.length == _returnWps.length) {
+          // 长度相同，可能是位置更新
+          bool hasChange = false;
+          for (int i = 0; i < newReturnWps.length; i++) {
+            if (newReturnWps[i] != _returnWps[i]) {
+              hasChange = true;
+              break;
+            }
+          }
+          if (hasChange) {
+            setState(() {
+              _returnWps.clear();
+              _returnWps.addAll(newReturnWps);
+              // 清除旧地址缓存，重新加载
+              // 注意：这里只处理返程途经点的地址，如果地址缓存key包含方向信息，需要区分
+              for (final wp in newReturnWps) {
+                final key = '${wp.latitude}_${wp.longitude}';
+                if (!_waypointAddressCache.containsKey(key)) {
+                  _waypointAddressFutures[key] = _loadAddress(wp, isStart: false);
+                  _waypointAddressFutures[key]!.then((address) {
+                    if (!mounted) return;
+                    if (address != null && address.trim().isNotEmpty) {
+                      setState(() {
+                        _waypointAddressCache[key] = address.trim();
+                      });
+                    }
+                  });
+                }
+              }
+            });
+          }
+        }
+      }
+    });
 
     // 根据模式显示不同的UI
     if (widget.mode == CreateRoadTripMode.startLocationOnly) {
@@ -641,6 +840,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         child: Column(
           children: [
             // PageView
+            // 在 overlay 模式下，使用 DraggableScrollableSheet 的 scrollController
+            // PageView 本身不应该可滚动，让内部的滚动视图处理
             Expanded(
               child: NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (n) {
@@ -648,30 +849,32 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                   return true;
                 },
                 child: PageView(
-                  controller: _pageCtrl,
-                  physics: canScroll
-                      ? const PageScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  children: [
-                    _ConnectionStart(
-                      scrollCtrl: widget.scrollCtrl, // ✅ 外部传入
-                      onContinue: _enableWizard,
-                      departureTitle: startTitle,
-                      departureSubtitle: startSubtitle,
-                      destinationTitle: destinationTitle,
-                      destinationSubtitle: destinationSubtitle,
-                      onEditDeparture: _onEditDeparture,
-                      onEditDestination: _onEditDestination,
-                      departurePosition: _startLatLng,
-                      departureAddressFuture: _startAddressFuture,
-                      departureNearbyFuture: _startNearbyFuture,
-                      destinationPosition: _destinationLatLng,
-                      destinationAddressFuture: _destinationAddressFuture,
-                      destinationNearbyFuture: _destinationNearbyFuture,
-                    ),
-                    ..._sectionsOrder.map(_buildSectionPage),
-                  ],
-                ),
+                        controller: _pageCtrl,
+                        physics: canScroll
+                            ? const PageScrollPhysics()
+                            : const NeverScrollableScrollPhysics(),
+                        children: [
+                          // 第一个页面使用 scrollController，让 DraggableScrollableSheet 可以拖动
+                          _ConnectionStart(
+                            scrollCtrl: widget.scrollCtrl,
+                            onContinue: _enableWizard,
+                            departureTitle: startTitle,
+                            departureSubtitle: startSubtitle,
+                            destinationTitle: destinationTitle,
+                            destinationSubtitle: destinationSubtitle,
+                            onEditDeparture: _onEditDeparture,
+                            onEditDestination: _onEditDestination,
+                            departurePosition: _startLatLng,
+                            departureAddressFuture: _startAddressFuture,
+                            departureNearbyFuture: _startNearbyFuture,
+                            destinationPosition: _destinationLatLng,
+                            destinationAddressFuture: _destinationAddressFuture,
+                            destinationNearbyFuture: _destinationNearbyFuture,
+                          ),
+                          // 其他页面不使用 scrollController，避免冲突
+                          ..._sectionsOrder.map(_buildSectionPage),
+                        ],
+                      ),
               ),
             ),
             // 底部进度 + 按钮
@@ -706,7 +909,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                       child: SizedBox(
                         width: double.infinity,
                         child: FilledButton(
-                          onPressed: _enableWizard,
+                          // 只有当起点和终点都选择了才能继续
+                          onPressed: (_startLatLng != null && _destinationLatLng != null)
+                              ? _enableWizard
+                              : null,
                           child: const Text('继续'),
                         ),
                       ),
@@ -870,7 +1076,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
 class _ConnectionStart extends StatelessWidget {
   const _ConnectionStart({
-    required this.scrollCtrl,
+    this.scrollCtrl,
     required this.onContinue,
     required this.departureTitle,
     required this.departureSubtitle,
@@ -885,7 +1091,7 @@ class _ConnectionStart extends StatelessWidget {
     this.destinationAddressFuture,
     this.destinationNearbyFuture,
   });
-  final ScrollController scrollCtrl;
+  final ScrollController? scrollCtrl;
   final VoidCallback onContinue;
   final String departureTitle;
   final String departureSubtitle;
@@ -903,11 +1109,13 @@ class _ConnectionStart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    // 直接使用 scrollCtrl，如果为 null 则不使用 controller
+    // 让 DraggableScrollableSheet 的滚动控制器直接连接到这个 CustomScrollView
     return CustomScrollView(
       controller: scrollCtrl,
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           sliver: SliverList.list(
             children: [
               _CardTile(
@@ -926,7 +1134,7 @@ class _ConnectionStart extends StatelessWidget {
                 onTap: departurePosition != null ? onEditDestination : null,
                 enabled: departurePosition != null,
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
               _LocationDetails(
                 label: loc.map_select_location_start_label,
                 tip: loc.map_select_location_tip,
@@ -934,7 +1142,7 @@ class _ConnectionStart extends StatelessWidget {
                 addressFuture: departureAddressFuture,
                 nearbyFuture: departureNearbyFuture,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               _LocationDetails(
                 label: loc.map_select_location_destination_label,
                 tip: loc.map_select_location_destination_tip,

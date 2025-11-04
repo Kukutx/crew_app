@@ -28,11 +28,18 @@ class LocationSelectionManager {
   // Getters
   bool get isHandlingLongPress => _isHandlingLongPress;
 
-  /// 处理地图长按
+  /// 处理地图长按（用于创建/更新起点和终点）
   Future<void> onMapLongPress(LatLng latlng, BuildContext context) async {
     final selectionState = ref.read(mapSelectionControllerProvider);
+    
+    // 如果正在选择终点，长按设置终点
     if (selectionState.isSelectingDestination) {
       _handleDestinationSelection(latlng, context);
+      return;
+    }
+    
+    // 如果正在添加途经点，长按不应该处理（途经点用单击）
+    if (selectionState.isAddingWaypoint) {
       return;
     }
     
@@ -53,14 +60,22 @@ class LocationSelectionManager {
     }
   }
 
-  /// 处理地图点击
+  /// 处理地图点击（用于添加途经点和其他正常点击）
   Future<void> onMapTap(LatLng position, BuildContext context) async {
     final selectionState = ref.read(mapSelectionControllerProvider);
-    if (selectionState.isSelectingDestination) {
-      _handleDestinationSelection(position, context);
+    
+    // 如果正在添加途经点，单击添加途经点（不处理终点选择）
+    if (selectionState.isAddingWaypoint) {
+      _handleWaypointSelection(position, context);
       return;
     }
-
+    
+    // 如果正在选择终点，单击不应该处理（终点用长按）
+    if (selectionState.isSelectingDestination) {
+      return;
+    }
+    
+    // 其他正常点击：显示地点详情
     final loc = AppLocalizations.of(context)!;
     final places = ref.read(placesServiceProvider);
 
@@ -88,6 +103,26 @@ class LocationSelectionManager {
     } catch (_) {
       _showSnackBar(context, loc.map_place_details_error);
     }
+  }
+  
+  /// 处理途经点选择
+  void _handleWaypointSelection(LatLng position, BuildContext context) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    
+    if (!selectionState.isAddingWaypoint) {
+      return;
+    }
+    
+    HapticFeedback.lightImpact();
+    
+    // 存储临时途经点，供 CreateRoadTripSheet 监听
+    selectionController.setPendingWaypoint(position);
+    selectionController.setAddingWaypoint(false);
+    
+    // 移动相机到新添加的途经点
+    final mapController = ref.read(mapControllerProvider);
+    unawaited(mapController.moveCamera(position, zoom: 14));
   }
 
   /// 处理目标位置选择
@@ -163,6 +198,13 @@ class LocationSelectionManager {
     }
 
     selectionController.resetSelection();
+  }
+
+  /// 清除途经点选择状态（只清除途经点模式，保留起点和终点）
+  void clearWaypointSelection() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    selectionController.setAddingWaypoint(false);
+    selectionController.setPendingWaypoint(null);
   }
 
   /// 等待选择Sheet关闭

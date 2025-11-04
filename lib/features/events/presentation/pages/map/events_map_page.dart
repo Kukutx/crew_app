@@ -5,6 +5,7 @@ import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
 import 'package:crew_app/features/events/presentation/sheets/create_moment_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -216,6 +217,101 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       );
     }
 
+    // 添加途经点 markers（黄色，可拖动）
+    final forwardWaypoints = selectionState.forwardWaypoints;
+    final returnWaypoints = selectionState.returnWaypoints;
+    
+    for (int i = 0; i < forwardWaypoints.length; i++) {
+      markers.add(
+        Marker(
+          markerId: MarkerId('forward_waypoint_$i'),
+          position: forwardWaypoints[i],
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueYellow,
+          ),
+          onDrag: (pos) {
+            // 拖动过程中实时更新位置
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setForwardWaypoints(currentWaypoints);
+          },
+          onDragEnd: (pos) {
+            // 拖动结束，更新位置并触发触觉反馈
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setForwardWaypoints(currentWaypoints);
+            HapticFeedback.lightImpact();
+          },
+        ),
+      );
+    }
+    
+    for (int i = 0; i < returnWaypoints.length; i++) {
+      markers.add(
+        Marker(
+          markerId: MarkerId('return_waypoint_$i'),
+          position: returnWaypoints[i],
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueYellow,
+          ),
+          onDrag: (pos) {
+            // 拖动过程中实时更新位置
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            final currentWaypoints = List<LatLng>.from(returnWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setReturnWaypoints(currentWaypoints);
+          },
+          onDragEnd: (pos) {
+            // 拖动结束，更新位置并触发触觉反馈
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            final currentWaypoints = List<LatLng>.from(returnWaypoints);
+            currentWaypoints[i] = pos;
+            selectionController.setReturnWaypoints(currentWaypoints);
+            HapticFeedback.lightImpact();
+          },
+        ),
+      );
+    }
+
+    // 构建 polyline 路径
+    final polylines = <Polyline>{};
+    if (selected != null && destination != null) {
+      final routeType = selectionState.routeType;
+      final points = <LatLng>[];
+      
+      // 起点
+      points.add(selected);
+      
+      // 根据路线类型添加途经点和终点
+      if (routeType == RoadTripRouteType.roundTrip) {
+        // 往返路线：起点 -> 去程途经点 -> 终点 -> 返程途经点 -> 起点
+        points.addAll(forwardWaypoints);
+        points.add(destination);
+        points.addAll(returnWaypoints.reversed);
+        points.add(selected); // 回到起点
+      } else {
+        // 单程路线：起点 -> 去程途经点 -> 终点
+        points.addAll(forwardWaypoints);
+        points.add(destination);
+      }
+      
+      if (points.length > 1) {
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('route_polyline'),
+            points: points,
+            color: Colors.blue,
+            width: 4,
+            geodesic: true,
+          ),
+        );
+      }
+    }
+
     // 页面首帧跳转至选中事件
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.selectedEvent != null && !mapController.movedToSelected) {
@@ -227,6 +323,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final hideSearchBar =
         selectionState.isSelectionSheetOpen ||
         selectionState.isSelectingDestination ||
+        selectionState.isAddingWaypoint ||
         selectionState.selectedLatLng != null;
     final showClearSelectionInAppBar =
         !hideSearchBar && selectionState.selectedLatLng != null;
@@ -303,6 +400,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               },
               markers: markers,
               clusterManagers: clusterManagers,
+              polylines: polylines,
               showUserLocation: true,
               mapPadding: selectionState.mapPadding,
             ),
@@ -346,9 +444,11 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              selectionState.isSelectingDestination
-                                  ? loc.map_select_location_destination_tip
-                                  : loc.map_select_location_tip,
+                              selectionState.isAddingWaypoint
+                                  ? loc.map_add_waypoint_tip
+                                  : selectionState.isSelectingDestination
+                                      ? loc.map_select_location_destination_tip
+                                      : loc.map_select_location_tip,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface.withValues(
                                   alpha: .8,
@@ -358,11 +458,23 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                           ),
                           const SizedBox(width: 12),
                           TextButton.icon(
-                            onPressed: () => unawaited(
-                              locationSelectionManager.clearSelectedLocation(),
-                            ),
+                            onPressed: () {
+                              if (selectionState.isAddingWaypoint) {
+                                // 在途经点阶段，只清除途经点选择状态，保留起点和终点
+                                locationSelectionManager.clearWaypointSelection();
+                              } else {
+                                // 其他阶段，清除所有选择
+                                unawaited(
+                                  locationSelectionManager.clearSelectedLocation(),
+                                );
+                              }
+                            },
                             icon: const Icon(Icons.close),
-                            label: Text(loc.map_clear_selected_point),
+                            label: Text(
+                              selectionState.isAddingWaypoint
+                                  ? loc.map_clear_waypoint
+                                  : loc.map_clear_selected_point,
+                            ),
                           ),
                         ],
                       ),

@@ -266,6 +266,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_clear_selected_point => '清除选点';
 
   @override
+  String get map_clear_waypoint => '清除途经点';
+
+  @override
+  String get map_add_waypoint_tip => '单击地图添加途经点，长按调整起点和终点';
+
+  @override
+  String get map_select_location_destination_tip => '点击地图选择终点。';
+
+  @override
   String get map_location_info_title => '位置信息';
 
   @override
@@ -1047,9 +1056,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get map_selection_sheet_tap_to_expand => '点击展开';
-
-  @override
-  String get map_select_location_destination_tip => '点击地图选择终点。';
 
   @override
   String get map_select_location_destination_missing => '请选择终点后继续。';

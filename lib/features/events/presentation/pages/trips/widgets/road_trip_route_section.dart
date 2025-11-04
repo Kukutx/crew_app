@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../data/road_trip_editor_models.dart';
 import 'road_trip_section_card.dart';
 
@@ -19,20 +20,23 @@ class RoadTripRouteSection extends StatelessWidget {
     required this.onAddReturn,
     required this.onRemoveReturn,
     required this.onReorderReturn,
+    this.waypointAddressMap,
   });
 
   final RoadTripRouteType routeType;
   final ValueChanged<RoadTripRouteType> onRouteTypeChanged;
 
-  final List<String> forwardWaypoints;
+  final List<LatLng> forwardWaypoints; // 途经点位置
   final VoidCallback onAddForward;
   final ValueChanged<int> onRemoveForward;
   final void Function(int oldIndex, int newIndex) onReorderForward;
 
-  final List<String> returnWaypoints;
+  final List<LatLng> returnWaypoints; // 途经点位置
   final VoidCallback onAddReturn;
   final ValueChanged<int> onRemoveReturn;
   final void Function(int oldIndex, int newIndex) onReorderReturn;
+  
+  final Map<String, String>? waypointAddressMap; // 途经点地址映射
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +101,7 @@ class RoadTripRouteSection extends StatelessWidget {
             items: forwardWaypoints,
             onRemove: onRemoveForward,
             onReorder: onReorderForward,
+            addressMap: waypointAddressMap,
           )
         else ...[
           _ReorderableListSection(
@@ -104,6 +109,7 @@ class RoadTripRouteSection extends StatelessWidget {
             items: forwardWaypoints,
             onRemove: onRemoveForward,
             onReorder: onReorderForward,
+            addressMap: waypointAddressMap,
           ),
           const SizedBox(height: 12),
           _ReorderableListSection(
@@ -111,6 +117,7 @@ class RoadTripRouteSection extends StatelessWidget {
             items: returnWaypoints,
             onRemove: onRemoveReturn,
             onReorder: onReorderReturn,
+            addressMap: waypointAddressMap,
           ),
         ],
       ],
@@ -124,12 +131,14 @@ class _ReorderableListSection extends StatelessWidget {
     required this.items,
     required this.onRemove,
     required this.onReorder,
+    this.addressMap,
   });
 
   final String title;
-  final List<String> items;
+  final List<LatLng> items;
   final ValueChanged<int> onRemove;
   final void Function(int oldIndex, int newIndex) onReorder;
+  final Map<String, String>? addressMap; // 途经点地址映射
 
   @override
   Widget build(BuildContext context) {
@@ -148,10 +157,13 @@ class _ReorderableListSection extends StatelessWidget {
             onReorder(oldIndex, newIndex);
           },
           buildDefaultDragHandles: false,
-          itemBuilder: (context, index) {
-            final text = items[index];
+              itemBuilder: (context, index) {
+            final item = items[index];
+            final key = '${item.latitude}_${item.longitude}';
+            final address = addressMap?[key];
+            final text = address ?? '途经点 ${index + 1}'; // 显示地址或编号
             return Dismissible(
-              key: ValueKey('wp-$text-$index'),
+              key: ValueKey('wp-$index-${item.latitude}-${item.longitude}'),
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.symmetric(horizontal: 16),

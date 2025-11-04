@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 export 'data/road_trip_editor_models.dart';
@@ -77,6 +78,20 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       _descriptionCtrl.text = initial.description;
       _hostDisclaimerCtrl.text = initial.hostDisclaimer;
 
+      // 解析途经点坐标字符串为 LatLng
+      // 注意：waypoints 是扁平列表，不区分去程和返程，这里暂时全部放到去程
+      final waypoints = <LatLng>[];
+      for (final wpStr in initial.waypoints) {
+        final parts = wpStr.split(',');
+        if (parts.length == 2) {
+          final lat = double.tryParse(parts[0].trim());
+          final lng = double.tryParse(parts[1].trim());
+          if (lat != null && lng != null) {
+            waypoints.add(LatLng(lat, lng));
+          }
+        }
+      }
+      
       final initialState = RoadTripEditorState(
         dateRange: initial.dateRange,
         routeType: initial.isRoundTrip
@@ -86,7 +101,8 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
             ? RoadTripPricingType.free
             : RoadTripPricingType.paid,
         carType: initial.carType,
-        waypoints: List.of(initial.waypoints),
+        // waypoints 在编辑页面中通过 _forwardWps 和 _returnWps 管理
+        waypoints: const <String>[],
         tags: List.of(initial.tags),
         galleryItems: [
           ...initial.existingImageUrls.map(RoadTripGalleryItem.network),
@@ -94,6 +110,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         ],
       );
       _state = initialState;
+      
+      // 将解析的途经点加载到去程列表（编辑页面暂时不区分去程和返程）
+      _forwardWps.addAll(waypoints);
     }
   }
 
@@ -197,7 +216,10 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       endLocation: _endLocationCtrl.text.trim(),
       meetingPoint: _meetingLocationCtrl.text.trim(),
       isRoundTrip: _state.routeType == RoadTripRouteType.roundTrip,
-      waypoints: List.of(_state.waypoints),
+      waypoints: [
+        ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
+        ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
+      ],
       maxParticipants: int.parse(_maxParticipantsCtrl.text),
       isFree: _state.pricingType == RoadTripPricingType.free,
       pricePerPerson: price,
@@ -238,24 +260,34 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     }
   }
 
-  final List<String> _forwardWps = []; // 去程
-  final List<String> _returnWps = []; // 返程
+  final List<LatLng> _forwardWps = []; // 去程途经点
+  final List<LatLng> _returnWps = []; // 返程途经点
 
-  void _onAddForward() =>
-      setState(() => _forwardWps.add('途经点 ${_forwardWps.length + 1}'));
+  // 在编辑页面中，途经点添加功能需要从地图选择
+  // 这里暂时提供空实现，实际使用时需要打开地图选择界面
+  void _onAddForward() {
+    // TODO: 在编辑页面中打开地图选择界面来选择途经点
+    // 暂时不做任何操作，因为编辑页面可能不需要地图选择功能
+  }
+  
   void _onRemoveForward(int i) => setState(() {
     if (i >= 0 && i < _forwardWps.length) _forwardWps.removeAt(i);
   });
+  
   void _onReorderForward(int oldIndex, int newIndex) => setState(() {
     final item = _forwardWps.removeAt(oldIndex);
     _forwardWps.insert(newIndex, item);
   });
 
-  void _onAddReturn() =>
-      setState(() => _returnWps.add('返程点 ${_returnWps.length + 1}'));
+  void _onAddReturn() {
+    // TODO: 在编辑页面中打开地图选择界面来选择途经点
+    // 暂时不做任何操作，因为编辑页面可能不需要地图选择功能
+  }
+  
   void _onRemoveReturn(int i) => setState(() {
     if (i >= 0 && i < _returnWps.length) _returnWps.removeAt(i);
   });
+  
   void _onReorderReturn(int oldIndex, int newIndex) => setState(() {
     final item = _returnWps.removeAt(oldIndex);
     _returnWps.insert(newIndex, item);

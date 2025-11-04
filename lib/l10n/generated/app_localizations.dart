@@ -614,6 +614,36 @@ abstract class AppLocalizations {
   /// **'Tap the map to choose a destination.'**
   String get map_select_location_destination_tip;
 
+  /// No description provided for @map_guide_step_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Long press on the map to choose a start location'**
+  String get map_guide_step_1;
+
+  /// No description provided for @map_guide_step_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Long press on the map to choose a destination'**
+  String get map_guide_step_2;
+
+  /// No description provided for @map_guide_step_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Tap the map to add waypoints (optional)'**
+  String get map_guide_step_3;
+
+  /// No description provided for @map_guide_waypoint_step_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Tap the \"Add waypoint\" button, then tap the map to add a waypoint (optional)'**
+  String get map_guide_waypoint_step_3;
+
+  /// No description provided for @map_guide_waypoint_manage.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder waypoints in the list, swipe left to delete'**
+  String get map_guide_waypoint_manage;
+
   /// No description provided for @map_location_info_title.
   ///
   /// In en, this message translates to:

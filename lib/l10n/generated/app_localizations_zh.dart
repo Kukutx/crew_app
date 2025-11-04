@@ -275,6 +275,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_destination_tip => '点击地图选择终点。';
 
   @override
+  String get map_guide_step_1 => '步骤 1：长按地图选择起点位置';
+
+  @override
+  String get map_guide_step_2 => '步骤 2：长按地图选择终点位置';
+
+  @override
+  String get map_guide_step_3 => '步骤 3：点击地图添加途径点（可选）';
+
+  @override
+  String get map_guide_waypoint_step_3 => '步骤 3：点击\"添加途径点\"按钮，然后点击地图添加途径点（可选）';
+
+  @override
+  String get map_guide_waypoint_manage => '在列表中拖拽可调整顺序，左滑可删除途径点';
+
+  @override
   String get map_location_info_title => '位置信息';
 
   @override

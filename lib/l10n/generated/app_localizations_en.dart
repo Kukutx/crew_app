@@ -283,6 +283,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap the map to choose a destination.';
 
   @override
+  String get map_guide_step_1 =>
+      'Step 1: Long press on the map to choose a start location';
+
+  @override
+  String get map_guide_step_2 =>
+      'Step 2: Long press on the map to choose a destination';
+
+  @override
+  String get map_guide_step_3 =>
+      'Step 3: Tap the map to add waypoints (optional)';
+
+  @override
+  String get map_guide_waypoint_step_3 =>
+      'Step 3: Tap the \"Add waypoint\" button, then tap the map to add a waypoint (optional)';
+
+  @override
+  String get map_guide_waypoint_manage =>
+      'Drag to reorder waypoints in the list, swipe left to delete';
+
+  @override
   String get map_location_info_title => 'Location info';
 
   @override

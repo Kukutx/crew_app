@@ -197,12 +197,21 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         Marker(
           markerId: const MarkerId('destination_location'),
           position: destination,
-          draggable: false,
+          draggable: true,
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueGreen,
           ),
           onTap: () =>
               unawaited(locationSelectionManager.clearSelectedLocation()),
+          onDrag: (pos) => ref
+              .read(mapSelectionControllerProvider.notifier)
+              .setDestinationLatLng(pos),
+          onDragEnd: (pos) {
+            ref
+                .read(mapSelectionControllerProvider.notifier)
+                .setDestinationLatLng(pos);
+            HapticFeedback.lightImpact();
+          },
         ),
       );
     }
@@ -717,9 +726,65 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                 effectiveContent = const SizedBox.shrink();
                 break;
               case MapOverlaySheetType.createRoadTrip:
-                effectiveContent = CreateRoadTripSheet(
-                  // ✅ 新的可复用“内容层”
-                  scrollController: scrollController,
+                effectiveContent = Consumer(
+                  builder: (context, ref, _) {
+                    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+                    final selectionState = ref.read(mapSelectionControllerProvider);
+                    
+                    // 始终使用完整创建模式
+                    const mode = CreateRoadTripMode.fullCreation;
+                    
+                    // 构建 initialRoute（如果有起点）
+                    QuickRoadTripResult? initialRoute;
+                    if (selectionState.selectedLatLng != null) {
+                      initialRoute = QuickRoadTripResult(
+                        title: '',
+                        start: selectionState.selectedLatLng!,
+                        destination: selectionState.destinationLatLng,
+                        startAddress: null,
+                        destinationAddress: null,
+                        openDetailed: false,
+                      );
+                    }
+                    
+                    return CreateRoadTripSheet(
+                      scrollController: scrollController,
+                      mode: mode,
+                      embeddedMode: true, // overlay 模式
+                      initialRoute: initialRoute,
+                      startPositionListenable: selectionController.selectedLatLngListenable,
+                      destinationListenable: selectionController.destinationLatLngListenable,
+                      onCancel: () {
+                        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+                        
+                        // 立即清理所有选择状态（包括起点、终点、选择模式）
+                        // 这会清除地图标记和顶部提示
+                        // 必须按顺序清除：先清除选择模式，再清除位置，最后清除 sheet 状态
+                        selectionController.setSelectingDestination(false);
+                        selectionController.setSelectionSheetOpen(false);
+                        selectionController.setSelectedLatLng(null); // 这会自动清除 destination
+                        selectionController.resetMapPadding();
+                        
+                        // 关闭 overlay
+                        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+                      },
+                      onCreateQuickTrip: (result) async {
+                        // 处理快速创建
+                        final manager = ref.read(locationSelectionManagerProvider);
+                        await manager.createQuickRoadTrip(result);
+                        // 关闭 overlay
+                        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+                        // 清理选择状态
+                        ref.read(mapSelectionControllerProvider.notifier).resetSelection();
+                      },
+                      onOpenDetailed: () {
+                        // 打开详细编辑器
+                        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+                        // 清理选择状态，但保留位置信息用于详细编辑器
+                        // ref.read(mapSelectionControllerProvider.notifier).resetSelection();
+                      },
+                    );
+                  },
                 );
             }
 
@@ -776,6 +841,18 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                                       curve: Curves.easeOutCubic,
                                     );
                                     return;
+                                  }
+                                  // 关闭 overlay 时，如果是 CreateRoadTripSheet，需要清理状态
+                                  if (widget.sheetType == MapOverlaySheetType.createRoadTrip) {
+                                    final selectionController = ref
+                                        .read(mapSelectionControllerProvider.notifier);
+                                    
+                                    // 立即清理所有选择状态（包括起点、终点、选择模式）
+                                    // 这会清除地图标记和顶部提示
+                                    selectionController.setSelectingDestination(false);
+                                    selectionController.setSelectionSheetOpen(false);
+                                    selectionController.setSelectedLatLng(null); // 这会自动清除 destination
+                                    selectionController.resetMapPadding();
                                   }
                                   ref
                                       .read(mapOverlaySheetProvider.notifier)

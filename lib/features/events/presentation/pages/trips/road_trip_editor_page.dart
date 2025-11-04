@@ -159,39 +159,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     });
   }
 
-  void _showAddWaypointDialog() {
-    final ctrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('添加途经点'),
-        content: TextField(
-          controller: ctrl,
-          decoration: const InputDecoration(hintText: '例如: Pisa Tower 或者具体地址'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (ctrl.text.trim().isNotEmpty) {
-                setState(() {
-                  _state = _state.copyWith(
-                    waypoints: [..._state.waypoints, ctrl.text.trim()],
-                  );
-                });
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('添加'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _addTagFromInput() {
     final value = _tagInputCtrl.text.trim();
     if (value.isEmpty) return;

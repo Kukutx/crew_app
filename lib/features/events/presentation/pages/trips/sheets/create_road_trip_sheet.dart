@@ -12,6 +12,8 @@ import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_t
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
+import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,14 +22,46 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/foundation.dart';
 
-class CreateRoadTripSheet  extends ConsumerStatefulWidget {
-  const CreateRoadTripSheet ({super.key,     required this.scrollController,this.initialRoute});
+/// 创建自驾游Sheet模式
+enum CreateRoadTripMode {
+  /// 完整创建流程（默认）
+  fullCreation,
+  /// 仅起点确认（替代 StartLocationSheet）
+  startLocationOnly,
+}
+
+class CreateRoadTripSheet extends ConsumerStatefulWidget {
+  const CreateRoadTripSheet({
+    super.key,
+    required this.scrollController,
+    this.initialRoute,
+    this.mode = CreateRoadTripMode.fullCreation,
+    this.embeddedMode = true,
+    // 以下参数用于 startLocationOnly 模式
+    this.startPositionListenable,
+    this.destinationListenable,
+    this.onConfirm,
+    this.onCancel,
+    this.onCreateQuickTrip,
+    this.onOpenDetailed,
+  });
 
   final QuickRoadTripResult? initialRoute;
   final ScrollController scrollController;
+  final CreateRoadTripMode mode;
+  final bool embeddedMode;
+  // 用于位置选择模式
+  final ValueListenable<LatLng?>? startPositionListenable;
+  final ValueListenable<LatLng?>? destinationListenable;
+  final VoidCallback? onConfirm;
+  final VoidCallback? onCancel;
+  final Future<void> Function(QuickRoadTripResult)? onCreateQuickTrip;
+  final VoidCallback? onOpenDetailed;
+  
   @override
-  ConsumerState<CreateRoadTripSheet > createState() => _CreateRoadTripSheetState();
+  ConsumerState<CreateRoadTripSheet> createState() => _CreateRoadTripSheetState();
 }
 
 // 1) 定义 Section 锚点
@@ -39,7 +73,14 @@ class _CreateRoadTripSheetState extends ConsumerState<CreateRoadTripSheet> {
     return _CreateRoadTripContent(
       scrollCtrl: widget.scrollController,
       initialRoute: widget.initialRoute,
-      embeddedMode: true, // ✅ 嵌入 Overlay
+      embeddedMode: widget.embeddedMode,
+      mode: widget.mode,
+      startPositionListenable: widget.startPositionListenable,
+      destinationListenable: widget.destinationListenable,
+      onConfirm: widget.onConfirm,
+      onCancel: widget.onCancel,
+      onCreateQuickTrip: widget.onCreateQuickTrip,
+      onOpenDetailed: widget.onOpenDetailed,
     );
   }
 }
@@ -48,12 +89,26 @@ class _CreateRoadTripContent extends ConsumerStatefulWidget {
   const _CreateRoadTripContent({
     required this.scrollCtrl,
     required this.embeddedMode,
+    required this.mode,
     this.initialRoute,
+    this.startPositionListenable,
+    this.destinationListenable,
+    this.onConfirm,
+    this.onCancel,
+    this.onCreateQuickTrip,
+    this.onOpenDetailed,
   });
 
   final ScrollController scrollCtrl; // 由外部传入
   final bool embeddedMode; // true: 嵌入 Overlay; false: 弹窗
+  final CreateRoadTripMode mode;
   final QuickRoadTripResult? initialRoute;
+  final ValueListenable<LatLng?>? startPositionListenable;
+  final ValueListenable<LatLng?>? destinationListenable;
+  final VoidCallback? onConfirm;
+  final VoidCallback? onCancel;
+  final Future<void> Function(QuickRoadTripResult)? onCreateQuickTrip;
+  final VoidCallback? onOpenDetailed;
 
   @override
   ConsumerState<_CreateRoadTripContent> createState() => _PlannerContentState();
@@ -122,33 +177,61 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   void initState() {
     super.initState();
 
-    final initialRoute = widget.initialRoute;
-    if (initialRoute != null) {
-      _startLatLng = initialRoute.start;
-      _destinationLatLng = initialRoute.destination;
-      _startAddress = initialRoute.startAddress;
-      _destinationAddress = initialRoute.destinationAddress;
-      final trimmedTitle = initialRoute.title.trim();
-      if (trimmedTitle.isNotEmpty) {
-        _titleCtrl.text = trimmedTitle;
+    // 根据模式初始化位置信息
+    if (widget.mode == CreateRoadTripMode.startLocationOnly) {
+      // 从 ValueListenable 读取起点位置
+      if (widget.startPositionListenable != null) {
+        _startLatLng = widget.startPositionListenable!.value;
+        widget.startPositionListenable!.addListener(_onStartPositionChanged);
+        _updateStartLocation(_startLatLng);
       }
-    }
+    } else {
+      // 完整创建模式：从 initialRoute 读取，同时也监听 ValueListenable 的变化
+      final initialRoute = widget.initialRoute;
+      if (initialRoute != null) {
+        _startLatLng = initialRoute.start;
+        _destinationLatLng = initialRoute.destination;
+        _startAddress = initialRoute.startAddress;
+        _destinationAddress = initialRoute.destinationAddress;
+        final trimmedTitle = initialRoute.title.trim();
+        if (trimmedTitle.isNotEmpty) {
+          _titleCtrl.text = trimmedTitle;
+        }
+      }
 
-    if (_startLatLng != null) {
-      final hasAddress =
-          _startAddress != null && _startAddress!.trim().isNotEmpty;
-      _startAddressFuture = hasAddress
-          ? Future<String?>.value(_startAddress)
-          : _loadAddress(_startLatLng!, isStart: true);
-      _startNearbyFuture = _loadNearbyPlaces(_startLatLng!);
-    }
-    if (_destinationLatLng != null) {
-      final hasAddress = _destinationAddress != null &&
-          _destinationAddress!.trim().isNotEmpty;
-      _destinationAddressFuture = hasAddress
-          ? Future<String?>.value(_destinationAddress)
-          : _loadAddress(_destinationLatLng!, isStart: false);
-      _destinationNearbyFuture = _loadNearbyPlaces(_destinationLatLng!);
+      // 如果提供了 ValueListenable，也监听位置变化
+      if (widget.startPositionListenable != null) {
+        final currentStart = widget.startPositionListenable!.value;
+        if (currentStart != null && currentStart != _startLatLng) {
+          _startLatLng = currentStart;
+        }
+        widget.startPositionListenable!.addListener(_onStartPositionChanged);
+      }
+      
+      if (widget.destinationListenable != null) {
+        final currentDestination = widget.destinationListenable!.value;
+        if (currentDestination != null && currentDestination != _destinationLatLng) {
+          _destinationLatLng = currentDestination;
+        }
+        widget.destinationListenable!.addListener(_onDestinationPositionChanged);
+      }
+
+      if (_startLatLng != null) {
+        final hasAddress =
+            _startAddress != null && _startAddress!.trim().isNotEmpty;
+        _startAddressFuture = hasAddress
+            ? Future<String?>.value(_startAddress)
+            : _loadAddress(_startLatLng!, isStart: true);
+        _startNearbyFuture = _loadNearbyPlaces(_startLatLng!);
+      }
+      if (_destinationLatLng != null) {
+        final hasAddress = _destinationAddress != null &&
+            _destinationAddress!.trim().isNotEmpty;
+        _destinationAddressFuture = hasAddress
+            ? Future<String?>.value(_destinationAddress)
+            : _loadAddress(_destinationLatLng!, isStart: false);
+        _destinationNearbyFuture = _loadNearbyPlaces(_destinationLatLng!);
+      }
     }
 
     _pageCtrl.addListener(() {
@@ -161,8 +244,54 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     _titleCtrl.addListener(() => setState(() {})); // 标题变化触发校验
   }
 
+  void _onStartPositionChanged() {
+    if (!mounted) return;
+    final newPosition = widget.startPositionListenable?.value;
+    if (newPosition != _startLatLng) {
+      _updateStartLocation(newPosition);
+    }
+  }
+
+  void _onDestinationPositionChanged() {
+    if (!mounted) return;
+    final newPosition = widget.destinationListenable?.value;
+    if (newPosition != _destinationLatLng) {
+      _updateDestinationLocation(newPosition);
+    }
+  }
+
+  void _updateStartLocation(LatLng? position) {
+    setState(() {
+      _startLatLng = position;
+      if (position != null) {
+        _startAddressFuture = _loadAddress(position, isStart: true);
+        _startNearbyFuture = _loadNearbyPlaces(position);
+      } else {
+        _startAddressFuture = null;
+        _startNearbyFuture = null;
+        _startAddress = null;
+      }
+    });
+  }
+
+  void _updateDestinationLocation(LatLng? position) {
+    setState(() {
+      _destinationLatLng = position;
+      if (position != null) {
+        _destinationAddressFuture = _loadAddress(position, isStart: false);
+        _destinationNearbyFuture = _loadNearbyPlaces(position);
+      } else {
+        _destinationAddressFuture = null;
+        _destinationNearbyFuture = null;
+        _destinationAddress = null;
+      }
+    });
+  }
+
   @override
   void dispose() {
+    widget.startPositionListenable?.removeListener(_onStartPositionChanged);
+    widget.destinationListenable?.removeListener(_onDestinationPositionChanged);
     _titleCtrl.dispose();
     _maxParticipantsCtrl.dispose();
     _priceCtrl.dispose();
@@ -189,15 +318,19 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   Future<void> _onCreatePressed() async {
-    // TODO: 收集数据提交（略）
-    // overlay 模式：直接把 overlay sheet 关掉
-    // 弹窗模式：由上层 showModalBottomSheet 的 pop 处理
-    if (!widget.embeddedMode) {
-      Navigator.of(context).maybePop();
-      return;
+    // 根据模式处理不同的操作
+    if (widget.mode == CreateRoadTripMode.startLocationOnly) {
+      // 起点确认模式：调用 onConfirm
+      widget.onConfirm?.call();
+    } else {
+      // 完整创建模式：关闭 sheet
+      if (!widget.embeddedMode) {
+        Navigator.of(context).maybePop();
+        return;
+      }
+      // 关闭 overlay
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
     }
-    // 关闭 overlay：
-    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
   }
 
   void _onRouteTypeChanged(RoadTripRouteType t) {
@@ -289,19 +422,90 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   Future<void> _restartSelectionFlow({required bool skipStart}) async {
-    final manager = ref.read(locationSelectionManagerProvider);
-
-    // 弹窗模式需先关闭自身；嵌入模式无需 pop
-    if (!widget.embeddedMode) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final mapController = ref.read(mapControllerProvider);
+    
+    // overlay 模式下，所有操作都在同一个 overlay 内完成
+    if (widget.embeddedMode) {
+      if (skipStart && _startLatLng != null) {
+        // 跳过起点选择，直接进入终点选择模式
+        selectionController.setSelectingDestination(true);
+        if (_destinationLatLng != null) {
+          unawaited(mapController.moveCamera(_destinationLatLng!, zoom: 12));
+        } else {
+          selectionController.setDestinationLatLng(null);
+          unawaited(mapController.moveCamera(_startLatLng!, zoom: 6));
+        }
+      } else {
+        // 重新开始起点选择
+        selectionController.setSelectingDestination(false);
+        selectionController.setSelectedLatLng(_startLatLng);
+        if (_startLatLng != null) {
+          unawaited(mapController.moveCamera(_startLatLng!, zoom: 12));
+        }
+      }
+      
+      // 确保 overlay 打开
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+    } else {
+      // 弹窗模式：关闭当前sheet，然后打开 overlay
       Navigator.of(context).pop();
+      
+      final manager = ref.read(locationSelectionManagerProvider);
+      await Future<void>.microtask(() => manager.startRouteSelectionFlow(
+            context,
+            initialStart: _startLatLng,
+            initialDestination: _destinationLatLng,
+            skipStart: skipStart && _startLatLng != null,
+          ));
+    }
+  }
+
+  // 处理起点卡片点击
+  Future<void> _onEditDeparture() async {
+    await _restartSelectionFlow(skipStart: false);
+  }
+
+  // 处理终点卡片点击
+  Future<void> _onEditDestination() async {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final mapController = ref.read(mapControllerProvider);
+
+    // 如果已经有终点，定位到终点位置（类似起点的行为）
+    if (_destinationLatLng != null) {
+      // 设置终点选择模式
+      selectionController.setSelectingDestination(true);
+      
+      // 确保 overlay 打开（保持在 fullCreation 模式）
+      if (widget.embeddedMode) {
+        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+      } else {
+        // 弹窗模式：关闭当前sheet，然后打开 overlay
+        Navigator.of(context).pop();
+        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+      }
+      
+      // 定位到终点
+      await mapController.moveCamera(_destinationLatLng!, zoom: 12);
+      return;
     }
 
-    await Future<void>.microtask(() => manager.startRouteSelectionFlow(
-          context,
-          initialStart: _startLatLng,
-          initialDestination: _destinationLatLng,
-          skipStart: skipStart && _startLatLng != null,
-        ));
+    // 如果没有终点，设置终点选择模式，让用户在地图上选择
+    selectionController.setSelectingDestination(true);
+    
+    // 确保 overlay 打开（保持在 fullCreation 模式）
+    if (widget.embeddedMode) {
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+    } else {
+      // 弹窗模式：关闭当前sheet，然后打开 overlay
+      Navigator.of(context).pop();
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+    }
+    
+    // 定位地图到起点（缩放以便选择终点）
+    if (_startLatLng != null) {
+      unawaited(mapController.moveCamera(_startLatLng!, zoom: 6));
+    }
   }
 
   Future<void> goToSection(TripSection s) async {
@@ -385,6 +589,12 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
 
+    // 根据模式显示不同的UI
+    if (widget.mode == CreateRoadTripMode.startLocationOnly) {
+      return _buildStartLocationOnlyUI(context, theme, loc);
+    }
+
+    // 完整创建模式：保持原有UI
     final canScroll = _canSwipe && !(_isBasicPage && !_basicValid);
 
     // 计算启动页展示信息（起终点坐标/地址）
@@ -450,10 +660,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                       departureSubtitle: startSubtitle,
                       destinationTitle: destinationTitle,
                       destinationSubtitle: destinationSubtitle,
-                      onEditDeparture: () => _restartSelectionFlow(skipStart: false),
-                      onEditDestination: () => _restartSelectionFlow(
-                        skipStart: _destinationLatLng != null && _startLatLng != null,
-                      ),
+                      onEditDeparture: _onEditDeparture,
+                      onEditDestination: _onEditDestination,
                       departurePosition: _startLatLng,
                       departureAddressFuture: _startAddressFuture,
                       departureNearbyFuture: _startNearbyFuture,
@@ -509,6 +717,155 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       ),
     );
   }
+
+  // 构建起点确认UI（替代 StartLocationSheet）
+  Widget _buildStartLocationOnlyUI(BuildContext context, ThemeData theme, AppLocalizations loc) {
+    final viewPadding = MediaQuery.of(context).viewPadding.bottom;
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+    final tipStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurface.withValues(alpha: .7),
+    );
+
+    return Material(
+      color: theme.colorScheme.surface,
+      child: ListView(
+        controller: widget.scrollCtrl,
+        padding: EdgeInsets.fromLTRB(
+          24,
+          16,
+          24,
+          24 + viewPadding + viewInsets,
+        ),
+        children: [
+          const SheetHandle(),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.map_select_location_title,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      loc.map_select_location_tip,
+                      style: tipStyle,
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: loc.action_cancel,
+                onPressed: widget.onCancel,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (_startLatLng != null) ...[
+            ValueListenableBuilder<LatLng?>(
+              valueListenable: widget.startPositionListenable!,
+              builder: (context, position, _) {
+                if (position == null) {
+                  return const SizedBox.shrink();
+                }
+
+                final coords = loc.location_coordinates(
+                  position.latitude.toStringAsFixed(6),
+                  position.longitude.toStringAsFixed(6),
+                );
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.place_outlined,
+                          color: Colors.redAccent,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            coords,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (_startAddressFuture != null)
+                      FutureBuilder<String?>(
+                        key: ValueKey(
+                          '${position.latitude}_${position.longitude}_start_info',
+                        ),
+                        future: _startAddressFuture,
+                        builder: (context, snapshot) {
+                          final icon = Icon(
+                            Icons.home_outlined,
+                            color: theme.colorScheme.onSurface.withValues(alpha: .7),
+                          );
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return LocationSheetRow(
+                              icon: icon,
+                              child: Text(loc.map_location_info_address_loading),
+                            );
+                          }
+                          if (snapshot.hasError) {
+                            return LocationSheetRow(
+                              icon: icon,
+                              child: Text(loc.map_location_info_address_unavailable),
+                            );
+                          }
+                          final address = snapshot.data;
+                          final display = (address == null || address.trim().isEmpty)
+                              ? loc.map_location_info_address_unavailable
+                              : address;
+                          return LocationSheetRow(
+                            icon: icon,
+                            child: Text(display),
+                          );
+                        },
+                      ),
+                    const SizedBox(height: 16),
+                    if (_startNearbyFuture != null)
+                      NearbyPlacesPreview(
+                        key: ValueKey(
+                          '${position.latitude}_${position.longitude}_start_nearby',
+                        ),
+                        future: _startNearbyFuture!,
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: widget.onCancel,
+                  child: Text(loc.action_cancel),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  onPressed: widget.onConfirm,
+                  child: Text(loc.map_location_info_create_event),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
 }
 
 class _ConnectionStart extends StatelessWidget {
@@ -566,7 +923,8 @@ class _ConnectionStart extends StatelessWidget {
                 subtitle: destinationSubtitle.isEmpty
                     ? null
                     : destinationSubtitle,
-                onTap: onEditDestination,
+                onTap: departurePosition != null ? onEditDestination : null,
+                enabled: departurePosition != null,
               ),
               const SizedBox(height: 40),
               _LocationDetails(
@@ -679,51 +1037,57 @@ class _CardTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.onTap,
+    this.enabled = true,
   });
   final Widget leading;
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final opacity = enabled ? 1.0 : 0.5;
     return Material(
       color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-          child: Row(
-            children: [
-              leading,
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 4),
+        child: Opacity(
+          opacity: opacity,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+            child: Row(
+              children: [
+                leading,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        subtitle!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle!,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
+                const Icon(Icons.chevron_right),
+              ],
+            ),
           ),
         ),
       ),

@@ -12,9 +12,8 @@ import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/sheets/start_location_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/sheets/destination_selection_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/sheets/map_place_details_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 /// 位置选择管理器
@@ -33,7 +32,7 @@ class LocationSelectionManager {
   Future<void> onMapLongPress(LatLng latlng, BuildContext context) async {
     final selectionState = ref.read(mapSelectionControllerProvider);
     if (selectionState.isSelectingDestination) {
-      await _handleDestinationSelection(latlng, context);
+      _handleDestinationSelection(latlng, context);
       return;
     }
     
@@ -45,8 +44,10 @@ class LocationSelectionManager {
       ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(latlng);
       
       final mapController = ref.read(mapControllerProvider);
-      await mapController.moveCamera(latlng, zoom: 17);
-      await _showLocationSelectionSheet(context);
+      unawaited(mapController.moveCamera(latlng, zoom: 17));
+      
+      // 直接显示 CreateRoadTripSheet 的启动页
+      _showRoadTripCreationSheet(context, latlng);
     } finally {
       _isHandlingLongPress = false;
     }
@@ -56,7 +57,7 @@ class LocationSelectionManager {
   Future<void> onMapTap(LatLng position, BuildContext context) async {
     final selectionState = ref.read(mapSelectionControllerProvider);
     if (selectionState.isSelectingDestination) {
-      await _handleDestinationSelection(position, context);
+      _handleDestinationSelection(position, context);
       return;
     }
 
@@ -90,128 +91,44 @@ class LocationSelectionManager {
   }
 
   /// 处理目标位置选择
-  Future<void> _handleDestinationSelection(LatLng position, BuildContext context) async {
+  void _handleDestinationSelection(LatLng position, BuildContext context) {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final selectionState = ref.read(mapSelectionControllerProvider);
     
-    if (!selectionState.isSelectingDestination || selectionState.isSelectionSheetOpen) {
+    if (!selectionState.isSelectingDestination) {
       return;
     }
     
     selectionController.setDestinationLatLng(position);
     
     final mapController = ref.read(mapControllerProvider);
-    await mapController.moveCamera(position, zoom: 12);
+    unawaited(mapController.moveCamera(position, zoom: 12));
     
     HapticFeedback.lightImpact();
-    await _showDestinationSelectionSheet(context);
+    
+    // 确保 overlay sheet 打开，CreateRoadTripSheet 会显示在 fullCreation 模式
+    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
   }
 
-  /// 显示位置选择Sheet
-  Future<bool?> _showLocationSelectionSheet(BuildContext context) async {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+  /// 显示自驾游创建Sheet（启动页）- 使用 overlay 模式
+  void _showRoadTripCreationSheet(BuildContext context, LatLng startLatLng) {
     final selectionState = ref.read(mapSelectionControllerProvider);
     
-    if (selectionState.selectedLatLng == null || selectionState.isSelectionSheetOpen) {
-      return null;
-    }
-
-    final proceed = await _presentSelectionSheet<bool>(
-      context: context,
-      initialChildSize: 0.45,
-      minChildSize: 0.3,
-      maxChildSize: 0.9,
-      cancelResult: false,
-      builder: (sheetContext, scrollController) {
-        return StartLocationSheet(
-          positionListenable: selectionController.selectedLatLngListenable,
-          onConfirm: () => Navigator.of(sheetContext).pop(true),
-          onCancel: () => Navigator.of(sheetContext).pop(false),
-          reverseGeocode: _reverseGeocode,
-          fetchNearbyPlaces: selectionController.getNearbyPlaces,
-          scrollController: scrollController,
-        );
-      },
-    );
-
-    if (proceed != null && proceed) {
-      await _beginDestinationSelection();
-    } else {
-      await clearSelectedLocation(dismissSheet: false);
-    }
-
-    return proceed;
-  }
-
-  /// 开始目标位置选择
-  Future<void> _beginDestinationSelection() async {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final selectionState = ref.read(mapSelectionControllerProvider);
-    final start = selectionState.selectedLatLng;
-    
-    if (start == null) {
-      await clearSelectedLocation(dismissSheet: false);
+    if (selectionState.selectedLatLng == null) {
       return;
     }
 
-    selectionController.setSelectingDestination(true);
-    selectionController.setDestinationLatLng(null);
-    
-    final mapController = ref.read(mapControllerProvider);
-    await mapController.moveCamera(start, zoom: 6);
+    // 获取起点地址（异步获取，不影响显示）
+    unawaited(_reverseGeocode(startLatLng));
+
+    // 使用 overlay 模式显示 CreateRoadTripSheet
+    // overlay 模式下的 CreateRoadTripSheet 由 events_map_page 管理
+    // 它会通过 ValueListenable 读取位置信息，显示在 fullCreation 模式
+    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
   }
 
-  /// 显示目标位置选择Sheet
-  Future<void> _showDestinationSelectionSheet(BuildContext context) async {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final selectionState = ref.read(mapSelectionControllerProvider);
-    
-    if (!selectionState.isSelectingDestination || 
-        selectionState.selectedLatLng == null ||
-        selectionState.destinationLatLng == null) {
-      return;
-    }
-
-    final result = await _presentSelectionSheet<QuickRoadTripResult>(
-      context: context,
-      initialChildSize: 0.55,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      builder: (sheetContext, scrollController) {
-        return DestinationSelectionSheet(
-          startPositionListenable: selectionController.selectedLatLngListenable,
-          destinationListenable: selectionController.destinationLatLngListenable,
-          reverseGeocode: _reverseGeocode,
-          fetchNearbyPlaces: selectionController.getNearbyPlaces,
-          scrollController: scrollController,
-          onCancel: () => Navigator.of(sheetContext).pop(null),
-        );
-      },
-    );
-
-    if (result == null) {
-      await _finishDestinationFlow();
-      return;
-    }
-
-    if (result.openDetailed) {
-      await _finishDestinationFlow();
-      return;
-    }
-
-    if (result.destination != null) {
-      await _createQuickRoadTrip(result);
-    }
-    await _finishDestinationFlow();
-  }
-
-  /// 完成目标位置选择流程
-  Future<void> _finishDestinationFlow() async {
-    await clearSelectedLocation(dismissSheet: false);
-  }
-
-  /// 创建快速行程
-  Future<void> _createQuickRoadTrip(QuickRoadTripResult result) async {
+  /// 创建快速行程（公开方法）
+  Future<void> createQuickRoadTrip(QuickRoadTripResult result) async {
     final destination = result.destination;
     if (destination == null) return;
     
@@ -257,65 +174,6 @@ class LocationSelectionManager {
     }
   }
 
-  /// 显示Sheet
-  Future<T?> _presentSelectionSheet<T>({
-    required BuildContext context,
-    required double initialChildSize,
-    required Widget Function(BuildContext sheetContext, ScrollController scrollController) builder,
-    double minChildSize = 0.3,
-    double maxChildSize = 0.95,
-    T? cancelResult,
-  }) async {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final media = MediaQuery.of(context);
-    final controller = DraggableScrollableController();
-    _activeSheetCancelResult = cancelResult;
-
-    EdgeInsets _paddingForSize(double size) {
-      final height = media.size.height;
-      final bottom = height * size;
-      return EdgeInsets.only(bottom: bottom);
-    }
-
-    void updatePadding() {
-      selectionController.setMapPadding(_paddingForSize(controller.size));
-    }
-
-    selectionController.setMapPadding(_paddingForSize(initialChildSize));
-    selectionController.setSelectionSheetOpen(true);
-    controller.addListener(updatePadding);
-
-    T? result;
-    try {
-      result = await showModalBottomSheet<T>(
-        context: context,
-        backgroundColor: Colors.transparent,
-        isScrollControlled: true,
-        barrierColor: Colors.black.withValues(alpha: .45),
-        builder: (modalContext) {
-          _activeSheetNavigator = Navigator.of(modalContext);
-          return _DraggableSheetModal(
-            controller: controller,
-            initialChildSize: initialChildSize,
-            minChildSize: minChildSize,
-            maxChildSize: maxChildSize,
-            childBuilder: (sheetContext, scrollController) {
-              return builder(sheetContext, scrollController);
-            },
-          );
-        },
-      );
-    } finally {
-      controller.removeListener(updatePadding);
-      selectionController.resetMapPadding();
-      selectionController.setSelectionSheetOpen(false);
-      _activeSheetNavigator = null;
-      _activeSheetCancelResult = null;
-    }
-
-    return result;
-  }
-
   /// 对外公开的反向地理编码
   Future<String?> reverseGeocode(LatLng latlng) {
     return _reverseGeocode(latlng);
@@ -344,33 +202,28 @@ class LocationSelectionManager {
     }
 
     if (skipStart && initialStart != null) {
+      // 跳过起点选择，直接进入终点选择模式
       selectionController.setSelectingDestination(true);
       if (initialDestination != null) {
         selectionController.setDestinationLatLng(initialDestination);
-        await mapController.moveCamera(initialDestination, zoom: 12);
+        unawaited(mapController.moveCamera(initialDestination, zoom: 12));
       } else {
-        selectionController.setDestinationLatLng(initialStart);
-        await mapController.moveCamera(initialStart, zoom: 6);
+        selectionController.setDestinationLatLng(null);
+        unawaited(mapController.moveCamera(initialStart, zoom: 6));
       }
-      await _showDestinationSelectionSheet(context);
+      // 使用 overlay 模式显示 CreateRoadTripSheet（fullCreation 模式）
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
       return;
     }
 
+    // 需要选择起点，直接使用 overlay 模式显示 CreateRoadTripSheet
     if (initialStart != null) {
-      await mapController.moveCamera(initialStart, zoom: 12);
+      unawaited(mapController.moveCamera(initialStart, zoom: 12));
     }
-
-    final proceed = await _showLocationSelectionSheet(context);
-    if (proceed == true) {
-      await _beginDestinationSelection();
-      if (initialDestination != null) {
-        selectionController.setDestinationLatLng(initialDestination);
-        await mapController.moveCamera(initialDestination, zoom: 12);
-      }
-      await _showDestinationSelectionSheet(context);
-    } else {
-      await clearSelectedLocation(dismissSheet: false);
-    }
+    
+    // 直接使用 overlay 模式显示 CreateRoadTripSheet（fullCreation 或 startLocationOnly 模式）
+    // 不再使用弹窗模式，所有操作都在 overlay 内完成
+    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
   }
 
   /// 反向地理编码
@@ -443,59 +296,10 @@ class LocationSelectionManager {
   }
 }
 
-class _DraggableSheetModal extends StatelessWidget {
-  const _DraggableSheetModal({
-    required this.controller,
-    required this.initialChildSize,
-    required this.minChildSize,
-    required this.maxChildSize,
-    required this.childBuilder,
-  });
-
-  final DraggableScrollableController controller;
-  final double initialChildSize;
-  final double minChildSize;
-  final double maxChildSize;
-  final Widget Function(BuildContext context, ScrollController scrollController)
-      childBuilder;
-
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      controller: controller,
-      expand: false,
-      initialChildSize: initialChildSize,
-      minChildSize: minChildSize,
-      maxChildSize: maxChildSize,
-      builder: (context, scrollController) {
-        final theme = Theme.of(context);
-        return AnimatedPadding(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: Material(
-              color: theme.colorScheme.surface,
-              child: SafeArea(
-                top: false,
-                child: childBuilder(context, scrollController),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 /// LocationSelectionManager的Provider
 final locationSelectionManagerProvider = Provider<LocationSelectionManager>((ref) {
   return LocationSelectionManager(ref);
 });
-
 
 
 /// Sheet手柄

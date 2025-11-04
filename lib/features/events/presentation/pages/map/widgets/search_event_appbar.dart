@@ -122,7 +122,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12,
-                              vertical: 10,
+                              vertical: 14,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),

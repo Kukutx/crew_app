@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_host_disclaimer_section.dart';
@@ -1258,7 +1257,6 @@ class _RouteSelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
     // 直接使用 scrollCtrl，如果为 null 则不使用 controller
     // 让 DraggableScrollableSheet 的滚动控制器直接连接到这个 CustomScrollView
     return CustomScrollView(
@@ -1410,87 +1408,6 @@ class _UnifiedNearbyPlacesList extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class _LocationDetails extends StatelessWidget {
-  const _LocationDetails({
-    required this.label,
-    required this.tip,
-    this.position,
-    this.addressFuture,
-    this.nearbyFuture,
-  });
-
-  final String label;
-  final String tip;
-  final LatLng? position;
-  final Future<String?>? addressFuture;
-  final Future<List<NearbyPlace>>? nearbyFuture;
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
-        if (position == null) ...[
-          Text(
-            tip,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: .75),
-            ),
-          ),
-        ] else ...[
-          LocationSheetRow(
-            icon: const Icon(Icons.place_outlined),
-            child: Text(
-              loc.location_coordinates(
-                position!.latitude.toStringAsFixed(6),
-                position!.longitude.toStringAsFixed(6),
-              ),
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (addressFuture != null)
-            FutureBuilder<String?>(
-              future: addressFuture,
-              builder: (context, snapshot) {
-                final icon = Icon(
-                  Icons.home_outlined,
-                  color: theme.colorScheme.onSurface.withValues(alpha: .7),
-                );
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return LocationSheetRow(
-                    icon: icon,
-                    child: Text(loc.map_location_info_address_loading),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return LocationSheetRow(
-                    icon: icon,
-                    child: Text(loc.map_location_info_address_unavailable),
-                  );
-                }
-                final address = snapshot.data;
-                final display = (address == null || address.trim().isEmpty)
-                    ? loc.map_location_info_address_unavailable
-                    : address;
-                return LocationSheetRow(icon: icon, child: Text(display));
-              },
-            ),
-          if (nearbyFuture != null) ...[
-            const SizedBox(height: 16),
-            NearbyPlacesPreview(future: nearbyFuture!),
-          ],
-        ],
-      ],
     );
   }
 }

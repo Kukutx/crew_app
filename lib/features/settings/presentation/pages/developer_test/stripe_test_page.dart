@@ -1,6 +1,6 @@
 // lib/features/user/presentation/settings/pages/developer_test/stripe_test_page.dart
 
-import 'package:crew_app/features/user/presentation/pages/settings/pages/developer_test/stripe_test_service.dart';
+import 'package:crew_app/features/settings/presentation/pages/developer_test/stripe_test_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;

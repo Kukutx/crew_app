@@ -1,4 +1,4 @@
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/models/wallet_transaction.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/models/wallet_transaction.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';

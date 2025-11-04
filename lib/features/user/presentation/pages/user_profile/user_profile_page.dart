@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
+import 'package:crew_app/features/user/presentation/pages/guestbook/guestbook_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +17,6 @@ import 'package:crew_app/features/user/presentation/pages/user_profile/state/use
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/collapsed_profile_avatar.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_header_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
-import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_guestbook_page.dart';
 import 'package:crew_app/shared/utils/image_url.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
@@ -231,7 +231,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
   Future<void> _openGuestbookPage() async {
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const ProfileGuestbookPage()),
+      MaterialPageRoute<void>(builder: (_) => const GuestbookPage()),
     );
   }
 

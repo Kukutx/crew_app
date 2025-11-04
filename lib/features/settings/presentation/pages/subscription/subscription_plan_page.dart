@@ -1,4 +1,4 @@
-import 'package:crew_app/features/user/presentation/pages/settings/state/subscription_plan.dart';
+import 'package:crew_app/features/settings/state/subscription_plan.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

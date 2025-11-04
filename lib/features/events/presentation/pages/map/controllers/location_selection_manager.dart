@@ -8,7 +8,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:crew_app/core/config/environment.dart';
 import 'package:crew_app/core/error/api_exception.dart';
-import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
@@ -302,11 +301,6 @@ class LocationSelectionManager {
   Future<bool> _ensureDisclaimerAccepted() async {
     // 这里需要实现免责声明检查逻辑
     return true;
-  }
-
-  /// 显示SnackBar
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 

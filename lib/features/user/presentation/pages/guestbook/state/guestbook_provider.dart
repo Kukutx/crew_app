@@ -53,6 +53,27 @@ class ProfileGuestbookNotifier extends StateNotifier<List<ProfileMessage>> {
 
     state = [message, ...state];
   }
+
+  void updateMessage(String id, String content) {
+    state = [
+      for (final msg in state)
+        if (msg.id == id)
+          ProfileMessage(
+            id: msg.id,
+            authorName: msg.authorName,
+            content: content,
+            timestamp: msg.timestamp,
+            likes: msg.likes,
+            comments: msg.comments,
+          )
+        else
+          msg,
+    ];
+  }
+
+  void deleteMessage(String id) {
+    state = state.where((msg) => msg.id != id).toList();
+  }
 }
 
 final profileGuestbookProvider =

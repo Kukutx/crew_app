@@ -12,7 +12,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
+import 'package:crew_app/features/settings/presentation/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 class LoginPage extends ConsumerStatefulWidget {

@@ -4,13 +4,12 @@ import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/expenses/expenses_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
-import 'package:crew_app/features/user/presentation/pages/drafts/my_drafts_page.dart';
+import 'package:crew_app/features/events/presentation/pages/drafts/my_drafts_page.dart';
 import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
-import 'package:crew_app/features/user/presentation/pages/moments/my_moments_page.dart';
-import 'package:crew_app/features/user/presentation/pages/qr/my_qr_code_page.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/wallet_page.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/settings_page.dart';
-import 'package:crew_app/features/user/presentation/pages/support/support_feedback_page.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/my_moments_page.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/wallet_page.dart';
+import 'package:crew_app/features/settings/presentation/settings_page.dart';
+import 'package:crew_app/features/settings/presentation/pages/support/support_feedback_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/shared/widgets/qr_scanner/qr_scanner_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -116,11 +115,6 @@ final crewAppRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutePaths.qrScanner,
         name: AppRouteNames.qrScanner,
         builder: (context, state) => const QrScannerScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.myQrCode,
-        name: AppRouteNames.myQrCode,
-        builder: (context, state) => const MyQrCodePage(),
       ),
       GoRoute(
         path: AppRoutePaths.profile,

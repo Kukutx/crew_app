@@ -1,11 +1,11 @@
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/models/wallet_transaction.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/sample_wallet_data.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/widgets/wallet_balance_card.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/widgets/wallet_help_bottom_sheet.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/widgets/wallet_insights_card.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/widgets/wallet_management_card.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/widgets/wallet_quick_actions.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/wallet/widgets/wallet_transactions_card.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/models/wallet_transaction.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/sample_wallet_data.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/widgets/wallet_balance_card.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/widgets/wallet_help_bottom_sheet.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/widgets/wallet_insights_card.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/widgets/wallet_management_card.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/widgets/wallet_quick_actions.dart';
+import 'package:crew_app/features/settings/presentation/pages/wallet/widgets/wallet_transactions_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 

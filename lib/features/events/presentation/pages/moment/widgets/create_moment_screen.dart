@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
@@ -27,7 +26,6 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
   MomentType _selectedType = MomentType.instant;
   File? _selectedMedia;
   bool _isVideo = false;
-  LatLng? _currentLocation;
   bool _isLoadingLocation = false;
   bool _isLoadingAddress = false;
 
@@ -63,7 +61,6 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
       }
 
       setState(() {
-        _currentLocation = location;
         _isLoadingLocation = false;
       });
 
@@ -272,7 +269,7 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     FaIcon(
-                                      FontAwesomeIcons.photoVideo,
+                                      FontAwesomeIcons.photoFilm,
                                       size: 100,
                                       color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                                     ),

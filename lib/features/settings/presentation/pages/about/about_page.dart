@@ -1,5 +1,5 @@
 import 'package:crew_app/core/state/app_update/state/app_update_providers.dart';
-import 'package:crew_app/features/user/presentation/pages/settings/pages/privacy/privacy_documents_page.dart';
+import 'package:crew_app/features/settings/presentation/pages/privacy/privacy_documents_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

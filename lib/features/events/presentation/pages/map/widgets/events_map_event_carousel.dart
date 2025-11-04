@@ -42,8 +42,11 @@ class EventsMapEventCarousel extends StatelessWidget {
             opacity: visible ? 1 : 0,
             child: Padding(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + safeBottom),
-              child: SizedBox(
-                height: 158,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 140,
+                  minHeight: 140,
+                ),
                 child: PageView.builder(
                   controller: controller,
                   physics: events.length > 1

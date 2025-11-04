@@ -340,8 +340,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         participants: participants,
         onOpenSettings: () => _openSettings(participants),
         onSearchTap: _showSearchSheet,
-        onVideoCallTap: () =>
-            _showFeatureComingSoon(loc.chat_action_video_call),
         onParticipantTap: _openUserProfile,
       );
     }
@@ -418,10 +416,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       actions: [
         ChatHeaderActions(
           onSearchTap: _showSearchSheet,
-          onPhoneCallTap: () =>
-              _showFeatureComingSoon(loc.chat_action_phone_call),
-          onVideoCallTap: () =>
-              _showFeatureComingSoon(loc.chat_action_video_call),
           onOpenSettings: () => _openSettings(participants),
         ),
       ],

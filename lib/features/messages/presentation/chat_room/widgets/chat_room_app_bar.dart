@@ -11,8 +11,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.participants,
     required this.onOpenSettings,
     this.onSearchTap,
-    this.onVideoCallTap,
-    this.onPhoneCallTap,
     this.onParticipantTap,
   });
 
@@ -20,8 +18,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<ChatParticipant> participants;
   final VoidCallback onOpenSettings;
   final VoidCallback? onSearchTap;
-  final VoidCallback? onVideoCallTap;
-  final VoidCallback? onPhoneCallTap;
   final ValueChanged<ChatParticipant>? onParticipantTap;
 
   @override
@@ -47,11 +43,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
       return callback ?? () => showUnavailable(label);
     }
 
-    final videoAction =
-        withFallback(onVideoCallTap, loc.chat_action_video_call);
-    final phoneAction =
-        withFallback(onPhoneCallTap, loc.chat_action_phone_call);
-
     return AppBar(
       elevation: 0,
       backgroundColor: colorScheme.surface,
@@ -65,8 +56,6 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         ChatHeaderActions(
           onSearchTap: withFallback(onSearchTap, loc.chat_search_hint),
-          onPhoneCallTap: phoneAction,
-          onVideoCallTap: videoAction,
           onOpenSettings: onOpenSettings,
         ),
       ],

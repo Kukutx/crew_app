@@ -58,13 +58,13 @@ class MapEventFloatingCard extends StatelessWidget {
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: 10,
                     vertical: 6,
                   ),
                   minimumSize: const Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 onPressed: onRegister,
@@ -72,6 +72,10 @@ class MapEventFloatingCard extends StatelessWidget {
                   loc.action_register_now,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: 0,
                   ),
                 ),
               )
@@ -82,13 +86,29 @@ class MapEventFloatingCard extends StatelessWidget {
         IconButton(
           onPressed: onFavorite,
           visualDensity: VisualDensity.compact,
-          icon: Icon(resolvedIsFavorite ? Icons.star : Icons.star_border),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(
+            minWidth: 32,
+            minHeight: 32,
+          ),
+          icon: Icon(
+            resolvedIsFavorite ? Icons.star : Icons.star_border,
+            size: 20,
+          ),
         ),
       if (onClose != null)
         IconButton(
           onPressed: onClose,
           visualDensity: VisualDensity.compact,
-          icon: const Icon(Icons.close),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(
+            minWidth: 32,
+            minHeight: 32,
+          ),
+          icon: const Icon(
+            Icons.close,
+            size: 20,
+          ),
         ),
     ];
 
@@ -99,17 +119,26 @@ class MapEventFloatingCard extends StatelessWidget {
         children: [
           _smallChip(context, loc.registration_open),
           const SizedBox(width: 6),
-          Icon(Icons.groups, size: 16, color: colorScheme.onSurfaceVariant),
+          Icon(
+            Icons.groups,
+            size: 14,
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+          ),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
               participantSummary,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
+                fontSize: 12,
+                height: 1.3,
+                letterSpacing: 0,
               ),
             ),
           ),
-          if (actionButton != null) ...[const SizedBox(width: 8), actionButton],
+          if (actionButton != null) ...[const SizedBox(width: 6), actionButton],
         ],
       );
     } else if (actionButton != null) {
@@ -128,115 +157,128 @@ class MapEventFloatingCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            padding: const EdgeInsets.all(12),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: SizedBox(
-                        width: 96,
-                        height: 96,
-                        child: imageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                memCacheHeight: 512, // 合理压缩，减内存抖动
-                                placeholder: (_, _) => const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (_, _, _) => ColoredBox(
-                                  color: colorScheme.surfaceContainerHighest,
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.error,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : ColoredBox(
-                                color: colorScheme.surfaceContainerHighest,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 88,
+                    height: 88,
+                    child: imageUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            memCacheHeight: 512,
+                            placeholder: (_, _) => const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                 ),
                               ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
+                            ),
+                            errorWidget: (_, _, _) => ColoredBox(
+                              color: colorScheme.surfaceContainerHighest,
+                              child: Center(
+                                child: Icon(
+                                  Icons.error,
+                                  size: 20,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          )
+                        : ColoredBox(
+                            color: colorScheme.surfaceContainerHighest,
+                            child: Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 20,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  resolvedTitle,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                          Expanded(
+                            child: Text(
+                              resolvedTitle,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                                height: 1.25,
+                                letterSpacing: -0.2,
                               ),
-                              ...trailingActions,
-                            ],
+                            ),
                           ),
-                          if (resolvedTimeLabel != null) ...[
-                            const SizedBox(height: 6),
-                            Text(
-                              resolvedTimeLabel,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                          if (resolvedLocation != null &&
-                              resolvedLocation.isNotEmpty) ...[
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.place,
-                                  size: 16,
-                                  color: colorScheme.outline,
-                                ),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    resolvedLocation,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                          if (footer != null) const SizedBox(height: 6),
-                          if (footer != null) footer,
+                          const SizedBox(width: 4),
+                          ...trailingActions.map((action) => SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: action,
+                          )),
                         ],
                       ),
-                    ),
-                  ],
+                      if (resolvedTimeLabel != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          resolvedTimeLabel,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            height: 1.3,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ],
+                      if (resolvedLocation != null &&
+                          resolvedLocation.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.place,
+                              size: 14,
+                              color: colorScheme.outline.withValues(alpha: 0.8),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                resolvedLocation,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontSize: 12,
+                                  height: 1.3,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      if (footer != null) ...[
+                        const SizedBox(height: 6),
+                        footer,
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -249,16 +291,19 @@ class MapEventFloatingCard extends StatelessWidget {
   Widget _smallChip(BuildContext context, String text) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: theme.colorScheme.secondary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         text,
         style: theme.textTheme.labelSmall?.copyWith(
           color: theme.colorScheme.secondary,
           fontWeight: FontWeight.w600,
+          fontSize: 11,
+          height: 1.2,
+          letterSpacing: 0,
         ),
       ),
     );

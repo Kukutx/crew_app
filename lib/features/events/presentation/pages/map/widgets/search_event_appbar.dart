@@ -41,19 +41,23 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   double get _resultsHeight {
     if (!showResults) return 0;
 
-    // 结果列表容器外部有 Padding(top: 4, bottom: 12)，需要将这 16 像素计入
+    // 结果列表容器外部有 Padding(top: 8, bottom: 12)，需要将这 20 像素计入
     // preferredSize，否则在部分屏幕上会出现底部溢出。
-    const padding = 16.0;
+    const padding = 20.0;
 
     if (isLoading) return 72 + padding;
     if (errorText != null || results.isEmpty) return 64 + padding;
 
-    const itemHeight = 60.0;
+    // ListTile 的实际高度：minHeight 56 + 可能的 padding
+    // 加上 Divider 的高度 1
+    const itemHeight = 57.0; // 56 (ListTile) + 1 (Divider)
     const maxVisible = 4;
     final visibleCount = results.length > maxVisible
         ? maxVisible
         : results.length;
-    return visibleCount * itemHeight + padding;
+    // 如果有分隔线，需要减去最后一个分隔线（因为最后一个item后面没有分隔线）
+    final dividerHeight = visibleCount > 1 ? (visibleCount - 1) * 1.0 : 0.0;
+    return visibleCount * 56.0 + dividerHeight + padding;
   }
 
   // 搜索框 ~56 + 余量12 + 结果列表高度
@@ -100,18 +104,24 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                     borderRadius: BorderRadius.circular(16),
                     clipBehavior: Clip.antiAlias,
                     surfaceTintColor: Colors.transparent,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
                     child: ValueListenableBuilder<TextEditingValue>(
                       valueListenable: controller,
                       builder: (context, value, _) {
+                        final theme = Theme.of(context);
                         final hasQuery = value.text.isNotEmpty;
                         return TextField(
                           controller: controller,
                           focusNode: focusNode,
                           textInputAction: TextInputAction.search,
+                          style: TextStyle(color: theme.colorScheme.onSurface),
                           decoration: InputDecoration(
                             hintText: loc.search_hint,
+                            hintStyle: TextStyle(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -122,7 +132,10 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon: IconButton(
-                              icon: const Icon(Icons.menu),
+                              icon: Icon(
+                                Icons.menu,
+                                color: theme.colorScheme.onSurface,
+                              ),
                               onPressed: onQuickActionsTap,
                             ),
                             suffixIconConstraints: const BoxConstraints(
@@ -134,7 +147,10 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                               children: [
                                 if (hasQuery)
                                   IconButton(
-                                    icon: const Icon(Icons.close),
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
                                     onPressed: onClear,
                                   )
                                 else
@@ -164,10 +180,8 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                   elevation: 4,
                   borderRadius: BorderRadius.circular(16),
                   clipBehavior: Clip.antiAlias,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 240),
-                    child: _buildResults(context),
-                  ),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                  child: _buildResults(context),
                 ),
               ),
           ],
@@ -185,6 +199,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
+    final theme = Theme.of(context);
     if (errorText != null) {
       return SizedBox(
         height: 64,
@@ -193,7 +208,9 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               errorText!,
-              style: const TextStyle(color: Colors.redAccent),
+              style: TextStyle(
+                color: theme.colorScheme.error,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -204,28 +221,77 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (results.isEmpty) {
       return SizedBox(
         height: 64,
-        child: Center(child: Text(loc.no_events_found)),
+        child: Center(
+          child: Text(
+            loc.no_events_found,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+        ),
       );
     }
 
-    return ListView.separated(
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      itemCount: results.length,
-      separatorBuilder: (_, _) => const Divider(height: 1, thickness: 1),
-      itemBuilder: (context, index) {
-        final event = results[index];
-        return ListTile(
-          onTap: () => onResultTap(event),
-          title: Text(event.title),
-          subtitle: Text(
-            event.description,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          leading: const Icon(Icons.location_on_outlined),
-        );
-      },
+    // 计算实际可用高度
+    final maxItems = results.length > 4 ? 4 : results.length;
+    final itemHeight = 56.0;
+    final dividerHeight = maxItems > 1 ? (maxItems - 1) * 1.0 : 0.0;
+    final calculatedHeight = maxItems * itemHeight + dividerHeight;
+    
+    return SizedBox(
+      height: calculatedHeight,
+      child: ListView.separated(
+        shrinkWrap: false,
+        physics: const ClampingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: results.length > 4 ? 4 : results.length,
+        separatorBuilder: (_, _) => Divider(
+          height: 1,
+          thickness: 1,
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+        itemBuilder: (context, index) {
+          final event = results[index];
+          return SizedBox(
+            height: 56,
+            child: ListTile(
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 0,
+              ),
+              minVerticalPadding: 0,
+              visualDensity: VisualDensity.compact,
+              onTap: () => onResultTap(event),
+              title: Text(
+                event.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 14,
+                  height: 1.3,
+                ),
+              ),
+              subtitle: Text(
+                event.description,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontSize: 12,
+                  height: 1.3,
+                ),
+              ),
+              leading: Icon(
+                Icons.location_on_outlined,
+                size: 20,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

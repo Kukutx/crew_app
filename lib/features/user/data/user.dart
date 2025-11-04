@@ -1,3 +1,5 @@
+import 'package:crew_app/shared/utils/country_helper.dart';
+
 enum Gender {
   female,
   male,
@@ -43,7 +45,7 @@ class User {
   final String? location;
   final String? ipLocation; // IP属地
 
-  String? get countryFlag => countryCodeToEmoji(countryCode);
+  String? get countryFlag => CountryHelper.countryCodeToEmoji(countryCode);
 
   User({
     required this.uid,
@@ -107,16 +109,4 @@ class User {
             ? this.ipLocation
             : ipLocation as String?,
       );
-}
-
-String? countryCodeToEmoji(String? countryCode) {
-  if (countryCode == null || countryCode.length != 2) {
-    return null;
-  }
-
-  final upper = countryCode.toUpperCase();
-  final codeUnits = upper.codeUnits
-      .map((unit) => 0x1F1E6 + unit - 'A'.codeUnitAt(0))
-      .toList();
-  return String.fromCharCodes(codeUnits);
 }

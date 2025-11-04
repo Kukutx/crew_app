@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
-import 'package:crew_app/shared/widgets/scroll_activity_listener.dart';
+import 'package:crew_app/app/state/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

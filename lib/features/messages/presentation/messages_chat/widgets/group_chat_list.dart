@@ -62,7 +62,6 @@ class GroupChatListTile extends StatelessWidget {
         elevation: 0,
         shadowColor: colorScheme.shadow.withValues(alpha: 0.08),
         surfaceTintColor: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(

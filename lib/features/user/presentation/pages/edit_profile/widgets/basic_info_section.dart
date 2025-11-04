@@ -1,4 +1,5 @@
 import 'package:crew_app/features/user/data/user.dart';
+import 'package:crew_app/shared/utils/country_helper.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -170,7 +171,7 @@ class BasicInfoSection extends StatelessWidget {
                 DropdownMenuItem<String?>(
                   value: option.key,
                   child: _CountryMenuLabel(
-                    flag: countryCodeToEmoji(option.key) ?? '',
+                    flag: CountryHelper.countryCodeToEmoji(option.key) ?? '',
                     name: option.value,
                   ),
                 ),

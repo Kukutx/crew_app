@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/country_helper.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -43,7 +44,7 @@ class ProfilePreviewSection extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final loc = AppLocalizations.of(context)!;
-    final flagEmoji = countryCodeToEmoji(countryCode);
+    final flagEmoji = CountryHelper.countryCodeToEmoji(countryCode);
     final infoBadges = <Widget>[];
     final birthdayLabel =
         birthday == null ? null : DateFormat('yyyy年MM月dd日').format(birthday!);

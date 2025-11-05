@@ -78,7 +78,7 @@ class ExpenseListTile extends StatelessWidget {
           Text(expense.title, style: theme.textTheme.titleMedium),
           const SizedBox(height: 6),
           Text(
-            FormattedDate.relative(expense.timestamp),
+            DateFormatHelper.relative(expense.timestamp),
             style: supportingTextStyle,
           ),
           if (expense.paymentMethod != null || expense.note != null) ...[

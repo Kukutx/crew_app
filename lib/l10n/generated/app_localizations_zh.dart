@@ -1371,4 +1371,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get event_delete_not_implemented => '活动删除暂未接入后端';
+
+  @override
+  String get moment_post_ip_location_label => 'IP属地';
+
+  @override
+  String get moment_post_ip_location_prefix => 'IP属地：';
+
+  @override
+  String get moment_post_ip_location_unknown => '未知';
+
+  @override
+  String get profile_followers => '粉丝';
+
+  @override
+  String get profile_following => '关注';
+
+  @override
+  String get profile_events => '活动';
+
+  @override
+  String get profile_view_guestbook => '查看留言簿';
+
+  @override
+  String get profile_message_button => '私信';
 }

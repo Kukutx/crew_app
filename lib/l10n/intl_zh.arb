@@ -553,5 +553,13 @@
   "event_action_edit": "编辑",
   "event_action_delete": "删除",
   "event_edit_not_implemented": "活动编辑提交暂未接入后端",
-  "event_delete_not_implemented": "活动删除暂未接入后端"
+  "event_delete_not_implemented": "活动删除暂未接入后端",
+  "moment_post_ip_location_label": "IP属地",
+  "moment_post_ip_location_prefix": "IP属地：",
+  "moment_post_ip_location_unknown": "未知",
+  "profile_followers": "粉丝",
+  "profile_following": "关注",
+  "profile_events": "活动",
+  "profile_view_guestbook": "查看留言簿",
+  "profile_message_button": "私信"
 }

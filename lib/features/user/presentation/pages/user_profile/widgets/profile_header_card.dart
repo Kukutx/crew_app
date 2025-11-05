@@ -1,11 +1,13 @@
 import 'dart:ui';
-import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:crew_app/shared/utils/image_url.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
@@ -29,6 +31,7 @@ class ProfileHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -52,8 +55,6 @@ class ProfileHeaderCard extends StatelessWidget {
 
                 Widget buildProfileDetails() {
                   final locationLabel = userProfile.location?.trim();
-                  // 自动获取IP属地（基于设备locale）
-                  final ipLocation = _getIpLocationFromLocaleStatic();
 
                   return DefaultTextStyle(
                     style: t.bodyMedium!.copyWith(color: Colors.white),
@@ -111,81 +112,52 @@ class ProfileHeaderCard extends StatelessWidget {
                             letterSpacing: 0,
                           ),
                         ),
-                        if (locationLabel?.isNotEmpty ?? false || ipLocation != null) ...[
+                        if (locationLabel?.isNotEmpty ?? false) ...[
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              if (locationLabel?.isNotEmpty ?? false) ...[
-                                Icon(
-                                  Icons.place_outlined,
-                                  size: 16,
+                              Icon(
+                                Icons.place_outlined,
+                                size: 16,
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                locationLabel!,
+                                style: t.bodySmall!.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 13,
+                                  height: 1.3,
+                                  letterSpacing: 0,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  locationLabel!,
-                                  style: t.bodySmall!.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontSize: 13,
-                                    height: 1.3,
-                                    letterSpacing: 0,
-                                  ),
-                                ),
-                              ],
-                              if (ipLocation != null) ...[
-                                if (locationLabel?.isNotEmpty ?? false) ...[
-                                  const SizedBox(width: 12),
-                                  Icon(
-                                    Icons.public_outlined,
-                                    size: 16,
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'IP属地：$ipLocation',
-                                    style: t.bodySmall!.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.7),
-                                      fontSize: 13,
-                                      height: 1.3,
-                                      letterSpacing: 0,
-                                    ),
-                                  ),
-                                ] else ...[
-                                  Icon(
-                                    Icons.public_outlined,
-                                    size: 16,
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'IP属地：$ipLocation',
-                                    style: t.bodySmall!.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.7),
-                                      fontSize: 13,
-                                      height: 1.3,
-                                      letterSpacing: 0,
-                                    ),
-                                  ),
-                                ],
-                              ],
+                              ),
+                              _IpLocationWidget(
+                                showSpacing: true,
+                                showPadding: false,
+                              ),
                             ],
+                          ),
+                        ] else ...[
+                          _IpLocationWidget(
+                            showSpacing: false,
+                            showPadding: true,
                           ),
                         ],
                         const SizedBox(height: 12),
                         Row(
                           children: [
                             _ProfileStat(
-                              label: '粉丝',
+                              label: loc.profile_followers,
                               value: userProfile.followers.toCompactString(),
                             ),
                             const _ProfileStatDot(),
                             _ProfileStat(
-                              label: '关注',
+                              label: loc.profile_following,
                               value: userProfile.following.toCompactString(),
                             ),
                             const _ProfileStatDot(),
                             _ProfileStat(
-                              label: '活动',
+                              label: loc.profile_events,
                               value: userProfile.events.toCompactString(),
                             ),
                           ],
@@ -224,7 +196,7 @@ class ProfileHeaderCard extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          '查看留言簿',
+                          loc.profile_view_guestbook,
                           style: TextStyle(
                             decoration: TextDecoration.underline,
                             decorationThickness: 1.5,
@@ -332,68 +304,49 @@ class ProfileHeaderCard extends StatelessWidget {
       ),
     );
   }
-  
-  String? _getIpLocationFromLocaleStatic() {
-    final locale = ui.PlatformDispatcher.instance.locale;
-    final countryCode = locale.countryCode;
-    
-    // 根据国家代码返回对应的地区
-    if (countryCode == null) return null;
-    
-    // 简单的地区映射（可以根据需要扩展）
-    final locationMap = {
-      'CN': '中国',
-      'US': '美国',
-      'GB': '英国',
-      'JP': '日本',
-      'KR': '韩国',
-      'TW': '台湾',
-      'HK': '香港',
-      'MO': '澳门',
-      'SG': '新加坡',
-      'MY': '马来西亚',
-      'AU': '澳大利亚',
-      'CA': '加拿大',
-      'FR': '法国',
-      'DE': '德国',
-      'IT': '意大利',
-      'ES': '西班牙',
-      'NL': '荷兰',
-      'BE': '比利时',
-      'CH': '瑞士',
-      'AT': '奥地利',
-      'SE': '瑞典',
-      'NO': '挪威',
-      'DK': '丹麦',
-      'FI': '芬兰',
-      'PL': '波兰',
-      'RU': '俄罗斯',
-      'IN': '印度',
-      'BR': '巴西',
-      'MX': '墨西哥',
-      'AR': '阿根廷',
-      'ZA': '南非',
-      'NZ': '新西兰',
-      'IE': '爱尔兰',
-      'PT': '葡萄牙',
-      'GR': '希腊',
-      'TR': '土耳其',
-      'TH': '泰国',
-      'VN': '越南',
-      'PH': '菲律宾',
-      'ID': '印度尼西亚',
-    };
-    
-    final country = locationMap[countryCode];
-    if (country == null) return countryCode;
-    
-    // 对于中国，可以进一步细化到省份（这里简化处理）
-    if (countryCode == 'CN') {
-      // 可以根据语言环境或其他因素进一步细化
-      return '中国';
+
+  /// 使用 geolocator 和 geocoding 获取当前位置的国家名称
+  /// 如果获取失败，返回空字符串（将由 FutureBuilder 显示"未知"）
+  static Future<String> _getIpLocation() async {
+    try {
+      // 检查定位服务是否启用
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        return Future.value('');
+      }
+
+      // 检查权限
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever ||
+          permission == LocationPermission.denied) {
+        return Future.value('');
+      }
+
+      // 获取当前位置
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+        ),
+      ).timeout(const Duration(seconds: 5));
+
+      // 反向地理编码获取地址信息
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      ).timeout(const Duration(seconds: 5));
+
+      if (placemarks.isNotEmpty) {
+        final country = placemarks.first.country;
+        if (country != null && country.isNotEmpty) {
+          return country;
+        }
+      }
+    } catch (_) {
+      // 静默失败，返回空字符串
     }
-    
-    return country;
+    return '';
   }
 }
 
@@ -499,7 +452,6 @@ class _ProfileTag extends StatelessWidget {
     );
   }
 
-  // 根据设备locale自动获取IP属地（静态方法，可在嵌套函数中使用）
 
 }
 
@@ -511,6 +463,7 @@ class _FollowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: followed
@@ -527,7 +480,7 @@ class _FollowButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: Text(
-        followed ? '已关注' : '关注',
+        followed ? loc.action_following : loc.action_follow,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
@@ -546,6 +499,7 @@ class _MessageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return OutlinedButton.icon(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
@@ -560,9 +514,9 @@ class _MessageButton extends StatelessWidget {
         ),
       ),
       icon: const Icon(Icons.mail_outline, size: 18),
-      label: const Text(
-        '私信',
-        style: TextStyle(
+      label: Text(
+        loc.profile_message_button,
+        style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           height: 1.3,
@@ -570,5 +524,60 @@ class _MessageButton extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _IpLocationWidget extends StatelessWidget {
+  const _IpLocationWidget({
+    required this.showSpacing,
+    required this.showPadding,
+  });
+
+  final bool showSpacing;
+  final bool showPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final t = Theme.of(context).textTheme;
+
+    Widget locationRow = FutureBuilder<String>(
+      future: ProfileHeaderCard._getIpLocation(),
+      builder: (context, snapshot) {
+        final location = (snapshot.hasData && snapshot.data!.isNotEmpty)
+            ? snapshot.data!
+            : loc.moment_post_ip_location_unknown;
+        return Row(
+          mainAxisSize: showSpacing ? MainAxisSize.min : MainAxisSize.max,
+          children: [
+            if (showSpacing) const SizedBox(width: 12),
+            Icon(
+              Icons.public_outlined,
+              size: 16,
+              color: Colors.white.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '${loc.moment_post_ip_location_prefix}$location',
+              style: t.bodySmall!.copyWith(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 13,
+                height: 1.3,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (showPadding) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: locationRow,
+      );
+    }
+
+    return locationRow;
   }
 }

@@ -558,5 +558,13 @@
   "event_action_edit": "Edit",
   "event_action_delete": "Delete",
   "event_edit_not_implemented": "Event editing submission is not yet connected to backend",
-  "event_delete_not_implemented": "Event deletion is not yet connected to backend"
+  "event_delete_not_implemented": "Event deletion is not yet connected to backend",
+  "moment_post_ip_location_label": "IP Location",
+  "moment_post_ip_location_prefix": "IP: ",
+  "moment_post_ip_location_unknown": "Unknown",
+  "profile_followers": "Followers",
+  "profile_following": "Following",
+  "profile_events": "Events",
+  "profile_view_guestbook": "View Guestbook",
+  "profile_message_button": "Message"
 }

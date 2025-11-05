@@ -2725,6 +2725,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Event deletion is not yet connected to backend'**
   String get event_delete_not_implemented;
+
+  /// No description provided for @moment_post_ip_location_label.
+  ///
+  /// In en, this message translates to:
+  /// **'IP Location'**
+  String get moment_post_ip_location_label;
+
+  /// No description provided for @moment_post_ip_location_prefix.
+  ///
+  /// In en, this message translates to:
+  /// **'IP: '**
+  String get moment_post_ip_location_prefix;
+
+  /// No description provided for @moment_post_ip_location_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get moment_post_ip_location_unknown;
+
+  /// No description provided for @profile_followers.
+  ///
+  /// In en, this message translates to:
+  /// **'Followers'**
+  String get profile_followers;
+
+  /// No description provided for @profile_following.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get profile_following;
+
+  /// No description provided for @profile_events.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get profile_events;
+
+  /// No description provided for @profile_view_guestbook.
+  ///
+  /// In en, this message translates to:
+  /// **'View Guestbook'**
+  String get profile_view_guestbook;
+
+  /// No description provided for @profile_message_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get profile_message_button;
 }
 
 class _AppLocalizationsDelegate

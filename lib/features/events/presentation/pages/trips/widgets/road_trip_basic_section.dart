@@ -46,7 +46,7 @@ class RoadTripBasicSection extends StatelessWidget {
           title: Text(
             dateRange == null
                 ? loc.road_trip_basic_date_label
-                : '${FormattedDate.formatDate(dateRange!.start)} → ${FormattedDate.formatDate(dateRange!.end)}',
+                : '${DateFormatHelper.formatDate(dateRange!.start)} → ${DateFormatHelper.formatDate(dateRange!.end)}',
           ),
           trailing: const Icon(Icons.chevron_right_rounded),
           onTap: onPickDateRange,

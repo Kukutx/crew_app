@@ -156,7 +156,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               DialogRow(label: '金额', value: currency.format(expense.amount)),
               DialogRow(
                 label: '时间',
-                value: FormattedDate.format(expense.timestamp),
+                value: DateFormatHelper.format(expense.timestamp),
               ),
               if (expense.paymentMethod != null)
                 DialogRow(label: '支付方式', value: expense.paymentMethod!),

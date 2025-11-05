@@ -15,7 +15,7 @@
 // ```
 
 export 'country_helper.dart';
-export 'formatted_date.dart';
+export 'formatted_date.dart' show DateFormatHelper;
 export 'image_url.dart';
 export 'json_parser_helper.dart';
 export 'number_format_helper.dart';

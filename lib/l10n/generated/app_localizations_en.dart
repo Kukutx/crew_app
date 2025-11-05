@@ -1437,4 +1437,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get event_delete_not_implemented =>
       'Event deletion is not yet connected to backend';
+
+  @override
+  String get moment_post_ip_location_label => 'IP Location';
+
+  @override
+  String get moment_post_ip_location_prefix => 'IP: ';
+
+  @override
+  String get moment_post_ip_location_unknown => 'Unknown';
+
+  @override
+  String get profile_followers => 'Followers';
+
+  @override
+  String get profile_following => 'Following';
+
+  @override
+  String get profile_events => 'Events';
+
+  @override
+  String get profile_view_guestbook => 'View Guestbook';
+
+  @override
+  String get profile_message_button => 'Message';
 }

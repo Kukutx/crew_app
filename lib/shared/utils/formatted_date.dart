@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-class FormattedDate {
+class DateFormatHelper {
   static final DateFormat _date = DateFormat('MM月dd日 HH:mm');
   static final DateFormat _relativeFormat = DateFormat('MM月dd日');
 

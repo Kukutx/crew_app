@@ -250,20 +250,17 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   }
 
   void _showOrganizerDisclaimer() {
+    final loc = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('发起人免责声明'),
-          content: const Text(
-            '本活动由发起人自行发布并负责组织，Crew 仅提供信息展示与沟通工具。'
-            '请在参与前自行核实活动详情与安全保障，并根据自身情况评估风险。'
-            '如遇异常情况或争议，请及时与发起人沟通或联系 Crew 寻求协助。',
-          ),
+          title: Text(loc.event_organizer_disclaimer_title),
+          content: Text(loc.event_organizer_disclaimer_content),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('我知道了'),
+              child: Text(loc.event_organizer_disclaimer_acknowledge),
             ),
           ],
         );
@@ -284,7 +281,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
-                title: const Text('编辑'),
+                title: Text(loc.event_action_edit),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   final event = widget.event;
@@ -319,7 +316,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                         initialValue: draft,
                         onSubmit: (input) async {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('活动编辑提交暂未接入后端')),
+                            SnackBar(content: Text(loc.event_edit_not_implemented)),
                           );
                         },
                       ),
@@ -330,11 +327,11 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
               const Divider(height: 0),
               ListTile(
                 leading: const Icon(Icons.delete_outline),
-                title: const Text('删除'),
+                title: Text(loc.event_action_delete),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('活动删除暂未接入后端')),
+                    SnackBar(content: Text(loc.event_delete_not_implemented)),
                   );
                 },
               ),

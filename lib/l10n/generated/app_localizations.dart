@@ -2665,6 +2665,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get road_trip_create_done_button;
+
+  /// No description provided for @event_members_list.
+  ///
+  /// In en, this message translates to:
+  /// **'Members list'**
+  String get event_members_list;
+
+  /// No description provided for @event_member_role_organizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer'**
+  String get event_member_role_organizer;
+
+  /// No description provided for @event_member_role_participant.
+  ///
+  /// In en, this message translates to:
+  /// **'Participant'**
+  String get event_member_role_participant;
+
+  /// No description provided for @event_organizer_disclaimer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer disclaimer'**
+  String get event_organizer_disclaimer_title;
+
+  /// No description provided for @event_organizer_disclaimer_content.
+  ///
+  /// In en, this message translates to:
+  /// **'This event is posted and organized by the organizer. Crew only provides information display and communication tools. Please verify event details and safety measures before participating, and assess risks based on your own situation. If you encounter any unusual situations or disputes, please communicate with the organizer promptly or contact Crew for assistance.'**
+  String get event_organizer_disclaimer_content;
+
+  /// No description provided for @event_organizer_disclaimer_acknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get event_organizer_disclaimer_acknowledge;
+
+  /// No description provided for @event_action_edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get event_action_edit;
+
+  /// No description provided for @event_action_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get event_action_delete;
+
+  /// No description provided for @event_edit_not_implemented.
+  ///
+  /// In en, this message translates to:
+  /// **'Event editing submission is not yet connected to backend'**
+  String get event_edit_not_implemented;
+
+  /// No description provided for @event_delete_not_implemented.
+  ///
+  /// In en, this message translates to:
+  /// **'Event deletion is not yet connected to backend'**
+  String get event_delete_not_implemented;
 }
 
 class _AppLocalizationsDelegate

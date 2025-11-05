@@ -1340,4 +1340,35 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get road_trip_create_done_button => '完成';
+
+  @override
+  String get event_members_list => '成员列表';
+
+  @override
+  String get event_member_role_organizer => '组织者';
+
+  @override
+  String get event_member_role_participant => '参与者';
+
+  @override
+  String get event_organizer_disclaimer_title => '发起人免责声明';
+
+  @override
+  String get event_organizer_disclaimer_content =>
+      '本活动由发起人自行发布并负责组织，Crew 仅提供信息展示与沟通工具。请在参与前自行核实活动详情与安全保障，并根据自身情况评估风险。如遇异常情况或争议，请及时与发起人沟通或联系 Crew 寻求协助。';
+
+  @override
+  String get event_organizer_disclaimer_acknowledge => '我知道了';
+
+  @override
+  String get event_action_edit => '编辑';
+
+  @override
+  String get event_action_delete => '删除';
+
+  @override
+  String get event_edit_not_implemented => '活动编辑提交暂未接入后端';
+
+  @override
+  String get event_delete_not_implemented => '活动删除暂未接入后端';
 }

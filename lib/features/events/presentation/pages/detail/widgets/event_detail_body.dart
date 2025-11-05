@@ -6,7 +6,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_meeting_point_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_moments_section.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_content_tabs.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/app/router/app_router.dart';
@@ -338,12 +338,12 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   loc: widget.loc,
                 ),
                 const SizedBox(height: 10),
-                EventMomentsSection(loc: widget.loc),
+                EventContentTabs(loc: widget.loc),
                 const SizedBox(height: 16),
                 Center(
                   child: TextButton(
                     onPressed: widget.onShowOrganizerDisclaimer,
-                    child: const Text('发起人免责声明'),
+                    child: Text(widget.loc.event_organizer_disclaimer_title),
                   ),
                 ),
                 const SizedBox(height: 120),

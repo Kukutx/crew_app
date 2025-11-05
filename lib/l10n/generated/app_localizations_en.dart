@@ -1404,4 +1404,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get road_trip_create_done_button => 'Done';
+
+  @override
+  String get event_members_list => 'Members list';
+
+  @override
+  String get event_member_role_organizer => 'Organizer';
+
+  @override
+  String get event_member_role_participant => 'Participant';
+
+  @override
+  String get event_organizer_disclaimer_title => 'Organizer disclaimer';
+
+  @override
+  String get event_organizer_disclaimer_content =>
+      'This event is posted and organized by the organizer. Crew only provides information display and communication tools. Please verify event details and safety measures before participating, and assess risks based on your own situation. If you encounter any unusual situations or disputes, please communicate with the organizer promptly or contact Crew for assistance.';
+
+  @override
+  String get event_organizer_disclaimer_acknowledge => 'Got it';
+
+  @override
+  String get event_action_edit => 'Edit';
+
+  @override
+  String get event_action_delete => 'Delete';
+
+  @override
+  String get event_edit_not_implemented =>
+      'Event editing submission is not yet connected to backend';
+
+  @override
+  String get event_delete_not_implemented =>
+      'Event deletion is not yet connected to backend';
 }

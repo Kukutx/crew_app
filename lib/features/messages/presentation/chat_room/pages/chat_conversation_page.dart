@@ -365,15 +365,29 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       return AppBar(title: Text(widget.title));
     }
 
-    final avatarColor = Color(
-      preview.avatarColorValue ??
+    // 如果是客服聊天，完全使用固定的客服信息（头像和名称）
+    final isCustomerService = _isCustomerService();
+    
+    // 客服聊天时，固定使用客服的头像和名称
+    final String displayName;
+    final Color? avatarBackgroundColor;
+    final Color? avatarForegroundColor;
+    
+    if (isCustomerService) {
+      // 客服固定信息，使用与通知页相同的颜色方案
+      displayName = '客服';
+      avatarBackgroundColor = colorScheme.secondaryContainer;
+      avatarForegroundColor = colorScheme.onSecondaryContainer;
+    } else {
+      // 非客服聊天，使用 partner 的信息
+      displayName = widget.title;
+      final avatarColorValue = preview.avatarColorValue ??
           partner.avatarColorValue ??
-          colorScheme.primary.toARGB32(),
-    );
-
-    final partnerInitials =
-        (partner.initials ?? partner.displayName.characters.take(2).toString())
-            .toUpperCase();
+          colorScheme.primary.toARGB32();
+      final avatarColor = Color(avatarColorValue);
+      avatarBackgroundColor = avatarColor.withValues(alpha: .15);
+      avatarForegroundColor = avatarColor;
+    }
 
     final statusText = preview.isActive
         ? loc.chat_status_online
@@ -391,14 +405,17 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
             onTap: () => _openUserProfile(partner),
             child: CrewAvatar(
               radius: 22,
-              backgroundColor: avatarColor.withValues(alpha: .15),
-              foregroundColor: avatarColor,
-              child: Text(
-                partnerInitials,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              backgroundColor: avatarBackgroundColor,
+              foregroundColor: avatarForegroundColor,
+              child: isCustomerService
+                  ? const Icon(Icons.support_agent_outlined)
+                  : Text(
+                      (partner.initials ?? partner.displayName.characters.take(2).toString())
+                          .toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 12),
@@ -407,7 +424,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.title,
+                  displayName,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -500,5 +517,13 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     }
 
     return participants;
+  }
+
+  /// 判断是否为客服聊天
+  bool _isCustomerService() {
+    final partner = widget.partner;
+    final preview = widget.preview;
+    return partner?.id == 'customer-service-agent' ||
+        preview?.id == 'customer-service';
   }
 }

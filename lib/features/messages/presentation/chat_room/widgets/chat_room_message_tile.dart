@@ -25,6 +25,12 @@ class ChatRoomMessageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isMine = message.isFromCurrentUser;
+    // 判断是否为客服消息
+    final isCustomerService = message.sender.id == 'customer-service-agent';
+    // 判断是否为系统通知消息
+    final isSystemNotification = message.sender.displayName == '系统通知' ||
+        message.sender.id.contains('system');
+    
     // 使用 surfaceContainerHighest 提高其他用户气泡的对比度，让气泡更清晰可见
     final bubbleColor = isMine 
         ? colorScheme.primary 
@@ -32,9 +38,15 @@ class ChatRoomMessageTile extends StatelessWidget {
     final textColor = isMine ? colorScheme.onPrimary : colorScheme.onSurface;
     final captionColor =
         isMine ? colorScheme.onPrimary.withValues(alpha: .8) : colorScheme.onSurfaceVariant;
-    final senderColor = Color(
-      message.sender.avatarColorValue ?? colorScheme.primary.toARGB32(),
-    );
+    
+    // 如果是客服或系统通知，使用与通知页相同的颜色方案
+    final isSystemMessage = isCustomerService || isSystemNotification;
+    final senderColor = isSystemMessage
+        ? null // 系统消息使用主题色，不单独设置
+        : Color(
+            message.sender.avatarColorValue ?? colorScheme.primary.toARGB32(),
+          );
+    
     final senderInitials = (message.sender.initials ??
             message.sender.displayName.characters.take(2).toString())
         .toUpperCase();
@@ -71,15 +83,23 @@ class ChatRoomMessageTile extends StatelessWidget {
                             : () => onAvatarTap!(message.sender),
                         child: CrewAvatar(
                           radius: 16,
-                          backgroundColor: senderColor.withValues(alpha: .15),
-                          foregroundColor: senderColor,
-                          child: Text(
-                            senderInitials,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                          backgroundColor: isSystemMessage
+                              ? colorScheme.secondaryContainer
+                              : senderColor!.withValues(alpha: .15),
+                          foregroundColor: isSystemMessage
+                              ? colorScheme.onSecondaryContainer
+                              : senderColor!,
+                          child: isCustomerService
+                              ? const Icon(Icons.support_agent_outlined, size: 18)
+                              : isSystemNotification
+                                  ? const Icon(Icons.notifications_none_outlined, size: 18)
+                                  : Text(
+                                      senderInitials,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
                         ),
                       )
                     : const SizedBox(width: 32),

@@ -20,6 +20,7 @@ class RoadTripHostDisclaimerSection extends StatelessWidget {
       children: [
         TextFormField(
           controller: disclaimerController,
+          style: const TextStyle(fontSize: 14),
           decoration: roadTripInputDecoration(
             context,
             loc.road_trip_disclaimer_content_label,

@@ -27,6 +27,7 @@ class RoadTripBasicSection extends StatelessWidget {
       children: [
         TextFormField(
           controller: titleController,
+          style: const TextStyle(fontSize: 14),
           decoration: roadTripInputDecoration(
             context,
             loc.road_trip_basic_title_label,
@@ -48,6 +49,7 @@ class RoadTripBasicSection extends StatelessWidget {
             dateRange == null
                 ? loc.road_trip_basic_date_label
                 : '${DateFormatHelper.formatDate(dateRange!.start)} → ${DateFormatHelper.formatDate(dateRange!.end)}',
+            style: const TextStyle(fontSize: 14),
           ),
           trailing: const Icon(Icons.chevron_right_rounded),
           onTap: onPickDateRange,

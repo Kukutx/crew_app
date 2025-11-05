@@ -420,9 +420,11 @@ class NearbyPlaceTile extends StatelessWidget {
     final theme = Theme.of(context);
     final titleStyle = theme.textTheme.bodyMedium?.copyWith(
       fontWeight: FontWeight.w600,
+      fontSize: 14,
     );
     final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurface.withValues(alpha: .7),
+      fontSize: 12,
     );
     final address = place.formattedAddress?.trim();
 

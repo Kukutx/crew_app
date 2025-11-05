@@ -14,7 +14,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 
 enum ChatConversationType { group, direct }

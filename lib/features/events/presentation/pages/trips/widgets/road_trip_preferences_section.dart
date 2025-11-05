@@ -30,6 +30,7 @@ class RoadTripPreferencesSection extends StatelessWidget {
       children: [
         TextField(
           controller: tagInputController,
+          style: const TextStyle(fontSize: 14),
           decoration: roadTripInputDecoration(
             context,
             loc.road_trip_preferences_tag_label,
@@ -49,9 +50,13 @@ class RoadTripPreferencesSection extends StatelessWidget {
           children: tags
               .map(
                 (t) => Chip(
-                  label: Text('#$t'),
-                  deleteIcon: const Icon(Icons.close),
+                  label: Text(
+                    '#$t',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  deleteIcon: const Icon(Icons.close, size: 16),
                   onDeleted: () => onRemoveTag(t),
+                  labelStyle: const TextStyle(fontSize: 12),
                 ),
               )
               .toList(),

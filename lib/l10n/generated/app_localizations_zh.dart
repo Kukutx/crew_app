@@ -263,6 +263,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get login_agreement_children => '《未成年人个人信息保护规则》';
 
   @override
+  String get login_failed_message => '登录失败，请稍后重试';
+
+  @override
   String get logout_success => '已退出登录';
 
   @override
@@ -1346,6 +1349,38 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get road_trip_create_done_button => '完成';
+
+  @override
+  String get road_trip_validation_date_range_required => '请选择活动日期范围';
+
+  @override
+  String get road_trip_validation_title_max_length => '标题不能超过20个字符';
+
+  @override
+  String get road_trip_validation_price_invalid => '请输入有效的人均费用（0-100）';
+
+  @override
+  String get road_trip_validation_coordinate_invalid => '坐标值无效，请重新选择位置';
+
+  @override
+  String get road_trip_validation_max_participants_invalid =>
+      '请输入有效的人数上限（≥1的整数）';
+
+  @override
+  String road_trip_create_success(Object action, Object id) {
+    return '$action成功：$id';
+  }
+
+  @override
+  String road_trip_create_failed(Object error) {
+    return '创建失败：$error';
+  }
+
+  @override
+  String get action_update => '更新';
+
+  @override
+  String get share_error_retry => '分享失败，请稍后重试';
 
   @override
   String get event_members_list => '成员列表';

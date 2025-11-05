@@ -988,24 +988,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         ? _startAddress!.trim()
         : (startCoords ?? loc.map_select_location_title);
     final startSubtitle = _startLatLng != null
-        ? (hasStartAddress
-            ? loc.location_coordinates(
-                _startLatLng!.latitude.toStringAsFixed(6),
-                _startLatLng!.longitude.toStringAsFixed(6),
-              )
-            : '')
+        ? ''
         : loc.map_select_location_tip;
 
     final destinationTitle = hasDestinationAddress
         ? _destinationAddress!.trim()
         : (destinationCoords ?? loc.map_select_location_destination_label);
     final destinationSubtitle = _destinationLatLng != null
-        ? (hasDestinationAddress
-            ? loc.location_coordinates(
-                _destinationLatLng!.latitude.toStringAsFixed(6),
-                _destinationLatLng!.longitude.toStringAsFixed(6),
-              )
-            : '')
+        ? ''
         : loc.map_select_location_destination_tip;
 
     // 顶部把手 + TabBar + PageView + 底部操作，与原版一致
@@ -1025,7 +1015,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                   controller: _pageCtrl,
                   physics: (_isCompletionPage || !canScroll)
                       ? const NeverScrollableScrollPhysics()
-                      : const PageScrollPhysics(),
+                      : (_currentPage >= _totalPages - 2
+                          ? const NeverScrollableScrollPhysics() // 防止滑动到完成页
+                          : const PageScrollPhysics()),
                   children: [
                     _RouteSelectionPage(
                       scrollCtrl: widget.scrollCtrl,
@@ -1088,7 +1080,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                               Center(
                                 child: SmoothPageIndicator(
                                   controller: _pageCtrl,
-                                  count: _totalPages,
+                                  count: _totalPages - 1, // 不包含完成页
                                   effect: const WormEffect(dotHeight: 8, dotWidth: 8),
                                 ),
                               ),
@@ -1189,29 +1181,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                   return const SizedBox.shrink();
                 }
 
-                final coords = loc.location_coordinates(
-                  position.latitude.toStringAsFixed(6),
-                  position.longitude.toStringAsFixed(6),
-                );
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.place_outlined,
-                          color: Colors.redAccent,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            coords,
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
                     if (_startAddressFuture != null)
                       FutureBuilder<String?>(
                         key: ValueKey(
@@ -1329,16 +1301,14 @@ class _RouteSelectionPage extends StatelessWidget {
               _CardTile(
                 leading: const Icon(Icons.radio_button_checked),
                 title: departureTitle,
-                subtitle: departureSubtitle.isEmpty ? null : departureSubtitle,
+                subtitle: null,
                 onTap: onEditDeparture,
               ),
               const SizedBox(height: 12),
               _CardTile(
                 leading: const Icon(Icons.place_outlined),
                 title: destinationTitle,
-                subtitle: destinationSubtitle.isEmpty
-                    ? null
-                    : destinationSubtitle,
+                subtitle: null,
                 onTap: departurePosition != null ? onEditDestination : null,
                 enabled: departurePosition != null,
               ),
@@ -1510,16 +1480,18 @@ class _CardTile extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: theme.textTheme.titleMedium?.copyWith(
+                        style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
+                          fontSize: 15,
                         ),
                       ),
-                      if (subtitle != null) ...[
+                      if (subtitle != null && subtitle!.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           subtitle!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 12,
                           ),
                         ),
                       ],

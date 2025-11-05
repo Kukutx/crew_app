@@ -590,6 +590,12 @@ abstract class AppLocalizations {
   /// **'Children\'s Privacy Guidelines'**
   String get login_agreement_children;
 
+  /// No description provided for @login_failed_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed. Please try again later.'**
+  String get login_failed_message;
+
   /// No description provided for @logout_success.
   ///
   /// In en, this message translates to:
@@ -2677,6 +2683,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get road_trip_create_done_button;
+
+  /// No description provided for @road_trip_validation_date_range_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select activity date range'**
+  String get road_trip_validation_date_range_required;
+
+  /// No description provided for @road_trip_validation_title_max_length.
+  ///
+  /// In en, this message translates to:
+  /// **'Title cannot exceed 20 characters'**
+  String get road_trip_validation_title_max_length;
+
+  /// No description provided for @road_trip_validation_price_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid price per person (0-100)'**
+  String get road_trip_validation_price_invalid;
+
+  /// No description provided for @road_trip_validation_coordinate_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid coordinates, please reselect location'**
+  String get road_trip_validation_coordinate_invalid;
+
+  /// No description provided for @road_trip_validation_max_participants_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid max participants (integer ≥ 1)'**
+  String get road_trip_validation_max_participants_invalid;
+
+  /// No description provided for @road_trip_create_success.
+  ///
+  /// In en, this message translates to:
+  /// **'{action} successful: {id}'**
+  String road_trip_create_success(Object action, Object id);
+
+  /// No description provided for @road_trip_create_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create: {error}'**
+  String road_trip_create_failed(Object error);
+
+  /// No description provided for @action_update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get action_update;
+
+  /// No description provided for @share_error_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Share failed, please try again later'**
+  String get share_error_retry;
 
   /// No description provided for @event_members_list.
   ///

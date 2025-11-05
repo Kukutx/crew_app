@@ -9,21 +9,20 @@ import '../error/api_exception.dart';
 import 'auth/auth_service.dart';
 
 class ApiService {
-  ApiService({
-    Dio? dio,
-    required AuthService authService,
-  })  : _dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: Env.current,
-                connectTimeout: const Duration(seconds: 10),
-                receiveTimeout: const Duration(seconds: 30),
-                sendTimeout: const Duration(seconds: 30),
-              ),
+  ApiService({Dio? dio, required AuthService authService})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: Env.current,
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 30),
+              sendTimeout: const Duration(seconds: 30),
             ),
-        _auth = authService {
+          ),
+      _auth = authService {
     // 添加重试拦截器（在日志拦截器之前）
-    _dio.interceptors.add(_RetryInterceptor());
+    _dio.interceptors.add(_RetryInterceptor(_dio));
 
     // 只在开发环境启用日志，避免在生产环境泄露敏感信息
     // 生产环境日志可能包含：
@@ -95,10 +94,7 @@ class ApiService {
       rethrow;
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
-      throw ApiException(
-        message,
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException(message, statusCode: e.response?.statusCode);
     }
   }
 
@@ -106,9 +102,9 @@ class ApiService {
     try {
       final response = await _dio.get('/events');
       if (response.statusCode == 200) {
-        final events = _unwrapEventList(response.data)
-            .map(Event.fromJson)
-            .toList(growable: false);
+        final events = _unwrapEventList(
+          response.data,
+        ).map(Event.fromJson).toList(growable: false);
         if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
           return events;
         }
@@ -120,10 +116,7 @@ class ApiService {
       );
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
-      throw ApiException(
-        message,
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException(message, statusCode: e.response?.statusCode);
     }
   }
 
@@ -158,10 +151,7 @@ class ApiService {
       rethrow;
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
-      throw ApiException(
-        message,
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException(message, statusCode: e.response?.statusCode);
     }
   }
 
@@ -173,9 +163,9 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final events = _unwrapEventList(response.data)
-            .map(Event.fromJson)
-            .toList(growable: false);
+        final events = _unwrapEventList(
+          response.data,
+        ).map(Event.fromJson).toList(growable: false);
         if (events.isNotEmpty || _isKnownEmptyCollection(response.data)) {
           return events;
         }
@@ -187,10 +177,7 @@ class ApiService {
       );
     } on DioException catch (e) {
       final message = _extractErrorMessage(e) ?? 'Request error';
-      throw ApiException(
-        message,
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException(message, statusCode: e.response?.statusCode);
     }
   }
 
@@ -280,9 +267,13 @@ List<dynamic> _extractEventList(dynamic data) {
 class _RetryInterceptor extends Interceptor {
   /// 最大重试次数
   static const int _maxRetries = 3;
-  
+
   /// 重试间隔
   static const Duration _retryInterval = Duration(seconds: 1);
+
+  final Dio _dio;
+
+  _RetryInterceptor(this._dio);
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
@@ -295,12 +286,16 @@ class _RetryInterceptor extends Interceptor {
       await Future.delayed(_retryInterval);
 
       // 更新重试次数
-      final newOptions = err.requestOptions;
-      newOptions.extra['retryCount'] = retryCount + 1;
+      final newOptions = err.requestOptions.copyWith(
+        extra: {
+          ...err.requestOptions.extra,
+          'retryCount': retryCount + 1,
+        },
+      );
 
       try {
         // 重新发送请求
-        final response = await err.requestOptions.dio.fetch(newOptions);
+        final response = await _dio.fetch(newOptions);
         handler.resolve(response);
         return;
       } catch (e) {
@@ -308,12 +303,7 @@ class _RetryInterceptor extends Interceptor {
         if (e is DioException) {
           handler.reject(e);
         } else {
-          handler.reject(
-            DioException(
-              requestOptions: newOptions,
-              error: e,
-            ),
-          );
+          handler.reject(DioException(requestOptions: newOptions, error: e));
         }
         return;
       }
@@ -324,7 +314,7 @@ class _RetryInterceptor extends Interceptor {
   }
 
   /// 判断是否应该重试
-  /// 
+  ///
   /// 仅在以下情况重试：
   /// - 连接超时
   /// - 接收超时
@@ -349,3 +339,4 @@ class _RetryInterceptor extends Interceptor {
         return false;
     }
   }
+}

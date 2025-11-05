@@ -51,17 +51,26 @@ class RoadTripRouteSection extends StatelessWidget {
               builder: (context, ctrl, _) => FilledButton.icon(
                 style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
                 onPressed: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
-                icon: const Icon(Icons.add_road, size: 18),
-                label: Text(loc.road_trip_route_add_waypoint),
+                icon: const Icon(Icons.add_road, size: 16),
+                label: Text(
+                  loc.road_trip_route_add_waypoint,
+                  style: const TextStyle(fontSize: 13),
+                ),
               ),
               menuChildren: [
                 MenuItemButton(
                   onPressed: onAddForward,
-                  child: Text(loc.road_trip_route_add_to_forward),
+                  child: Text(
+                    loc.road_trip_route_add_to_forward,
+                    style: const TextStyle(fontSize: 14),
+                  ),
                 ),
                 MenuItemButton(
                   onPressed: onAddReturn,
-                  child: Text(loc.road_trip_route_add_to_return),
+                  child: Text(
+                    loc.road_trip_route_add_to_return,
+                    style: const TextStyle(fontSize: 14),
+                  ),
                 ),
               ],
             )
@@ -84,13 +93,19 @@ class RoadTripRouteSection extends StatelessWidget {
                   segments: [
                     ButtonSegment(
                       value: RoadTripRouteType.roundTrip,
-                      label: Text(loc.road_trip_route_type_round),
-                      icon: const Icon(Icons.autorenew),
+                      label: Text(
+                        loc.road_trip_route_type_round,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      icon: const Icon(Icons.autorenew, size: 18),
                     ),
                     ButtonSegment(
                       value: RoadTripRouteType.oneWay,
-                      label: Text(loc.road_trip_route_type_one_way),
-                      icon: const Icon(Icons.route_outlined),
+                      label: Text(
+                        loc.road_trip_route_type_one_way,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      icon: const Icon(Icons.route_outlined, size: 18),
                     ),
                   ],
                   selected: {routeType},
@@ -156,7 +171,13 @@ class _ReorderableListSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: theme.textTheme.titleSmall),
+        Text(
+          title,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: 8),
         ReorderableListView.builder(
           shrinkWrap: true,
@@ -188,7 +209,10 @@ class _ReorderableListSection extends StatelessWidget {
                   index: index,
                   child: const Icon(Icons.drag_indicator),
                 ),
-                title: Text('${index + 1}. $text'),
+                title: Text(
+                  '${index + 1}. $text',
+                  style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                ),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => onRemove(index),

@@ -108,6 +108,7 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   }
 
   Future<void> _shareThroughSystem(BuildContext sheetContext) async {
+    final loc = AppLocalizations.of(context)!;
     final shareText = _buildShareMessage();
     final boundary =
         _sharePreviewKey.currentContext?.findRenderObject()

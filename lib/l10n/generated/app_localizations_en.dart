@@ -269,6 +269,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_agreement_children => 'Children\'s Privacy Guidelines';
 
   @override
+  String get login_failed_message => 'Login failed. Please try again later.';
+
+  @override
   String get logout_success => 'Signed out successfully.';
 
   @override
@@ -1410,6 +1413,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get road_trip_create_done_button => 'Done';
+
+  @override
+  String get road_trip_validation_date_range_required =>
+      'Please select activity date range';
+
+  @override
+  String get road_trip_validation_title_max_length =>
+      'Title cannot exceed 20 characters';
+
+  @override
+  String get road_trip_validation_price_invalid =>
+      'Please enter a valid price per person (0-100)';
+
+  @override
+  String get road_trip_validation_coordinate_invalid =>
+      'Invalid coordinates, please reselect location';
+
+  @override
+  String get road_trip_validation_max_participants_invalid =>
+      'Please enter a valid max participants (integer ≥ 1)';
+
+  @override
+  String road_trip_create_success(Object action, Object id) {
+    return '$action successful: $id';
+  }
+
+  @override
+  String road_trip_create_failed(Object error) {
+    return 'Failed to create: $error';
+  }
+
+  @override
+  String get action_update => 'Update';
+
+  @override
+  String get share_error_retry => 'Share failed, please try again later';
 
   @override
   String get event_members_list => 'Members list';

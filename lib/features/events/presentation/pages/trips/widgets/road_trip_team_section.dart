@@ -30,13 +30,19 @@ class RoadTripTeamSection extends StatelessWidget {
         segments: [
           ButtonSegment(
             value: RoadTripPricingType.free,
-            label: Text(loc.road_trip_team_pricing_free),
-            icon: const Icon(Icons.favorite_outline),
+            label: Text(
+              loc.road_trip_team_pricing_free,
+              style: const TextStyle(fontSize: 13),
+            ),
+            icon: const Icon(Icons.favorite_outline, size: 18),
           ),
           ButtonSegment(
             value: RoadTripPricingType.paid,
-            label: Text(loc.road_trip_team_pricing_paid),
-            icon: const Icon(Icons.payments_outlined),
+            label: Text(
+              loc.road_trip_team_pricing_paid,
+              style: const TextStyle(fontSize: 13),
+            ),
+            icon: const Icon(Icons.payments_outlined, size: 18),
           ),
         ],
         selected: {pricingType},
@@ -48,6 +54,7 @@ class RoadTripTeamSection extends StatelessWidget {
             Expanded(
               child: TextFormField(
                 controller: maxParticipantsController,
+                style: const TextStyle(fontSize: 14),
                 decoration: roadTripInputDecoration(
                   context,
                   loc.road_trip_team_max_participants_label,
@@ -68,6 +75,7 @@ class RoadTripTeamSection extends StatelessWidget {
             Expanded(
               child: TextFormField(
                 controller: priceController,
+                style: const TextStyle(fontSize: 14),
                 decoration: roadTripInputDecoration(
                   context,
                   loc.road_trip_team_price_label,

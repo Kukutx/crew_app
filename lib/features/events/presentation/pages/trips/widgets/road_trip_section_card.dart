@@ -52,8 +52,9 @@ class RoadTripSectionCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               title,
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
                               ),
                             ),
                           ),
@@ -67,8 +68,9 @@ class RoadTripSectionCard extends StatelessWidget {
                       if (subtitle.isNotEmpty)
                         Text(
                           subtitle,
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
+                            fontSize: 12,
                           ),
                         ),
                     ],
@@ -92,9 +94,12 @@ InputDecoration roadTripInputDecoration(
   String? hint,
 ) {
   final colorScheme = Theme.of(context).colorScheme;
+  final theme = Theme.of(context);
   return InputDecoration(
     labelText: label,
     hintText: hint,
+    labelStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+    hintStyle: theme.textTheme.bodySmall?.copyWith(fontSize: 13),
     filled: true,
     fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
     border: OutlineInputBorder(

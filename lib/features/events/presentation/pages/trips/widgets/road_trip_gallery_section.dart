@@ -34,10 +34,13 @@ class RoadTripGallerySection extends StatelessWidget {
         const SizedBox(height: 12),
         FilledButton.icon(
           onPressed: onPickImages,
-          icon: const Icon(Icons.collections_outlined),
-          label: Text(items.isEmpty
-              ? loc.road_trip_gallery_select_images
-              : loc.road_trip_gallery_add_more),
+          icon: const Icon(Icons.collections_outlined, size: 18),
+          label: Text(
+            items.isEmpty
+                ? loc.road_trip_gallery_select_images
+                : loc.road_trip_gallery_add_more,
+            style: const TextStyle(fontSize: 14),
+          ),
         ),
       ],
     );
@@ -73,8 +76,9 @@ class RoadTripGalleryGrid extends StatelessWidget {
         child: Center(
           child: Text(
             loc.road_trip_gallery_empty_hint,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
+              fontSize: 13,
             ),
           ),
         ),
@@ -154,6 +158,7 @@ class _GalleryTile extends StatelessWidget {
                       ? colorScheme.onPrimaryContainer
                       : colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
+                  fontSize: 10,
                 ),
               ),
             ),
@@ -192,6 +197,7 @@ class _GalleryTile extends StatelessWidget {
                   loc.road_trip_gallery_set_cover,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurface,
+                    fontSize: 10,
                   ),
                 ),
               ),

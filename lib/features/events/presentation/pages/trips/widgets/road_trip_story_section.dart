@@ -21,6 +21,7 @@ class RoadTripStorySection extends StatelessWidget {
       children: [
         TextFormField(
           controller: descriptionController,
+          style: const TextStyle(fontSize: 14),
           decoration: roadTripInputDecoration(
             context,
             loc.road_trip_story_description_label,

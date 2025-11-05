@@ -60,6 +60,8 @@
   "event_title_field_label": "Event Title",
   "messages_tab_private": "Private",
   "messages_tab_groups": "Groups",
+  "system_notifications_tab_notifications": "System Notifications",
+  "system_notifications_tab_customer_service": "Customer Service",
   "events_tab_invites": "Invites",
   "events_tab_moments": "Moments",
   "create_moment_title": "Share a moment",

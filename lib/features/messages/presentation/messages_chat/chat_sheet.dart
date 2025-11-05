@@ -2,10 +2,10 @@ import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:crew_app/features/messages/data/group_chat_preview.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/chat_conversation_page.dart';
-import 'package:crew_app/features/messages/presentation/messages_chat/system_notifications_page.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_conversation_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/direct_chat_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list.dart';
+import 'package:crew_app/features/messages/presentation/notifications/notifications_page.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -377,7 +377,7 @@ class _ChatSheetState extends State<ChatSheet> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => SystemNotificationsPage(
+        builder: (_) => NotificationsPage(
           notifications: _systemPrivateConversations,
         ),
       ),

@@ -188,11 +188,11 @@ class _DirectChatTile extends StatelessWidget {
             letterSpacing: 0,
           );
 
-    final effectiveOnTap = (conversation.isSystem || isSystem)
+    // 如果提供了 onConversationTap，就允许点击
+    // 这样可以在系统通知页面中点击系统通知
+    final effectiveOnTap = onConversationTap == null
         ? null
-        : onConversationTap == null
-            ? null
-            : () => onConversationTap!(conversation);
+        : () => onConversationTap!(conversation);
 
     final effectiveOnAvatarTap = (conversation.isSystem || isSystem)
         ? null
@@ -227,7 +227,9 @@ class _DirectChatTile extends StatelessWidget {
                           ? colorScheme.onSecondaryContainer
                           : avatarColor,
                       child: isSystem
-                          ? const Icon(Icons.notifications_none_outlined)
+                          ? (conversation.id == 'customer-service'
+                              ? const Icon(Icons.support_agent_outlined)
+                              : const Icon(Icons.notifications_none_outlined))
                           : Text(
                               (conversation.initials ?? conversation.displayName)
                                   .characters

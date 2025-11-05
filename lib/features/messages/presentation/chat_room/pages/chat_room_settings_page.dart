@@ -1,5 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_participant.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/chat_shared_media_page.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_shared_media_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
@@ -24,6 +24,46 @@ class ChatRoomSettingsPage extends StatefulWidget {
 
   @override
   State<ChatRoomSettingsPage> createState() => _ChatRoomSettingsPageState();
+}
+
+/// 聊天设置页面相关常量和样式
+class _ChatRoomSettingsConstants {
+  // 按钮样式
+  static ButtonStyle get filledButtonStyle => FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      );
+
+  static ButtonStyle get outlinedButtonStyle => OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      );
+
+  // 文本样式
+  static const TextStyle buttonTextStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 1.3,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle listTileTitleStyle = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    height: 1.3,
+    letterSpacing: 0,
+  );
+
+  static TextStyle listTileSubtitleStyle(ColorScheme colorScheme) => TextStyle(
+        fontSize: 13,
+        color: colorScheme.onSurfaceVariant,
+        height: 1.4,
+        letterSpacing: 0,
+      );
 }
 
 class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
@@ -195,19 +235,9 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                 icon: const Icon(Icons.ios_share_outlined, size: 18),
                 label: Text(
                   loc.chat_settings_share,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    height: 1.3,
-                    letterSpacing: 0,
-                  ),
+                  style: _ChatRoomSettingsConstants.buttonTextStyle,
                 ),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                style: _ChatRoomSettingsConstants.filledButtonStyle,
               ),
               OutlinedButton.icon(
                 onPressed: () {
@@ -232,38 +262,18 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                 ),
                 label: Text(
                   exitLabel,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    height: 1.3,
-                    letterSpacing: 0,
-                  ),
+                  style: _ChatRoomSettingsConstants.buttonTextStyle,
                 ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                style: _ChatRoomSettingsConstants.outlinedButtonStyle,
               ),
               OutlinedButton.icon(
                 onPressed: () => _showReportSheet(loc),
                 icon: const Icon(Icons.flag_outlined, size: 18),
                 label: Text(
                   loc.chat_settings_report,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    height: 1.3,
-                    letterSpacing: 0,
-                  ),
+                  style: _ChatRoomSettingsConstants.buttonTextStyle,
                 ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                style: _ChatRoomSettingsConstants.outlinedButtonStyle,
               ),
             ],
           ),
@@ -288,21 +298,11 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                   },
                   title: Text(
                     loc.chat_settings_notifications,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      height: 1.3,
-                      letterSpacing: 0,
-                    ),
+                    style: _ChatRoomSettingsConstants.listTileTitleStyle,
                   ),
                   subtitle: Text(
                     loc.chat_settings_notifications_subtitle,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colorScheme.onSurfaceVariant,
-                      height: 1.4,
-                      letterSpacing: 0,
-                    ),
+                    style: _ChatRoomSettingsConstants.listTileSubtitleStyle(colorScheme),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -324,21 +324,11 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
                   ),
                   title: Text(
                     loc.chat_settings_shared_files,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      height: 1.3,
-                      letterSpacing: 0,
-                    ),
+                    style: _ChatRoomSettingsConstants.listTileTitleStyle,
                   ),
                   subtitle: Text(
                     loc.chat_settings_shared_files_subtitle,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colorScheme.onSurfaceVariant,
-                      height: 1.4,
-                      letterSpacing: 0,
-                    ),
+                    style: _ChatRoomSettingsConstants.listTileSubtitleStyle(colorScheme),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -526,22 +516,12 @@ class _ChatParticipantTile extends StatelessWidget {
         ),
         title: Text(
           participant.displayName,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            height: 1.3,
-            letterSpacing: 0,
-          ),
+          style: _ChatRoomSettingsConstants.listTileTitleStyle,
         ),
         subtitle: subtitle != null
             ? Text(
                 subtitle!,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.4,
-                  letterSpacing: 0,
-                ),
+                style: _ChatRoomSettingsConstants.listTileSubtitleStyle(colorScheme),
               )
             : null,
         contentPadding: const EdgeInsets.symmetric(

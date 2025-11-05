@@ -25,7 +25,10 @@ class ChatRoomMessageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isMine = message.isFromCurrentUser;
-    final bubbleColor = isMine ? colorScheme.primary : colorScheme.surface;
+    // 使用 surfaceContainerHighest 提高其他用户气泡的对比度，让气泡更清晰可见
+    final bubbleColor = isMine 
+        ? colorScheme.primary 
+        : colorScheme.surfaceContainerHighest;
     final textColor = isMine ? colorScheme.onPrimary : colorScheme.onSurface;
     final captionColor =
         isMine ? colorScheme.onPrimary.withValues(alpha: .8) : colorScheme.onSurfaceVariant;

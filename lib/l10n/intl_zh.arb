@@ -147,6 +147,8 @@
   "event_title_field_label": "活动标题",
   "messages_tab_private": "私聊",
   "messages_tab_groups": "群聊",
+  "system_notifications_tab_notifications": "系统通知",
+  "system_notifications_tab_customer_service": "客服",
   "events_tab_invites": "召集",
   "events_tab_moments": "瞬间",
   "create_moment_title": "发布瞬间",

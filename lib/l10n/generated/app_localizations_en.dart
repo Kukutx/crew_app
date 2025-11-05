@@ -165,6 +165,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messages_tab_groups => 'Groups';
 
   @override
+  String get system_notifications_tab_notifications => 'System Notifications';
+
+  @override
+  String get system_notifications_tab_customer_service => 'Customer Service';
+
+  @override
   String get events_tab_invites => 'Invites';
 
   @override

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:crew_app/features/messages/data/chat_message.dart';
 import 'package:crew_app/features/messages/data/chat_participant.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/chat_room_settings_page.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_room_settings_page.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_attachment_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_message_search_sheet.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_header_actions.dart';
@@ -17,6 +17,20 @@ import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
 enum ChatConversationType { group, direct }
+
+/// 聊天页面相关常量
+class _ChatConversationConstants {
+  // 滚动相关常量
+  static const double scrollOffsetPadding = 72.0;
+  static const int scrollAnimationDurationMs = 300;
+  static const int scrollDelayMs = 16;
+  
+  // 高亮相关常量
+  static const int highlightDurationSeconds = 2;
+  
+  // Emoji 选择器相关常量
+  static const double emojiPickerHeight = 320.0;
+}
 
 class ChatConversationPage extends StatefulWidget {
   ChatConversationPage.group({
@@ -182,8 +196,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     if (!_scrollController.hasClients) return;
 
     _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent + 72,
-      duration: const Duration(milliseconds: 300),
+      _scrollController.position.maxScrollExtent + _ChatConversationConstants.scrollOffsetPadding,
+      duration: const Duration(milliseconds: _ChatConversationConstants.scrollAnimationDurationMs),
       curve: Curves.easeOut,
     );
   }
@@ -206,20 +220,20 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       try {
         await _scrollController.animateTo(
           targetOffset,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: _ChatConversationConstants.scrollAnimationDurationMs),
           curve: Curves.easeOut,
         );
       } catch (_) {
         // Ignore scroll errors when the controller is no longer attached.
       }
-      await Future<void>.delayed(const Duration(milliseconds: 16));
+      await Future<void>.delayed(const Duration(milliseconds: _ChatConversationConstants.scrollDelayMs));
     }
 
     final context = key?.currentContext;
     if (context != null) {
       await Scrollable.ensureVisible(
         context,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: _ChatConversationConstants.scrollAnimationDurationMs),
         alignment: 0.1,
         curve: Curves.easeOut,
       );
@@ -245,7 +259,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   void _highlightMessage(String messageId) {
     _highlightTimer?.cancel();
     setState(() => _highlightedMessageId = messageId);
-    _highlightTimer = Timer(const Duration(seconds: 2), () {
+    _highlightTimer = Timer(const Duration(seconds: _ChatConversationConstants.highlightDurationSeconds), () {
       if (!mounted) return;
       if (_highlightedMessageId == messageId) {
         setState(() => _highlightedMessageId = null);
@@ -461,7 +475,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
             child: _isEmojiPickerVisible
                 ? SizedBox(
                     key: const ValueKey('emoji_picker'),
-                    height: 320,
+                    height: _ChatConversationConstants.emojiPickerHeight,
                   child: EmojiPicker(
                     onEmojiSelected: _handleEmojiSelected,
                     onBackspacePressed: _handleBackspacePressed,

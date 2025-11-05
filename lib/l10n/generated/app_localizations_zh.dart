@@ -163,6 +163,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get messages_tab_groups => '群聊';
 
   @override
+  String get system_notifications_tab_notifications => '系统通知';
+
+  @override
+  String get system_notifications_tab_customer_service => '客服';
+
+  @override
   String get events_tab_invites => '召集';
 
   @override

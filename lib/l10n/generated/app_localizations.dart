@@ -398,6 +398,18 @@ abstract class AppLocalizations {
   /// **'Groups'**
   String get messages_tab_groups;
 
+  /// No description provided for @system_notifications_tab_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'System Notifications'**
+  String get system_notifications_tab_notifications;
+
+  /// No description provided for @system_notifications_tab_customer_service.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Service'**
+  String get system_notifications_tab_customer_service;
+
   /// No description provided for @events_tab_invites.
   ///
   /// In en, this message translates to:

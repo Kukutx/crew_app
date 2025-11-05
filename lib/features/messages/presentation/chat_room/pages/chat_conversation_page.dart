@@ -14,6 +14,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 enum ChatConversationType { group, direct }
@@ -223,8 +224,12 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
           duration: const Duration(milliseconds: _ChatConversationConstants.scrollAnimationDurationMs),
           curve: Curves.easeOut,
         );
-      } catch (_) {
-        // Ignore scroll errors when the controller is no longer attached.
+      } catch (e, stackTrace) {
+        // 记录滚动错误，但不需要显示给用户（当controller已销毁时这是正常情况）
+        debugPrint('Scroll animation error: $e');
+        if (kDebugMode) {
+          debugPrint('Stack trace: $stackTrace');
+        }
       }
       await Future<void>.delayed(const Duration(milliseconds: _ChatConversationConstants.scrollDelayMs));
     }

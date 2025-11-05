@@ -355,16 +355,64 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       });
       
       try {
-        // 构建 RoadTripDraft
+        // 文本长度验证
+        final title = _titleCtrl.text.trim();
+        if (title.length > 20) {
+          _showSnack('标题不能超过20个字符');
+          setState(() {
+            _isCreating = false;
+          });
+          return;
+        }
+
+        // 价格验证
         double? price;
         if (_pricingType == RoadTripPricingType.paid) {
           price = double.tryParse(_priceCtrl.text.trim());
+          if (price == null || price < 0 || price > 100) {
+            _showSnack('请输入有效的人均费用（0-100）');
+            setState(() {
+              _isCreating = false;
+            });
+            return;
+          }
+        }
+
+        // 坐标范围验证 - 起点和终点
+        if (_startLatLng!.latitude < -90 ||
+            _startLatLng!.latitude > 90 ||
+            _startLatLng!.longitude < -180 ||
+            _startLatLng!.longitude > 180 ||
+            _destinationLatLng!.latitude < -90 ||
+            _destinationLatLng!.latitude > 90 ||
+            _destinationLatLng!.longitude < -180 ||
+            _destinationLatLng!.longitude > 180) {
+          _showSnack('坐标值无效，请重新选择位置');
+          setState(() {
+            _isCreating = false;
+          });
+          return;
+        }
+
+        // 坐标范围验证 - 途经点
+        final allWaypoints = [..._forwardWps, ..._returnWps];
+        for (final wp in allWaypoints) {
+          if (wp.latitude < -90 ||
+              wp.latitude > 90 ||
+              wp.longitude < -180 ||
+              wp.longitude > 180) {
+            _showSnack('坐标值无效，请重新选择位置');
+            setState(() {
+              _isCreating = false;
+            });
+            return;
+          }
         }
 
         final maxParticipants = int.tryParse(_maxParticipantsCtrl.text.trim()) ?? 4;
         
         final draft = RoadTripDraft(
-          title: _titleCtrl.text.trim(),
+          title: title,
           dateRange: _editorState.dateRange!,
           startLocation: _startAddress ?? 
               '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
@@ -695,7 +743,13 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         duration: const Duration(milliseconds: 280),
         curve: Curves.easeOut,
       );
-    } catch (_) {}
+    } catch (e, stackTrace) {
+      // 记录页面切换错误（当PageView已销毁时这是正常情况）
+      debugPrint('Page animation error: $e');
+      if (kDebugMode) {
+        debugPrint('Stack trace: $stackTrace');
+      }
+    }
   }
 
   void _enableWizard() {
@@ -711,7 +765,13 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
             curve: Curves.easeOut,
           );
         }
-      } catch (_) {}
+      } catch (e, stackTrace) {
+        // 记录页面切换错误（当PageView已销毁时这是正常情况）
+        debugPrint('Page animation error: $e');
+        if (kDebugMode) {
+          debugPrint('Stack trace: $stackTrace');
+        }
+      }
     });
   }
 

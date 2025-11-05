@@ -27,6 +27,7 @@ class RoadTripStorySection extends StatelessWidget {
             loc.road_trip_story_description_hint,
           ),
           maxLines: 6,
+          maxLength: 500,
           validator: (v) => (v == null || v.trim().isEmpty)
               ? loc.road_trip_story_description_required
               : null,

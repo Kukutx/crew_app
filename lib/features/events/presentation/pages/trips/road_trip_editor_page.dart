@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
+import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -72,7 +73,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       _meetingLocationCtrl.text = initial.meetingPoint;
       _maxParticipantsCtrl.text = initial.maxParticipants.toString();
       if (initial.pricePerPerson != null) {
-        _priceCtrl.text = initial.pricePerPerson!.toString();
+        _priceCtrl.text = initial.pricePerPerson.toString();
       }
       _descriptionCtrl.text = initial.description;
       _hostDisclaimerCtrl.text = initial.hostDisclaimer;
@@ -85,7 +86,13 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         if (parts.length == 2) {
           final lat = double.tryParse(parts[0].trim());
           final lng = double.tryParse(parts[1].trim());
-          if (lat != null && lng != null) {
+          // 坐标范围验证
+          if (lat != null &&
+              lng != null &&
+              lat >= -90 &&
+              lat <= 90 &&
+              lng >= -180 &&
+              lng <= 180) {
             waypoints.add(LatLng(lat, lng));
           }
         }
@@ -188,28 +195,64 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   }
 
   Future<void> _submit() async {
+    final loc = AppLocalizations.of(context)!;
+    
     if (!_formKey.currentState!.validate()) return;
     if (_state.dateRange == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('请选择活动日期范围')));
+      ).showSnackBar(SnackBar(content: Text(loc.road_trip_validation_date_range_required)));
       return;
     }
 
+    // 文本长度验证
+    final title = _titleCtrl.text.trim();
+    if (title.length > 20) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.road_trip_validation_title_max_length)),
+      );
+      return;
+    }
+
+    // 最大参与人数验证
+    final maxParticipantsText = _maxParticipantsCtrl.text.trim();
+    final maxParticipants = int.tryParse(maxParticipantsText);
+    if (maxParticipants == null || maxParticipants <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.road_trip_validation_max_participants_invalid)),
+      );
+      return;
+    }
+
+    // 价格验证
     double? price;
     if (_state.pricingType == RoadTripPricingType.paid) {
       price = double.tryParse(_priceCtrl.text.trim());
-      if (price == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('请输入正确的人均费用')));
+      if (price == null || price < 0 || price > 100) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.road_trip_validation_price_invalid)),
+        );
+        return;
+      }
+    }
+
+    // 坐标范围验证
+    final allWaypoints = [..._forwardWps, ..._returnWps];
+    for (final wp in allWaypoints) {
+      if (wp.latitude < -90 ||
+          wp.latitude > 90 ||
+          wp.longitude < -180 ||
+          wp.longitude > 180) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.road_trip_validation_coordinate_invalid)),
+        );
         return;
       }
     }
 
     final draft = RoadTripDraft(
       id: widget.initialValue?.id,
-      title: _titleCtrl.text.trim(),
+      title: title,
       dateRange: _state.dateRange!,
       startLocation: _startLocationCtrl.text.trim(),
       endLocation: _endLocationCtrl.text.trim(),
@@ -219,7 +262,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
         ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
       ],
-      maxParticipants: int.parse(_maxParticipantsCtrl.text),
+      maxParticipants: maxParticipants,
       isFree: _state.pricingType == RoadTripPricingType.free,
       pricePerPerson: price,
       carType: _state.carType,
@@ -246,15 +289,16 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
 
       final id = await ref.read(eventsApiProvider).createRoadTrip(draft);
       if (!mounted) return;
+      final actionText = widget.isEditing ? loc.action_update : loc.action_create;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${widget.isEditing ? '更新' : '创建'}成功：$id')),
+        SnackBar(content: Text(loc.road_trip_create_success(actionText, id))),
       );
       Navigator.pop(context, id);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('创建失败：$e')));
+        ).showSnackBar(SnackBar(content: Text(loc.road_trip_create_failed(e.toString()))));
       }
     }
   }

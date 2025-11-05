@@ -3,13 +3,35 @@ import 'dart:async';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 /// A cache manager that throttles repeated failed image downloads for events.
+/// 
+/// **性能优化策略：**
+/// - 限制缓存对象数量：最多200个图片对象
+/// - 缓存过期时间：7天后过期
+/// - 失败重试限制：失败后1分钟内不再重试，避免频繁请求
+/// 
+/// **图片尺寸限制建议：**
+/// 在使用 [CachedNetworkImage] 时，建议设置以下参数来控制内存使用：
+/// - `memCacheHeight`: 推荐 512-1024 像素（根据显示需求）
+/// - `memCacheWidth`: 推荐 512-1024 像素（根据显示需求）
+/// - 这些参数会限制图片在内存中的尺寸，自动进行压缩，减少内存占用
+/// 
+/// **示例：**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   cacheManager: EventImageCacheManager.instance,
+///   memCacheHeight: 512, // 限制内存中图片高度为512px
+///   memCacheWidth: 512,  // 限制内存中图片宽度为512px
+///   fit: BoxFit.cover,
+/// )
+/// ```
 class EventImageCacheManager extends CacheManager {
   EventImageCacheManager._()
       : super(
           Config(
             'event_images',
             stalePeriod: const Duration(days: 7),
-            maxNrOfCacheObjects: 200,
+            maxNrOfCacheObjects: 200, // 限制缓存对象数量，控制存储空间
           ),
         );
 
@@ -17,6 +39,8 @@ class EventImageCacheManager extends CacheManager {
   static final EventImageCacheManager instance = EventImageCacheManager._();
 
   /// Duration to wait before retrying a failed download.
+  /// 
+  /// 当图片下载失败后，会等待此时间再允许重试，避免频繁请求失败的URL。
   final Duration retryDelay = const Duration(minutes: 1);
 
   final Map<String, DateTime> _failedFetches = <String, DateTime>{};

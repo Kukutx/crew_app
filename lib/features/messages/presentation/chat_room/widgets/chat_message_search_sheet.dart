@@ -89,11 +89,13 @@ class _ChatMessageSearchSheetState extends State<ChatMessageSearchSheet> {
               TextField(
                 controller: _controller,
                 autofocus: true,
+                maxLength: 100,
                 onChanged: (value) => setState(() => _query = value),
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: loc.chat_search_hint,
                   prefixIcon: const Icon(Icons.search),
+                  counterText: '', // 隐藏字符计数器
                   suffixIcon: trimmedQuery.isEmpty
                       ? null
                       : IconButton(

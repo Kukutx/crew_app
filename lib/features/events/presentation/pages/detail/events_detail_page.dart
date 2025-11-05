@@ -9,6 +9,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/sheets/event_
 import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
 import 'package:flutter/material.dart';
@@ -138,8 +139,24 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
           ShareParams(text: shareText, files: [xFile]),
         );
       }
-    } catch (_) {
-      await SharePlus.instance.share(ShareParams(text: shareText));
+    } catch (e, stackTrace) {
+      // 如果分享图片失败，尝试只分享文本
+      debugPrint('Failed to share image, falling back to text only: $e');
+      try {
+        await SharePlus.instance.share(ShareParams(text: shareText));
+      } catch (fallbackError, fallbackStack) {
+        // 如果文本分享也失败，记录错误并显示提示
+        debugPrint('Failed to share text: $fallbackError');
+        if (mounted && sheetContext.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(loc.share_error_retry)),
+          );
+        }
+        // 记录错误到监控系统
+        ref.read(talkerProvider).error(fallbackError, fallbackStack);
+      }
+      // 记录原始错误
+      ref.read(talkerProvider).error(e, stackTrace);
     }
     if (!sheetContext.mounted) return;
     Navigator.of(sheetContext).pop();
@@ -198,7 +215,11 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
           ),
         ),
       );
-    } catch (_) {
+    } catch (e, stackTrace) {
+      // 记录错误到监控系统
+      debugPrint('Failed to save share image: $e');
+      ref.read(talkerProvider).error(e, stackTrace);
+      
       if (!sheetContext.mounted || !mounted) return;
       Navigator.of(sheetContext).pop();
       ScaffoldMessenger.of(
@@ -376,10 +397,10 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         ? organizer!.name
         : _fallbackHost.name;
     final hostBio = (organizer?.bio?.isNotEmpty ?? false)
-        ? organizer!.bio!
+        ? (organizer!.bio ?? _fallbackHost.bio)
         : _fallbackHost.bio;
     final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
-        ? organizer!.avatarUrl!
+        ? (organizer!.avatarUrl ?? _fallbackHost.avatar)
         : _fallbackHost.avatar;
     final colorScheme = Theme.of(context).colorScheme;
 

@@ -40,6 +40,7 @@ class RoadTripPreferencesSection extends StatelessWidget {
               onPressed: onSubmitTag,
             ),
           ),
+          maxLength: 30,
           onSubmitted: (_) => onSubmitTag(),
         ),
         const SizedBox(height: 8),

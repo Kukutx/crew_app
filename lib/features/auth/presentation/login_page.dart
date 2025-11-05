@@ -69,8 +69,9 @@ class _LoginPageState extends ConsumerState<LoginPage>
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e, st) {
       debugPrint('Google sign-in failed: $e\n$st');
+      final loc = AppLocalizations.of(context)!;
       messenger.showSnackBar(
-        SnackBar(content: Text("Login failed. Please try again later.")),
+        SnackBar(content: Text(loc.login_failed_message)),
       );
     } finally {
       if (mounted) setState(() => _loading = false);

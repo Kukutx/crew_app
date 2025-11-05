@@ -21,7 +21,15 @@ class AuthenticatedUserNotifier
   }
 
   final Ref _ref;
+  
+  /// 正在加载的profile Future，用于防止并发调用
+  Future<AuthenticatedUserDto?>? _loadingProfile;
 
+  /// 监听认证状态变化
+  /// 
+  /// 注意：由于使用了 StateNotifierProvider.autoDispose，
+  /// Riverpod会自动在provider销毁时清理ref.listen创建的监听器，
+  /// 无需手动管理，不会有内存泄漏风险。
   void _listenToAuthChanges() {
     _ref.listen<User?>(currentUserProvider, (previous, next) {
       final previousUser = previous;
@@ -29,6 +37,7 @@ class AuthenticatedUserNotifier
 
       if (currentUser == null) {
         state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+        _loadingProfile = null; // 清除加载状态
         return;
       }
 
@@ -39,7 +48,8 @@ class AuthenticatedUserNotifier
   }
 
   Future<void> _initialize() async {
-    final user = _ref.read(currentUserProvider);
+    // 使用 ref.watch 确保依赖关系正确，当 currentUserProvider 更新时能正确响应
+    final user = _ref.watch(currentUserProvider);
     if (user == null) {
       state = const AsyncValue<AuthenticatedUserDto?>.data(null);
       return;
@@ -51,22 +61,42 @@ class AuthenticatedUserNotifier
     state = nextState;
   }
 
+  /// 刷新用户资料，如果正在加载则返回现有的Future，避免并发调用
   Future<AuthenticatedUserDto?> refreshProfile() async {
-    final user = _ref.read(currentUserProvider);
+    // 如果正在加载，返回现有Future
+    if (_loadingProfile != null) {
+      return _loadingProfile;
+    }
+    
+    // 使用 ref.watch 确保依赖关系正确，当 currentUserProvider 更新时能正确响应
+    final user = _ref.watch(currentUserProvider);
     if (user == null) {
       state = const AsyncValue<AuthenticatedUserDto?>.data(null);
+      _loadingProfile = null;
       return null;
     }
 
     state = const AsyncValue<AuthenticatedUserDto?>.loading();
-   final nextState = await AsyncValue.guard(_loadProfile);
-    if (!mounted) return null;
-    state = nextState;
-    return state.asData?.value;
+    
+    // 创建并保存Future，防止并发调用
+    _loadingProfile = _loadProfile().then((result) {
+      _loadingProfile = null; // 清除加载状态
+      if (!mounted) return null;
+      state = AsyncValue.data(result);
+      return result;
+    }).catchError((error, stackTrace) {
+      _loadingProfile = null; // 清除加载状态
+      if (!mounted) return null;
+      state = AsyncValue.error(error, stackTrace);
+      return null;
+    });
+    
+    return _loadingProfile;
   }
 
   Future<AuthenticatedUserDto?> _loadProfile() async {
-    final api = _ref.read(apiServiceProvider);
+    // 使用 ref.watch 确保依赖关系正确，当 apiServiceProvider 更新时能正确响应
+    final api = _ref.watch(apiServiceProvider);
 
     try {
       return await api.getAuthenticatedUserDetail();

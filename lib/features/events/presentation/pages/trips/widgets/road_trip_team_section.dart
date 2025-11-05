@@ -54,6 +54,7 @@ class RoadTripTeamSection extends StatelessWidget {
                   loc.road_trip_team_max_participants_hint,
                 ),
                 keyboardType: TextInputType.number,
+                maxLength: 3,
                 validator: (v) {
                   final n = int.tryParse(v ?? '');
                   if (n == null || n < 1) {
@@ -77,6 +78,7 @@ class RoadTripTeamSection extends StatelessWidget {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
+                maxLength: 10,
                 enabled: pricingType == RoadTripPricingType.paid,
               ),
             ),

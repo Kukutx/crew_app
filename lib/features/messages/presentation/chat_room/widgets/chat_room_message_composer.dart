@@ -146,6 +146,7 @@ class ChatRoomMessageComposer extends StatelessWidget {
                   controller: controller,
                   minLines: 1,
                   maxLines: 4,
+                  maxLength: 1000,
                   focusNode: focusNode,
                   textCapitalization: TextCapitalization.sentences,
                   style: TextStyle(
@@ -167,6 +168,7 @@ class ChatRoomMessageComposer extends StatelessWidget {
                       vertical: 10,
                     ),
                     isDense: true,
+                    counterText: '', // 隐藏字符计数器
                   ),
                   onTap: onTextFieldTap,
                   onSubmitted: (_) => onSend(),

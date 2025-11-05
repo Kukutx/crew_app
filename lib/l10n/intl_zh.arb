@@ -189,6 +189,7 @@
   "login_agreement_terms": "《用户协议》",
   "login_agreement_privacy": "《隐私政策》",
   "login_agreement_children": "《未成年人个人信息保护规则》",
+  "login_failed_message": "登录失败，请稍后重试",
   "logout_success": "已退出登录",
   "map": "地图",
   "map_clear_selected_point": "清除选点",
@@ -546,6 +547,27 @@
   "road_trip_create_failed_title": "创建失败",
   "road_trip_create_failed_message": "无法创建您的自驾游，请重试。",
   "road_trip_create_done_button": "完成",
+  "road_trip_validation_date_range_required": "请选择活动日期范围",
+  "road_trip_validation_title_max_length": "标题不能超过20个字符",
+  "road_trip_validation_price_invalid": "请输入有效的人均费用（0-100）",
+  "road_trip_validation_coordinate_invalid": "坐标值无效，请重新选择位置",
+  "road_trip_validation_max_participants_invalid": "请输入有效的人数上限（≥1的整数）",
+  "road_trip_create_success": "{action}成功：{id}",
+  "@road_trip_create_success": {
+    "placeholders": {
+      "action": {},
+      "id": {}
+    }
+  },
+  "road_trip_create_failed": "创建失败：{error}",
+  "@road_trip_create_failed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "action_create": "创建",
+  "action_update": "更新",
+  "share_error_retry": "分享失败，请稍后重试",
   "event_members_list": "成员列表",
   "event_member_role_organizer": "组织者",
   "event_member_role_participant": "参与者",

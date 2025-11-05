@@ -103,6 +103,7 @@
   "login_agreement_terms": "Terms of Service",
   "login_agreement_privacy": "Privacy Policy",
   "login_agreement_children": "Children's Privacy Guidelines",
+  "login_failed_message": "Login failed. Please try again later.",
   "logout_success": "Signed out successfully.",
   "map": "Map",
   "map_clear_selected_point": "Clear selected point",
@@ -551,6 +552,27 @@
   "road_trip_create_failed_title": "Failed to Create Trip",
   "road_trip_create_failed_message": "We couldn't create your road trip. Please try again.",
   "road_trip_create_done_button": "Done",
+  "road_trip_validation_date_range_required": "Please select activity date range",
+  "road_trip_validation_title_max_length": "Title cannot exceed 20 characters",
+  "road_trip_validation_price_invalid": "Please enter a valid price per person (0-100)",
+  "road_trip_validation_coordinate_invalid": "Invalid coordinates, please reselect location",
+  "road_trip_validation_max_participants_invalid": "Please enter a valid max participants (integer ≥ 1)",
+  "road_trip_create_success": "{action} successful: {id}",
+  "@road_trip_create_success": {
+    "placeholders": {
+      "action": {},
+      "id": {}
+    }
+  },
+  "road_trip_create_failed": "Failed to create: {error}",
+  "@road_trip_create_failed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "action_create": "Create",
+  "action_update": "Update",
+  "share_error_retry": "Share failed, please try again later",
   "event_members_list": "Members list",
   "event_member_role_organizer": "Organizer",
   "event_member_role_participant": "Participant",

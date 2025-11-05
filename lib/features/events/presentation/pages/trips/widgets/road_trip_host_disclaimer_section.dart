@@ -27,6 +27,7 @@ class RoadTripHostDisclaimerSection extends StatelessWidget {
           ),
           minLines: 3,
           maxLines: 5,
+          maxLength: 500,
           keyboardType: TextInputType.multiline,
           textInputAction: TextInputAction.newline,
         ),

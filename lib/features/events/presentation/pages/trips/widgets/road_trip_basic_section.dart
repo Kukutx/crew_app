@@ -32,6 +32,7 @@ class RoadTripBasicSection extends StatelessWidget {
             loc.road_trip_basic_title_label,
             loc.road_trip_basic_title_hint,
           ),
+          maxLength: 20,
           validator: (v) => (v == null || v.trim().isEmpty)
               ? loc.road_trip_basic_title_required
               : null,

@@ -19,4 +19,5 @@ export 'formatted_date.dart';
 export 'image_url.dart';
 export 'json_parser_helper.dart';
 export 'number_format_helper.dart';
+export 'text_truncate_helper.dart';
 export 'version_helper.dart';

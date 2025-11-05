@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/text_truncate_helper.dart';
 
 ///是用来给现有类添加新功能的方法，而不需要继承或修改原始类。它们很适合给内置类型或第三方库类型增加自定义方法。
 
@@ -15,6 +16,66 @@ extension StringExt on String {
 
   /// 去除所有空格
   String get noSpace => replaceAll(' ', '');
+
+  /// 截断文本（从末尾截断）
+  /// 
+  /// [maxLength] 最大长度（包含省略符号）
+  /// [ellipsis] 省略符号，默认为 ".."
+  /// 
+  /// 示例：
+  /// ```dart
+  /// '这是一个很长的地址'.truncate(maxLength: 8); // '这是一个..'
+  /// ```
+  String truncate({
+    required int maxLength,
+    String ellipsis = '..',
+  }) {
+    return TextTruncateHelper.truncate(
+      this,
+      maxLength: maxLength,
+      ellipsis: ellipsis,
+    );
+  }
+
+  /// 从开头截断文本
+  /// 
+  /// [maxLength] 最大长度（包含省略符号）
+  /// [ellipsis] 省略符号，默认为 ".."
+  /// 
+  /// 示例：
+  /// ```dart
+  /// '这是一个很长的地址'.truncateStart(maxLength: 8); // '..长的地址'
+  /// ```
+  String truncateStart({
+    required int maxLength,
+    String ellipsis = '..',
+  }) {
+    return TextTruncateHelper.truncateStart(
+      this,
+      maxLength: maxLength,
+      ellipsis: ellipsis,
+    );
+  }
+
+  /// 从中间截断文本
+  /// 
+  /// [maxLength] 最大长度（包含省略符号）
+  /// [ellipsis] 省略符号，默认为 ".."
+  /// 
+  /// 示例：
+  /// ```dart
+  /// '这是一个很长的地址文本'.truncateMiddle(maxLength: 10); // '这是一个..文本'
+  /// ```
+  String truncateMiddle({
+    required int maxLength,
+    String ellipsis = '..',
+  }) {
+    return TextTruncateHelper.truncateMiddle(
+      this,
+      maxLength: maxLength,
+      ellipsis: ellipsis,
+    );
+  }
 }
 
 /// 🔹 List 扩展

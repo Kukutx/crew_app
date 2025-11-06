@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// 可展开的分享按钮组件
-/// 位于搜索框下方，点击可展开显示更多内容
-class ExpandableSharingButton extends StatefulWidget {
-  const ExpandableSharingButton({
+/// 可展开的筛选器按钮组件
+/// 位于搜索框下方，点击可展开显示筛选器选项（附近、最新、热门、关注）
+class ExpandableFilterButton extends StatefulWidget {
+  const ExpandableFilterButton({
     super.key,
     this.onFilterSelected,
     this.selectedFilter,
@@ -13,10 +13,10 @@ class ExpandableSharingButton extends StatefulWidget {
   final String? selectedFilter;
 
   @override
-  State<ExpandableSharingButton> createState() => _ExpandableSharingButtonState();
+  State<ExpandableFilterButton> createState() => _ExpandableFilterButtonState();
 }
 
-class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
+class _ExpandableFilterButtonState extends State<ExpandableFilterButton>
     with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
   late AnimationController _animationController;
@@ -40,7 +40,7 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
   }
 
   @override
-  void didUpdateWidget(ExpandableSharingButton oldWidget) {
+  void didUpdateWidget(ExpandableFilterButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedFilter != null && widget.selectedFilter != _selectedFilter) {
       _selectedFilter = widget.selectedFilter!;
@@ -73,13 +73,13 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // 主按钮 - 与图片完全一致：白色背景、圆角、深蓝色文字
+        // 主按钮 - 使用主题颜色
         Material(
           elevation: 4,
           borderRadius: BorderRadius.circular(12),
           clipBehavior: Clip.antiAlias,
           surfaceTintColor: Colors.transparent,
-          color: Colors.white,
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
           child: InkWell(
             onTap: _toggleExpand,
             borderRadius: BorderRadius.circular(12),
@@ -92,10 +92,10 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 左侧图标 - 两个互联的人物图标
+                  // 左侧图标 - 附近图标
                   Icon(
-                    Icons.people,
-                    color: const Color(0xFF1E3A8A), // 深蓝色，与图片一致
+                    Icons.near_me,
+                    color: colorScheme.onSurface,
                     size: 18,
                   ),
                   // 文字 - 显示选中的筛选器，展开时隐藏
@@ -104,7 +104,7 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
                     Text(
                       _selectedFilter,
                       style: TextStyle(
-                        color: const Color(0xFF1E3A8A), // 深蓝色，与图片一致
+                        color: colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -117,7 +117,7 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
                     duration: const Duration(milliseconds: 300),
                     child: Icon(
                       Icons.chevron_right,
-                      color: const Color(0xFF1E3A8A), // 深蓝色，与图片一致
+                      color: colorScheme.onSurface,
                       size: 18,
                     ),
                   ),
@@ -174,12 +174,15 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       surfaceTintColor: Colors.transparent,
-      color: Colors.white,
+      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -188,7 +191,7 @@ class _ExpandableSharingButtonState extends State<ExpandableSharingButton>
           child: Text(
             label,
             style: TextStyle(
-              color: const Color(0xFF1E3A8A),
+              color: colorScheme.onSurface,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),

@@ -27,7 +27,7 @@ import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'widgets/breathing_marker_overlay.dart';
-import 'widgets/expandable_sharing_button.dart';
+import 'widgets/expandable_filter_button.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
 import 'controllers/map_controller.dart';
@@ -346,28 +346,35 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               cameraPosition: _currentCameraPosition,
             ),
           ),
-          // 可展开的分享按钮（在搜索框下方，独立于搜索框）
-          if (!hideSearchBar)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 
-                  (showClearSelectionInAppBar ? 112.0 : 68.0) + 
-                  (searchState.showResults 
-                      ? (searchState.isLoading 
-                          ? 92.0 
-                          : (searchState.errorText != null || searchState.results.isEmpty 
-                              ? 84.0 
-                              : ((searchState.results.length > 4 ? 4 : searchState.results.length) * 56.0 + 
-                                 ((searchState.results.length > 4 ? 4 : searchState.results.length) > 1 
-                                  ? ((searchState.results.length > 4 ? 4 : searchState.results.length) - 1) * 1.0 
-                                  : 0.0) + 20.0)))
-                      : 0.0) + 
-                  8.0,
-              left: 12,
-              right: 12,
-              child: RepaintBoundary(
-                child: const ExpandableSharingButton(),
-              ),
+          // 可展开的分享按钮（自适应位置：搜索框下方或顶部）
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            top: (hideSearchBar || 
+                  (mapSheetType != MapOverlaySheetType.none && 
+                   mapSheetStage == MapOverlaySheetStage.expanded))
+                // 搜索框消失时，移动到搜索框原本的位置（顶部安全区域 + 搜索框顶部 padding）
+                ? MediaQuery.of(context).padding.top + 12.0
+                // 搜索框显示时，在搜索框下方
+                : MediaQuery.of(context).padding.top + 
+                    (showClearSelectionInAppBar ? 112.0 : 68.0) + 
+                    (searchState.showResults 
+                        ? (searchState.isLoading 
+                            ? 92.0 
+                            : (searchState.errorText != null || searchState.results.isEmpty 
+                                ? 84.0 
+                                : ((searchState.results.length > 4 ? 4 : searchState.results.length) * 56.0 + 
+                                   ((searchState.results.length > 4 ? 4 : searchState.results.length) > 1 
+                                    ? ((searchState.results.length > 4 ? 4 : searchState.results.length) - 1) * 1.0 
+                                    : 0.0) + 20.0)))
+                        : 0.0) + 
+                    8.0,
+            left: 12,
+            right: 12,
+            child: RepaintBoundary(
+              child: const ExpandableFilterButton(),
             ),
+          ),
           // 使用 RepaintBoundary 隔离提示横幅，避免地图移动时重绘
           if (hideSearchBar)
             RepaintBoundary(
@@ -962,10 +969,10 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
 
   List<double> get _snapSizes {
     return switch (widget.sheetType) {
-      MapOverlaySheetType.chat => const [0.32, 0.5, 0.82],
-      MapOverlaySheetType.explore => const [0.23, 0.5, 0.82],
-      MapOverlaySheetType.none => const [0.2, 0.5, 0.82],
-      MapOverlaySheetType.createRoadTrip => const [0.28, 0.45, 0.82],
+      MapOverlaySheetType.chat => const [0.32, 0.5, 0.88],
+      MapOverlaySheetType.explore => const [0.23, 0.5, 0.88],
+      MapOverlaySheetType.none => const [0.2, 0.5, 0.88],
+      MapOverlaySheetType.createRoadTrip => const [0.28, 0.45, 0.88],
     };
   }
   

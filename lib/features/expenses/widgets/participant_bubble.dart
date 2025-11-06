@@ -39,26 +39,7 @@ class ParticipantBubble extends StatefulWidget {
   State<ParticipantBubble> createState() => _ParticipantBubbleState();
 }
 
-class _ParticipantBubbleState extends State<ParticipantBubble>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(
-        milliseconds: 2600 + (widget.participant.total * 4).toInt(),
-      ),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class _ParticipantBubbleState extends State<ParticipantBubble> {
 
   @override
   Widget build(BuildContext context) {
@@ -92,16 +73,7 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
         ? Colors.black.withValues(alpha: 0.4)
         : const Color(0x335B8DEF);
     final primaryContentColor = isDark ? Colors.white : scheme.onPrimary;
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final floatOffset = math.sin(_controller.value * math.pi * 2) * 6;
-        return Transform.translate(
-          offset: Offset(0, floatOffset),
-          child: child,
-        );
-      },
-      child: SizedBox(
+    return SizedBox(
         width: stackExtent,
         height: stackExtent,
         child: Stack(
@@ -211,7 +183,6 @@ class _ParticipantBubbleState extends State<ParticipantBubble>
             ),
           ],
         ),
-      ),
     );
   }
 }

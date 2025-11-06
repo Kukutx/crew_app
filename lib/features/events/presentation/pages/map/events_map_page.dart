@@ -131,6 +131,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
     final mapSheetType = ref.watch(mapOverlaySheetProvider);
     final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
+    final mapSheetSize = ref.watch(mapOverlaySheetSizeProvider);
     final showBottomNavigation = ref.watch(bottomNavigationVisibilityProvider);
 
     if (mapSheetType == MapOverlaySheetType.none &&
@@ -143,6 +144,18 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         if (notifier.state != MapOverlaySheetStage.collapsed) {
           notifier.state = MapOverlaySheetStage.collapsed;
         }
+        // 重置 sheet size
+        ref.read(mapOverlaySheetSizeProvider.notifier).state = 0.0;
+      });
+    }
+    
+    // 当 sheet 类型变为 none 时，重置 sheet size
+    if (mapSheetType == MapOverlaySheetType.none && mapSheetSize > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        ref.read(mapOverlaySheetSizeProvider.notifier).state = 0.0;
       });
     }
 
@@ -472,30 +485,17 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             ),
           if (mapSheetType != MapOverlaySheetType.none)
             _MapOverlaySheet(sheetType: mapSheetType),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: AppFloatingActionButton(
-              heroTag: 'events_map_add_fab',
-              backgroundColor: theme.colorScheme.secondary,
-              foregroundColor: theme.colorScheme.onSecondary,
-              onPressed: () => showCreateContentOptionsSheet(context),
-              child: const Icon(Icons.add),
-            ),
-          ),
-          AppFloatingActionButton(
-            heroTag: 'events_map_my_location_fab',
-            margin: EdgeInsets.only(top: 12, bottom: bottomPadding, right: 6),
-            onPressed: () async {
+          // 自适应悬浮按钮
+          _AdaptiveFloatingButtons(
+            mapSheetType: mapSheetType,
+            mapSheetStage: mapSheetStage,
+            mapSheetSize: mapSheetSize,
+            bottomPadding: bottomPadding,
+            safeBottom: safeBottom,
+            onAddPressed: () => showCreateContentOptionsSheet(context),
+            onLocationPressed: () async {
               await mapController.moveToMyLocation();
             },
-            child: const Icon(Icons.my_location),
           ),
         ],
       ),
@@ -866,13 +866,22 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     _controller = DraggableScrollableController()
       ..addListener(_handleSizeChanged);
     _currentSize = _initialSize;
-    _notifyStage(_currentSize);
+    // 延迟到下一帧再更新状态，避免在 initState 中直接修改 provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _notifyStage(_currentSize);
+      _notifySize(_currentSize);
+    });
   }
 
   @override
   void dispose() {
     _controller.removeListener(_handleSizeChanged);
     _controller.dispose();
+    // 不在这里重置，因为主页面会在 sheet 类型变为 none 时重置
+    // 这样可以避免在 dispose 生命周期中修改 provider 状态
     super.dispose();
   }
 
@@ -886,6 +895,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     final schedulerPhase = SchedulerBinding.instance.schedulerPhase;
     if (schedulerPhase == SchedulerPhase.idle) {
       _notifyStage(size);
+      _notifySize(size);
       setState(() => _currentSize = size);
       return;
     }
@@ -895,8 +905,32 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
         return;
       }
       _notifyStage(size);
+      _notifySize(size);
       setState(() => _currentSize = size);
     });
+  }
+
+  void _notifySize(double size) {
+    final notifier = ref.read(mapOverlaySheetSizeProvider.notifier);
+    if ((notifier.state - size).abs() < 1e-4) {
+      return;
+    }
+
+    void updateSize() {
+      if (!mounted) {
+        return;
+      }
+      notifier.state = size;
+    }
+
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.idle ||
+        phase == SchedulerPhase.postFrameCallbacks) {
+      updateSize();
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => updateSize());
   }
 
   void _onDragUpdate(
@@ -994,11 +1028,13 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     if (oldWidget.sheetType != widget.sheetType) {
       final newSize = _initialSize;
       setState(() => _currentSize = newSize);
-      _notifyStage(newSize);
+      // 延迟到下一帧再更新状态，避免在 didUpdateWidget 中直接修改 provider
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {
           return;
         }
+        _notifyStage(newSize);
+        _notifySize(newSize);
         DraggableScrollableActuator.reset(context);
       });
     }
@@ -1235,6 +1271,88 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _AdaptiveFloatingButtons extends StatelessWidget {
+  const _AdaptiveFloatingButtons({
+    required this.mapSheetType,
+    required this.mapSheetStage,
+    required this.mapSheetSize,
+    required this.bottomPadding,
+    required this.safeBottom,
+    required this.onAddPressed,
+    required this.onLocationPressed,
+  });
+
+  final MapOverlaySheetType mapSheetType;
+  final MapOverlaySheetStage mapSheetStage;
+  final double mapSheetSize;
+  final double bottomPadding;
+  final double safeBottom;
+  final VoidCallback onAddPressed;
+  final VoidCallback onLocationPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    
+    // 计算按钮的底部偏移
+    double bottomOffset;
+    double opacity;
+    
+    if (mapSheetType != MapOverlaySheetType.none) {
+      if (mapSheetStage == MapOverlaySheetStage.collapsed) {
+        // 阶段一（collapsed）：根据 sheet 高度平滑上移
+        final sheetHeight = screenHeight * mapSheetSize;
+        // 按钮需要上移到 sheet 上方，加上一些间距
+        bottomOffset = sheetHeight + 16 + safeBottom;
+        opacity = 1.0;
+      } else {
+        // 其他阶段（middle, expanded）：直接隐藏
+        bottomOffset = bottomPadding;
+        opacity = 0.0;
+      }
+    } else {
+      // 没有 sheet，使用默认位置
+      bottomOffset = bottomPadding;
+      opacity = 1.0;
+    }
+
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      right: 16,
+      bottom: bottomOffset,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: opacity,
+        child: IgnorePointer(
+          ignoring: opacity == 0.0,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              AppFloatingActionButton(
+                heroTag: 'events_map_add_fab',
+                backgroundColor: theme.colorScheme.secondary,
+                foregroundColor: theme.colorScheme.onSecondary,
+                onPressed: onAddPressed,
+                child: const Icon(Icons.add),
+              ),
+              AppFloatingActionButton(
+                heroTag: 'events_map_my_location_fab',
+                margin: const EdgeInsets.only(top: 8, right: 0),
+                onPressed: onLocationPressed,
+                child: const Icon(Icons.my_location),
+              ),
+            ],
+          ),
         ),
       ),
     );

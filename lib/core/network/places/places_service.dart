@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../config/google_maps_config.dart';
+import '../error_message_extractor.dart';
 
 class PlacesApiException implements Exception {
   PlacesApiException(this.message, {this.statusCode});
@@ -103,7 +104,10 @@ class PlacesService {
       return null;
     } on DioException catch (error) {
       throw PlacesApiException(
-        _resolveErrorMessage(error) ?? 'Failed to search places',
+        ErrorMessageExtractor.extractWithDefault(
+          error,
+          defaultMessage: 'Failed to search places',
+        ),
         statusCode: error.response?.statusCode,
       );
     }
@@ -160,7 +164,10 @@ class PlacesService {
           .toList(growable: false);
     } on DioException catch (error) {
       throw PlacesApiException(
-        _resolveErrorMessage(error) ?? 'Failed to search places',
+        ErrorMessageExtractor.extractWithDefault(
+          error,
+          defaultMessage: 'Failed to search places',
+        ),
         statusCode: error.response?.statusCode,
       );
     }
@@ -286,27 +293,12 @@ class PlacesService {
       );
     } on DioException catch (error) {
       throw PlacesApiException(
-        _resolveErrorMessage(error) ?? 'Failed to load place details',
+        ErrorMessageExtractor.extractWithDefault(
+          error,
+          defaultMessage: 'Failed to load place details',
+        ),
         statusCode: error.response?.statusCode,
       );
     }
-  }
-
-  String? _resolveErrorMessage(DioException exception) {
-    final data = exception.response?.data;
-    if (data is Map<String, dynamic>) {
-      final error = data['error'];
-      if (error is Map<String, dynamic>) {
-        final message = error['message'];
-        if (message is String && message.isNotEmpty) {
-          return message;
-        }
-      }
-      final message = data['message'];
-      if (message is String && message.isNotEmpty) {
-        return message;
-      }
-    }
-    return exception.message;
   }
 }

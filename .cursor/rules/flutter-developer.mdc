@@ -1,0 +1,23 @@
+---
+alwaysApply: true
+---
+# Crew App 开发规则
+
+- 项目框架：Flutter 3.35.2 + Dart 3.9.0  
+- 状态管理：flutter_riverpod: ^3.0.0  
+- 路由方案：go_router  
+- UI 风格：Neumorphism  
+- 地图服务：Google Maps  
+- 后端接口：Crew.Api（.NET 9，使用 Controllers，不采用 Minimal APIs）  
+- Firebase：启用所有核心服务（Auth、Firestore、Remote Config 等）  
+
+## 开发者约定
+- 所有代码应保持类型安全（null-safety）。  
+- 避免在 UI 中直接处理业务逻辑。  
+- 与后端交互的服务层使用 repository 模式封装。  
+- 所有界面应支持浅色/深色主题。  
+
+## AI 使用提示
+- 生成代码时默认使用 Flutter 3.35.2 语法规范。  
+- 所有回答使用简体中文。  
+- 在涉及 UI 时，优先采用 Neumorphism 风格设计建议

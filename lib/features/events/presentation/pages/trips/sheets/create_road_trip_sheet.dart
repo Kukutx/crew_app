@@ -207,8 +207,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       _titleCtrl.text.trim().isNotEmpty && _editorState.dateRange != null;
   bool get _startValid =>
       _startLatLng != null && _destinationLatLng != null; // 起始页是否有效
-  // 是否显示创建按钮：起始点和终点必须有值且点击了继续（从起始页点击继续）
-  bool get _shouldShowCreateButton => _startValid && _hasClickedStartContinue;
   // 是否已点击起始页的继续按钮
   bool _hasClickedStartContinue = false;
 
@@ -652,8 +650,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       }
     });
   }
-
-  void _onCarTypeChanged(String? v) => setState(() => _carType = v);
 
   void _onSubmitTag() {
     final t = _tagInputCtrl.text.trim();
@@ -1123,14 +1119,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         : null;
 
     final startTitle = hasStartAddress
-        ? _startAddress!.trim()
+        ? _startAddress!.trim().truncateStart(maxLength: 50)
         : (startCoords ?? loc.map_select_location_title);
     final startSubtitle = _startLatLng != null
         ? ''
         : loc.map_select_location_tip;
 
     final destinationTitle = hasDestinationAddress
-        ? _destinationAddress!.trim()
+        ? _destinationAddress!.trim().truncateStart(maxLength: 50)
         : (destinationCoords ?? loc.map_select_location_destination_label);
     final destinationSubtitle = _destinationLatLng != null
         ? ''
@@ -1707,7 +1703,7 @@ class _CardTile extends StatelessWidget {
                         title,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          fontSize: 15,
+                          fontSize: 13,
                         ),
                       ),
                       if (subtitle != null && subtitle!.isNotEmpty) ...[

@@ -200,6 +200,49 @@ class MapController {
     }
   }
 
+  /// 调整相机以包含多个位置点
+  /// [points] 要包含的位置点列表
+  /// [padding] 边距（像素），默认为 50
+  Future<void> fitBounds(List<LatLng> points, {double padding = 50}) async {
+    final controller = _mapController;
+    if (controller == null || points.isEmpty) return;
+
+    // 如果只有一个点，使用 moveCamera
+    if (points.length == 1) {
+      await moveCamera(points.first, zoom: 14);
+      return;
+    }
+
+    // 计算边界框
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+
+    for (final point in points) {
+      minLat = minLat < point.latitude ? minLat : point.latitude;
+      maxLat = maxLat > point.latitude ? maxLat : point.latitude;
+      minLng = minLng < point.longitude ? minLng : point.longitude;
+      maxLng = maxLng > point.longitude ? maxLng : point.longitude;
+    }
+
+    // 创建边界框
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+
+    try {
+      await controller.animateCamera(
+        CameraUpdate.newLatLngBounds(bounds, padding),
+      );
+    } catch (_) {
+      await controller.moveCamera(
+        CameraUpdate.newLatLngBounds(bounds, padding),
+      );
+    }
+  }
+
   /// 聚焦到指定事件
   Future<void> focusOnEvent(Event event, {bool showEventCard = true}) async {
     await moveCamera(LatLng(event.latitude, event.longitude), zoom: 14);

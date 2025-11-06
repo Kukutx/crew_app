@@ -109,7 +109,17 @@ class LocationSelectionManager {
     selectionController.setDestinationLatLng(position);
     
     final mapController = ref.read(mapControllerProvider);
-    unawaited(mapController.moveCamera(position, zoom: 12));
+    
+    // 如果起点也存在，调整地图以同时显示起点和终点
+    if (selectionState.selectedLatLng != null) {
+      unawaited(mapController.fitBounds(
+        [selectionState.selectedLatLng!, position],
+        padding: 100,
+      ));
+    } else {
+      // 如果只有终点，移动到终点位置
+      unawaited(mapController.moveCamera(position, zoom: 12));
+    }
     
     HapticFeedback.lightImpact();
     
@@ -220,7 +230,11 @@ class LocationSelectionManager {
       selectionController.setSelectingDestination(true);
       if (initialDestination != null) {
         selectionController.setDestinationLatLng(initialDestination);
-        unawaited(mapController.moveCamera(initialDestination, zoom: 12));
+        // 如果起点和终点都存在，调整地图以同时显示起点和终点
+        unawaited(mapController.fitBounds(
+          [initialStart, initialDestination],
+          padding: 100,
+        ));
       } else {
         selectionController.setDestinationLatLng(null);
         unawaited(mapController.moveCamera(initialStart, zoom: 6));

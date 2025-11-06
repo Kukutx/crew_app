@@ -18,7 +18,6 @@ import 'package:crew_app/features/events/presentation/pages/map/state/map_select
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -953,8 +952,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     }
     
     // 包装在可滚动容器中，适配 overlay sheet 的高度限制
+    // 使用外部的 scrollCtrl 以支持 DraggableScrollableSheet 的上下拉动
     return SingleChildScrollView(
-      controller: null, // 其他页面不使用 controller
+      controller: widget.scrollCtrl,
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: content,

@@ -98,7 +98,7 @@ class RoadTripTeamSection extends StatelessWidget {
               onPressed: onSubmitTag,
             ),
           ),
-          maxLength: 30,
+          maxLength: 20,
           onSubmitted: (_) => onSubmitTag(),
         ),
         if (tags.isNotEmpty) ...[

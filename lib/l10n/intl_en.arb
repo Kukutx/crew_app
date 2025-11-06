@@ -465,6 +465,8 @@
   "settings_developer_stripe_test": "Stripe payment test",
   "road_trip_create_button": "Create",
   "road_trip_continue_button": "Continue",
+  "road_trip_tab_route": "Route",
+  "road_trip_tab_waypoints": "Waypoints",
   "road_trip_image_picker_failed": "Failed to pick images. Please check permission settings.",
   "road_trip_basic_section_title": "Basic info",
   "road_trip_basic_section_subtitle": "Name your trip and set dates",

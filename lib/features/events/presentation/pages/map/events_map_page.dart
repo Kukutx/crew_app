@@ -874,6 +874,9 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   double _currentSize = 0;
   int _chatTab = 0; // Chat sheet 的 tab 状态
   int _exploreTab = 0; // Explore sheet 的 tab 状态
+  bool _roadTripCanSwipe = false; // CreateRoadTrip sheet 是否显示 ToggleTabBar
+  int _roadTripTab = 0; // CreateRoadTrip sheet 的 tab 状态（路线/途径点）
+  ValueNotifier<int>? _roadTripTabChangeNotifier; // CreateRoadTrip sheet 的 tab 切换请求
 
  bool get _attached => _controller.isAttached;
 
@@ -1163,6 +1166,9 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                       );
                     }
                     
+                    // 创建 ValueNotifier 用于 tab 切换请求
+                    _roadTripTabChangeNotifier ??= ValueNotifier<int>(0);
+                    
                     return CreateRoadTripSheet(
                       scrollController: scrollController,
                       mode: mode,
@@ -1170,6 +1176,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                       initialRoute: initialRoute,
                       startPositionListenable: selectionController.selectedLatLngListenable,
                       destinationListenable: selectionController.destinationLatLngListenable,
+                      tabChangeNotifier: _roadTripTabChangeNotifier, // 传递 ValueNotifier
                       onCancel: () {
                         final selectionController = ref.read(mapSelectionControllerProvider.notifier);
                         
@@ -1198,6 +1205,22 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                         ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
                         // 清理选择状态，但保留位置信息用于详细编辑器
                         // ref.read(mapSelectionControllerProvider.notifier).resetSelection();
+                      },
+                      onCanSwipeChanged: (canSwipe) {
+                        // 接收 _canSwipe 状态变化
+                        if (mounted) {
+                          setState(() {
+                            _roadTripCanSwipe = canSwipe;
+                          });
+                        }
+                      },
+                      onTabIndexChanged: (index) {
+                        // 接收 TabController 的 index 变化
+                        if (mounted) {
+                          setState(() {
+                            _roadTripTab = index;
+                          });
+                        }
                       },
                     );
                   },
@@ -1303,6 +1326,21 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                             secondLabel: loc.events_tab_moments,
                             onChanged: (value) {
                               setState(() => _exploreTab = value);
+                            },
+                          );
+                        } else if (widget.sheetType == MapOverlaySheetType.createRoadTrip) {
+                          // CreateRoadTrip 的 ToggleTabBar（只在 _roadTripCanSwipe 为 true 时显示）
+                          if (!_roadTripCanSwipe) {
+                            return const SizedBox.shrink();
+                          }
+                          return ToggleTabBar(
+                            selectedIndex: _roadTripTab,
+                            firstLabel: loc.road_trip_tab_route,
+                            secondLabel: loc.road_trip_tab_waypoints,
+                            onChanged: (value) {
+                              setState(() => _roadTripTab = value);
+                              // 通知 CreateRoadTripSheet 切换 tab
+                              _roadTripTabChangeNotifier?.value = value;
                             },
                           );
                         }

@@ -1219,6 +1219,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get road_trip_continue_button => 'Continue';
 
   @override
+  String get road_trip_tab_route => 'Route';
+
+  @override
+  String get road_trip_tab_waypoints => 'Waypoints';
+
+  @override
   String get road_trip_image_picker_failed =>
       'Failed to pick images. Please check permission settings.';
 

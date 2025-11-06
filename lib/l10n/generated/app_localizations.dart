@@ -2330,6 +2330,18 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get road_trip_continue_button;
 
+  /// No description provided for @road_trip_tab_route.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get road_trip_tab_route;
+
+  /// No description provided for @road_trip_tab_waypoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoints'**
+  String get road_trip_tab_waypoints;
+
   /// No description provided for @road_trip_image_picker_failed.
   ///
   /// In en, this message translates to:

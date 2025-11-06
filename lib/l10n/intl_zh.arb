@@ -465,6 +465,8 @@
   "settings_developer_stripe_test": "Stripe 支付测试",
   "road_trip_create_button": "创建",
   "road_trip_continue_button": "继续",
+  "road_trip_tab_route": "路线",
+  "road_trip_tab_waypoints": "途径点",
   "road_trip_image_picker_failed": "选择图片失败，请检查权限设置",
   "road_trip_basic_section_title": "基础信息",
   "road_trip_basic_section_subtitle": "命名旅程并锁定时间",

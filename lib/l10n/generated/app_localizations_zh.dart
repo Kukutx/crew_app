@@ -1166,6 +1166,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_continue_button => '继续';
 
   @override
+  String get road_trip_tab_route => '路线';
+
+  @override
+  String get road_trip_tab_waypoints => '途径点';
+
+  @override
   String get road_trip_image_picker_failed => '选择图片失败，请检查权限设置';
 
   @override

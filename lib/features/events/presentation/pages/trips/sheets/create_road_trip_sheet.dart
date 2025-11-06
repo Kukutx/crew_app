@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
+import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_host_disclaimer_section.dart';
@@ -46,6 +47,11 @@ class CreateRoadTripSheet extends ConsumerStatefulWidget {
     this.onCancel,
     this.onCreateQuickTrip,
     this.onOpenDetailed,
+    // 用于暴露状态给外部（events_map_page.dart）
+    this.onCanSwipeChanged,
+    this.onTabIndexChanged,
+    // 用于外部控制 TabController
+    this.tabChangeNotifier,
   });
 
   final QuickRoadTripResult? initialRoute;
@@ -59,6 +65,11 @@ class CreateRoadTripSheet extends ConsumerStatefulWidget {
   final VoidCallback? onCancel;
   final Future<void> Function(QuickRoadTripResult)? onCreateQuickTrip;
   final VoidCallback? onOpenDetailed;
+  // 用于暴露状态给外部
+  final ValueChanged<bool>? onCanSwipeChanged;
+  final ValueChanged<int>? onTabIndexChanged;
+  // 用于外部控制 TabController
+  final ValueNotifier<int>? tabChangeNotifier;
   
   @override
   ConsumerState<CreateRoadTripSheet> createState() => _CreateRoadTripSheetState();
@@ -81,6 +92,9 @@ class _CreateRoadTripSheetState extends ConsumerState<CreateRoadTripSheet> {
       onCancel: widget.onCancel,
       onCreateQuickTrip: widget.onCreateQuickTrip,
       onOpenDetailed: widget.onOpenDetailed,
+      onCanSwipeChanged: widget.onCanSwipeChanged,
+      onTabIndexChanged: widget.onTabIndexChanged,
+      tabChangeNotifier: widget.tabChangeNotifier,
     );
   }
 }
@@ -97,6 +111,9 @@ class _CreateRoadTripContent extends ConsumerStatefulWidget {
     this.onCancel,
     this.onCreateQuickTrip,
     this.onOpenDetailed,
+    this.onCanSwipeChanged,
+    this.onTabIndexChanged,
+    this.tabChangeNotifier,
   });
 
   final ScrollController scrollCtrl; // 由外部传入
@@ -109,6 +126,11 @@ class _CreateRoadTripContent extends ConsumerStatefulWidget {
   final VoidCallback? onCancel;
   final Future<void> Function(QuickRoadTripResult)? onCreateQuickTrip;
   final VoidCallback? onOpenDetailed;
+  // 用于暴露状态给外部
+  final ValueChanged<bool>? onCanSwipeChanged;
+  final ValueChanged<int>? onTabIndexChanged;
+  // 用于外部控制 TabController
+  final ValueNotifier<int>? tabChangeNotifier;
 
   @override
   ConsumerState<_CreateRoadTripContent> createState() => _PlannerContentState();
@@ -117,9 +139,10 @@ class _CreateRoadTripContent extends ConsumerStatefulWidget {
 class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     with TickerProviderStateMixin {
   // ===== 内部状态 =====
-  final _pageCtrl = PageController();
-  bool _canSwipe = false; // 初始只展示启动页
-  int _currentPage = 0;
+  late final TabController _tabController; // 路线/途径点 TabController
+  final PageController _routePageCtrl = PageController(); // 路线 tab 内的 PageView
+  bool _canSwipe = false; // 是否显示 ToggleTabBar 和其他 section（点击 basic 的继续后为 true）
+  int _currentRoutePage = 0; // 路线 tab 内的当前页面
 
   RoadTripEditorState _editorState = const RoadTripEditorState();
 
@@ -167,23 +190,35 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   String? _createErrorMessage;
 
   // ==== 分段顺序 ====
-  static const List<TripSection> _sectionsOrder = [
+  // 路线 tab 中的 section 顺序（不包含 route）
+  static const List<TripSection> _routeSectionsOrder = [
     TripSection.basic,
-    TripSection.route,
     TripSection.team,
     TripSection.gallery,
     TripSection.story,
     TripSection.disclaimer,
   ];
-  int get _totalPages => 1 + _sectionsOrder.length; // 不再包含完成页
-  bool get _isBasicPage => _currentPage == 1; // 0 是启动页，1 是 basic
+  // 初始只有起始页和 basic 页（2个页面）
+  // 点击 basic 的继续后，包含起始页、basic、team、gallery、story、disclaimer（6个页面）
+  int get _totalRoutePages => _canSwipe ? 1 + _routeSectionsOrder.length : 2;
+  bool get _isBasicPage => _currentRoutePage == 1; // 第二个页面是 basic
+  bool get _isStartPage => _currentRoutePage == 0; // 第一个页面是起始页
   bool get _basicValid =>
       _titleCtrl.text.trim().isNotEmpty && _editorState.dateRange != null;
+  bool get _startValid =>
+      _startLatLng != null && _destinationLatLng != null; // 起始页是否有效
+  // 是否显示创建按钮：起始点和终点必须有值且点击了继续（从起始页点击继续）
+  bool get _shouldShowCreateButton => _startValid && _hasClickedStartContinue;
+  // 是否已点击起始页的继续按钮
+  bool _hasClickedStartContinue = false;
 
   // ===== 生命周期 =====
   @override
   void initState() {
     super.initState();
+    // 初始化 TabController（路线/途径点）
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
 
     // 根据模式初始化位置信息
     if (widget.mode == CreateRoadTripMode.startLocationOnly) {
@@ -242,9 +277,20 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       }
     }
 
-    _pageCtrl.addListener(_onPageChanged);
-
     _titleCtrl.addListener(() => setState(() {})); // 标题变化触发校验
+    
+    // 监听外部 tab 切换请求
+    if (widget.tabChangeNotifier != null) {
+      widget.tabChangeNotifier!.addListener(_onTabChangeRequested);
+    }
+  }
+  
+  void _onTabChangeRequested() {
+    if (!mounted || widget.tabChangeNotifier == null) return;
+    final requestedIndex = widget.tabChangeNotifier!.value;
+    if (!_tabController.indexIsChanging && _tabController.index != requestedIndex) {
+      _tabController.animateTo(requestedIndex);
+    }
   }
 
   void _onStartPositionChanged() {
@@ -260,16 +306,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     final newPosition = widget.destinationListenable?.value;
     if (newPosition != _destinationLatLng) {
       _updateDestinationLocation(newPosition);
-    }
-  }
-
-  void _onPageChanged() {
-    if (!_pageCtrl.hasClients) return;
-    final page = _pageCtrl.page;
-    if (page == null) return;
-    final newPage = page.round().clamp(0, _totalPages - 1);
-    if (newPage != _currentPage) {
-      setState(() => _currentPage = newPage);
     }
   }
 
@@ -301,12 +337,22 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     });
   }
 
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) {
+      setState(() {});
+      // 通知外部 TabController 的 index 变化
+      widget.onTabIndexChanged?.call(_tabController.index);
+    }
+  }
+  
   @override
   void dispose() {
+    widget.tabChangeNotifier?.removeListener(_onTabChangeRequested);
     widget.startPositionListenable?.removeListener(_onStartPositionChanged);
     widget.destinationListenable?.removeListener(_onDestinationPositionChanged);
-    _pageCtrl.removeListener(_onPageChanged);
-    _pageCtrl.dispose();
+    _tabController.removeListener(_onTabChanged);
+    _tabController.dispose();
+    _routePageCtrl.dispose();
     _titleCtrl.dispose();
     _tagInputCtrl.dispose();
     _storyCtrl.dispose();
@@ -744,21 +790,59 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   Future<void> goToSection(TripSection s) async {
-    final idx = _sectionsOrder.indexOf(s);
-    if (idx < 0) return;
-    final targetPage = 1 + idx; // 0 是启动页，1 是 basic
-    if (targetPage < 0 || targetPage >= _totalPages) return;
+    // 如果 section 是 route，切换到途径点 tab
+    if (s == TripSection.route) {
+      if (!_canSwipe) {
+        setState(() => _canSwipe = true);
+      }
+      if (_tabController.index != 1) {
+        _tabController.animateTo(1);
+      }
+      return;
+    }
     
-    setState(() => _canSwipe = true);
+    // basic 页：索引 1
+    if (s == TripSection.basic) {
+      try {
+        if (!_routePageCtrl.hasClients) return;
+        await _routePageCtrl.animateToPage(
+          1, // basic 页是第二个页面
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOut,
+        );
+      } catch (e, stackTrace) {
+        debugPrint('Page animation error: $e');
+        if (kDebugMode) {
+          debugPrint('Stack trace: $stackTrace');
+        }
+      }
+      return;
+    }
+    
+    // 其他 section（team, gallery, story, disclaimer）在路线 tab 中
+    // 这些 section 只有在 _canSwipe 为 true 后才显示
+    final idx = _routeSectionsOrder.indexOf(s);
+    if (idx < 0) return;
+    
+    // 如果还没有显示这些 section，先显示它们
+    if (!_canSwipe) {
+      setState(() => _canSwipe = true);
+    }
+    
+    // 确保在路线 tab
+    if (_tabController.index != 0) {
+      _tabController.animateTo(0);
+    }
+    
+    // 切换到对应的页面（索引 = idx，因为第一个页面是起始页，第二个是 basic）
     try {
-      if (!_pageCtrl.hasClients) return;
-      await _pageCtrl.animateToPage(
-        targetPage,
+      if (!_routePageCtrl.hasClients) return;
+      await _routePageCtrl.animateToPage(
+        idx, // basic 是索引 1，team 是索引 2，以此类推
         duration: const Duration(milliseconds: 280),
         curve: Curves.easeOut,
       );
     } catch (e, stackTrace) {
-      // 记录页面切换错误（当PageView已销毁时这是正常情况）
       debugPrint('Page animation error: $e');
       if (kDebugMode) {
         debugPrint('Stack trace: $stackTrace');
@@ -767,21 +851,45 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   void _enableWizard() {
-    // 先更新状态，然后在下一帧执行动画，确保 PageView 的 physics 已经更新
-    setState(() => _canSwipe = true);
+    // 从起始页点击继续，跳转到 basic 页（这是开放条件的开始）
+    setState(() {
+      _hasClickedStartContinue = true; // 标记已点击起始页的继续按钮
+    });
+    
+    try {
+      if (!_routePageCtrl.hasClients) return;
+      _routePageCtrl.animateToPage(
+        1, // 跳转到 basic 页
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } catch (e, stackTrace) {
+      debugPrint('Page animation error: $e');
+      if (kDebugMode) {
+        debugPrint('Stack trace: $stackTrace');
+      }
+    }
+  }
+
+  void _continueFromBasic() {
+    // 从 basic 页点击继续，显示 ToggleTabBar 和其他 section，并跳转到下一页
+    setState(() {
+      _canSwipe = true;
+    });
+    // 通知外部 _canSwipe 变化
+    widget.onCanSwipeChanged?.call(true);
+    // 延迟到下一帧，确保 PageView 已经构建
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       try {
-        if (!_pageCtrl.hasClients) return;
-        final targetPage = 1; // 跳转到 basic 页
-        if (targetPage >= _totalPages) return;
-        _pageCtrl.animateToPage(
-          targetPage,
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeOut,
+        if (!_routePageCtrl.hasClients) return;
+        // 跳转到下一页（team 页，索引 2）
+        _routePageCtrl.animateToPage(
+          2,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
         );
       } catch (e, stackTrace) {
-        // 记录页面切换错误（当PageView已销毁时这是正常情况）
         debugPrint('Page animation error: $e');
         if (kDebugMode) {
           debugPrint('Stack trace: $stackTrace');
@@ -799,21 +907,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           titleController: _titleCtrl,
           dateRange: _editorState.dateRange,
           onPickDateRange: _pickDateRange,
-        );
-        break;
-        case TripSection.route:
-        content = RoadTripRouteSection(
-          routeType: _routeType,
-          onRouteTypeChanged: _onRouteTypeChanged,
-          forwardWaypoints: _forwardWps,
-          onAddForward: _onAddForward,
-          onRemoveForward: _onRemoveForward,
-          onReorderForward: _onReorderForward,
-          returnWaypoints: _returnWps,
-          onAddReturn: _onAddReturn,
-          onRemoveReturn: _onRemoveReturn,
-          onReorderReturn: _onReorderReturn,
-          waypointAddressMap: _waypointAddressCache,
         );
         break;
       case TripSection.team:
@@ -852,6 +945,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         break;
       case TripSection.disclaimer:
         content = RoadTripHostDisclaimerSection(disclaimerController: _disclaimerCtrl);
+        break;
+      case TripSection.route:
+        // route section 不再在这里使用，已移到途径点 tab
+        content = const SizedBox.shrink();
         break;
     }
     
@@ -989,9 +1086,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       return _buildStartLocationOnlyUI(context, theme, loc);
     }
 
-    // 完整创建模式：保持原有UI
-    final canScroll = _canSwipe && !(_isBasicPage && !_basicValid);
-
+    // 完整创建模式
     // 计算启动页展示信息（起终点坐标/地址）
     final hasStartAddress = _startAddress != null && _startAddress!.trim().isNotEmpty;
     final hasDestinationAddress =
@@ -1018,108 +1113,216 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         ? ''
         : loc.map_select_location_destination_tip;
 
-    // 顶部把手 + TabBar + PageView + 底部操作，与原版一致
+    // 构建 PageView 的 children
+    final routePageChildren = [
+      // 第一个页面：起始页
+      _RouteSelectionPage(
+        scrollCtrl: widget.scrollCtrl,
+        onContinue: _enableWizard,
+        departureTitle: startTitle,
+        departureSubtitle: startSubtitle,
+        destinationTitle: destinationTitle,
+        destinationSubtitle: destinationSubtitle,
+        onEditDeparture: _onEditDeparture,
+        onEditDestination: _onEditDestination,
+        departurePosition: _startLatLng,
+        departureAddressFuture: _startAddressFuture,
+        departureNearbyFuture: _startNearbyFuture,
+        destinationPosition: _destinationLatLng,
+        destinationAddressFuture: _destinationAddressFuture,
+        destinationNearbyFuture: _destinationNearbyFuture,
+      ),
+      // 第二个页面：basic 页
+      _buildSectionPage(TripSection.basic),
+      // 如果 _canSwipe 为 true，显示其他 section
+      if (_canSwipe) ..._routeSectionsOrder.skip(1).map(_buildSectionPage),
+    ];
+
+    // 判断是否可以滑动（basic 页未填写完整时禁止滑动）
+    final canScroll = !(_isBasicPage && !_basicValid);
+
     return Material(
       color: theme.colorScheme.surface,
-      child: DefaultTabController(
-        length: 2,
-        child: Column(
-          children: [
-            Expanded(
-              child: NotificationListener<OverscrollIndicatorNotification>(
-                onNotification: (n) {
-                  n.disallowIndicator();
-                  return true;
-                },
-                child: PageView(
-                  controller: _pageCtrl,
-                  physics: !canScroll
-                      ? const NeverScrollableScrollPhysics()
-                      : const PageScrollPhysics(),
-                  allowImplicitScrolling: false,
-                  children: [
-                    _RouteSelectionPage(
-                      scrollCtrl: widget.scrollCtrl,
-                      onContinue: _enableWizard,
-                      departureTitle: startTitle,
-                      departureSubtitle: startSubtitle,
-                      destinationTitle: destinationTitle,
-                      destinationSubtitle: destinationSubtitle,
-                      onEditDeparture: _onEditDeparture,
-                      onEditDestination: _onEditDestination,
-                      departurePosition: _startLatLng,
-                      departureAddressFuture: _startAddressFuture,
-                      departureNearbyFuture: _startNearbyFuture,
-                      destinationPosition: _destinationLatLng,
-                      destinationAddressFuture: _destinationAddressFuture,
-                      destinationNearbyFuture: _destinationNearbyFuture,
-                    ),
-                    ..._sectionsOrder.map(_buildSectionPage),
-                  ],
-                ),
-              ),
-            ),
-            // 底部进度 + 按钮
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
-              child: _canSwipe
-                  ? Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Center(
-                            child: _ClickablePageIndicator(
-                              controller: _pageCtrl,
-                              currentPage: _currentPage,
-                              totalPages: _totalPages,
-                              onPageTap: (index) {
-                                if (!_pageCtrl.hasClients) return;
-                                _pageCtrl.animateToPage(
-                                  index,
-                                  duration: const Duration(milliseconds: 280),
-                                  curve: Curves.easeOut,
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: (!canScroll || _isCreating) 
-                                  ? null 
-                                  : _onCreatePressed,
-                              child: _isCreating
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(loc.road_trip_create_button),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          // 只有当起点和终点都选择了才能继续
-                          onPressed: (_startLatLng != null && _destinationLatLng != null)
-                              ? _enableWizard
-                              : null,
-                          child: Text(loc.road_trip_continue_button),
+      child: Column(
+        children: [
+          // ToggleTabBar 已移到 events_map_page.dart 中，这里不再显示
+          Expanded(
+            child: _canSwipe
+                ? TabBarView(
+                    controller: _tabController,
+                    physics: const NeverScrollableScrollPhysics(), // 禁止左右滑动，只能点击切换
+                    children: [
+                      // 路线 tab：使用 PageView 显示起始页和其他 section
+                      NotificationListener<OverscrollIndicatorNotification>(
+                        onNotification: (n) {
+                          n.disallowIndicator();
+                          return true;
+                        },
+                        child: PageView(
+                          controller: _routePageCtrl,
+                          physics: !canScroll
+                              ? const NeverScrollableScrollPhysics()
+                              : const PageScrollPhysics(),
+                          onPageChanged: (index) {
+                            setState(() => _currentRoutePage = index);
+                          },
+                          children: routePageChildren,
                         ),
                       ),
+                      // 途径点 tab：显示 RoadTripRouteSection
+                      SingleChildScrollView(
+                        controller: widget.scrollCtrl,
+                        physics: const ClampingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: RoadTripRouteSection(
+                          routeType: _routeType,
+                          onRouteTypeChanged: _onRouteTypeChanged,
+                          forwardWaypoints: _forwardWps,
+                          onAddForward: _onAddForward,
+                          onRemoveForward: _onRemoveForward,
+                          onReorderForward: _onReorderForward,
+                          returnWaypoints: _returnWps,
+                          onAddReturn: _onAddReturn,
+                          onRemoveReturn: _onRemoveReturn,
+                          onReorderReturn: _onReorderReturn,
+                          waypointAddressMap: _waypointAddressCache,
+                        ),
+                      ),
+                    ],
+                  )
+                : // 初始状态：只显示起始页和 basic 页的 PageView
+                  NotificationListener<OverscrollIndicatorNotification>(
+                      onNotification: (n) {
+                        n.disallowIndicator();
+                        return true;
+                      },
+                      child: PageView(
+                        controller: _routePageCtrl,
+                        physics: !canScroll
+                            ? const NeverScrollableScrollPhysics()
+                            : const PageScrollPhysics(),
+                        onPageChanged: (index) {
+                          setState(() => _currentRoutePage = index);
+                        },
+                        children: routePageChildren,
+                      ),
                     ),
+          ),
+          // 底部按钮
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 页面指示器（在点击起始页继续后显示，显示起始页和basic页的指示点）
+                if (_hasClickedStartContinue && !_canSwipe && _tabController.index == 0)
+                  Center(
+                    child: _ClickablePageIndicator(
+                      controller: _routePageCtrl,
+                      currentPage: _currentRoutePage,
+                      totalPages: 2, // 只有起始页和basic页
+                      onPageTap: (index) {
+                        if (!_routePageCtrl.hasClients) return;
+                        _routePageCtrl.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
+                  ),
+                // 页面指示器（显示ToggleTabBar后显示所有页面的指示点）
+                if (_canSwipe && _tabController.index == 0)
+                  Center(
+                    child: _ClickablePageIndicator(
+                      controller: _routePageCtrl,
+                      currentPage: _currentRoutePage,
+                      totalPages: _totalRoutePages,
+                      onPageTap: (index) {
+                        if (!_routePageCtrl.hasClients) return;
+                        _routePageCtrl.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
+                  ),
+                if ((_hasClickedStartContinue && !_canSwipe) || (_canSwipe && _tabController.index == 0))
+                  const SizedBox(height: 10),
+                // 按钮区域
+                if (_canSwipe)
+                  // 显示 ToggleTabBar 后：只有创建按钮
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: (_startValid && _basicValid && !_isCreating)
+                          ? _onCreatePressed
+                          : null,
+                      child: _isCreating
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(loc.road_trip_create_button),
+                    ),
+                  )
+                else if (_hasClickedStartContinue)
+                  // 点击起始页继续后：在basic页显示创建和继续两个按钮
+                  _isBasicPage
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: (_startValid && _basicValid && !_isCreating)
+                                    ? _onCreatePressed
+                                    : null,
+                                child: _isCreating
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(loc.road_trip_create_button),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: _basicValid ? _continueFromBasic : null,
+                                child: Text(loc.road_trip_continue_button),
+                              ),
+                            ),
+                          ],
+                        )
+                      : // 在起始页：只显示继续按钮（跳转到basic页）
+                        SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              onPressed: _startValid ? _enableWizard : null,
+                              child: Text(loc.road_trip_continue_button),
+                            ),
+                          )
+                else
+                  // 初始状态：只在起始页显示继续按钮
+                  _isStartPage
+                      ? SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: _startValid ? _enableWizard : null,
+                            child: Text(loc.road_trip_continue_button),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

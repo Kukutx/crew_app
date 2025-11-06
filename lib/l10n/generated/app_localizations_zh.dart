@@ -1208,10 +1208,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_route_add_to_return => '添加到返程';
 
   @override
-  String get road_trip_route_type_round => '往返路线';
+  String get road_trip_route_type_round => '往返';
 
   @override
-  String get road_trip_route_type_one_way => '单程路线';
+  String get road_trip_route_type_one_way => '单程';
 
   @override
   String road_trip_route_waypoints_one_way(int count) {

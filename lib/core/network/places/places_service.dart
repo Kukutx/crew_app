@@ -301,4 +301,6 @@ class PlacesService {
       );
     }
   }
+
+  Future searchPlacesByText(String query, {LatLng? locationBias, required int maxResults}) async {}
 }

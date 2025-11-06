@@ -18,7 +18,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:crew_app/shared/widgets/map_floating_action_buttons.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/app/view/app_drawer.dart';
@@ -68,6 +67,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   
   // 保存 bottom navigation visibility 的 notifier，以便在 dispose 时安全使用
   StateController<bool>? _bottomNavigationVisibilityController;
+  
+  // CreateRoadTrip sheet 是否显示 ToggleTabBar（用于控制添加途径点按钮的显示）
+  bool _roadTripCanSwipe = false;
 
   @override
   void initState() {
@@ -491,7 +493,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               ),
             ),
           if (mapSheetType != MapOverlaySheetType.none)
-            _MapOverlaySheet(sheetType: mapSheetType),
+            _MapOverlaySheet(
+              sheetType: mapSheetType,
+              onRoadTripCanSwipeChanged: (canSwipe) {
+                setState(() {
+                  _roadTripCanSwipe = canSwipe;
+                });
+              },
+            ),
           // 通用多功能悬浮按钮
           MapFloatingActionButtons(
             mapSheetType: mapSheetType,
@@ -501,6 +510,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             safeBottom: safeBottom,
             startLatLng: selectionState.selectedLatLng,
             destinationLatLng: selectionState.destinationLatLng,
+            canSwipe: _roadTripCanSwipe,
             onAddWaypoint: () {
               final selectionController = ref.read(mapSelectionControllerProvider.notifier);
               selectionController.setAddingWaypoint(true);
@@ -836,9 +846,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 }
 
 class _MapOverlaySheet extends ConsumerStatefulWidget {
-  const _MapOverlaySheet({required this.sheetType});
+  const _MapOverlaySheet({
+    required this.sheetType,
+    this.onRoadTripCanSwipeChanged,
+  });
 
   final MapOverlaySheetType sheetType;
+  final ValueChanged<bool>? onRoadTripCanSwipeChanged;
 
   @override
   ConsumerState<_MapOverlaySheet> createState() => _MapOverlaySheetState();
@@ -1207,7 +1221,8 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                         // ref.read(mapSelectionControllerProvider.notifier).resetSelection();
                       },
                       onCanSwipeChanged: (canSwipe) {
-                        // 接收 _canSwipe 状态变化
+                        // 接收 _canSwipe 状态变化，通知父组件
+                        widget.onRoadTripCanSwipeChanged?.call(canSwipe);
                         if (mounted) {
                           setState(() {
                             _roadTripCanSwipe = canSwipe;

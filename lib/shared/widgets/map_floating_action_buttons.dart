@@ -2,6 +2,7 @@ import 'package:crew_app/features/events/presentation/pages/map/state/map_overla
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_stage_provider.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// 地图悬浮按钮配置
@@ -36,6 +37,7 @@ class MapFloatingActionButtons extends StatelessWidget {
     required this.safeBottom,
     this.startLatLng,
     this.destinationLatLng,
+    this.canSwipe = false,
     this.onAddWaypoint,
     this.onEdit,
     this.onAddPressed,
@@ -49,6 +51,7 @@ class MapFloatingActionButtons extends StatelessWidget {
   final double safeBottom;
   final LatLng? startLatLng;
   final LatLng? destinationLatLng;
+  final bool canSwipe;
   final VoidCallback? onAddWaypoint;
   final VoidCallback? onEdit;
   final VoidCallback? onAddPressed;
@@ -136,15 +139,15 @@ class MapFloatingActionButtons extends StatelessWidget {
       final hasAtLeastOne = hasStart || hasDestination;
 
       return [
-        // + 按钮：添加途径点（起点和终点都有值才显示）
+        // 添加途径点按钮（在 basic 点继续后，且起点和终点都有值才显示）
         MapFloatingButtonConfig(
-          icon: Icons.add,
+          icon: FontAwesomeIcons.route,
           heroTag: 'events_map_add_waypoint_fab',
           backgroundColor: theme.colorScheme.secondary,
           foregroundColor: theme.colorScheme.onSecondary,
           onPressed: onAddWaypoint ?? () {},
           tooltip: '添加途径点',
-          visible: hasBoth,
+          visible: canSwipe && hasBoth,
         ),
         // 编辑按钮（起点和终点至少有一个有值就显示）
         MapFloatingButtonConfig(

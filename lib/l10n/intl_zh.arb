@@ -479,8 +479,8 @@
   "road_trip_route_add_waypoint": "添加途经点",
   "road_trip_route_add_to_forward": "添加到去程",
   "road_trip_route_add_to_return": "添加到返程",
-  "road_trip_route_type_round": "往返路线",
-  "road_trip_route_type_one_way": "单程路线",
+  "road_trip_route_type_round": "往返",
+  "road_trip_route_type_one_way": "单程",
   "road_trip_route_waypoints_one_way": "途经点（单程） · 共 {count} 个",
   "@road_trip_route_waypoints_one_way": {
     "placeholders": {

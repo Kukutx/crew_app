@@ -46,77 +46,30 @@ class RoadTripRouteSection extends StatelessWidget {
       icon: Icons.route_outlined,
       title: loc.road_trip_route_section_title,
       subtitle: '',
-      headerTrailing: routeType == RoadTripRouteType.roundTrip
-          ? MenuAnchor(
-              builder: (context, ctrl, _) => FilledButton.icon(
-                style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
-                onPressed: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
-                icon: const Icon(Icons.add_road, size: 16),
-                label: Text(
-                  loc.road_trip_route_add_waypoint,
-                  style: const TextStyle(fontSize: 13),
-                ),
-              ),
-              menuChildren: [
-                MenuItemButton(
-                  onPressed: onAddForward,
-                  child: Text(
-                    loc.road_trip_route_add_to_forward,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
-                MenuItemButton(
-                  onPressed: onAddReturn,
-                  child: Text(
-                    loc.road_trip_route_add_to_return,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
-              ],
-            )
-          : FilledButton.icon(
-              style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
-              onPressed: onAddForward,
-              icon: const Icon(Icons.add_road, size: 18),
-              label: Text(loc.road_trip_route_add_waypoint),
+      headerTrailing: SegmentedButton<RoadTripRouteType>(
+        showSelectedIcon: false,
+        segments: [
+          ButtonSegment(
+            value: RoadTripRouteType.roundTrip,
+            label: Text(
+              loc.road_trip_route_type_round,
+              style: const TextStyle(fontSize: 13),
             ),
-      children: [
-        // 顶部：中间 SegmentedButton + 右上"添加途经点"
-        SizedBox(
-          height: 48,
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: SegmentedButton<RoadTripRouteType>(
-                  showSelectedIcon: false,
-                  segments: [
-                    ButtonSegment(
-                      value: RoadTripRouteType.roundTrip,
-                      label: Text(
-                        loc.road_trip_route_type_round,
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      icon: const Icon(Icons.autorenew, size: 18),
-                    ),
-                    ButtonSegment(
-                      value: RoadTripRouteType.oneWay,
-                      label: Text(
-                        loc.road_trip_route_type_one_way,
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      icon: const Icon(Icons.route_outlined, size: 18),
-                    ),
-                  ],
-                  selected: {routeType},
-                  onSelectionChanged: (value) => onRouteTypeChanged(value.first),
-                ),
-              ),
-            ],
+            icon: const Icon(Icons.autorenew, size: 18),
           ),
-        ),
-        const SizedBox(height: 10),
-
+          ButtonSegment(
+            value: RoadTripRouteType.oneWay,
+            label: Text(
+              loc.road_trip_route_type_one_way,
+              style: const TextStyle(fontSize: 13),
+            ),
+            icon: const Icon(Icons.route_outlined, size: 18),
+          ),
+        ],
+        selected: {routeType},
+        onSelectionChanged: (value) => onRouteTypeChanged(value.first),
+      ),
+      children: [
         // 列表区域
         if (routeType == RoadTripRouteType.oneWay)
           _ReorderableListSection(

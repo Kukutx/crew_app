@@ -16,6 +16,7 @@ import 'package:crew_app/features/events/presentation/pages/map/controllers/loca
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -338,6 +339,28 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) {
+      // 当切换回路线tab时，同步分页指示点
+      if (_tabController.index == 0 && _routePageCtrl.hasClients) {
+        // 使用 addPostFrameCallback 确保在 PageView 构建后同步
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          try {
+            // 从 PageController 获取当前页面（四舍五入到最近的整数）
+            final pageValue = _routePageCtrl.page;
+            if (pageValue != null) {
+              final currentPage = pageValue.round().clamp(0, _totalRoutePages - 1);
+              if (currentPage != _currentRoutePage) {
+                setState(() {
+                  _currentRoutePage = currentPage;
+                });
+              }
+            }
+          } catch (e) {
+            // 如果获取失败，保持当前值不变
+            debugPrint('Failed to sync current route page: $e');
+          }
+        });
+      }
       setState(() {});
       // 通知外部 TabController 的 index 变化
       widget.onTabIndexChanged?.call(_tabController.index);
@@ -1412,7 +1435,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           final address = snapshot.data;
                           final display = (address == null || address.trim().isEmpty)
                               ? loc.map_location_info_address_unavailable
-                              : address;
+                              : address.truncate(maxLength: 30);
                           return LocationSheetRow(
                             icon: icon,
                             child: Text(display),

@@ -1,4 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -134,7 +135,7 @@ class _MeetingPointButton extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    meetingPoint,
+                    meetingPoint.truncate(maxLength: 30),
                     style: effectiveStyle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

@@ -23,7 +23,7 @@ class RoadTripBasicSection extends StatelessWidget {
     return RoadTripSectionCard(
       icon: Icons.rocket_launch_outlined,
       title: loc.road_trip_basic_section_title,
-      subtitle: '',
+      subtitle: loc.road_trip_basic_section_subtitle,
       children: [
         TextFormField(
           controller: titleController,

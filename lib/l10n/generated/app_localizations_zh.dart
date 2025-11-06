@@ -1199,6 +1199,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_route_section_title => '路线类型';
 
   @override
+  String get road_trip_route_section_subtitle => '选择往返或单程路线';
+
+  @override
   String get road_trip_route_add_waypoint => '添加途经点';
 
   @override

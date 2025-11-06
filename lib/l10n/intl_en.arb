@@ -476,6 +476,7 @@
   "road_trip_basic_date_label": "Event dates",
   "road_trip_basic_date_hint": "Tap to select date range",
   "road_trip_route_section_title": "Route type",
+  "road_trip_route_section_subtitle": "Choose round trip or one-way route",
   "road_trip_route_add_waypoint": "Add waypoint",
   "road_trip_route_add_to_forward": "Add to outbound",
   "road_trip_route_add_to_return": "Add to return",

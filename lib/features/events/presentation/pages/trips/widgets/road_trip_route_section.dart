@@ -1,4 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../data/road_trip_editor_models.dart';
@@ -45,7 +46,7 @@ class RoadTripRouteSection extends StatelessWidget {
     return RoadTripSectionCard(
       icon: Icons.route_outlined,
       title: loc.road_trip_route_section_title,
-      subtitle: '',
+      subtitle: loc.road_trip_route_section_subtitle,
       headerTrailing: SegmentedButton<RoadTripRouteType>(
         showSelectedIcon: false,
         segments: [
@@ -146,7 +147,9 @@ class _ReorderableListSection extends StatelessWidget {
             final item = items[index];
             final key = '${item.latitude}_${item.longitude}';
             final address = addressMap?[key];
-            final text = address ?? loc.road_trip_route_waypoint_label(index + 1); // 显示地址或编号
+            final text = address != null
+                ? address.truncate(maxLength: 30)
+                : loc.road_trip_route_waypoint_label(index + 1); // 显示地址或编号
             return Dismissible(
               key: ValueKey('wp-$index-${item.latitude}-${item.longitude}'),
               background: Container(

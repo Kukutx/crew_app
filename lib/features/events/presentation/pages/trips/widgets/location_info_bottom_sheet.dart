@@ -1,5 +1,6 @@
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// 位置信息底部窗口
@@ -109,7 +110,9 @@ class LocationInfoBottomSheet extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          address ?? '地址不可用',
+                          address != null
+                              ? address.truncate(maxLength: 30)
+                              : '地址不可用',
                           style: theme.textTheme.bodyMedium,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -226,7 +229,7 @@ class _NearbyPlaceCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            place.displayName,
+            place.displayName.truncate(maxLength: 30),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -236,7 +239,7 @@ class _NearbyPlaceCard extends StatelessWidget {
           if (place.formattedAddress != null) ...[
             const SizedBox(height: 4),
             Text(
-              place.formattedAddress!,
+              place.formattedAddress!.truncate(maxLength: 30),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -238,10 +239,10 @@ class _LocationSearchPageState extends ConsumerState<LocationSearchPage> {
         final place = _searchResults[index];
         return ListTile(
           leading: const Icon(Icons.place_outlined),
-          title: Text(place.displayName),
+          title: Text(place.displayName.truncate(maxLength: 30)),
           subtitle: place.formattedAddress != null
               ? Text(
-                  place.formattedAddress!,
+                  place.formattedAddress!.truncate(maxLength: 30),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 )

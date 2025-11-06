@@ -2396,6 +2396,12 @@ abstract class AppLocalizations {
   /// **'Route type'**
   String get road_trip_route_section_title;
 
+  /// No description provided for @road_trip_route_section_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose round trip or one-way route'**
+  String get road_trip_route_section_subtitle;
+
   /// No description provided for @road_trip_route_add_waypoint.
   ///
   /// In en, this message translates to:

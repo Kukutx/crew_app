@@ -1253,6 +1253,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get road_trip_route_section_title => 'Route type';
 
   @override
+  String get road_trip_route_section_subtitle =>
+      'Choose round trip or one-way route';
+
+  @override
   String get road_trip_route_add_waypoint => 'Add waypoint';
 
   @override

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/share_sheet/app_share_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -191,9 +192,10 @@ class SharePreviewCard extends StatelessWidget {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  event.address?.isNotEmpty == true
-                                      ? event.address!
-                                      : event.location,
+                                  (event.address?.isNotEmpty == true
+                                          ? event.address!
+                                          : event.location)
+                                      .truncate(maxLength: 30),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: Colors.white.withValues(alpha: 0.9),
                                   ),

@@ -13,6 +13,7 @@ import 'package:crew_app/features/events/presentation/pages/map/state/map_select
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 
 /// 位置选择管理器
 class LocationSelectionManager {
@@ -438,7 +439,7 @@ class NearbyPlaceTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                place.displayName,
+                place.displayName.truncate(maxLength: 30),
                 style: titleStyle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -446,7 +447,7 @@ class NearbyPlaceTile extends StatelessWidget {
               if (address != null && address.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
-                  address,
+                  address.truncate(maxLength: 30),
                   style: subtitleStyle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

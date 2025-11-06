@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/app/state/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,12 @@ class _AppState extends ConsumerState<App> {
   @override
   void initState() {
     super.initState();
+    // 如果登录了，设置 MapOverlaySheetType.none，导航索引会设置为1
+    final currentUser = ref.read(currentUserProvider);
+    if (currentUser != null) {
+      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+    }
+    
     _overlayIndexSubscription = ref.listenManual(appOverlayIndexProvider, (
       previous,
       next,
@@ -44,7 +51,6 @@ class _AppState extends ConsumerState<App> {
         curve: Curves.easeInOut,
       );
     });
-
   }
 
   @override

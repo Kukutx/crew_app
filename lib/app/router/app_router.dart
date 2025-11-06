@@ -1,5 +1,6 @@
 import 'package:crew_app/app/app.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
+import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/auth/presentation/login_page.dart';
 import 'package:crew_app/features/expenses/expenses_page.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
@@ -51,10 +52,28 @@ class AppRouteNames {
 
 final crewAppRouterProvider = Provider<GoRouter>((ref) {
   final observer = ref.watch(talkerRouteObserverProvider);
+  final currentUser = ref.watch(currentUserProvider);
 
   return GoRouter(
     initialLocation: AppRoutePaths.home,
     observers: [observer],
+    redirect: (context, state) {
+      final isLoggedIn = currentUser != null;
+      final isLoginPage = state.matchedLocation == AppRoutePaths.login;
+
+      // 如果未登录且不在登录页，重定向到登录页
+      if (!isLoggedIn && !isLoginPage) {
+        return AppRoutePaths.login;
+      }
+
+      // 如果已登录且在登录页，重定向到首页
+      if (isLoggedIn && isLoginPage) {
+        return AppRoutePaths.home;
+      }
+
+      // 其他情况不重定向
+      return null;
+    },
     routes: [
       GoRoute(
         path: AppRoutePaths.home,

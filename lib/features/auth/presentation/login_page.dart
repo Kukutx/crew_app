@@ -28,11 +28,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
   bool _loading = false;
 
   Future<void> _signInWithGoogle() async {
-    // 这里不再做“是否勾选”的校验，交给按钮自身处理动画与提示
+    // 这里不再做"是否勾选"的校验，交给按钮自身处理动画与提示
     if (_loading) return;
 
     setState(() => _loading = true);
-    final messenger = ScaffoldMessenger.of(context);
 
     try {
       UserCredential credential;
@@ -48,7 +47,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
         );
         final googleUser = await googleSignIn.signIn();
         if (googleUser == null) {
-          setState(() => _loading = false);
+          if (mounted) setState(() => _loading = false);
           return; // 用户取消
         }
         final googleAuth = await googleUser.authentication;
@@ -66,13 +65,19 @@ class _LoginPageState extends ConsumerState<LoginPage>
       if (!mounted) return;
       context.go(AppRoutePaths.home);
     } on ApiException catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
     } catch (e, st) {
       debugPrint('Google sign-in failed: $e\n$st');
-      final loc = AppLocalizations.of(context)!;
-      messenger.showSnackBar(
-        SnackBar(content: Text(loc.login_failed_message)),
-      );
+      if (!mounted) return;
+      final loc = AppLocalizations.of(context);
+      if (loc != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.login_failed_message)),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

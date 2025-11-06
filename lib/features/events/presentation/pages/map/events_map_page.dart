@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -62,6 +63,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   Set<Polyline>? _cachedPolylines;
   MapSelectionState? _lastSelectionState;
   List<Event>? _lastEventsList;
+  
+  // 保存 bottom navigation visibility 的 notifier，以便在 dispose 时安全使用
+  StateController<bool>? _bottomNavigationVisibilityController;
 
   @override
   void initState() {
@@ -108,12 +112,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   void dispose() {
     _mapFocusSubscription?.close();
     _carouselSubscription?.close();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
-      if (controller.state) {
-        controller.state = false;
+    // 使用保存的 notifier 引用，避免在 dispose 时使用 ref
+    if (_bottomNavigationVisibilityController != null) {
+      try {
+        if (_bottomNavigationVisibilityController!.state) {
+          _bottomNavigationVisibilityController!.state = false;
+        }
+      } catch (e) {
+        // 如果 notifier 已经不可用，忽略错误
       }
-    });
+    }
     super.dispose();
   }
 
@@ -515,7 +523,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _updateBottomNavigation(bool visible) {
-    final controller = ref.read(bottomNavigationVisibilityProvider.notifier);
+    // 保存 notifier 引用，以便在 dispose 时安全使用
+    _bottomNavigationVisibilityController ??= ref.read(bottomNavigationVisibilityProvider.notifier);
+    final controller = _bottomNavigationVisibilityController!;
     if (controller.state != visible) {
       controller.state = visible;
     }

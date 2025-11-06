@@ -325,9 +325,8 @@ class SettingsPage extends ConsumerWidget {
       context,
     ).showSnackBar(SnackBar(content: Text(loc.logout_success)));
     ref.read(appOverlayIndexProvider.notifier).state = 0;
-    Navigator.of(
-      context,
-    ).popUntil((route) => route.settings.name == '/' || route.isFirst);
+    // 退出登录后跳转到登录页
+    context.go(AppRoutePaths.login);
   }
 
   Future<bool> _confirmLogout(

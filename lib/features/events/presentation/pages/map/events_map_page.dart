@@ -19,6 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/shared/widgets/map_floating_action_buttons.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/app/view/app_drawer.dart';
 
@@ -491,13 +492,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             ),
           if (mapSheetType != MapOverlaySheetType.none)
             _MapOverlaySheet(sheetType: mapSheetType),
-          // 自适应悬浮按钮
-          _AdaptiveFloatingButtons(
+          // 通用多功能悬浮按钮
+          MapFloatingActionButtons(
             mapSheetType: mapSheetType,
             mapSheetStage: mapSheetStage,
             mapSheetSize: mapSheetSize,
             bottomPadding: bottomPadding,
             safeBottom: safeBottom,
+            startLatLng: selectionState.selectedLatLng,
+            destinationLatLng: selectionState.destinationLatLng,
+            onAddWaypoint: () {
+              final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+              selectionController.setAddingWaypoint(true);
+            },
             onAddPressed: () => showCreateContentOptionsSheet(context),
             onLocationPressed: () async {
               await mapController.moveToMyLocation();
@@ -1315,84 +1322,3 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   }
 }
 
-class _AdaptiveFloatingButtons extends StatelessWidget {
-  const _AdaptiveFloatingButtons({
-    required this.mapSheetType,
-    required this.mapSheetStage,
-    required this.mapSheetSize,
-    required this.bottomPadding,
-    required this.safeBottom,
-    required this.onAddPressed,
-    required this.onLocationPressed,
-  });
-
-  final MapOverlaySheetType mapSheetType;
-  final MapOverlaySheetStage mapSheetStage;
-  final double mapSheetSize;
-  final double bottomPadding;
-  final double safeBottom;
-  final VoidCallback onAddPressed;
-  final VoidCallback onLocationPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    
-    // 计算按钮的底部偏移
-    double bottomOffset;
-    double opacity;
-    
-    if (mapSheetType != MapOverlaySheetType.none) {
-      if (mapSheetStage == MapOverlaySheetStage.collapsed) {
-        // 阶段一（collapsed）：根据 sheet 高度平滑上移
-        final sheetHeight = screenHeight * mapSheetSize;
-        // 按钮需要上移到 sheet 上方，加上一些间距
-        bottomOffset = sheetHeight + 16 + safeBottom;
-        opacity = 1.0;
-      } else {
-        // 其他阶段（middle, expanded）：直接隐藏
-        bottomOffset = bottomPadding;
-        opacity = 0.0;
-      }
-    } else {
-      // 没有 sheet，使用默认位置
-      bottomOffset = bottomPadding;
-      opacity = 1.0;
-    }
-
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      right: 16,
-      bottom: bottomOffset,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 200),
-        opacity: opacity,
-        child: IgnorePointer(
-          ignoring: opacity == 0.0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              AppFloatingActionButton(
-                heroTag: 'events_map_add_fab',
-                backgroundColor: theme.colorScheme.secondary,
-                foregroundColor: theme.colorScheme.onSecondary,
-                onPressed: onAddPressed,
-                child: const Icon(Icons.add),
-              ),
-              AppFloatingActionButton(
-                heroTag: 'events_map_my_location_fab',
-                margin: const EdgeInsets.only(top: 8, right: 0),
-                onPressed: onLocationPressed,
-                child: const Icon(Icons.my_location),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

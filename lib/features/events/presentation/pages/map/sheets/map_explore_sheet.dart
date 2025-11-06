@@ -3,8 +3,6 @@ import 'package:crew_app/features/events/presentation/pages/moment/sheets/moment
 import 'package:crew_app/features/events/presentation/pages/moment/widgets/moment_post_detail_screen.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/moment_post_card.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -28,15 +26,6 @@ class MapExploreSheet extends ConsumerStatefulWidget {
 
 class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
   int _tab = 0;
-  String? _selectedFilter;
-
-  static const _filters = ['附近', '最新', '热门', '关注'];
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedFilter = _filters.first;
-  }
 
   static const List<MomentPost> _momentPosts = [
     MomentPost(
@@ -220,85 +209,6 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
               firstIcon: Icons.campaign,
               secondIcon: Icons.public,
               onChanged: (value) => setState(() => _tab = value),
-              leadingBuilder: (context, _) {
-                final theme = Theme.of(context);
-                final buttonColor = theme.colorScheme.surfaceContainerHighest;
-
-                return PopupMenuButton<String>(
-                  onSelected: (value) {
-                    setState(() {
-                      _selectedFilter = value;
-                    });
-                  },
-                  itemBuilder: (context) => [
-                    for (final filter in _filters)
-                      PopupMenuItem<String>(
-                        value: filter,
-                        child: Text(
-                          filter,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            height: 1.3,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ),
-                  ],
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: buttonColor.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _selectedFilter ?? _filters.first,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            height: 1.3,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.keyboard_arrow_down, size: 18),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              trailingBuilder: (context, selectedIndex) {
-                final theme = Theme.of(context);
-                final isInvitesTab = selectedIndex == 0;
-                final onPressed = isInvitesTab
-                    ? () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (routeContext) => RoadTripEditorPage(
-                              onClose: () => Navigator.of(routeContext).pop(),
-                            ),
-                          ),
-                        );
-                      }
-                    : () => showCreateContentOptionsSheet(context);
-                return Material(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(16),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: onPressed,
-                    child: const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Icon(Icons.add, size: 20),
-                    ),
-                  ),
-                );
-              },
             ),
           ),
         ),

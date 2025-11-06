@@ -55,6 +55,7 @@ class MapCanvas extends StatelessWidget {
       clusterManagers: clusterManagers,
       polylines: polylines,
       myLocationEnabled: showUserLocation,
+      myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       mapToolbarEnabled: false,
       compassEnabled: false,

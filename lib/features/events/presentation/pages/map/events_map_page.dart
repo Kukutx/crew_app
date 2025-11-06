@@ -27,6 +27,7 @@ import 'widgets/map_canvas.dart';
 import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'widgets/breathing_marker_overlay.dart';
+import 'widgets/expandable_sharing_button.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
 import 'controllers/map_controller.dart';
@@ -315,7 +316,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 markers: markers,
                 clusterManagers: clusterManagers,
                 polylines: polylines,
-                showUserLocation: true,
+                showUserLocation: false,
                 mapPadding: selectionState.mapPadding,
               ),
             ),
@@ -345,6 +346,28 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               cameraPosition: _currentCameraPosition,
             ),
           ),
+          // 可展开的分享按钮（在搜索框下方，独立于搜索框）
+          if (!hideSearchBar)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 
+                  (showClearSelectionInAppBar ? 112.0 : 68.0) + 
+                  (searchState.showResults 
+                      ? (searchState.isLoading 
+                          ? 92.0 
+                          : (searchState.errorText != null || searchState.results.isEmpty 
+                              ? 84.0 
+                              : ((searchState.results.length > 4 ? 4 : searchState.results.length) * 56.0 + 
+                                 ((searchState.results.length > 4 ? 4 : searchState.results.length) > 1 
+                                  ? ((searchState.results.length > 4 ? 4 : searchState.results.length) - 1) * 1.0 
+                                  : 0.0) + 20.0)))
+                      : 0.0) + 
+                  8.0,
+              left: 12,
+              right: 12,
+              child: RepaintBoundary(
+                child: const ExpandableSharingButton(),
+              ),
+            ),
           // 使用 RepaintBoundary 隔离提示横幅，避免地图移动时重绘
           if (hideSearchBar)
             RepaintBoundary(
@@ -939,10 +962,10 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
 
   List<double> get _snapSizes {
     return switch (widget.sheetType) {
-      MapOverlaySheetType.chat => const [0.32, 0.5, 0.92],
-      MapOverlaySheetType.explore => const [0.23, 0.5, 0.92],
-      MapOverlaySheetType.none => const [0.2, 0.5, 0.92],
-      MapOverlaySheetType.createRoadTrip => const [0.28, 0.45, 0.95],
+      MapOverlaySheetType.chat => const [0.32, 0.5, 0.82],
+      MapOverlaySheetType.explore => const [0.23, 0.5, 0.82],
+      MapOverlaySheetType.none => const [0.2, 0.5, 0.82],
+      MapOverlaySheetType.createRoadTrip => const [0.28, 0.45, 0.82],
     };
   }
   

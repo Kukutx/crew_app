@@ -1025,8 +1025,8 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   double get _initialSize {
     final snapSizes = _snapSizes;
     return switch (widget.sheetType) {
-      MapOverlaySheetType.chat => snapSizes[1],
-      MapOverlaySheetType.explore => snapSizes[1],
+      MapOverlaySheetType.chat => snapSizes[0], // 初始为 collapsed（阶段一），确保底部导航栏和悬浮按钮显示
+      MapOverlaySheetType.explore => snapSizes[0], // 初始为 collapsed（阶段一），确保底部导航栏和悬浮按钮显示
       MapOverlaySheetType.none => snapSizes.first,
       MapOverlaySheetType.createRoadTrip => snapSizes.length > 1 ? snapSizes[1] : snapSizes.first,
     };

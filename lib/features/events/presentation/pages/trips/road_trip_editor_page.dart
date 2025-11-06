@@ -11,7 +11,6 @@ export 'data/road_trip_editor_models.dart';
 
 import 'data/road_trip_editor_models.dart';
 import 'widgets/road_trip_basic_section.dart';
-import 'widgets/road_trip_preferences_section.dart';
 import 'widgets/road_trip_route_section.dart';
 import 'widgets/road_trip_story_section.dart';
 import 'widgets/road_trip_team_section.dart';
@@ -52,8 +51,8 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   final _startLocationCtrl = TextEditingController();
   final _endLocationCtrl = TextEditingController();
   final _meetingLocationCtrl = TextEditingController();
-  final _maxParticipantsCtrl = TextEditingController(text: '4');
-  final _priceCtrl = TextEditingController();
+  int _maxParticipants = 4;
+  double? _price;
   final _descriptionCtrl = TextEditingController();
   final _hostDisclaimerCtrl = TextEditingController();
   final _tagInputCtrl = TextEditingController();
@@ -71,10 +70,8 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       _startLocationCtrl.text = initial.startLocation;
       _endLocationCtrl.text = initial.endLocation;
       _meetingLocationCtrl.text = initial.meetingPoint;
-      _maxParticipantsCtrl.text = initial.maxParticipants.toString();
-      if (initial.pricePerPerson != null) {
-        _priceCtrl.text = initial.pricePerPerson.toString();
-      }
+      _maxParticipants = initial.maxParticipants;
+      _price = initial.pricePerPerson;
       _descriptionCtrl.text = initial.description;
       _hostDisclaimerCtrl.text = initial.hostDisclaimer;
 
@@ -128,8 +125,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     _startLocationCtrl.dispose();
     _endLocationCtrl.dispose();
     _meetingLocationCtrl.dispose();
-    _maxParticipantsCtrl.dispose();
-    _priceCtrl.dispose();
     _descriptionCtrl.dispose();
     _hostDisclaimerCtrl.dispose();
     _tagInputCtrl.dispose();
@@ -214,20 +209,10 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       return;
     }
 
-    // 最大参与人数验证
-    final maxParticipantsText = _maxParticipantsCtrl.text.trim();
-    final maxParticipants = int.tryParse(maxParticipantsText);
-    if (maxParticipants == null || maxParticipants <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.road_trip_validation_max_participants_invalid)),
-      );
-      return;
-    }
-
     // 价格验证
     double? price;
     if (_state.pricingType == RoadTripPricingType.paid) {
-      price = double.tryParse(_priceCtrl.text.trim());
+      price = _price;
       if (price == null || price < 0 || price > 100) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(loc.road_trip_validation_price_invalid)),
@@ -262,7 +247,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
         ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
       ],
-      maxParticipants: maxParticipants,
+      maxParticipants: _maxParticipants,
       isFree: _state.pricingType == RoadTripPricingType.free,
       pricePerPerson: price,
       carType: _state.carType,
@@ -378,23 +363,20 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 onReorderReturn: _onReorderReturn,
               ),
               RoadTripTeamSection(
-                maxParticipantsController: _maxParticipantsCtrl,
-                priceController: _priceCtrl,
+                maxParticipants: _maxParticipants,
+                onMaxParticipantsChanged: (value) => setState(() {
+                  _maxParticipants = value;
+                }),
+                price: _price,
+                onPriceChanged: (value) => setState(() {
+                  _price = value;
+                }),
                 pricingType: _state.pricingType,
                 onPricingTypeChanged: (type) => setState(() {
                   _state = _state.copyWith(pricingType: type);
                   if (type == RoadTripPricingType.free) {
-                    _priceCtrl.clear();
+                    _price = null;
                   }
-                }),
-              ),
-              RoadTripPreferencesSection(
-                carType: _state.carType,
-                onCarTypeChanged: (value) => setState(() {
-                  _state = _state.copyWith(
-                    carType: value,
-                    clearCarType: value == null,
-                  );
                 }),
                 tagInputController: _tagInputCtrl,
                 onSubmitTag: _addTagFromInput,

@@ -7,7 +7,6 @@ import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_host_disclaimer_section.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_preferences_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_route_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
@@ -66,7 +65,7 @@ class CreateRoadTripSheet extends ConsumerStatefulWidget {
 }
 
 // 1) 定义 Section 锚点
-enum TripSection { basic, route, team, prefs, gallery, story, disclaimer }
+enum TripSection { basic, route, team, gallery, story, disclaimer }
 
 class _CreateRoadTripSheetState extends ConsumerState<CreateRoadTripSheet> {
   @override
@@ -145,8 +144,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   final Map<String, Future<String?>> _waypointAddressFutures = {};
 
   // ==== 团队/费用 ====
-  final _maxParticipantsCtrl = TextEditingController(text: '4');
-  final _priceCtrl = TextEditingController();
+  int _maxParticipants = 4;
+  double? _price;
   RoadTripPricingType _pricingType = RoadTripPricingType.free;
 
   // ==== 偏好 ====
@@ -172,7 +171,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     TripSection.basic,
     TripSection.route,
     TripSection.team,
-    TripSection.prefs,
     TripSection.gallery,
     TripSection.story,
     TripSection.disclaimer,
@@ -310,8 +308,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     _pageCtrl.removeListener(_onPageChanged);
     _pageCtrl.dispose();
     _titleCtrl.dispose();
-    _maxParticipantsCtrl.dispose();
-    _priceCtrl.dispose();
     _tagInputCtrl.dispose();
     _storyCtrl.dispose();
     _disclaimerCtrl.dispose();
@@ -374,7 +370,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         // 价格验证
         double? price;
         if (_pricingType == RoadTripPricingType.paid) {
-          price = double.tryParse(_priceCtrl.text.trim());
+          price = _price;
           if (price == null || price < 0 || price > 100) {
             _showSnack('请输入有效的人均费用（0-100）');
             setState(() {
@@ -415,8 +411,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           }
         }
 
-        final maxParticipants = int.tryParse(_maxParticipantsCtrl.text.trim()) ?? 4;
-        
         final draft = RoadTripDraft(
           title: title,
           dateRange: _editorState.dateRange!,
@@ -431,7 +425,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
             ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
             ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
           ],
-          maxParticipants: maxParticipants,
+          maxParticipants: _maxParticipants,
           isFree: _pricingType == RoadTripPricingType.free,
           pricePerPerson: price,
           carType: _carType,
@@ -824,16 +818,21 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         break;
       case TripSection.team:
         content = RoadTripTeamSection(
-          maxParticipantsController: _maxParticipantsCtrl,
-          priceController: _priceCtrl,
+          maxParticipants: _maxParticipants,
+          onMaxParticipantsChanged: (value) => setState(() {
+            _maxParticipants = value;
+          }),
+          price: _price,
+          onPriceChanged: (value) => setState(() {
+            _price = value;
+          }),
           pricingType: _pricingType,
-          onPricingTypeChanged: (v) => setState(() => _pricingType = v),
-        );
-        break;
-      case TripSection.prefs:
-        content = RoadTripPreferencesSection(
-          carType: _carType,
-          onCarTypeChanged: _onCarTypeChanged,
+          onPricingTypeChanged: (v) => setState(() {
+            _pricingType = v;
+            if (v == RoadTripPricingType.free) {
+              _price = null;
+            }
+          }),
           tagInputController: _tagInputCtrl,
           onSubmitTag: _onSubmitTag,
           tags: _tags,

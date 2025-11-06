@@ -25,22 +25,22 @@ class RoadTripGallerySection extends StatelessWidget {
       icon: Icons.photo_library_outlined,
       title: loc.road_trip_gallery_section_title,
       subtitle: loc.road_trip_gallery_section_subtitle,
+      headerTrailing: FilledButton.icon(
+        onPressed: onPickImages,
+        icon: const Icon(Icons.collections_outlined, size: 18),
+        label: Text(
+          items.isEmpty
+              ? loc.road_trip_gallery_select_images
+              : loc.road_trip_gallery_add_more,
+          style: const TextStyle(fontSize: 14),
+        ),
+      ),
       children: [
         RoadTripGalleryGrid(
           items: items,
+          onPickImages: onPickImages,
           onRemove: onRemoveImage,
           onSetCover: onSetCover,
-        ),
-        const SizedBox(height: 12),
-        FilledButton.icon(
-          onPressed: onPickImages,
-          icon: const Icon(Icons.collections_outlined, size: 18),
-          label: Text(
-            items.isEmpty
-                ? loc.road_trip_gallery_select_images
-                : loc.road_trip_gallery_add_more,
-            style: const TextStyle(fontSize: 14),
-          ),
         ),
       ],
     );
@@ -51,11 +51,13 @@ class RoadTripGalleryGrid extends StatelessWidget {
   const RoadTripGalleryGrid({
     super.key,
     required this.items,
+    required this.onPickImages,
     required this.onRemove,
     required this.onSetCover,
   });
 
   final List<RoadTripGalleryItem> items;
+  final VoidCallback onPickImages;
   final ValueChanged<int> onRemove;
   final ValueChanged<int> onSetCover;
 
@@ -66,19 +68,23 @@ class RoadTripGalleryGrid extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
 
     if (items.isEmpty) {
-      return Container(
-        height: 160,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15)),
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-        ),
-        child: Center(
-          child: Text(
-            loc.road_trip_gallery_empty_hint,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 13,
+      return InkWell(
+        onTap: onPickImages,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          height: 160,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15)),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          ),
+          child: Center(
+            child: Text(
+              loc.road_trip_gallery_empty_hint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 13,
+              ),
             ),
           ),
         ),

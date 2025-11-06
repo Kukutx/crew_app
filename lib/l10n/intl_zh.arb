@@ -568,7 +568,7 @@
   "action_create": "创建",
   "action_update": "更新",
   "share_error_retry": "分享失败，请稍后重试",
-  "event_members_list": "成员列表",
+  "event_members_list": "成员",
   "event_member_role_organizer": "组织者",
   "event_member_role_participant": "参与者",
   "event_organizer_disclaimer_title": "发起人免责声明",

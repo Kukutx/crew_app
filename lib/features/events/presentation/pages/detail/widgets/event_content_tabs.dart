@@ -133,13 +133,13 @@ class _TabIndicator extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        width: isActive ? 24 : 8,
-        height: 8,
+        width: isActive ? 28 : 10,
+        height: 10,
         decoration: BoxDecoration(
           color: isActive
               ? colorScheme.primary
               : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(5),
         ),
       ),
     );

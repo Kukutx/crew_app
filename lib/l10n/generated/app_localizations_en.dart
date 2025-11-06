@@ -1451,7 +1451,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_error_retry => 'Share failed, please try again later';
 
   @override
-  String get event_members_list => 'Members list';
+  String get event_members_list => 'Members';
 
   @override
   String get event_member_role_organizer => 'Organizer';

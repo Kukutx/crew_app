@@ -1383,7 +1383,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get share_error_retry => '分享失败，请稍后重试';
 
   @override
-  String get event_members_list => '成员列表';
+  String get event_members_list => '成员';
 
   @override
   String get event_member_role_organizer => '组织者';

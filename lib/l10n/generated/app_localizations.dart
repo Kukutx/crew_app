@@ -2741,7 +2741,7 @@ abstract class AppLocalizations {
   /// No description provided for @event_members_list.
   ///
   /// In en, this message translates to:
-  /// **'Members list'**
+  /// **'Members'**
   String get event_members_list;
 
   /// No description provided for @event_member_role_organizer.

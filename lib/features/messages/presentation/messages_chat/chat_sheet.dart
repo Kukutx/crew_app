@@ -520,112 +520,120 @@ class _ChatSheetState extends State<ChatSheet> {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
           sliver: SliverToBoxAdapter(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => setState(() => _searchQuery = value),
-              textInputAction: TextInputAction.search,
-              style: TextStyle(
-                fontSize: 15,
-                height: 1.5,
-                color: colorScheme.onSurface,
-                letterSpacing: 0.2,
-              ),
-              decoration: InputDecoration(
-                hintText: loc.chat_search_hint,
-                hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                  fontSize: 15,
-                  height: 1.5,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                  size: 20,
-                ),
-                suffixIcon: _searchQuery.trim().isEmpty
-                    ? null
-                    : IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          size: 20,
-                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      ),
-                filled: true,
-                fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                isDense: true,
-              ),
-            ),
-          ),
-        ),
-        const SliverToBoxAdapter(child: Divider(height: 1)),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          sliver: SliverToBoxAdapter(
             child: ToggleTabBar(
               selectedIndex: _tab,
               firstLabel: loc.messages_tab_private,
               secondLabel: loc.messages_tab_groups,
               onChanged: (value) => setState(() => _tab = value),
-              trailingBuilder: (_, _) {
-                final hasUnreadNotifications = _systemPrivateConversations
-                    .any((conversation) => conversation.hasUnread);
-                final canOpenNotifications =
-                    _systemPrivateConversations.isNotEmpty;
-
-                return Opacity(
-                  opacity: canOpenNotifications ? 1 : 0.6,
-                  child: Material(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest
-                        .withValues(alpha: .7),
-                    borderRadius: BorderRadius.circular(16),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap:
-                          canOpenNotifications ? _openSystemNotifications : null,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Icon(
-                              Icons.notifications_none_outlined,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            if (hasUnreadNotifications)
-                              Positioned(
-                                top: -2,
-                                right: -2,
-                                child: Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.error,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) => setState(() => _searchQuery = value),
+                    textInputAction: TextInputAction.search,
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
+                      color: colorScheme.onSurface,
+                      letterSpacing: 0.2,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: loc.chat_search_hint,
+                      hintStyle: TextStyle(
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                        fontSize: 15,
+                        height: 1.5,
                       ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                        size: 20,
+                      ),
+                      suffixIcon: _searchQuery.trim().isEmpty
+                          ? null
+                          : IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                size: 20,
+                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _searchQuery = '');
+                              },
+                            ),
+                      filled: true,
+                      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      isDense: true,
                     ),
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 8),
+                Builder(
+                  builder: (context) {
+                    final hasUnreadNotifications = _systemPrivateConversations
+                        .any((conversation) => conversation.hasUnread);
+                    final canOpenNotifications =
+                        _systemPrivateConversations.isNotEmpty;
+
+                    return Opacity(
+                      opacity: canOpenNotifications ? 1 : 0.6,
+                      child: Material(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: .7),
+                        borderRadius: BorderRadius.circular(16),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap:
+                              canOpenNotifications ? _openSystemNotifications : null,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Icon(
+                                  Icons.notifications_none_outlined,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                                if (hasUnreadNotifications)
+                                  Positioned(
+                                    top: -2,
+                                    right: -2,
+                                    child: Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.error,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),

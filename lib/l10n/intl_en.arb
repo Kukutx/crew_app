@@ -573,7 +573,7 @@
   "action_create": "Create",
   "action_update": "Update",
   "share_error_retry": "Share failed, please try again later",
-  "event_members_list": "Members list",
+  "event_members_list": "Members",
   "event_member_role_organizer": "Organizer",
   "event_member_role_participant": "Participant",
   "event_organizer_disclaimer_title": "Organizer disclaimer",

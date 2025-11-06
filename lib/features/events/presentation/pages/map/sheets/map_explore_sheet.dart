@@ -8,7 +8,6 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
-import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
 import '../../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../../core/error/api_exception.dart';
@@ -16,16 +15,20 @@ import 'package:crew_app/features/events/state/events_providers.dart';
 import '../state/map_overlay_sheet_provider.dart';
 
 class MapExploreSheet extends ConsumerStatefulWidget {
-  const MapExploreSheet({super.key, this.scrollController});
+  const MapExploreSheet({
+    super.key,
+    this.scrollController,
+    required this.selectedTab,
+  });
 
   final ScrollController? scrollController;
+  final int selectedTab;
 
   @override
   ConsumerState<MapExploreSheet> createState() => _MapExploreSheetState();
 }
 
 class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
-  int _tab = 0;
 
   static const List<MomentPost> _momentPosts = [
     MomentPost(
@@ -200,26 +203,13 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       ),
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-          sliver: SliverToBoxAdapter(
-            child: ToggleTabBar(
-              selectedIndex: _tab,
-              firstLabel: loc.events_tab_invites,
-              secondLabel: loc.events_tab_moments,
-              firstIcon: Icons.campaign,
-              secondIcon: Icons.public,
-              onChanged: (value) => setState(() => _tab = value),
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           sliver: SliverToBoxAdapter(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               switchInCurve: Curves.easeOut,
               switchOutCurve: Curves.easeIn,
-              child: _tab == 0
+              child: widget.selectedTab == 0
                   ? KeyedSubtree(
                       key: const ValueKey('invites'),
                       child: buildInvitesContent(),
@@ -234,7 +224,7 @@ class _MapExploreSheetState extends ConsumerState<MapExploreSheet> {
       ],
     );
 
-    final effectiveContent = _tab == 0
+    final effectiveContent = widget.selectedTab == 0
         ? RefreshIndicator(
             onRefresh: () async =>
                 await ref.refresh(eventsProvider.future),

@@ -98,7 +98,7 @@ final crewAppRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutePaths.messagesChat,
         name: AppRouteNames.messagesChat,
-        builder: (context, state) => const ChatSheet(),
+        builder: (context, state) => const ChatSheet(selectedTab: 0),
       ),
       GoRoute(
         path: AppRoutePaths.expenses,

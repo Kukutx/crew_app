@@ -6,22 +6,25 @@ import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_con
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/direct_chat_list.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/widgets/group_chat_list.dart';
 import 'package:crew_app/features/messages/presentation/notifications/notifications_page.dart';
-import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 
 class ChatSheet extends StatefulWidget {
-  const ChatSheet({super.key, this.scrollController});
+  const ChatSheet({
+    super.key,
+    this.scrollController,
+    required this.selectedTab,
+  });
 
   final ScrollController? scrollController;
+  final int selectedTab;
 
   @override
   State<ChatSheet> createState() => _ChatSheetState();
 }
 
 class _ChatSheetState extends State<ChatSheet> {
-  int _tab = 0;
 
   late final TextEditingController _searchController;
   String _searchQuery = '';
@@ -518,17 +521,6 @@ class _ChatSheetState extends State<ChatSheet> {
       ),
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-          sliver: SliverToBoxAdapter(
-            child: ToggleTabBar(
-              selectedIndex: _tab,
-              firstLabel: loc.messages_tab_private,
-              secondLabel: loc.messages_tab_groups,
-              onChanged: (value) => setState(() => _tab = value),
-            ),
-          ),
-        ),
-        SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
           sliver: SliverToBoxAdapter(
             child: Row(
@@ -644,7 +636,7 @@ class _ChatSheetState extends State<ChatSheet> {
               duration: const Duration(milliseconds: 250),
               switchInCurve: Curves.easeOut,
               switchOutCurve: Curves.easeIn,
-              child: _tab == 0 ? privateList : groupList,
+              child: widget.selectedTab == 0 ? privateList : groupList,
             ),
           ),
         ),

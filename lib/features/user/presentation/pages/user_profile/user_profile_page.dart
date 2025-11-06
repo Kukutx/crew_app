@@ -386,8 +386,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               selectedIndex: _currentTabIndex,
               firstLabel: _tabLabels[0],
               secondLabel: _tabLabels[1],
-              firstIcon: Icons.event,
-              secondIcon: Icons.bookmark,
               onChanged: (index) {
                 if (index != _currentTabIndex) {
                   _tabController.animateTo(index);

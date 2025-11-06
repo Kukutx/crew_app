@@ -19,6 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/app/view/app_drawer.dart';
 
 import '../../../data/event.dart';
@@ -867,6 +868,8 @@ class _SlidingAppBar extends StatelessWidget implements PreferredSizeWidget {
 class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   late final DraggableScrollableController _controller;
   double _currentSize = 0;
+  int _chatTab = 0; // Chat sheet 的 tab 状态
+  int _exploreTab = 0; // Explore sheet 的 tab 状态
 
  bool get _attached => _controller.isAttached;
 
@@ -1013,10 +1016,10 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
 
   List<double> get _snapSizes {
     return switch (widget.sheetType) {
-      MapOverlaySheetType.chat => const [0.32, 0.5, 0.88],
-      MapOverlaySheetType.explore => const [0.23, 0.5, 0.88],
+      MapOverlaySheetType.chat => const [0.2, 0.5, 0.88],
+      MapOverlaySheetType.explore => const [0.2, 0.5, 0.88],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.88],
-      MapOverlaySheetType.createRoadTrip => const [0.28, 0.45, 0.88],
+      MapOverlaySheetType.createRoadTrip => const [0.2, 0.3, 0.88],
     };
   }
   
@@ -1122,11 +1125,13 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
               case MapOverlaySheetType.explore:
                 effectiveContent = MapExploreSheet(
                   scrollController: scrollController,
+                  selectedTab: _exploreTab,
                 );
                 break;
               case MapOverlaySheetType.chat:
                 effectiveContent = ChatSheet(
                   scrollController: scrollController,
+                  selectedTab: _chatTab,
                 );
                 break;
               case MapOverlaySheetType.none:
@@ -1220,14 +1225,14 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 12,
+                          vertical: 6, // 进一步减小头部垂直 padding
                         ),
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             Container(
                               width: 40,
-                              height: 4,
+                              height: 3, // 减小拖动手柄高度
                               decoration: BoxDecoration(
                                 color: handleColor,
                                 borderRadius: BorderRadius.circular(2),
@@ -1273,6 +1278,32 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                           ],
                         ),
                       ),
+                    ),
+                    // 为使用 ToggleTabBar 的 sheet 类型添加 ToggleTabBar（在分割线上方）
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final loc = AppLocalizations.of(context)!;
+                        if (widget.sheetType == MapOverlaySheetType.chat) {
+                          return ToggleTabBar(
+                            selectedIndex: _chatTab,
+                            firstLabel: loc.messages_tab_private,
+                            secondLabel: loc.messages_tab_groups,
+                            onChanged: (value) {
+                              setState(() => _chatTab = value);
+                            },
+                          );
+                        } else if (widget.sheetType == MapOverlaySheetType.explore) {
+                          return ToggleTabBar(
+                            selectedIndex: _exploreTab,
+                            firstLabel: loc.events_tab_invites,
+                            secondLabel: loc.events_tab_moments,
+                            onChanged: (value) {
+                              setState(() => _exploreTab = value);
+                            },
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
                     const Divider(height: 1),
                     Expanded(child: effectiveContent),

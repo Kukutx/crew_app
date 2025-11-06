@@ -71,7 +71,7 @@ class RoadTripTeamSection extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: TextFormField(
                 controller: priceController,

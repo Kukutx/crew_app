@@ -38,21 +38,44 @@ class RoadTripBasicSection extends StatelessWidget {
               ? loc.road_trip_basic_title_required
               : null,
         ),
-        const SizedBox(height: 16),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(
-            Icons.calendar_month,
-            color: theme.colorScheme.primary,
-          ),
-          title: Text(
-            dateRange == null
-                ? loc.road_trip_basic_date_label
-                : '${DateFormatHelper.formatDate(dateRange!.start)} → ${DateFormatHelper.formatDate(dateRange!.end)}',
-            style: const TextStyle(fontSize: 14),
-          ),
-          trailing: const Icon(Icons.chevron_right_rounded),
+        const SizedBox(height: 12),
+        InkWell(
           onTap: onPickDateRange,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_month,
+                  color: theme.colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    dateRange == null
+                        ? loc.road_trip_basic_date_label
+                        : '${DateFormatHelper.formatDate(dateRange!.start)} → ${DateFormatHelper.formatDate(dateRange!.end)}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

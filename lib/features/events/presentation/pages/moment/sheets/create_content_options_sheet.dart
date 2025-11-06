@@ -70,9 +70,25 @@ class _CreateContentOptionsSheet extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // 第一个选项：自驾游
+                    // 第一个选项：城市玩家
                     _CreateOptionCard(
-                      title: '自驾游',
+                      title: '城市玩家',
+                      subtitle: '创建当地城市的活动',
+                      backgroundColor: isDark
+                          ? colorScheme.tertiaryContainer
+                          : const Color(0xFFFFF3E0), // 浅橙色
+                      onTap: () {
+                        Navigator.of(context).maybePop();
+                        // TODO: 实现城市玩家创建活动页面
+                        ScaffoldMessenger.of(parentContext).showSnackBar(
+                          const SnackBar(content: Text('城市玩家功能开发中...')),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    // 第二个选项：旅游
+                    _CreateOptionCard(
+                      title: '旅游',
                       subtitle: '规划您的旅行路线',
                       backgroundColor: isDark
                           ? colorScheme.primaryContainer
@@ -85,7 +101,7 @@ class _CreateContentOptionsSheet extends ConsumerWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    // 第二个选项：发表瞬间
+                    // 第三个选项：发表瞬间
                     _CreateOptionCard(
                       title: '发表瞬间',
                       subtitle: '分享您的精彩时刻',

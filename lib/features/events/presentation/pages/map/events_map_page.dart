@@ -345,7 +345,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               cameraPosition: _currentCameraPosition,
             ),
           ),
-          // 使用 RepaintBoundary 隔离搜索栏，避免地图移动时重绘
+          // 使用 RepaintBoundary 隔离提示横幅，避免地图移动时重绘
           if (hideSearchBar)
             RepaintBoundary(
               child: SafeArea(
@@ -354,21 +354,36 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
                   child: Align(
                     alignment: Alignment.topCenter,
-                    child: Material(
-                      elevation: 4,
-                      borderRadius: BorderRadius.circular(16),
-                      color: theme.colorScheme.surface,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.25),
+                            Colors.black.withValues(alpha: 0.15),
+                            Colors.black.withValues(alpha: 0.05),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.5, 0.8, 1.0],
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.info_outline,
-                              color: theme.colorScheme.primary,
+                              color: Colors.white.withValues(alpha: 0.85),
+                              size: 20,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -379,16 +394,16 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                                   mapSheetType == MapOverlaySheetType.createRoadTrip,
                                 ),
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: .8,
-                                  ),
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                             // 只在设置起点、终点的时候显示清除选点按钮（起始页）
                             if (_shouldShowClearButton(selectionState, isCreatingRoadTrip)) ...[
                               const SizedBox(width: 12),
-                              TextButton.icon(
+                              TextButton(
                                 onPressed: () {
                                   if (selectionState.isAddingWaypoint) {
                                     // 在途经点阶段，只清除途经点选择状态，保留起点和终点
@@ -400,11 +415,20 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                                     );
                                   }
                                 },
-                                icon: const Icon(Icons.close),
-                                label: Text(
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
                                   selectionState.isAddingWaypoint
                                       ? loc.map_clear_waypoint
                                       : loc.map_clear_selected_point,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.85),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ],

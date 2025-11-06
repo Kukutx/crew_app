@@ -272,7 +272,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map => '地图';
 
   @override
-  String get map_clear_selected_point => '清除选点';
+  String get map_clear_selected_point => '清除';
 
   @override
   String get map_clear_waypoint => '清除途经点';
@@ -284,10 +284,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_destination_tip => '点击地图选择终点。';
 
   @override
-  String get map_guide_step_1 => '步骤 1：长按地图选择起点位置';
+  String get map_guide_step_1 => '长按地图选择起点位置';
 
   @override
-  String get map_guide_step_2 => '步骤 2：长按地图选择终点位置';
+  String get map_guide_step_2 => '长按地图选择终点位置';
 
   @override
   String get map_guide_step_3 => '步骤 3：点击地图添加途径点（可选）';

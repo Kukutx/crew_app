@@ -44,10 +44,12 @@ class RoadTripPreferencesSection extends StatelessWidget {
           maxLength: 30,
           onSubmitted: (_) => onSubmitTag(),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: tags
+        if (tags.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: tags
               .map(
                 (t) => Chip(
                   label: Text(
@@ -60,7 +62,8 @@ class RoadTripPreferencesSection extends StatelessWidget {
                 ),
               )
               .toList(),
-        ),
+          ),
+        ],
       ],
     );
   }

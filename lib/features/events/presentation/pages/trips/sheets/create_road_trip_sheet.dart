@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_host_disclaimer_section.dart';
@@ -176,9 +177,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     TripSection.story,
     TripSection.disclaimer,
   ];
-  int get _totalPages => 1 + _sectionsOrder.length + 1; // +1 为完成页
+  int get _totalPages => 1 + _sectionsOrder.length; // 不再包含完成页
   bool get _isBasicPage => _currentPage == 1; // 0 是启动页，1 是 basic
-  bool get _isCompletionPage => _currentPage == _totalPages - 1; // 最后一页是完成页
   bool get _basicValid =>
       _titleCtrl.text.trim().isNotEmpty && _editorState.dateRange != null;
 
@@ -244,12 +244,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       }
     }
 
-    _pageCtrl.addListener(() {
-      final p = _pageCtrl.hasClients ? _pageCtrl.page?.round() ?? 0 : 0;
-      if (p != _currentPage) {
-        setState(() => _currentPage = p);
-      }
-    });
+    _pageCtrl.addListener(_onPageChanged);
 
     _titleCtrl.addListener(() => setState(() {})); // 标题变化触发校验
   }
@@ -267,6 +262,16 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     final newPosition = widget.destinationListenable?.value;
     if (newPosition != _destinationLatLng) {
       _updateDestinationLocation(newPosition);
+    }
+  }
+
+  void _onPageChanged() {
+    if (!_pageCtrl.hasClients) return;
+    final page = _pageCtrl.page;
+    if (page == null) return;
+    final newPage = page.round().clamp(0, _totalPages - 1);
+    if (newPage != _currentPage) {
+      setState(() => _currentPage = newPage);
     }
   }
 
@@ -302,13 +307,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   void dispose() {
     widget.startPositionListenable?.removeListener(_onStartPositionChanged);
     widget.destinationListenable?.removeListener(_onDestinationPositionChanged);
+    _pageCtrl.removeListener(_onPageChanged);
+    _pageCtrl.dispose();
     _titleCtrl.dispose();
     _maxParticipantsCtrl.dispose();
     _priceCtrl.dispose();
     _tagInputCtrl.dispose();
     _storyCtrl.dispose();
     _disclaimerCtrl.dispose();
-    _pageCtrl.dispose();
     super.dispose();
   }
 
@@ -447,53 +453,63 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         
         if (!mounted) return;
         
-        // 设置成功状态并跳转到完成页
+        // 设置成功状态并显示完成页 sheet
         setState(() {
           _isCreating = false;
           _createSuccess = true;
           _tripId = id;
         });
         
-        // 跳转到完成页
-        setState(() => _canSwipe = true);
-        await _pageCtrl.animateToPage(
-          _totalPages - 1,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        // 清理所有地图选择状态（在关闭 sheet 之前执行，确保 ref 有效）
+        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+        selectionController.resetSelection();
+        selectionController.setSelectionSheetOpen(false);
+        selectionController.setPendingWaypoint(null);
+        selectionController.resetMapPadding();
+        
+        // 关闭当前 sheet
+        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+        
+        // 显示完成页 sheet
+        if (mounted) {
+          await showCompletionSheet(
+            context,
+            isSuccess: true,
+          );
+        }
         
       } catch (e) {
         if (!mounted) return;
         
-        // 设置失败状态并跳转到完成页
+        // 设置失败状态并显示完成页 sheet
         setState(() {
           _isCreating = false;
           _createSuccess = false;
           _createErrorMessage = e.toString();
         });
         
-        // 跳转到完成页
-        setState(() => _canSwipe = true);
-        await _pageCtrl.animateToPage(
-          _totalPages - 1,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        // 清理所有地图选择状态（在关闭 sheet 之前执行，确保 ref 有效）
+        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+        selectionController.resetSelection();
+        selectionController.setSelectionSheetOpen(false);
+        selectionController.setPendingWaypoint(null);
+        selectionController.resetMapPadding();
+        
+        // 关闭当前 sheet
+        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+        
+        // 显示完成页 sheet
+        if (mounted) {
+          await showCompletionSheet(
+            context,
+            isSuccess: false,
+            errorMessage: e.toString(),
+          );
+        }
       }
     }
   }
 
-  void _onDonePressed() {
-    // 清理所有地图选择状态
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    selectionController.resetSelection();
-    selectionController.setSelectionSheetOpen(false);
-    selectionController.setPendingWaypoint(null);
-    selectionController.resetMapPadding();
-    
-    // 关闭 overlay
-    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
-  }
 
   void _onRouteTypeChanged(RoadTripRouteType t) {
     setState(() => _routeType = t);
@@ -736,10 +752,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   Future<void> goToSection(TripSection s) async {
     final idx = _sectionsOrder.indexOf(s);
     if (idx < 0) return;
+    final targetPage = 1 + idx; // 0 是启动页，1 是 basic
+    if (targetPage < 0 || targetPage >= _totalPages) return;
+    
     setState(() => _canSwipe = true);
     try {
+      if (!_pageCtrl.hasClients) return;
       await _pageCtrl.animateToPage(
-        1 + idx, // 0 是启动页
+        targetPage,
         duration: const Duration(milliseconds: 280),
         curve: Curves.easeOut,
       );
@@ -758,13 +778,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       try {
-        if (_pageCtrl.hasClients) {
-          _pageCtrl.animateToPage(
-            1,
-            duration: const Duration(milliseconds: 280),
-            curve: Curves.easeOut,
-          );
-        }
+        if (!_pageCtrl.hasClients) return;
+        final targetPage = 1; // 跳转到 basic 页
+        if (targetPage >= _totalPages) return;
+        _pageCtrl.animateToPage(
+          targetPage,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOut,
+        );
       } catch (e, stackTrace) {
         // 记录页面切换错误（当PageView已销毁时这是正常情况）
         debugPrint('Page animation error: $e');
@@ -839,7 +860,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     return SingleChildScrollView(
       controller: null, // 其他页面不使用 controller
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: content,
     );
   }
@@ -1013,11 +1034,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 },
                 child: PageView(
                   controller: _pageCtrl,
-                  physics: (_isCompletionPage || !canScroll)
+                  physics: !canScroll
                       ? const NeverScrollableScrollPhysics()
-                      : (_currentPage >= _totalPages - 2
-                          ? const NeverScrollableScrollPhysics() // 防止滑动到完成页
-                          : const PageScrollPhysics()),
+                      : const PageScrollPhysics(),
+                  allowImplicitScrolling: false,
                   children: [
                     _RouteSelectionPage(
                       scrollCtrl: widget.scrollCtrl,
@@ -1036,13 +1056,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                       destinationNearbyFuture: _destinationNearbyFuture,
                     ),
                     ..._sectionsOrder.map(_buildSectionPage),
-                    _CompletionPage(
-                      isSuccess: _createSuccess,
-                      tripId: _tripId,
-                      errorMessage: _createErrorMessage,
-                      isCreating: _isCreating,
-                      onDone: _onDonePressed,
-                    ),
                   ],
                 ),
               ),
@@ -1050,74 +1063,61 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
             // 底部进度 + 按钮
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
-              child: _isCompletionPage
+              child: _canSwipe
                   ? Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Center(
+                            child: _ClickablePageIndicator(
+                              controller: _pageCtrl,
+                              currentPage: _currentPage,
+                              totalPages: _totalPages,
+                              onPageTap: (index) {
+                                if (!_pageCtrl.hasClients) return;
+                                _pageCtrl.animateToPage(
+                                  index,
+                                  duration: const Duration(milliseconds: 280),
+                                  curve: Curves.easeOut,
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              onPressed: (!canScroll || _isCreating) 
+                                  ? null 
+                                  : _onCreatePressed,
+                              child: _isCreating
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(loc.road_trip_create_button),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Padding(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                       child: SizedBox(
                         width: double.infinity,
                         child: FilledButton(
-                          onPressed: (!_isCreating && _createSuccess != null)
-                              ? _onDonePressed
+                          // 只有当起点和终点都选择了才能继续
+                          onPressed: (_startLatLng != null && _destinationLatLng != null)
+                              ? _enableWizard
                               : null,
-                          child: _isCreating
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(loc.road_trip_create_done_button),
+                          child: Text(loc.road_trip_continue_button),
                         ),
                       ),
-                    )
-                  : _canSwipe
-                      ? Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Center(
-                                child: SmoothPageIndicator(
-                                  controller: _pageCtrl,
-                                  count: _totalPages - 1, // 不包含完成页
-                                  effect: const WormEffect(dotHeight: 8, dotWidth: 8),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                width: double.infinity,
-                                child: FilledButton(
-                                  onPressed: (!canScroll || _isCreating) 
-                                      ? null 
-                                      : _onCreatePressed,
-                                  child: _isCreating
-                                      ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : Text(loc.road_trip_create_button),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              // 只有当起点和终点都选择了才能继续
-                              onPressed: (_startLatLng != null && _destinationLatLng != null)
-                                  ? _enableWizard
-                                  : null,
-                              child: Text(loc.road_trip_continue_button),
-                            ),
-                          ),
-                        ),
+                    ),
             ),
           ],
         ),
@@ -1508,89 +1508,48 @@ class _CardTile extends StatelessWidget {
   }
 }
 
-/// 创建完成页面
-class _CompletionPage extends StatelessWidget {
-  const _CompletionPage({
-    required this.isSuccess,
-    this.tripId,
-    this.errorMessage,
-    required this.isCreating,
-    required this.onDone,
+/// 可点击的页面指示器
+class _ClickablePageIndicator extends StatelessWidget {
+  const _ClickablePageIndicator({
+    required this.controller,
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPageTap,
   });
 
-  final bool? isSuccess;
-  final String? tripId;
-  final String? errorMessage;
-  final bool isCreating;
-  final VoidCallback onDone;
+  final PageController controller;
+  final int currentPage;
+  final int totalPages;
+  final ValueChanged<int> onPageTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final loc = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
-    return SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 40),
-          // 图标
-          if (isCreating)
-            const SizedBox(
-              width: 80,
-              height: 80,
-              child: CircularProgressIndicator(
-                strokeWidth: 4,
-              ),
-            )
-          else
-            Container(
-              width: 80,
-              height: 80,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(totalPages, (index) {
+        final isActive = index == currentPage;
+        return GestureDetector(
+          onTap: () => onPageTap(index),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              width: isActive ? 12 : 10,
+              height: 10,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSuccess == true
-                    ? colorScheme.primaryContainer
-                    : colorScheme.errorContainer,
-              ),
-              child: Icon(
-                isSuccess == true ? Icons.check_circle : Icons.error_outline,
-                size: 48,
-                color: isSuccess == true
-                    ? colorScheme.onPrimaryContainer
-                    : colorScheme.onErrorContainer,
+                color: isActive
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
-          const SizedBox(height: 32),
-          // 标题
-          if (!isCreating)
-            Text(
-              isSuccess == true
-                  ? loc.road_trip_create_success_title
-                  : loc.road_trip_create_failed_title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          const SizedBox(height: 16),
-          // 消息
-          if (!isCreating)
-            Text(
-              isSuccess == true
-                  ? loc.road_trip_create_success_message
-                  : (errorMessage ?? loc.road_trip_create_failed_message),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          const SizedBox(height: 40),
-        ],
-      ),
+          ),
+        );
+      }),
     );
   }
 }

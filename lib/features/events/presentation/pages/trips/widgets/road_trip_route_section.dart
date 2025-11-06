@@ -115,7 +115,7 @@ class RoadTripRouteSection extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
 
         // 列表区域
         if (routeType == RoadTripRouteType.oneWay)
@@ -135,7 +135,7 @@ class RoadTripRouteSection extends StatelessWidget {
             onReorder: onReorderForward,
             addressMap: waypointAddressMap,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _ReorderableListSection(
             title:
                 '${loc.road_trip_route_return_label}${loc.road_trip_route_waypoints_count(returnWaypoints.length)}',
@@ -178,7 +178,7 @@ class _ReorderableListSection extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         ReorderableListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

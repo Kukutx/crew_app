@@ -69,9 +69,9 @@ class RoadTripGalleryGrid extends StatelessWidget {
       return Container(
         height: 160,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colorScheme.outline.withValues(alpha: .2)),
-          color: colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15)),
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         ),
         child: Center(
           child: Text(
@@ -90,8 +90,8 @@ class RoadTripGalleryGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -130,9 +130,9 @@ class _GalleryTile extends StatelessWidget {
       child: Stack(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(14),
             child: Container(
-              color: colorScheme.surfaceContainerHighest,
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               child: item.isFile
                   ? Image.file(item.file!, fit: BoxFit.cover)
                   : Image.network(item.url!, fit: BoxFit.cover),

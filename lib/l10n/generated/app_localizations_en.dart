@@ -278,7 +278,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'Map';
 
   @override
-  String get map_clear_selected_point => 'Clear selected point';
+  String get map_clear_selected_point => 'clear';
 
   @override
   String get map_clear_waypoint => 'Clear waypoint';
@@ -293,11 +293,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map_guide_step_1 =>
-      'Step 1: Long press on the map to choose a start location';
+      'Long press on the map to choose a start location';
 
   @override
   String get map_guide_step_2 =>
-      'Step 2: Long press on the map to choose a destination';
+      'Long press on the map to choose a destination';
 
   @override
   String get map_guide_step_3 =>

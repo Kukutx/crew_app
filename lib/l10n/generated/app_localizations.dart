@@ -611,7 +611,7 @@ abstract class AppLocalizations {
   /// No description provided for @map_clear_selected_point.
   ///
   /// In en, this message translates to:
-  /// **'Clear selected point'**
+  /// **'clear'**
   String get map_clear_selected_point;
 
   /// No description provided for @map_clear_waypoint.
@@ -635,13 +635,13 @@ abstract class AppLocalizations {
   /// No description provided for @map_guide_step_1.
   ///
   /// In en, this message translates to:
-  /// **'Step 1: Long press on the map to choose a start location'**
+  /// **'Long press on the map to choose a start location'**
   String get map_guide_step_1;
 
   /// No description provided for @map_guide_step_2.
   ///
   /// In en, this message translates to:
-  /// **'Step 2: Long press on the map to choose a destination'**
+  /// **'Long press on the map to choose a destination'**
   String get map_guide_step_2;
 
   /// No description provided for @map_guide_step_3.

@@ -338,7 +338,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                 markers: markers,
                 clusterManagers: clusterManagers,
                 polylines: polylines,
-                showUserLocation: false,
+                showUserLocation: true,
                 mapPadding: selectionState.mapPadding,
               ),
             ),

@@ -126,7 +126,7 @@ class ProfileHeaderCard extends StatelessWidget {
                                 locationLabel!,
                                 style: t.bodySmall!.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
-                                  fontSize: 13,
+                                  fontSize: 11,
                                   height: 1.3,
                                   letterSpacing: 0,
                                 ),
@@ -383,7 +383,7 @@ class _ProfileStat extends StatelessWidget {
           style: theme.textTheme.titleSmall!.copyWith(
             color: color,
             fontWeight: FontWeight.w700,
-            fontSize: 15,
+            fontSize: 13,
             height: 1.3,
             letterSpacing: 0,
           ),
@@ -393,7 +393,7 @@ class _ProfileStat extends StatelessWidget {
           label,
           style: theme.textTheme.bodySmall!.copyWith(
             color: color.withValues(alpha: 0.9),
-            fontSize: 13,
+            fontSize: 12,
             height: 1.3,
             letterSpacing: 0,
           ),
@@ -444,7 +444,7 @@ class _ProfileTag extends StatelessWidget {
         style: Theme.of(context).textTheme.labelSmall!.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w600,
-              fontSize: 12,
+              fontSize: 11,
               height: 1.3,
               letterSpacing: 0,
             ),
@@ -561,7 +561,7 @@ class _IpLocationWidget extends StatelessWidget {
               '${loc.moment_post_ip_location_prefix}$location',
               style: t.bodySmall!.copyWith(
                 color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 13,
+                fontSize: 11,
                 height: 1.3,
                 letterSpacing: 0,
               ),

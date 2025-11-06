@@ -27,9 +27,14 @@ class _AppState extends ConsumerState<App> {
   void initState() {
     super.initState();
     // 如果登录了，设置 MapOverlaySheetType.none，导航索引会设置为1
+    // 延迟到构建完成后修改 provider，避免在 initState 中直接修改
     final currentUser = ref.read(currentUserProvider);
     if (currentUser != null) {
-      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+      Future.microtask(() {
+        if (mounted) {
+          ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+        }
+      });
     }
     
     _overlayIndexSubscription = ref.listenManual(appOverlayIndexProvider, (

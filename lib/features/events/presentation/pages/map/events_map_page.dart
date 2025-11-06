@@ -90,7 +90,12 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       mapController.focusOnEvent(event);
       final carouselManager = ref.read(eventCarouselManagerProvider);
       carouselManager.showEventCard(event);
-      ref.read(mapFocusEventProvider.notifier).state = null;
+      // 延迟修改 provider，避免在 widget 构建期间修改
+      Future.microtask(() {
+        if (mounted) {
+          ref.read(mapFocusEventProvider.notifier).state = null;
+        }
+      });
     });
     _carouselSubscription = ref.listenManual(eventCarouselManagerProvider, (
       _,
@@ -113,16 +118,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   void dispose() {
     _mapFocusSubscription?.close();
     _carouselSubscription?.close();
-    // 使用保存的 notifier 引用，避免在 dispose 时使用 ref
-    if (_bottomNavigationVisibilityController != null) {
-      try {
-        if (_bottomNavigationVisibilityController!.state) {
-          _bottomNavigationVisibilityController!.state = false;
-        }
-      } catch (e) {
-        // 如果 notifier 已经不可用，忽略错误
-      }
-    }
+    // 注意：不能在 dispose 中修改 provider，这违反了 Riverpod 的规则
+    // Widget 销毁时，provider 状态会自动处理，无需手动清理
     super.dispose();
   }
 
@@ -524,7 +521,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   }
 
   void _updateBottomNavigation(bool visible) {
-    // 保存 notifier 引用，以便在 dispose 时安全使用
+    // 缓存 notifier 引用，避免重复调用 ref.read
     _bottomNavigationVisibilityController ??= ref.read(bottomNavigationVisibilityProvider.notifier);
     final controller = _bottomNavigationVisibilityController!;
     if (controller.state != visible) {

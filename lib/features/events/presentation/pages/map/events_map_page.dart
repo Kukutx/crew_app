@@ -797,114 +797,10 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       );
     }
 
-    // 添加路线箭头 markers
-    if (selected != null && destination != null) {
-      final routeType = selectionState.routeType;
-      final forwardWaypoints = selectionState.forwardWaypoints;
-      final returnWaypoints = selectionState.returnWaypoints;
-      final rawPoints = <LatLng>[];
-      
-      rawPoints.add(selected);
-      
-      if (routeType == RoadTripRouteType.roundTrip) {
-        rawPoints.addAll(forwardWaypoints);
-        rawPoints.add(destination);
-        rawPoints.addAll(returnWaypoints.reversed);
-        rawPoints.add(selected);
-      } else {
-        rawPoints.addAll(forwardWaypoints);
-        rawPoints.add(destination);
-      }
-      
-      if (rawPoints.length > 1) {
-        final curvedPoints = _generateCurvedRoute(rawPoints);
-        final arrowMarkers = _createArrowMarkers(curvedPoints);
-        markers.addAll(arrowMarkers);
-      }
-    }
-
     return markers;
   }
 
-  /// 在路线上创建箭头 markers
-  Set<Marker> _createArrowMarkers(List<LatLng> points) {
-    final arrowMarkers = <Marker>{};
-    
-    if (points.length < 2) return arrowMarkers;
-    
-    // 计算箭头间距（根据路线长度动态调整）
-    final totalDistance = _calculateTotalDistanceInDegrees(points);
-    final arrowSpacing = math.max(totalDistance / 8, 0.01); // 最多8个箭头
-    
-    double accumulatedDistance = 0;
-    double lastArrowDistance = 0;
-    
-    for (int i = 0; i < points.length - 1; i++) {
-      final segmentDistance = _calculateDistanceInDegrees(points[i], points[i + 1]);
-      accumulatedDistance += segmentDistance;
-      
-      // 如果累积距离超过箭头间距，添加箭头
-      if (accumulatedDistance - lastArrowDistance >= arrowSpacing) {
-        // 计算箭头位置（在当前段的中间）
-        final t = (arrowSpacing - (accumulatedDistance - segmentDistance - lastArrowDistance)) / segmentDistance;
-        final arrowLat = points[i].latitude + (points[i + 1].latitude - points[i].latitude) * t;
-        final arrowLng = points[i].longitude + (points[i + 1].longitude - points[i].longitude) * t;
-        final arrowPosition = LatLng(arrowLat, arrowLng);
-        
-        // 计算箭头方向（从箭头位置到下一个点）
-        // 如果箭头在当前段的中间，使用当前段的终点作为方向参考
-        final bearing = _calculateBearing(arrowPosition, points[i + 1]);
-        
-        // 创建箭头 marker（使用蓝色 marker 作为箭头）
-        arrowMarkers.add(
-          Marker(
-            markerId: MarkerId('route_arrow_${arrowMarkers.length}'),
-            position: arrowPosition,
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueBlue,
-            ),
-            anchor: const Offset(0.5, 0.5),
-            rotation: bearing,
-            flat: true,
-            zIndex: 1,
-          ),
-        );
-        
-        lastArrowDistance = accumulatedDistance;
-      }
-    }
-    
-    return arrowMarkers;
-  }
 
-  /// 计算两点之间的距离（度，用于箭头间距计算）
-  double _calculateDistanceInDegrees(LatLng a, LatLng b) {
-    final dx = b.longitude - a.longitude;
-    final dy = b.latitude - a.latitude;
-    return math.sqrt(dx * dx + dy * dy);
-  }
-
-  /// 计算路线总距离（度，用于箭头间距计算）
-  double _calculateTotalDistanceInDegrees(List<LatLng> points) {
-    double total = 0;
-    for (int i = 0; i < points.length - 1; i++) {
-      total += _calculateDistanceInDegrees(points[i], points[i + 1]);
-    }
-    return total;
-  }
-
-  /// 计算两点之间的方位角（度）
-  double _calculateBearing(LatLng start, LatLng end) {
-    final lat1 = start.latitude * math.pi / 180;
-    final lat2 = end.latitude * math.pi / 180;
-    final dLon = (end.longitude - start.longitude) * math.pi / 180;
-    
-    final y = math.sin(dLon) * math.cos(lat2);
-    final x = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
-    
-    final bearing = math.atan2(y, x) * 180 / math.pi;
-    return (bearing + 360) % 360;
-  }
 
   // 构建 polylines
   Set<Polyline> _buildPolylines(MapSelectionState selectionState) {
@@ -916,41 +812,65 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       final routeType = selectionState.routeType;
       final forwardWaypoints = selectionState.forwardWaypoints;
       final returnWaypoints = selectionState.returnWaypoints;
-      final rawPoints = <LatLng>[];
       
-      // 起点
-      rawPoints.add(selected);
-      
-      // 根据路线类型添加途经点和终点
       if (routeType == RoadTripRouteType.roundTrip) {
-        // 往返路线：起点 -> 去程途经点 -> 终点 -> 返程途经点 -> 起点
-        rawPoints.addAll(forwardWaypoints);
-        rawPoints.add(destination);
-        rawPoints.addAll(returnWaypoints.reversed);
-        rawPoints.add(selected); // 回到起点
+        // 往返路线：分为两条独立的贝塞尔曲线
+        // 去程：起点 -> 去程途经点 -> 终点
+        final forwardPoints = <LatLng>[selected, ...forwardWaypoints, destination];
+        if (forwardPoints.length > 1) {
+          final forwardCurvedPoints = _generateCurvedRoute(forwardPoints);
+          polylines.add(
+            Polyline(
+              polylineId: const PolylineId('route_polyline_forward'),
+              points: forwardCurvedPoints,
+              color: Colors.blue,
+              width: 4,
+              geodesic: true,
+              patterns: [
+                PatternItem.dash(20),
+                PatternItem.gap(10),
+              ],
+            ),
+          );
+        }
+        
+        // 返程：终点 -> 返程途经点 -> 起点
+        final returnPoints = <LatLng>[destination, ...returnWaypoints.reversed, selected];
+        if (returnPoints.length > 1) {
+          final returnCurvedPoints = _generateCurvedRoute(returnPoints);
+          polylines.add(
+            Polyline(
+              polylineId: const PolylineId('route_polyline_return'),
+              points: returnCurvedPoints,
+              color: Colors.orange,
+              width: 4,
+              geodesic: true,
+              patterns: [
+                PatternItem.dash(20),
+                PatternItem.gap(10),
+              ],
+            ),
+          );
+        }
       } else {
         // 单程路线：起点 -> 去程途经点 -> 终点
-        rawPoints.addAll(forwardWaypoints);
-        rawPoints.add(destination);
-      }
-      
-      if (rawPoints.length > 1) {
-        // 生成带弧度的路线点
-        final curvedPoints = _generateCurvedRoute(rawPoints);
-        
-        polylines.add(
-          Polyline(
-            polylineId: const PolylineId('route_polyline'),
-            points: curvedPoints,
-            color: Colors.blue,
-            width: 4,
-            geodesic: true,
-            patterns: [
-              PatternItem.dash(20),
-              PatternItem.gap(10),
-            ],
-          ),
-        );
+        final oneWayPoints = <LatLng>[selected, ...forwardWaypoints, destination];
+        if (oneWayPoints.length > 1) {
+          final curvedPoints = _generateCurvedRoute(oneWayPoints);
+          polylines.add(
+            Polyline(
+              polylineId: const PolylineId('route_polyline'),
+              points: curvedPoints,
+              color: Colors.blue,
+              width: 4,
+              geodesic: true,
+              patterns: [
+                PatternItem.dash(20),
+                PatternItem.gap(10),
+              ],
+            ),
+          );
+        }
       }
     }
 

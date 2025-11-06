@@ -281,6 +281,13 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     if (widget.tabChangeNotifier != null) {
       widget.tabChangeNotifier!.addListener(_onTabChangeRequested);
     }
+    
+    // 初始化路线类型为往返，并同步到 MapSelectionController
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(mapSelectionControllerProvider.notifier).setRouteType(_routeType);
+      }
+    });
   }
   
   void _onTabChangeRequested() {

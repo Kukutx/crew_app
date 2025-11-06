@@ -439,7 +439,7 @@ class NearbyPlaceTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                place.displayName.truncate(maxLength: 30),
+                place.displayName.truncateStart(maxLength: 30),
                 style: titleStyle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -447,7 +447,7 @@ class NearbyPlaceTile extends StatelessWidget {
               if (address != null && address.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
-                  address.truncate(maxLength: 30),
+                  address.truncateStart(maxLength: 30),
                   style: subtitleStyle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

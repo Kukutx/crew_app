@@ -1435,7 +1435,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           final address = snapshot.data;
                           final display = (address == null || address.trim().isEmpty)
                               ? loc.map_location_info_address_unavailable
-                              : address.truncate(maxLength: 30);
+                              : address.truncateStart(maxLength: 30);
                           return LocationSheetRow(
                             icon: icon,
                             child: Text(display),

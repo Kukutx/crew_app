@@ -1,4 +1,6 @@
+import 'package:crew_app/core/config/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 typedef ToggleTabChanged = void Function(int index);
 
@@ -18,27 +20,46 @@ class ToggleTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
       width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: colorScheme.surface,
-      child: Row(
-        children: [
-          Expanded(
-            child: _ToggleTabItem(
-              label: firstLabel,
-              selected: selectedIndex == 0,
-              onTap: () => onChanged(0),
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _ToggleTabItem(
+                label: firstLabel,
+                selected: selectedIndex == 0,
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  onChanged(0);
+                },
+                isDark: isDark,
+              ),
             ),
-          ),
-          Expanded(
-            child: _ToggleTabItem(
-              label: secondLabel,
-              selected: selectedIndex == 1,
-              onTap: () => onChanged(1),
+            Expanded(
+              child: _ToggleTabItem(
+                label: secondLabel,
+                selected: selectedIndex == 1,
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  onChanged(1);
+                },
+                isDark: isDark,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -49,40 +70,53 @@ class _ToggleTabItem extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    required this.isDark,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    // 活动状态：使用主题 primary 颜色
-    // 非活动状态：使用主题 onSurfaceVariant 颜色
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final textColor = selected
         ? colorScheme.primary
         : colorScheme.onSurfaceVariant;
 
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 2), // 进一步减小垂直 padding
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: selected ? colorScheme.primary : Colors.transparent,
-              width: selected ? 3.0 : 0.0,
-            ),
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-              color: textColor,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      margin: const EdgeInsets.all(4),
+      decoration: selected
+          ? BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusSmall - 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.08),
+                  offset: const Offset(0, 1),
+                  blurRadius: 3,
+                ),
+              ],
+            )
+          : null,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall - 2),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                color: textColor,
+                letterSpacing: 0.1,
+              ),
             ),
           ),
         ),

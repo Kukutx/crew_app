@@ -143,10 +143,41 @@ class NotificationsPage extends StatelessWidget {
       body: SafeArea(
         child: allConversations.isEmpty
             ? Center(
-                child: Text(
-                  '暂时没有系统通知',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        ),
+                        child: Icon(
+                          Icons.notifications_none_outlined,
+                          size: 64,
+                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        '暂时没有系统通知',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '有新的通知时，我们会在这里显示',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               )

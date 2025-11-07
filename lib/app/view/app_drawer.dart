@@ -1,6 +1,8 @@
 import 'package:crew_app/app/router/app_router.dart';
+import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -211,13 +213,17 @@ class _AppMenuItemSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = cs.surface;
 
-    return Material(
-      color: cs.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: cs.outlineVariant.withValues(alpha: .5)),
+    return Container(
+      decoration: BoxDecoration(
+        color: baseColor,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        gradient: AppTheme.neumorphicGradient(baseColor, isDark: isDark),
+        boxShadow: AppTheme.neumorphicShadowRaised(cs, isDark: isDark),
       ),
       child: Column(
         children: [
@@ -228,6 +234,8 @@ class _AppMenuItemSection extends StatelessWidget {
                 height: 1,
                 thickness: 0.5,
                 color: cs.outlineVariant.withValues(alpha: 0.35),
+                indent: 16,
+                endIndent: 16,
               ),
           ],
         ],
@@ -246,24 +254,32 @@ class _MinimalTile extends StatelessWidget {
     final cs = theme.colorScheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: definition.onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        definition.onTap();
+      },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
-            Icon(definition.icon, size: 22, color: cs.onSurface),
-            const SizedBox(width: 12),
+            Icon(definition.icon, size: 24, color: cs.onSurface),
+            const SizedBox(width: 14),
             Expanded(
               child: Text(
                 definition.title,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: cs.onSurfaceVariant,
+              size: 24,
+            ),
           ],
         ),
       ),
@@ -292,29 +308,53 @@ class _DrawerBottomAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = colorScheme.surfaceContainerHighest;
+    
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: definition.onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        definition.onTap();
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(18),
+                color: baseColor,
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                gradient: AppTheme.neumorphicGradient(baseColor, isDark: isDark),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                    offset: const Offset(2, 3),
+                    blurRadius: 8,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: isDark ? 0.03 : 0.5),
+                    offset: const Offset(-2, -3),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
-              child: Icon(definition.icon, color: colorScheme.onSurfaceVariant),
+              child: Icon(
+                definition.icon,
+                color: colorScheme.onSurfaceVariant,
+                size: 26,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               definition.label,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
             ),
           ],

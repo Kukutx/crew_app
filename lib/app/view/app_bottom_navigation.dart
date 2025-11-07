@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_stage_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../state/app_overlay_provider.dart';
@@ -70,6 +71,8 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
   void _handleDestinationSelected(int index) {
     if (_navigationIndex != index) {
       setState(() => _navigationIndex = index);
+      // 添加触感反馈
+      HapticFeedback.lightImpact();
     }
 
     final sheetNotifier = ref.read(mapOverlaySheetProvider.notifier);

@@ -96,39 +96,60 @@ class EventHostCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              SizedBox(
-                height: 36,
-                child: isFollowing
-                    ? OutlinedButton.icon(
-                        onPressed: onToggleFollow,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: colorScheme.primary,
-                          side: BorderSide(
-                            color: colorScheme.primary.withValues(alpha: 0.6),
-                          ),
-                          overlayColor: colorScheme.primary.withValues(
-                            alpha: 0.08,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+              isFollowing
+                  ? OutlinedButton.icon(
+                      onPressed: onToggleFollow,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colorScheme.primary,
+                        side: BorderSide(
+                          color: colorScheme.primary.withValues(alpha: 0.6),
                         ),
-                        icon: const Icon(Icons.check, size: 18),
-                        label: Text(loc.action_following),
-                      )
-                    : ElevatedButton.icon(
-                        onPressed: onToggleFollow,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                        overlayColor: colorScheme.primary.withValues(
+                          alpha: 0.08,
                         ),
-                        icon: const Icon(Icons.person_add_alt_1, size: 18),
-                        label: Text(loc.action_follow),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        minimumSize: const Size(0, 36),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-              ),
+                      icon: const Icon(Icons.check, size: 18),
+                      label: Text(
+                        loc.action_following,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )
+                  : ElevatedButton.icon(
+                      onPressed: onToggleFollow,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        minimumSize: const Size(0, 36),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      icon: const Icon(Icons.person_add_alt_1, size: 18),
+                      label: Text(
+                        loc.action_follow,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
             ],
           ),
         ),

@@ -6,7 +6,7 @@ import 'package:crew_app/features/events/presentation/pages/detail/widgets/event
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/sheets/event_share_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/moment/widgets/create_moment_screen.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
@@ -429,7 +429,13 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
       ),
       floatingActionButton: _MomentPostFab(
         label: loc.event_detail_publish_plaza,
-        onPressed: () => showCreateContentOptionsSheet(context),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const CreateMomentScreen(),
+            ),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: EventDetailBody(
@@ -479,7 +485,7 @@ class _MomentPostFab extends StatelessWidget {
       tooltip: label,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
-      child: const Icon(Icons.add),
+      child: const Icon(Icons.camera_alt),
     );
   }
 }

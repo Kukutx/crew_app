@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -81,10 +82,10 @@ class _EditMomentPageState extends State<EditMomentPage> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20.r),
               child: AspectRatio(
                 aspectRatio: 3 / 4,
                 child: mediaAssets.isNotEmpty
@@ -107,7 +108,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
                           ),
                           if (mediaAssets.length > 1)
                             Positioned(
-                              bottom: 12,
+                              bottom: 12.h,
                               left: 0,
                               right: 0,
                               child: Row(
@@ -116,12 +117,12 @@ class _EditMomentPageState extends State<EditMomentPage> {
                                   for (var i = 0; i < mediaAssets.length; i++)
                                     AnimatedContainer(
                                       duration: const Duration(milliseconds: 200),
-                                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                                      height: 6,
-                                      width: _currentImageIndex == i ? 16 : 6,
+                                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                      height: 6.h,
+                                      width: _currentImageIndex == i ? 16.w : 6.w,
                                       decoration: BoxDecoration(
                                         color: Colors.white.withValues(alpha: 0.8),
-                                        borderRadius: BorderRadius.circular(3),
+                                        borderRadius: BorderRadius.circular(3.r),
                                       ),
                                     ),
                                 ],
@@ -134,16 +135,16 @@ class _EditMomentPageState extends State<EditMomentPage> {
                         alignment: Alignment.center,
                         child: Icon(
                           Icons.photo_outlined,
-                          size: 48,
+                          size: 48.sp,
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
               ),
             ),
             if (mediaAssets.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               SizedBox(
-                height: 78,
+                height: 78.h,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
@@ -158,9 +159,9 @@ class _EditMomentPageState extends State<EditMomentPage> {
                         );
                       },
                       child: Container(
-                        width: 72,
+                        width: 72.w,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(
                             color: isSelected
                                 ? colorScheme.primary
@@ -174,15 +175,15 @@ class _EditMomentPageState extends State<EditMomentPage> {
                       ),
                     );
                   },
-                  separatorBuilder: (_, _) => const SizedBox(width: 12),
+                  separatorBuilder: (_, _) => SizedBox(width: 12.w),
                   itemCount: mediaAssets.length,
                 ),
               ),
             ],
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Wrap(
-              spacing: 12,
-              runSpacing: 12,
+              spacing: 12.w,
+              runSpacing: 12.h,
               alignment: WrapAlignment.end,
               children: [
                 OutlinedButton.icon(
@@ -205,12 +206,12 @@ class _EditMomentPageState extends State<EditMomentPage> {
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Text(
               '瞬间描述',
               style: theme.textTheme.titleMedium,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             TextField(
               controller: _contentController,
               minLines: 4,
@@ -219,35 +220,35 @@ class _EditMomentPageState extends State<EditMomentPage> {
               decoration: InputDecoration(
                 hintText: '记录这次活动的灵感或亮点...',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Text(
               '地点',
               style: theme.textTheme.titleMedium,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             TextField(
               controller: _locationController,
               decoration: InputDecoration(
                 hintText: '例如：城北城市绿地',
                 prefixIcon: const Icon(Icons.location_on_outlined),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               '标签',
               style: theme.textTheme.titleMedium,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Wrap(
-              spacing: 12,
-              runSpacing: 12,
+              spacing: 12.w,
+              runSpacing: 12.h,
               children: _tagSuggestions
                   .map(
                     (tag) => FilterChip(
@@ -266,11 +267,11 @@ class _EditMomentPageState extends State<EditMomentPage> {
                   )
                   .toList(),
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28.h),
             FilledButton(
               onPressed: _handleSubmit,
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
               ),
               child: const Text('保存修改'),
             ),

@@ -2150,6 +2150,12 @@ abstract class AppLocalizations {
   /// **'Create quick trip'**
   String get map_select_location_create_trip;
 
+  /// No description provided for @map_apply_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply location'**
+  String get map_apply_location;
+
   /// No description provided for @wallet_title.
   ///
   /// In en, this message translates to:

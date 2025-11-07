@@ -1074,6 +1074,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_create_trip => '创建快速行程';
 
   @override
+  String get map_apply_location => '应用位置';
+
+  @override
   String get wallet_title => '我的钱包';
 
   @override

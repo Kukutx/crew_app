@@ -1,4 +1,7 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/theme/app_design_tokens.dart';
+import 'package:crew_app/shared/theme/app_spacing.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../data/road_trip_editor_models.dart';
@@ -44,17 +47,17 @@ class RoadTripTeamSection extends StatelessWidget {
             value: RoadTripPricingType.free,
             label: Text(
               loc.road_trip_team_pricing_free,
-              style: const TextStyle(fontSize: 13),
+              style: TextStyle(fontSize: 13.sp),
             ),
-            icon: const Icon(Icons.favorite_outline, size: 18),
+            icon: Icon(Icons.favorite_outline, size: 18.sp),
           ),
           ButtonSegment(
             value: RoadTripPricingType.paid,
             label: Text(
               loc.road_trip_team_pricing_paid,
-              style: const TextStyle(fontSize: 13),
+              style: TextStyle(fontSize: 13.sp),
             ),
-            icon: const Icon(Icons.payments_outlined, size: 18),
+            icon: Icon(Icons.payments_outlined, size: 18.sp),
           ),
         ],
         selected: {pricingType},
@@ -71,7 +74,7 @@ class RoadTripTeamSection extends StatelessWidget {
                 hint: loc.road_trip_team_max_participants_hint,
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10.w),
             Expanded(
               child: _PriceInputField(
                 price: price,
@@ -84,10 +87,10 @@ class RoadTripTeamSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: AppDesignTokens.spacingLG.h),
         TextField(
           controller: tagInputController,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
           decoration: roadTripInputDecoration(
             context,
             loc.road_trip_preferences_tag_label,
@@ -102,20 +105,20 @@ class RoadTripTeamSection extends StatelessWidget {
           onSubmitted: (_) => onSubmitTag(),
         ),
         if (tags.isNotEmpty) ...[
-          const SizedBox(height: 12),
+          SizedBox(height: AppDesignTokens.spacingMD.h),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: AppDesignTokens.spacingSM.w,
+            runSpacing: AppDesignTokens.spacingSM.h,
             children: tags
               .map(
                 (t) => Chip(
                   label: Text(
                     '#$t',
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: AppDesignTokens.fontSizeSM.sp),
                   ),
-                  deleteIcon: const Icon(Icons.close, size: 16),
+                  deleteIcon: Icon(Icons.close, size: AppDesignTokens.iconSizeXS.sp),
                   onDeleted: () => onRemoveTag(t),
-                  labelStyle: const TextStyle(fontSize: 12),
+                  labelStyle: TextStyle(fontSize: AppDesignTokens.fontSizeSM.sp),
                 ),
               )
               .toList(),
@@ -180,14 +183,14 @@ class _MaxParticipantsInputFieldState extends State<_MaxParticipantsInputField> 
   Widget build(BuildContext context) {
     return TextFormField(
       controller: _controller,
-      style: const TextStyle(fontSize: 14),
+      style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
       decoration: roadTripInputDecoration(
         context,
         widget.label,
         widget.hint,
       ).copyWith(
         suffixIcon: PopupMenuButton<int>(
-          icon: const Icon(Icons.add, size: 18),
+          icon: Icon(Icons.add, size: 18.sp),
           tooltip: '预设人数',
           itemBuilder: (context) => _presetValues
               .map((value) => PopupMenuItem<int>(
@@ -306,20 +309,20 @@ class _PriceInputFieldState extends State<_PriceInputField> {
         key: const ValueKey('free_price_input'),
         enabled: false,
         initialValue: loc.road_trip_team_pricing_free,
-        style: const TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
         decoration: roadTripInputDecoration(
           context,
           widget.label,
           widget.freeHint,
         ).copyWith(
           // 添加空的 suffixIcon 以保持样式一致
-          suffixIcon: const SizedBox(width: 48, height: 48),
+          suffixIcon: SizedBox(width: 48.w, height: 48.h),
           // 确保禁用状态下的边框样式一致
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
             borderSide: BorderSide(
               color: colorScheme.outline.withValues(alpha: 0.2),
-              width: 1,
+              width: AppDesignTokens.borderWidthThin,
             ),
           ),
         ),
@@ -329,14 +332,14 @@ class _PriceInputFieldState extends State<_PriceInputField> {
     return TextFormField(
       key: const ValueKey('paid_price_input'),
       controller: _priceController,
-      style: const TextStyle(fontSize: 14),
+      style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
       decoration: roadTripInputDecoration(
         context,
         widget.label,
         widget.paidHint,
       ).copyWith(
         suffixIcon: PopupMenuButton<double>(
-          icon: const Icon(Icons.add, size: 18),
+          icon: Icon(Icons.add, size: 18.sp),
           tooltip: '预设价格',
           itemBuilder: (context) => _presetPrices
               .map((price) => PopupMenuItem<double>(

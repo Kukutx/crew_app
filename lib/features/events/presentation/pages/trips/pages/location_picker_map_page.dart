@@ -7,6 +7,8 @@ import 'package:crew_app/features/events/presentation/pages/map/widgets/map_canv
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/location_info_bottom_sheet.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/theme/app_design_tokens.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -149,7 +151,7 @@ class _LocationPickerMapPageState
         actions: [
           TextButton(
             onPressed: _currentLocation != null ? _onConfirm : null,
-            child: Text("Apply location"),
+            child: Text(loc.map_apply_location),
           ),
         ],
       ),
@@ -171,13 +173,13 @@ class _LocationPickerMapPageState
           Center(
             child: Icon(
               Icons.place,
-              size: 48,
+              size: AppDesignTokens.iconSizeXL.sp,
               color: markerColor,
-              shadows: const [
+              shadows: [
                 Shadow(
-                  blurRadius: 4,
+                  blurRadius: 4.r,
                   color: Colors.black26,
-                  offset: Offset(0, 2),
+                  offset: Offset(0, 2.h),
                 ),
               ],
             ),

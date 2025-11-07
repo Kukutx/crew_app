@@ -1122,6 +1122,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_select_location_create_trip => 'Create quick trip';
 
   @override
+  String get map_apply_location => 'Apply location';
+
+  @override
   String get wallet_title => 'Wallet';
 
   @override

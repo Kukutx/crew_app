@@ -1,3 +1,6 @@
+import 'package:crew_app/shared/theme/app_design_tokens.dart';
+import 'package:crew_app/shared/theme/app_spacing.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 class RoadTripSectionCard extends StatelessWidget {
@@ -21,7 +24,7 @@ class RoadTripSectionCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: AppSpacing.only(bottom: AppDesignTokens.spacingXL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -29,14 +32,19 @@ class RoadTripSectionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 40, height: 40,
+                width: 40.w,
+                height: 40.h,
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
                 ),
-                child: Icon(icon, color: colorScheme.onPrimaryContainer, size: 20),
+                child: Icon(
+                  icon,
+                  color: colorScheme.onPrimaryContainer,
+                  size: AppDesignTokens.iconSizeSM.sp,
+                ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDesignTokens.spacingMD.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,16 +61,16 @@ class RoadTripSectionCard extends StatelessWidget {
                                 title,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 17,
+                                  fontSize: AppDesignTokens.fontSizeXL.sp,
                                 ),
                               ),
                               if (subtitle.isNotEmpty) ...[
-                                const SizedBox(height: 2),
+                                SizedBox(height: AppDesignTokens.spacingXS.h / 2),
                                 Text(
                                   subtitle,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurfaceVariant,
-                                    fontSize: 12,
+                                    fontSize: AppDesignTokens.fontSizeSM.sp,
                                   ),
                                 ),
                               ],
@@ -70,7 +78,7 @@ class RoadTripSectionCard extends StatelessWidget {
                           ),
                         ),
                         if (headerTrailing != null) ...[
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDesignTokens.spacingSM.w),
                           headerTrailing!,
                         ],
                       ],
@@ -80,7 +88,7 @@ class RoadTripSectionCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDesignTokens.spacingLG.h),
           ...children,
         ],
       ),
@@ -99,28 +107,38 @@ InputDecoration roadTripInputDecoration(
   return InputDecoration(
     labelText: label,
     hintText: hint,
-    labelStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
-    hintStyle: theme.textTheme.bodySmall?.copyWith(fontSize: 13),
+    labelStyle: theme.textTheme.bodyMedium?.copyWith(
+      fontSize: AppDesignTokens.fontSizeMD.sp,
+    ),
+    hintStyle: theme.textTheme.bodySmall?.copyWith(
+      fontSize: 13.sp, // 13px 不在标准 token 中，使用响应式
+    ),
     filled: true,
     fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
       borderSide: BorderSide(
         color: colorScheme.outline.withValues(alpha: 0.2),
-        width: 1,
+        width: AppDesignTokens.borderWidthThin,
       ),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
       borderSide: BorderSide(
         color: colorScheme.outline.withValues(alpha: 0.2),
-        width: 1,
+        width: AppDesignTokens.borderWidthThin,
       ),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+      borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
+      borderSide: BorderSide(
+        color: colorScheme.primary,
+        width: AppDesignTokens.borderWidthMedium,
+      ),
     ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    contentPadding: AppSpacing.symmetric(
+      horizontal: AppDesignTokens.spacingLG,
+      vertical: 14.h, // 14px 不在标准 token 中，使用响应式
+    ),
   );
 }

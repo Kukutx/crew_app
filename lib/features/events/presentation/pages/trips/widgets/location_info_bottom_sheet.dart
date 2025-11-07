@@ -1,6 +1,9 @@
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
+import 'package:crew_app/shared/theme/app_design_tokens.dart';
+import 'package:crew_app/shared/theme/app_spacing.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// 位置信息底部窗口
@@ -24,12 +27,14 @@ class LocationInfoBottomSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDesignTokens.radiusXL.r),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            blurRadius: 10.r,
+            offset: Offset(0, -2.h),
           ),
         ],
       ),
@@ -38,18 +43,24 @@ class LocationInfoBottomSheet extends StatelessWidget {
         children: [
           // 拖拽手柄
           Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
+            margin: AppSpacing.only(
+              top: AppDesignTokens.spacingMD,
+              bottom: AppDesignTokens.spacingSM,
+            ),
+            width: 40.w,
+            height: 4.h,
             decoration: BoxDecoration(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(2.r),
             ),
           ),
           // 地址信息
           if (addressFuture != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: AppSpacing.symmetric(
+                horizontal: AppDesignTokens.spacingLG,
+                vertical: AppDesignTokens.spacingSM,
+              ),
               child: FutureBuilder<String?>(
                 future: addressFuture,
                 builder: (context, snapshot) {
@@ -59,19 +70,21 @@ class LocationInfoBottomSheet extends StatelessWidget {
                         Icon(
                           Icons.location_on_outlined,
                           color: theme.colorScheme.primary,
-                          size: 20,
+                          size: AppDesignTokens.iconSizeSM.sp,
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: AppDesignTokens.spacingMD.w),
                         Expanded(
                           child: Text(
-                            '正在获取地址...',
+                            loc.map_location_info_address_loading,
                             style: theme.textTheme.bodyMedium,
                           ),
                         ),
-                        const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                        SizedBox(
+                          width: AppDesignTokens.spacingLG.w,
+                          height: AppDesignTokens.spacingLG.h,
+                          child: CircularProgressIndicator(
+                            strokeWidth: AppDesignTokens.borderWidthThick,
+                          ),
                         ),
                       ],
                     );
@@ -83,12 +96,12 @@ class LocationInfoBottomSheet extends StatelessWidget {
                         Icon(
                           Icons.location_on_outlined,
                           color: theme.colorScheme.error,
-                          size: 20,
+                          size: AppDesignTokens.iconSizeSM.sp,
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: AppDesignTokens.spacingMD.w),
                         Expanded(
                           child: Text(
-                            '无法获取地址',
+                            loc.map_location_info_address_unavailable,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.error,
                             ),
@@ -105,14 +118,14 @@ class LocationInfoBottomSheet extends StatelessWidget {
                       Icon(
                         Icons.location_on_outlined,
                         color: theme.colorScheme.primary,
-                        size: 20,
+                        size: AppDesignTokens.iconSizeSM.sp,
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: AppDesignTokens.spacingMD.w),
                       Expanded(
                         child: Text(
                           address != null
                               ? address.truncate(maxLength: 30)
-                              : '地址不可用',
+                              : loc.map_location_info_address_unavailable,
                           style: theme.textTheme.bodyMedium,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -148,9 +161,9 @@ class _NearbyPlacesList extends StatelessWidget {
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(
+          return Padding(
+            padding: AppSpacing.all(AppDesignTokens.spacingLG),
+            child: const Center(
               child: CircularProgressIndicator(),
             ),
           );
@@ -158,9 +171,9 @@ class _NearbyPlacesList extends StatelessWidget {
 
         if (snapshot.hasError) {
           return Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.all(AppDesignTokens.spacingLG),
             child: Text(
-              '无法加载附近地点',
+              loc.map_location_info_nearby_error,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -178,19 +191,27 @@ class _NearbyPlacesList extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              padding: AppSpacing.only(
+                left: AppDesignTokens.spacingLG,
+                top: AppDesignTokens.spacingSM,
+                right: AppDesignTokens.spacingLG,
+                bottom: AppDesignTokens.spacingSM,
+              ),
               child: Text(
                 loc.map_location_info_nearby_title,
                 style: theme.textTheme.labelLarge,
               ),
             ),
             SizedBox(
-              height: 120,
+              height: 120.h,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: AppSpacing.symmetric(
+                  horizontal: AppDesignTokens.spacingLG,
+                ),
                 itemCount: places.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                separatorBuilder: (context, index) =>
+                    SizedBox(width: AppDesignTokens.spacingSM.w),
                 itemBuilder: (context, index) {
                   final place = places[index];
                   return _NearbyPlaceCard(place: place);
@@ -214,14 +235,14 @@ class _NearbyPlaceCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      width: 200,
-      padding: const EdgeInsets.all(12),
+      width: 200.w,
+      padding: AppSpacing.all(AppDesignTokens.spacingMD),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.2),
-          width: 1,
+          width: AppDesignTokens.borderWidthThin,
         ),
       ),
       child: Column(
@@ -237,7 +258,7 @@ class _NearbyPlaceCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           if (place.formattedAddress != null) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: AppDesignTokens.spacingXS.h),
             Text(
               place.formattedAddress!.truncate(maxLength: 30),
               style: theme.textTheme.bodySmall?.copyWith(

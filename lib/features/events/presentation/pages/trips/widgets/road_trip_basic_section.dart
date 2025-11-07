@@ -1,5 +1,8 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/theme/app_design_tokens.dart';
+import 'package:crew_app/shared/theme/app_spacing.dart';
 import 'package:crew_app/shared/utils/formatted_date.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'road_trip_section_card.dart';
@@ -27,7 +30,7 @@ class RoadTripBasicSection extends StatelessWidget {
       children: [
         TextFormField(
           controller: titleController,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
           decoration: roadTripInputDecoration(
             context,
             loc.road_trip_basic_title_label,
@@ -38,18 +41,21 @@ class RoadTripBasicSection extends StatelessWidget {
               ? loc.road_trip_basic_title_required
               : null,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: AppDesignTokens.spacingMD.h),
         InkWell(
           onTap: onPickDateRange,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: AppSpacing.symmetric(
+              horizontal: AppDesignTokens.spacingLG,
+              vertical: 14.h,
+            ),
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
               border: Border.all(
                 color: theme.colorScheme.outline.withValues(alpha: 0.2),
-                width: 1,
+                width: AppDesignTokens.borderWidthThin,
               ),
             ),
             child: Row(
@@ -57,21 +63,21 @@ class RoadTripBasicSection extends StatelessWidget {
                 Icon(
                   Icons.calendar_month,
                   color: theme.colorScheme.primary,
-                  size: 20,
+                  size: AppDesignTokens.iconSizeSM.sp,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: AppDesignTokens.spacingMD.w),
                 Expanded(
                   child: Text(
                     dateRange == null
                         ? loc.road_trip_basic_date_label
                         : '${DateFormatHelper.formatDate(dateRange!.start)} → ${DateFormatHelper.formatDate(dateRange!.end)}',
-                    style: const TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
                   ),
                 ),
                 Icon(
                   Icons.chevron_right_rounded,
                   color: theme.colorScheme.onSurfaceVariant,
-                  size: 20,
+                  size: AppDesignTokens.iconSizeSM.sp,
                 ),
               ],
             ),

@@ -430,6 +430,7 @@
   "map_select_location_destination_label": "终点",
   "map_select_location_open_detailed": "打开详细规划",
   "map_select_location_create_trip": "创建快速行程",
+  "map_apply_location": "应用位置",
   "wallet_title": "我的钱包",
   "wallet_balance_label": "可用余额",
   "wallet_last_updated": "{timeAgo}前更新",

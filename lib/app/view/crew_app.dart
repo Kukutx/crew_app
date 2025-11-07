@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:crew_app/app/router/app_router.dart';
+import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/features/settings/state/settings_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -131,15 +132,14 @@ class _CrewAppState extends ConsumerState<CrewApp> {
       minTextAdapt: true,
       // 根据屏幕高度分割，确保横竖屏都能正常显示
       splitScreenMode: true,
-      // 平板最大缩放比例限制为 1.2，避免内容过大
       builder: (context, child) {
         return MaterialApp.router(
-          title: 'Events Demo',
+          title: 'Crew',
           locale: settings.locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
           themeMode: settings.themeMode,
           routerConfig: router,
           builder: (context, child) {

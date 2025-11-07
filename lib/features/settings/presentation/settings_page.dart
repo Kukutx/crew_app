@@ -1,4 +1,5 @@
 import 'package:crew_app/app/router/app_router.dart';
+import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/settings/state/settings_providers.dart';
@@ -411,6 +412,10 @@ class _SettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = colorScheme.surface;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
@@ -421,17 +426,32 @@ class _SettingsSection extends StatelessWidget {
             child: Text(
               title,
               style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                letterSpacing: -0.2,
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          Card(
+          const SizedBox(height: 12),
+          Container(
             margin: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: baseColor,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              gradient: AppTheme.neumorphicGradient(baseColor, isDark: isDark),
+              boxShadow: AppTheme.neumorphicShadowRaised(colorScheme, isDark: isDark),
+            ),
             child: Column(
               children: [
                 for (int i = 0; i < children.length; i++) ...[
-                  if (i != 0) const Divider(height: 1),
+                  if (i != 0) 
+                    Divider(
+                      height: 1,
+                      thickness: 0.5,
+                      indent: 16,
+                      endIndent: 16,
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+                    ),
                   children[i],
                 ],
               ],

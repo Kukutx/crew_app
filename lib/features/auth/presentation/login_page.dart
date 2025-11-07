@@ -34,11 +34,9 @@ class _LoginPageState extends ConsumerState<LoginPage>
     setState(() => _loading = true);
 
     try {
-      UserCredential credential;
-
       if (kIsWeb) {
         final provider = GoogleAuthProvider();
-        credential = await FirebaseAuth.instance.signInWithPopup(provider);
+        await FirebaseAuth.instance.signInWithPopup(provider);
       } else {
         final googleSignIn = GoogleSignIn(
           clientId: Platform.isIOS
@@ -55,7 +53,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        credential = await FirebaseAuth.instance.signInWithCredential(oauth);
+        await FirebaseAuth.instance.signInWithCredential(oauth);
       }
 
       // 同步你现有后端用户信息
@@ -96,10 +94,22 @@ class _LoginPageState extends ConsumerState<LoginPage>
     final cs = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      body: SafeArea(
-        child: Stack(
-          children: [
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              cs.primaryContainer.withValues(alpha: 0.15),
+              cs.surface,
+              cs.surface,
+            ],
+            stops: const [0.0, 0.3, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
             // 顶部品牌
             Align(
               alignment: Alignment.topCenter,
@@ -109,18 +119,25 @@ class _LoginPageState extends ConsumerState<LoginPage>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 72,
-                      height: 72,
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
-                        color: cs.primary.withValues(alpha: 0.08),
+                        color: cs.primaryContainer.withValues(alpha: 0.3),
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: cs.primary.withValues(alpha: 0.15),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                          ),
+                        ],
                       ),
                       alignment: Alignment.center,
                       child: Image.asset(
                         'assets/images/icons/logo_login.png',
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.contain, // 保持比例不裁剪
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -245,6 +262,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
             ),
           ],
         ),
+      ),
       ),
     );
   }

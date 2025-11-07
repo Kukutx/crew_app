@@ -1,7 +1,8 @@
 import 'package:crew_app/app/router/app_router.dart';
+import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -141,14 +142,14 @@ class _AppDrawerState extends State<AppDrawer> {
             child: Align(
               alignment: Alignment.topCenter,
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(20.w, 80.h, 20.w, 24.h),
+                padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     for (final group in menuGroups) ...[
                       _AppMenuItemSection(group: group),
-                      SizedBox(height: 28.h),
+                      const SizedBox(height: 28),
                     ],
                   ],
                 ),
@@ -156,13 +157,13 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
 
-          Divider(height: 1.h),
+          const Divider(height: 1),
           Builder(
             builder: (context) {
               // iOS 底部 Home 指示条、Android 手势导航等的安全距离
               final bottomSafe = MediaQuery.of(context).viewPadding.bottom;
               return Padding(
-                padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h + bottomSafe),
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + bottomSafe),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -173,7 +174,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         ),
                       ),
                       if (i != bottomActions.length - 1)
-                        SizedBox(width: 16.w),
+                        const SizedBox(width: 16),
                     ],
                   ],
                 ),
@@ -212,13 +213,17 @@ class _AppMenuItemSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = cs.surface;
 
-    return Material(
-      color: cs.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-        side: BorderSide(color: cs.outlineVariant.withValues(alpha: .5)),
+    return Container(
+      decoration: BoxDecoration(
+        color: baseColor,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        gradient: AppTheme.neumorphicGradient(baseColor, isDark: isDark),
+        boxShadow: AppTheme.neumorphicShadowRaised(cs, isDark: isDark),
       ),
       child: Column(
         children: [
@@ -226,9 +231,11 @@ class _AppMenuItemSection extends StatelessWidget {
             _MinimalTile(definition: group.actions[i]),
             if (i != group.actions.length - 1)
               Divider(
-                height: 1.h,
-                thickness: 0.5.h,
+                height: 1,
+                thickness: 0.5,
                 color: cs.outlineVariant.withValues(alpha: 0.35),
+                indent: 16,
+                endIndent: 16,
               ),
           ],
         ],
@@ -247,24 +254,32 @@ class _MinimalTile extends StatelessWidget {
     final cs = theme.colorScheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(16.r),
-      onTap: definition.onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        definition.onTap();
+      },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
-            Icon(definition.icon, size: 22.sp, color: cs.onSurface),
-            SizedBox(width: 12.w),
+            Icon(definition.icon, size: 24, color: cs.onSurface),
+            const SizedBox(width: 14),
             Expanded(
               child: Text(
                 definition.title,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: cs.onSurfaceVariant,
+              size: 24,
+            ),
           ],
         ),
       ),
@@ -293,29 +308,53 @@ class _DrawerBottomAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = colorScheme.surfaceContainerHighest;
+    
     return InkWell(
-      borderRadius: BorderRadius.circular(16.r),
-      onTap: definition.onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        definition.onTap();
+      },
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12.h),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 52.w,
-              height: 52.h,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(18.r),
+                color: baseColor,
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                gradient: AppTheme.neumorphicGradient(baseColor, isDark: isDark),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                    offset: const Offset(2, 3),
+                    blurRadius: 8,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: isDark ? 0.03 : 0.5),
+                    offset: const Offset(-2, -3),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
-              child: Icon(definition.icon, color: colorScheme.onSurfaceVariant),
+              child: Icon(
+                definition.icon,
+                color: colorScheme.onSurfaceVariant,
+                size: 26,
+              ),
             ),
-            SizedBox(height: 8.h),
+            const SizedBox(height: 10),
             Text(
               definition.label,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
             ),
           ],

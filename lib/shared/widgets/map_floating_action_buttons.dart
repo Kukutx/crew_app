@@ -68,14 +68,14 @@ class MapFloatingActionButtons extends StatelessWidget {
     double opacity;
 
     if (mapSheetType != MapOverlaySheetType.none) {
-      if (mapSheetStage == MapOverlaySheetStage.collapsed) {
-        // 阶段一（collapsed）：根据 sheet 高度平滑上移
+      if (mapSheetStage != MapOverlaySheetStage.expanded) {
+        // 阶段一、二（collapsed, middle）：根据 sheet 高度平滑上移
         final sheetHeight = screenHeight * mapSheetSize;
         // 按钮需要上移到 sheet 上方，加上一些间距
         bottomOffset = sheetHeight + 16 + safeBottom;
         opacity = 1.0;
       } else {
-        // 其他阶段（middle, expanded）：直接隐藏
+        // 阶段三（expanded）：直接隐藏
         bottomOffset = bottomPadding;
         opacity = 0.0;
       }

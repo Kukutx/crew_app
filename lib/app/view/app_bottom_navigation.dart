@@ -125,10 +125,10 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
   // 如果你已经在项目里用了 stage，可一起判断；没有就删掉下一行和相关逻辑
   final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
 
-  // ✅ 出现创建行程时强制隐藏；（可选）其它 Sheet 在中/大展开时也隐藏
+  // ✅ 出现创建行程时强制隐藏；其它 Sheet 只在完全展开时隐藏（阶段一、二显示，阶段三隐藏）
   final hideForCreate = mapSheetType == MapOverlaySheetType.createRoadTrip;
   final hideForOthers = mapSheetType != MapOverlaySheetType.none &&
-      mapSheetStage != MapOverlaySheetStage.collapsed;
+    mapSheetStage == MapOverlaySheetStage.expanded;
 
       
     final baseVisible = widget.show && ref.watch(bottomNavigationVisibilityProvider);

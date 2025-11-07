@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_stage_provider.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -92,7 +93,7 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final borderRadius = BorderRadius.circular(18);
+    final borderRadius = BorderRadius.circular(18.r);
     final glassBorderColor = colorScheme.outline.withValues(alpha: 0.14);
 
     BoxDecoration navDecoration(bool isScrolling) {
@@ -109,8 +110,8 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
             color: colorScheme.shadow.withValues(
               alpha: isScrolling ? 0.08 : 0.12,
             ),
-            blurRadius: isScrolling ? 30 : 24,
-            offset: Offset(0, isScrolling ? 18 : 12),
+            blurRadius: isScrolling ? 30.r : 24.r,
+            offset: Offset(0, isScrolling ? 18.h : 12.h),
           ),
         ],
       );
@@ -140,7 +141,7 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
           curve: Curves.easeInOut,
           opacity: showBottomNav ? 1 : 0,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            padding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 0),
             child: ClipRRect(
               borderRadius: borderRadius,
               child: BackdropFilter(
@@ -153,7 +154,7 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
                   child: NavigationBarTheme(
                     data: theme.navigationBarTheme.copyWith(
                       backgroundColor: Colors.transparent,
-                      height: 64,
+                      height: 64.h,
                       indicatorColor: colorScheme.primary.withValues(
                         alpha: 0.12,
                       ),
@@ -161,7 +162,7 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
                       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
                       iconTheme: WidgetStateProperty.resolveWith(
                         (states) => IconThemeData(
-                          size: states.contains(WidgetState.selected) ? 30 : 26,
+                          size: states.contains(WidgetState.selected) ? 30.sp : 26.sp,
                           color: states.contains(WidgetState.selected)
                               ? colorScheme.primary
                               : colorScheme.onSurfaceVariant,

@@ -1,3 +1,4 @@
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 enum AppFloatingActionButtonVariant { small, regular, extended }
@@ -38,7 +39,7 @@ class AppFloatingActionButton extends StatelessWidget {
     final effectiveBackgroundColor = backgroundColor ?? theme.colorScheme.primary;
     final effectiveForegroundColor = foregroundColor ?? theme.colorScheme.onPrimary;
     final ShapeBorder defaultShape =
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r));
     final effectiveShape = shape ?? defaultShape;
 
     final Widget button;

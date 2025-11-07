@@ -1,5 +1,6 @@
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -140,14 +141,14 @@ class _AppDrawerState extends State<AppDrawer> {
             child: Align(
               alignment: Alignment.topCenter,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
+                padding: EdgeInsets.fromLTRB(20.w, 80.h, 20.w, 24.h),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     for (final group in menuGroups) ...[
                       _AppMenuItemSection(group: group),
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28.h),
                     ],
                   ],
                 ),
@@ -155,13 +156,13 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
 
-          const Divider(height: 1),
+          Divider(height: 1.h),
           Builder(
             builder: (context) {
               // iOS 底部 Home 指示条、Android 手势导航等的安全距离
               final bottomSafe = MediaQuery.of(context).viewPadding.bottom;
               return Padding(
-                padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + bottomSafe),
+                padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h + bottomSafe),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -172,7 +173,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         ),
                       ),
                       if (i != bottomActions.length - 1)
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16.w),
                     ],
                   ],
                 ),
@@ -216,7 +217,7 @@ class _AppMenuItemSection extends StatelessWidget {
     return Material(
       color: cs.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         side: BorderSide(color: cs.outlineVariant.withValues(alpha: .5)),
       ),
       child: Column(
@@ -225,8 +226,8 @@ class _AppMenuItemSection extends StatelessWidget {
             _MinimalTile(definition: group.actions[i]),
             if (i != group.actions.length - 1)
               Divider(
-                height: 1,
-                thickness: 0.5,
+                height: 1.h,
+                thickness: 0.5.h,
                 color: cs.outlineVariant.withValues(alpha: 0.35),
               ),
           ],
@@ -246,14 +247,14 @@ class _MinimalTile extends StatelessWidget {
     final cs = theme.colorScheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       onTap: definition.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
         child: Row(
           children: [
-            Icon(definition.icon, size: 22, color: cs.onSurface),
-            const SizedBox(width: 12),
+            Icon(definition.icon, size: 22.sp, color: cs.onSurface),
+            SizedBox(width: 12.w),
             Expanded(
               child: Text(
                 definition.title,
@@ -293,23 +294,23 @@ class _DrawerBottomAction extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       onTap: definition.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 12.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 52.w,
+              height: 52.h,
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18.r),
               ),
               child: Icon(definition.icon, color: colorScheme.onSurfaceVariant),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(
               definition.label,
               textAlign: TextAlign.center,

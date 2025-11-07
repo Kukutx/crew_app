@@ -308,6 +308,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                   }
                 },
                 onCameraMove: (position) {
+                  // 更新地图中心位置（用于地图选择模式）
+                  mapController.updateCenterPosition(position.target);
+                  
                   // 只更新相机位置，不触发 setState
                   // 这样可以避免每次相机移动时重建整个 widget 树
                   _currentCameraPosition = position;

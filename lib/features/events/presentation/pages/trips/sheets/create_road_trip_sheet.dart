@@ -846,10 +846,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
             final mapController = ref.read(mapControllerProvider);
             unawaited(mapController.moveCamera(location, zoom: 14));
           },
-          onFindOnMap: () {
-            // 进入地图选择模式（选择起点）
-            _enterMapPickerMode(isStart: true);
-          },
         ),
       ),
     );
@@ -892,92 +888,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
               unawaited(mapController.moveCamera(location, zoom: 14));
             }
           },
-          onFindOnMap: () {
-            // 进入地图选择模式（选择终点）
-            _enterMapPickerMode(isStart: false);
-          },
         ),
       ),
     );
-  }
-
-  // 进入地图选择模式
-  void _enterMapPickerMode({required bool isStart}) {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final mapController = ref.read(mapControllerProvider);
-    
-    // 设置地图选择模式
-    if (isStart) {
-      selectionController.setSelectingDestination(false);
-      // 如果有起点，移动到起点位置
-      if (_startLatLng != null) {
-        unawaited(mapController.moveCamera(_startLatLng!, zoom: 14));
-      }
-    } else {
-      selectionController.setSelectingDestination(true);
-      // 如果有终点，移动到终点位置；否则移动到起点
-      if (_destinationLatLng != null) {
-        unawaited(mapController.moveCamera(_destinationLatLng!, zoom: 14));
-      } else if (_startLatLng != null) {
-        unawaited(mapController.moveCamera(_startLatLng!, zoom: 12));
-      }
-    }
-    
-    // 进入地图选择模式，开启中心点标记
-    selectionController.setMapPickerMode(true, isSelectingStart: isStart);
-    
-    // 确保 overlay 打开
-    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
-  }
-
-  // 确认地图选择的位置
-  Future<void> _confirmMapPickerLocation() async {
-    final selectionState = ref.read(mapSelectionControllerProvider);
-    final mapController = ref.read(mapControllerProvider);
-    final locationManager = ref.read(locationSelectionManagerProvider);
-    
-    // 获取地图中心点的坐标
-    final centerPosition = await mapController.getCenterPosition();
-    if (centerPosition == null) return;
-    
-    // 判断是选择起点还是终点
-    final isSelectingStart = selectionState.isPickingStartLocation;
-    
-    // 反向地理编码获取地址
-    final address = await locationManager.reverseGeocode(centerPosition);
-    
-    // 更新位置
-    setState(() {
-      if (isSelectingStart) {
-        _startLatLng = centerPosition;
-        _startAddress = address;
-        _startAddressFuture = Future.value(address);
-        _startNearbyFuture = _loadNearbyPlaces(centerPosition);
-        
-        // 更新选择状态
-        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-        selectionController.setSelectedLatLng(centerPosition);
-      } else {
-        _destinationLatLng = centerPosition;
-        _destinationAddress = address;
-        _destinationAddressFuture = Future.value(address);
-        _destinationNearbyFuture = _loadNearbyPlaces(centerPosition);
-        
-        // 更新选择状态
-        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-        selectionController.setDestinationLatLng(centerPosition);
-      }
-    });
-    
-    // 退出地图选择模式
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    selectionController.setMapPickerMode(false);
-  }
-
-  // 取消地图选择
-  void _cancelMapPicker() {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    selectionController.setMapPickerMode(false);
   }
 
   Future<void> goToSection(TripSection s) async {

@@ -14,14 +14,12 @@ class LocationSearchPage extends ConsumerStatefulWidget {
   const LocationSearchPage({
     super.key,
     required this.onLocationSelected,
-    this.onFindOnMap,
     this.initialQuery,
     this.initialLocation,
     this.title,
   });
 
   final ValueChanged<PlaceDetails> onLocationSelected;
-  final VoidCallback? onFindOnMap;
   final String? initialQuery;
   final LatLng? initialLocation;
   final String? title;
@@ -114,9 +112,27 @@ class _LocationSearchPageState extends ConsumerState<LocationSearchPage> {
   }
 
   void _onFindOnMap() {
-    // 关闭搜索页面，触发地图选择模式
-    Navigator.of(context).pop();
-    widget.onFindOnMap?.call();
+    // 打开地图选择页面
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LocationPickerMapPage(
+          initialLocation: widget.initialLocation,
+          onLocationSelected: (latLng, address) {
+            // 创建一个临时的PlaceDetails
+            final place = PlaceDetails(
+              id: 'picked_${latLng.latitude}_${latLng.longitude}',
+              displayName: address ?? '已选择的位置',
+              formattedAddress: address,
+              location: latLng,
+            );
+            widget.onLocationSelected(place);
+            // 关闭地图选择页面和搜索页面，返回到创建页面
+            Navigator.of(context).pop(); // 关闭 LocationPickerMapPage
+            Navigator.of(context).pop(); // 关闭 LocationSearchPage
+          },
+        ),
+      ),
+    );
   }
 
   @override

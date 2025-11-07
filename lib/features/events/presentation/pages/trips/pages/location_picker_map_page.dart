@@ -167,6 +167,21 @@ class _LocationPickerMapPageState
             showUserLocation: false,
             mapPadding: EdgeInsets.zero,
           ),
+          // 中心标记点（固定在屏幕中心）
+          Center(
+            child: Icon(
+              Icons.place,
+              size: 48,
+              color: markerColor,
+              shadows: const [
+                Shadow(
+                  blurRadius: 4,
+                  color: Colors.black26,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+          ),
           // 底部信息窗口
           Positioned(
             left: 0,

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
@@ -982,7 +983,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     return SingleChildScrollView(
       controller: widget.scrollCtrl,
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
       child: content,
     );
   }
@@ -1199,7 +1200,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                       SingleChildScrollView(
                         controller: widget.scrollCtrl,
                         physics: const ClampingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
                         child: RoadTripRouteSection(
                           routeType: _routeType,
                           onRouteTypeChanged: _onRouteTypeChanged,
@@ -1236,7 +1237,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           ),
           // 底部按钮
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1275,7 +1276,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                     ),
                   ),
                 if ((_hasClickedStartContinue && !_canSwipe) || (_canSwipe && _tabController.index == 0))
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                 // 按钮区域
                 if (_canSwipe)
                   // 显示 ToggleTabBar 后：只有创建按钮
@@ -1286,10 +1287,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           ? _onCreatePressed
                           : null,
                       child: _isCreating
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.h,
+                              child: const CircularProgressIndicator(
                                 strokeWidth: 2,
                               ),
                             )
@@ -1307,17 +1308,17 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                                     ? _onCreatePressed
                                     : null,
                                 child: _isCreating
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
+                                    ? SizedBox(
+                                        width: 20.w,
+                                        height: 20.h,
+                                        child: const CircularProgressIndicator(
                                           strokeWidth: 2,
                                         ),
                                       )
                                     : Text(loc.road_trip_create_button),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12.w),
                             Expanded(
                               child: FilledButton(
                                 onPressed: _basicValid ? _continueFromBasic : null,
@@ -1366,14 +1367,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       child: ListView(
         controller: widget.scrollCtrl,
         padding: EdgeInsets.fromLTRB(
-          24,
-          16,
-          24,
-          24 + viewPadding + viewInsets,
+          24.w,
+          16.h,
+          24.w,
+          24.h + viewPadding + viewInsets,
         ),
         children: [
           const SheetHandle(),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1385,7 +1386,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                       loc.map_select_location_title,
                       style: theme.textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text(
                       loc.map_select_location_tip,
                       style: tipStyle,
@@ -1400,7 +1401,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           if (_startLatLng != null) ...[
             ValueListenableBuilder<LatLng?>(
               valueListenable: widget.startPositionListenable!,
@@ -1445,7 +1446,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           );
                         },
                       ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     if (_startNearbyFuture != null)
                       NearbyPlacesPreview(
                         key: ValueKey(
@@ -1458,7 +1459,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
               },
             ),
           ],
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           Row(
             children: [
               Expanded(
@@ -1467,7 +1468,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                   child: Text(loc.action_cancel),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
               Expanded(
                 child: FilledButton(
                   onPressed: widget.onConfirm,
@@ -1523,7 +1524,7 @@ class _RouteSelectionPage extends StatelessWidget {
       controller: scrollCtrl,
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           sliver: SliverList.list(
             children: [
               _CardTile(
@@ -1532,7 +1533,7 @@ class _RouteSelectionPage extends StatelessWidget {
                 subtitle: null,
                 onTap: onEditDeparture,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               _CardTile(
                 leading: const Icon(Icons.place_outlined),
                 title: destinationTitle,
@@ -1540,7 +1541,7 @@ class _RouteSelectionPage extends StatelessWidget {
                 onTap: departurePosition != null ? onEditDestination : null,
                 enabled: departurePosition != null,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               _UnifiedNearbyPlacesList(
                 startNearbyFuture: departureNearbyFuture,
                 destinationNearbyFuture: destinationNearbyFuture,
@@ -1592,9 +1593,9 @@ class _UnifiedNearbyPlacesList extends StatelessWidget {
                 loc.map_location_info_nearby_title,
                 style: theme.textTheme.labelLarge,
               ),
-              const SizedBox(height: 8),
-              const SizedBox(
-                height: 56,
+              SizedBox(height: 8.h),
+              SizedBox(
+                height: 56.h,
                 child: Center(child: CircularProgressIndicator()),
               ),
             ],
@@ -1609,7 +1610,7 @@ class _UnifiedNearbyPlacesList extends StatelessWidget {
                 loc.map_location_info_nearby_title,
                 style: theme.textTheme.labelLarge,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               Text(
                 loc.map_location_info_nearby_error,
                 style: theme.textTheme.bodySmall,
@@ -1637,7 +1638,7 @@ class _UnifiedNearbyPlacesList extends StatelessWidget {
                 loc.map_location_info_nearby_title,
                 style: theme.textTheme.labelLarge,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               Text(
                 loc.map_location_info_nearby_empty,
                 style: theme.textTheme.bodySmall,
@@ -1653,13 +1654,13 @@ class _UnifiedNearbyPlacesList extends StatelessWidget {
               loc.map_location_info_nearby_title,
               style: theme.textTheme.labelLarge,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (var i = 0; i < places.length; i++) ...[
                   NearbyPlaceTile(place: places[i]),
-                  if (i < places.length - 1) const SizedBox(height: 8),
+                  if (i < places.length - 1) SizedBox(height: 8.h),
                 ],
               ],
             ),
@@ -1690,18 +1691,18 @@ class _CardTile extends StatelessWidget {
     final opacity = enabled ? 1.0 : 0.5;
     return Material(
       color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Opacity(
           opacity: opacity,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
             child: Row(
               children: [
                 leading,
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1710,16 +1711,16 @@ class _CardTile extends StatelessWidget {
                         title,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                          fontSize: 13.sp,
                         ),
                       ),
                       if (subtitle != null && subtitle!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         Text(
                           subtitle!,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
-                            fontSize: 12,
+                            fontSize: 12.sp,
                           ),
                         ),
                       ],
@@ -1762,17 +1763,17 @@ class _ClickablePageIndicator extends StatelessWidget {
         return GestureDetector(
           onTap: () => onPageTap(index),
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
+            margin: EdgeInsets.symmetric(horizontal: 4.w),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOut,
-              width: isActive ? 12 : 10,
-              height: 10,
+              width: isActive ? 12.w : 10.w,
+              height: 10.h,
               decoration: BoxDecoration(
                 color: isActive
                     ? colorScheme.primary
                     : colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(5.r),
               ),
             ),
           ),

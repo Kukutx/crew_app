@@ -302,5 +302,112 @@ class PlacesService {
     }
   }
 
-  Future searchPlacesByText(String query, {LatLng? locationBias, required int maxResults}) async {}
+  Future<List<PlaceDetails>> searchPlacesByText(
+    String query, {
+    LatLng? locationBias,
+    required int maxResults,
+  }) async {
+    if (!_hasValidKey) {
+      throw PlacesApiException('Google Places API key is not configured');
+    }
+
+    if (query.trim().isEmpty) {
+      return const [];
+    }
+
+    try {
+      final requestData = <String, dynamic>{
+        'textQuery': query.trim(),
+        'maxResultCount': maxResults,
+      };
+
+      // 如果提供了位置偏好，添加位置限制
+      if (locationBias != null) {
+        requestData['locationBias'] = {
+          'circle': {
+            'center': {
+              'latitude': locationBias.latitude,
+              'longitude': locationBias.longitude,
+            },
+            'radius': 50000.0, // 50km 范围
+          },
+        };
+      }
+
+      final response = await _dio.post(
+        'places:searchText',
+        data: requestData,
+        options: Options(
+          headers: {
+            'X-Goog-Api-Key': _apiKey,
+            'X-Goog-FieldMask':
+                'places.name,places.displayName,places.formattedAddress,places.location',
+          },
+        ),
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        return const [];
+      }
+
+      final places = data['places'];
+      if (places is! List) {
+        return const [];
+      }
+
+      return places
+          .whereType<Map<String, dynamic>>()
+          .map(_mapPlaceDetails)
+          .whereType<PlaceDetails>()
+          .toList(growable: false);
+    } on DioException catch (error) {
+      throw PlacesApiException(
+        ErrorMessageExtractor.extractWithDefault(
+          error,
+          defaultMessage: 'Failed to search places',
+        ),
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  PlaceDetails? _mapPlaceDetails(Map<String, dynamic> data) {
+    final name = data['name'];
+    if (name is! String || name.isEmpty) {
+      return null;
+    }
+
+    String? displayName;
+    final displayNameField = data['displayName'];
+    if (displayNameField is Map<String, dynamic>) {
+      final text = displayNameField['text'];
+      if (text is String && text.isNotEmpty) {
+        displayName = text;
+      }
+    } else if (displayNameField is String && displayNameField.isNotEmpty) {
+      displayName = displayNameField;
+    }
+
+    final formattedAddress = data['formattedAddress'] as String?;
+
+    LatLng? location;
+    final locationMap = data['location'];
+    if (locationMap is Map<String, dynamic>) {
+      final lat = locationMap['latitude'];
+      final lng = locationMap['longitude'];
+      if (lat is num && lng is num) {
+        location = LatLng(lat.toDouble(), lng.toDouble());
+      }
+    }
+
+    final resolvedDisplayName = displayName ?? name;
+
+    return PlaceDetails(
+      id: name,
+      displayName: resolvedDisplayName,
+      formattedAddress: formattedAddress,
+      location: location,
+    );
+  }
 }

@@ -4,8 +4,7 @@ import 'dart:math' as math;
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/map_canvas.dart';
-// import 'package:crew_app/features/events/presentation/pages/trips/widgets/center_marker_overlay.dart';
-// import 'package:crew_app/features/events/presentation/pages/trips/widgets/location_info_bottom_sheet.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/location_info_bottom_sheet.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -147,12 +146,12 @@ class _LocationPickerMapPageState
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.map_select_location_title),
-        // actions: [
-        //   TextButton(
-        //     onPressed: _currentLocation != null ? _onConfirm : null,
-        //     child: Text(loc.action_confirm),
-        //   ),
-        // ],
+        actions: [
+          TextButton(
+            onPressed: _currentLocation != null ? _onConfirm : null,
+            child: Text("Apply location"),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -168,19 +167,17 @@ class _LocationPickerMapPageState
             showUserLocation: false,
             mapPadding: EdgeInsets.zero,
           ),
-          // 中心固定marker
-          // CenterMarkerOverlay(markerColor: markerColor),
-          // // 底部信息窗口
-          // Positioned(
-          //   left: 0,
-          //   right: 0,
-          //   bottom: 0,
-          //   child: LocationInfoBottomSheet(
-          //     addressFuture: _addressFuture,
-          //     nearbyPlacesFuture: _nearbyPlacesFuture,
-          //     isLoading: _isLoadingAddress,
-          //   ),
-          // ),
+          // 底部信息窗口
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: LocationInfoBottomSheet(
+              addressFuture: _addressFuture,
+              nearbyPlacesFuture: _nearbyPlacesFuture,
+              isLoading: _isLoadingAddress,
+            ),
+          ),
         ],
       ),
     );

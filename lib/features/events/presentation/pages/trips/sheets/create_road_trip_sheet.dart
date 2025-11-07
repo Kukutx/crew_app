@@ -13,6 +13,7 @@ import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_t
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_story_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_team_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/pages/location_search_page.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
@@ -815,6 +816,170 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     }
   }
 
+  // 处理起点 icon 点击 - 打开地址搜索页面
+  Future<void> _onSearchStartLocation() async {
+    final loc = AppLocalizations.of(context)!;
+    
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LocationSearchPage(
+          title: loc.map_select_location_title,
+          initialQuery: _startAddress,
+          initialLocation: _startLatLng,
+          onLocationSelected: (place) {
+            final location = place.location;
+            if (location == null) return;
+            
+            // 更新起点位置和地址
+            setState(() {
+              _startLatLng = location;
+              _startAddress = place.formattedAddress ?? place.displayName;
+              _startAddressFuture = Future.value(_startAddress);
+              _startNearbyFuture = _loadNearbyPlaces(location);
+            });
+            
+            // 更新选择状态
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setSelectedLatLng(location);
+            
+            // 移动地图到新位置
+            final mapController = ref.read(mapControllerProvider);
+            unawaited(mapController.moveCamera(location, zoom: 14));
+          },
+          onFindOnMap: () {
+            // 进入地图选择模式（选择起点）
+            _enterMapPickerMode(isStart: true);
+          },
+        ),
+      ),
+    );
+  }
+
+  // 处理终点 icon 点击 - 打开地址搜索页面
+  Future<void> _onSearchDestination() async {
+    final loc = AppLocalizations.of(context)!;
+    
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LocationSearchPage(
+          title: loc.map_select_location_destination_label,
+          initialQuery: _destinationAddress,
+          initialLocation: _destinationLatLng ?? _startLatLng,
+          onLocationSelected: (place) {
+            final location = place.location;
+            if (location == null) return;
+            
+            // 更新终点位置和地址
+            setState(() {
+              _destinationLatLng = location;
+              _destinationAddress = place.formattedAddress ?? place.displayName;
+              _destinationAddressFuture = Future.value(_destinationAddress);
+              _destinationNearbyFuture = _loadNearbyPlaces(location);
+            });
+            
+            // 更新选择状态
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+            selectionController.setDestinationLatLng(location);
+            
+            // 移动地图以显示起点和终点
+            final mapController = ref.read(mapControllerProvider);
+            if (_startLatLng != null) {
+              unawaited(mapController.fitBounds(
+                [_startLatLng!, location],
+                padding: 100,
+              ));
+            } else {
+              unawaited(mapController.moveCamera(location, zoom: 14));
+            }
+          },
+          onFindOnMap: () {
+            // 进入地图选择模式（选择终点）
+            _enterMapPickerMode(isStart: false);
+          },
+        ),
+      ),
+    );
+  }
+
+  // 进入地图选择模式
+  void _enterMapPickerMode({required bool isStart}) {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final mapController = ref.read(mapControllerProvider);
+    
+    // 设置地图选择模式
+    if (isStart) {
+      selectionController.setSelectingDestination(false);
+      // 如果有起点，移动到起点位置
+      if (_startLatLng != null) {
+        unawaited(mapController.moveCamera(_startLatLng!, zoom: 14));
+      }
+    } else {
+      selectionController.setSelectingDestination(true);
+      // 如果有终点，移动到终点位置；否则移动到起点
+      if (_destinationLatLng != null) {
+        unawaited(mapController.moveCamera(_destinationLatLng!, zoom: 14));
+      } else if (_startLatLng != null) {
+        unawaited(mapController.moveCamera(_startLatLng!, zoom: 12));
+      }
+    }
+    
+    // 进入地图选择模式，开启中心点标记
+    selectionController.setMapPickerMode(true, isSelectingStart: isStart);
+    
+    // 确保 overlay 打开
+    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+  }
+
+  // 确认地图选择的位置
+  Future<void> _confirmMapPickerLocation() async {
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    final mapController = ref.read(mapControllerProvider);
+    final locationManager = ref.read(locationSelectionManagerProvider);
+    
+    // 获取地图中心点的坐标
+    final centerPosition = await mapController.getCenterPosition();
+    if (centerPosition == null) return;
+    
+    // 判断是选择起点还是终点
+    final isSelectingStart = selectionState.isPickingStartLocation;
+    
+    // 反向地理编码获取地址
+    final address = await locationManager.reverseGeocode(centerPosition);
+    
+    // 更新位置
+    setState(() {
+      if (isSelectingStart) {
+        _startLatLng = centerPosition;
+        _startAddress = address;
+        _startAddressFuture = Future.value(address);
+        _startNearbyFuture = _loadNearbyPlaces(centerPosition);
+        
+        // 更新选择状态
+        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+        selectionController.setSelectedLatLng(centerPosition);
+      } else {
+        _destinationLatLng = centerPosition;
+        _destinationAddress = address;
+        _destinationAddressFuture = Future.value(address);
+        _destinationNearbyFuture = _loadNearbyPlaces(centerPosition);
+        
+        // 更新选择状态
+        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+        selectionController.setDestinationLatLng(centerPosition);
+      }
+    });
+    
+    // 退出地图选择模式
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    selectionController.setMapPickerMode(false);
+  }
+
+  // 取消地图选择
+  void _cancelMapPicker() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    selectionController.setMapPickerMode(false);
+  }
+
   Future<void> goToSection(TripSection s) async {
     // 如果 section 是 route，切换到途径点 tab
     if (s == TripSection.route) {
@@ -1152,6 +1317,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         destinationSubtitle: destinationSubtitle,
         onEditDeparture: _onEditDeparture,
         onEditDestination: _onEditDestination,
+        onSearchDeparture: _onSearchStartLocation,
+        onSearchDestination: _onSearchDestination,
         departurePosition: _startLatLng,
         departureAddressFuture: _startAddressFuture,
         departureNearbyFuture: _startNearbyFuture,
@@ -1494,6 +1661,8 @@ class _RouteSelectionPage extends StatelessWidget {
     required this.destinationSubtitle,
     required this.onEditDeparture,
     required this.onEditDestination,
+    this.onSearchDeparture,
+    this.onSearchDestination,
     this.departurePosition,
     this.departureAddressFuture,
     this.departureNearbyFuture,
@@ -1509,6 +1678,8 @@ class _RouteSelectionPage extends StatelessWidget {
   final String destinationSubtitle;
   final VoidCallback onEditDeparture;
   final VoidCallback onEditDestination;
+  final VoidCallback? onSearchDeparture;
+  final VoidCallback? onSearchDestination;
   final LatLng? departurePosition;
   final Future<String?>? departureAddressFuture;
   final Future<List<NearbyPlace>>? departureNearbyFuture;
@@ -1532,6 +1703,7 @@ class _RouteSelectionPage extends StatelessWidget {
                 title: departureTitle,
                 subtitle: null,
                 onTap: onEditDeparture,
+                onLeadingTap: onSearchDeparture,
               ),
               SizedBox(height: 12.h),
               _CardTile(
@@ -1539,6 +1711,7 @@ class _RouteSelectionPage extends StatelessWidget {
                 title: destinationTitle,
                 subtitle: null,
                 onTap: departurePosition != null ? onEditDestination : null,
+                onLeadingTap: departurePosition != null ? onSearchDestination : null,
                 enabled: departurePosition != null,
               ),
               SizedBox(height: 24.h),
@@ -1677,12 +1850,14 @@ class _CardTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.onTap,
+    this.onLeadingTap,
     this.enabled = true,
   });
   final Widget leading;
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
+  final VoidCallback? onLeadingTap;
   final bool enabled;
 
   @override
@@ -1701,7 +1876,16 @@ class _CardTile extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
             child: Row(
               children: [
-                leading,
+                onLeadingTap != null
+                    ? InkWell(
+                        onTap: enabled ? onLeadingTap : null,
+                        borderRadius: BorderRadius.circular(20.r),
+                        child: Padding(
+                          padding: EdgeInsets.all(4.r),
+                          child: leading,
+                        ),
+                      )
+                    : leading,
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Column(

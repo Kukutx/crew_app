@@ -32,6 +32,8 @@ class MapSelectionState {
     this.routeType,
     this.draggingMarkerPosition,
     this.draggingMarkerType,
+    this.isMapPickerMode = false,
+    this.isPickingStartLocation = true,
   });
 
   final LatLng? selectedLatLng;
@@ -47,6 +49,8 @@ class MapSelectionState {
   final RoadTripRouteType? routeType; // 路线类型
   final LatLng? draggingMarkerPosition; // 正在拖拽的标记点位置
   final DraggingMarkerType? draggingMarkerType; // 正在拖拽的标记点类型
+  final bool isMapPickerMode; // 是否正在进行地图选择模式
+  final bool isPickingStartLocation; // 是否正在选择起点（true）还是终点（false）
 
   MapSelectionState copyWith({
     LatLng? selectedLatLng,
@@ -66,6 +70,8 @@ class MapSelectionState {
     LatLng? draggingMarkerPosition,
     DraggingMarkerType? draggingMarkerType,
     bool clearDraggingMarker = false,
+    bool? isMapPickerMode,
+    bool? isPickingStartLocation,
   }) {
     return MapSelectionState(
       selectedLatLng:
@@ -85,6 +91,8 @@ class MapSelectionState {
       routeType: routeType ?? this.routeType,
       draggingMarkerPosition: clearDraggingMarker ? null : (draggingMarkerPosition ?? this.draggingMarkerPosition),
       draggingMarkerType: clearDraggingMarker ? null : (draggingMarkerType ?? this.draggingMarkerType),
+      isMapPickerMode: isMapPickerMode ?? this.isMapPickerMode,
+      isPickingStartLocation: isPickingStartLocation ?? this.isPickingStartLocation,
     );
   }
 }
@@ -189,6 +197,13 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
 
   void clearDraggingMarker() {
     state = state.copyWith(clearDraggingMarker: true);
+  }
+
+  void setMapPickerMode(bool value, {bool isSelectingStart = true}) {
+    state = state.copyWith(
+      isMapPickerMode: value,
+      isPickingStartLocation: isSelectingStart,
+    );
   }
 
   Future<List<NearbyPlace>> getNearbyPlaces(LatLng position) {

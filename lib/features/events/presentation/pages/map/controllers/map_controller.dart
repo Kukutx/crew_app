@@ -13,11 +13,22 @@ class MapController {
   GoogleMapController? _mapController;
   bool _mapReady = false;
   bool _movedToSelected = false;
+  LatLng? _currentCenterPosition;
 
   // Getters
   GoogleMapController? get mapController => _mapController;
   bool get mapReady => _mapReady;
   bool get movedToSelected => _movedToSelected;
+  
+  /// 获取地图当前中心位置
+  Future<LatLng?> getCenterPosition() async {
+    return _currentCenterPosition;
+  }
+  
+  /// 更新地图中心位置（在 onCameraMove 时调用）
+  void updateCenterPosition(LatLng position) {
+    _currentCenterPosition = position;
+  }
 
   /// 初始化地图控制器
   void initialize() {

@@ -2405,7 +2405,7 @@ abstract class AppLocalizations {
   /// No description provided for @road_trip_route_section_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose round trip or one-way route'**
+  /// **'Round trip or one-way'**
   String get road_trip_route_section_subtitle;
 
   /// No description provided for @road_trip_route_add_waypoint.
@@ -2441,7 +2441,7 @@ abstract class AppLocalizations {
   /// No description provided for @road_trip_route_waypoints_one_way.
   ///
   /// In en, this message translates to:
-  /// **'Waypoints (one-way) · {count} total'**
+  /// **'Waypoints · {count}'**
   String road_trip_route_waypoints_one_way(int count);
 
   /// No description provided for @road_trip_route_forward_label.
@@ -2459,7 +2459,7 @@ abstract class AppLocalizations {
   /// No description provided for @road_trip_route_waypoints_count.
   ///
   /// In en, this message translates to:
-  /// **' · {count} total'**
+  /// **' · {count}'**
   String road_trip_route_waypoints_count(int count);
 
   /// No description provided for @road_trip_route_waypoint_label.

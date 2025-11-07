@@ -1202,7 +1202,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_route_section_title => '路线类型';
 
   @override
-  String get road_trip_route_section_subtitle => '选择往返或单程路线';
+  String get road_trip_route_section_subtitle => '往返或单程';
 
   @override
   String get road_trip_route_add_waypoint => '添加途经点';
@@ -1221,18 +1221,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String road_trip_route_waypoints_one_way(int count) {
-    return '途经点（单程） · 共 $count 个';
+    return '途经点 · $count';
   }
 
   @override
-  String get road_trip_route_forward_label => '去程';
+  String get road_trip_route_forward_label => '去';
 
   @override
-  String get road_trip_route_return_label => '返程';
+  String get road_trip_route_return_label => '返';
 
   @override
   String road_trip_route_waypoints_count(int count) {
-    return ' · 共 $count 个';
+    return ' · $count';
   }
 
   @override

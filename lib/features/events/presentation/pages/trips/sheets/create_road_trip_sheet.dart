@@ -5,7 +5,6 @@ import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
-import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_basic_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_host_disclaimer_section.dart';
@@ -17,6 +16,10 @@ import 'package:crew_app/features/events/presentation/pages/trips/pages/location
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/utils/road_trip_form_validation_utils.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/utils/road_trip_address_loader.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/route_selection_page.dart';
+import 'package:crew_app/features/events/presentation/pages/trips/widgets/clickable_page_indicator.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
@@ -145,6 +148,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   final PageController _routePageCtrl = PageController(); // 路线 tab 内的 PageView
   bool _canSwipe = false; // 是否显示 ToggleTabBar 和其他 section（点击 basic 的继续后为 true）
   int _currentRoutePage = 0; // 路线 tab 内的当前页面
+  // 用于跟踪哪些页面应该使用 scrollController
+  // 使用 Set 来记录当前应该使用 scrollController 的页面索引和 tab 索引
+  int? _activeScrollablePageIndex; // 路线 tab 中当前活跃的页面索引（null 表示路线 tab 不活跃）
+  int? _activeScrollableTabIndex; // 当前活跃的 tab 索引
 
   RoadTripEditorState _editorState = const RoadTripEditorState();
 
@@ -187,8 +194,12 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
   // ==== 创建状态 ====
   bool _isCreating = false;
+  // 以下字段保留用于可能的扩展或调试
+  // ignore: unused_field
   bool? _createSuccess;
+  // ignore: unused_field
   String? _tripId;
+  // ignore: unused_field
   String? _createErrorMessage;
 
   // ==== 分段顺序 ====
@@ -219,6 +230,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     // 初始化 TabController（路线/途径点）
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_onTabChanged);
+    // 初始化活跃状态：默认在路线 tab 的第一个页面
+    _activeScrollableTabIndex = 0;
+    _activeScrollablePageIndex = 0;
 
     // 根据模式初始化位置信息
     if (widget.mode == CreateRoadTripMode.startLocationOnly) {
@@ -346,6 +360,18 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) {
+      // 更新活跃的 tab 索引，确保只有当前活跃的 tab 使用 scrollController
+      setState(() {
+        _activeScrollableTabIndex = _tabController.index;
+        // 如果切换到路线 tab，更新活跃页面索引
+        if (_tabController.index == 0) {
+          _activeScrollablePageIndex = _currentRoutePage;
+        } else {
+          // 如果切换到途径点 tab，清空页面索引（因为途径点 tab 不使用页面索引）
+          _activeScrollablePageIndex = null;
+        }
+      });
+      
       // 当切换回路线tab时，同步分页指示点
       if (_tabController.index == 0 && _routePageCtrl.hasClients) {
         // 使用 addPostFrameCallback 确保在 PageView 构建后同步
@@ -359,6 +385,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
               if (currentPage != _currentRoutePage) {
                 setState(() {
                   _currentRoutePage = currentPage;
+                  _activeScrollablePageIndex = currentPage;
                 });
               }
             }
@@ -368,7 +395,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           }
         });
       }
-      setState(() {});
       // 通知外部 TabController 的 index 变化
       widget.onTabIndexChanged?.call(_tabController.index);
     }
@@ -432,59 +458,30 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       });
       
       try {
-        // 文本长度验证
         final title = _titleCtrl.text.trim();
-        if (title.length > 20) {
-          _showSnack('标题不能超过20个字符');
+        
+        // 使用验证工具类进行验证
+        final validationErrors = RoadTripFormValidationUtils.validateForm(
+          title: title,
+          dateRange: _editorState.dateRange,
+          startLatLng: _startLatLng,
+          destinationLatLng: _destinationLatLng,
+          forwardWaypoints: _forwardWps,
+          returnWaypoints: _returnWps,
+          pricingType: _pricingType,
+          price: _price,
+        );
+
+        if (validationErrors.isNotEmpty) {
+          _showSnack(validationErrors.first);
           setState(() {
             _isCreating = false;
           });
           return;
         }
 
-        // 价格验证
-        double? price;
-        if (_pricingType == RoadTripPricingType.paid) {
-          price = _price;
-          if (price == null || price < 0 || price > 100) {
-            _showSnack('请输入有效的人均费用（0-100）');
-            setState(() {
-              _isCreating = false;
-            });
-            return;
-          }
-        }
-
-        // 坐标范围验证 - 起点和终点
-        if (_startLatLng!.latitude < -90 ||
-            _startLatLng!.latitude > 90 ||
-            _startLatLng!.longitude < -180 ||
-            _startLatLng!.longitude > 180 ||
-            _destinationLatLng!.latitude < -90 ||
-            _destinationLatLng!.latitude > 90 ||
-            _destinationLatLng!.longitude < -180 ||
-            _destinationLatLng!.longitude > 180) {
-          _showSnack('坐标值无效，请重新选择位置');
-          setState(() {
-            _isCreating = false;
-          });
-          return;
-        }
-
-        // 坐标范围验证 - 途经点
-        final allWaypoints = [..._forwardWps, ..._returnWps];
-        for (final wp in allWaypoints) {
-          if (wp.latitude < -90 ||
-              wp.latitude > 90 ||
-              wp.longitude < -180 ||
-              wp.longitude > 180) {
-            _showSnack('坐标值无效，请重新选择位置');
-            setState(() {
-              _isCreating = false;
-            });
-            return;
-          }
-        }
+        // 价格已经在验证工具类中验证，这里直接使用
+        final price = _pricingType == RoadTripPricingType.paid ? _price : null;
 
         final draft = RoadTripDraft(
           title: title,
@@ -709,24 +706,23 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  RoadTripAddressLoader get _addressLoader => RoadTripAddressLoader(ref);
+
   Future<String?> _loadAddress(LatLng latLng, {required bool isStart}) {
-    final manager = ref.read(locationSelectionManagerProvider);
-    final future = manager.reverseGeocode(latLng);
+    final future = _addressLoader.loadFormattedAddress(latLng);
     future.then((value) {
       if (!mounted) return;
-      final trimmed = value?.trim();
       if (isStart) {
-        setState(() => _startAddress = (trimmed == null || trimmed.isEmpty) ? null : trimmed);
+        setState(() => _startAddress = value);
       } else {
-        setState(() => _destinationAddress = (trimmed == null || trimmed.isEmpty) ? null : trimmed);
+        setState(() => _destinationAddress = value);
       }
     });
     return future;
   }
 
   Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng latLng) {
-    final manager = ref.read(locationSelectionManagerProvider);
-    return manager.fetchNearbyPlaces(latLng);
+    return _addressLoader.loadNearbyPlaces(latLng);
   }
 
   Future<void> _restartSelectionFlow({required bool skipStart}) async {
@@ -1003,7 +999,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   // ===== UI 构建 =====
-  Widget _buildSectionPage(TripSection s) {
+  Widget _buildSectionPage(TripSection s, {bool isCurrentPage = false}) {
     Widget content;
     switch (s) {
       case TripSection.basic:
@@ -1057,9 +1053,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     }
     
     // 包装在可滚动容器中，适配 overlay sheet 的高度限制
-    // 使用外部的 scrollCtrl 以支持 DraggableScrollableSheet 的上下拉动
+    // 只在当前页面使用 scrollCtrl，避免 ScrollController 被多个可滚动组件共享
     return SingleChildScrollView(
-      controller: widget.scrollCtrl,
+      controller: isCurrentPage ? widget.scrollCtrl : null,
       physics: const ClampingScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
       child: content,
@@ -1219,31 +1215,46 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         : loc.map_select_location_destination_tip;
 
     // 构建 PageView 的 children
-    final routePageChildren = [
-      // 第一个页面：起始页
-      _RouteSelectionPage(
-        scrollCtrl: widget.scrollCtrl,
-        onContinue: _enableWizard,
-        departureTitle: startTitle,
-        departureSubtitle: startSubtitle,
-        destinationTitle: destinationTitle,
-        destinationSubtitle: destinationSubtitle,
-        onEditDeparture: _onEditDeparture,
-        onEditDestination: _onEditDestination,
-        onSearchDeparture: _onSearchStartLocation,
-        onSearchDestination: _onSearchDestination,
-        departurePosition: _startLatLng,
-        departureAddressFuture: _startAddressFuture,
-        departureNearbyFuture: _startNearbyFuture,
-        destinationPosition: _destinationLatLng,
-        destinationAddressFuture: _destinationAddressFuture,
-        destinationNearbyFuture: _destinationNearbyFuture,
-      ),
-      // 第二个页面：basic 页
-      _buildSectionPage(TripSection.basic),
-      // 如果 _canSwipe 为 true，显示其他 section
-      if (_canSwipe) ..._routeSectionsOrder.skip(1).map(_buildSectionPage),
-    ];
+    // 注意：需要为每个页面动态判断是否为当前页面，避免 ScrollController 被多个可滚动组件共享
+    final routePageChildren = List<Widget>.generate(
+      _totalRoutePages,
+      (index) {
+        // 判断是否应该使用 scrollController：
+        // 1. 必须是路线 tab 活跃（_activeScrollableTabIndex == 0）
+        // 2. 必须是当前活跃的页面（_activeScrollablePageIndex == index）
+        final shouldUseScrollController = _activeScrollableTabIndex == 0 && _activeScrollablePageIndex == index;
+        
+        if (index == 0) {
+          // 第一个页面：起始页
+          return RouteSelectionPage(
+            scrollCtrl: shouldUseScrollController ? widget.scrollCtrl : null,
+            onContinue: _enableWizard,
+            departureTitle: startTitle,
+            departureSubtitle: startSubtitle,
+            destinationTitle: destinationTitle,
+            destinationSubtitle: destinationSubtitle,
+            onEditDeparture: _onEditDeparture,
+            onEditDestination: _onEditDestination,
+            onSearchDeparture: _onSearchStartLocation,
+            onSearchDestination: _onSearchDestination,
+            departurePosition: _startLatLng,
+            departureAddressFuture: _startAddressFuture,
+            departureNearbyFuture: _startNearbyFuture,
+            destinationPosition: _destinationLatLng,
+            destinationAddressFuture: _destinationAddressFuture,
+            destinationNearbyFuture: _destinationNearbyFuture,
+          );
+        } else if (index == 1) {
+          // 第二个页面：basic 页
+          return _buildSectionPage(TripSection.basic, isCurrentPage: shouldUseScrollController);
+        } else {
+          // 其他 section（只有在 _canSwipe 为 true 时才存在）
+          final sectionIndex = index - 1; // 减去起始页和 basic 页
+          final section = _routeSectionsOrder[sectionIndex];
+          return _buildSectionPage(section, isCurrentPage: shouldUseScrollController);
+        }
+      },
+    );
 
     // 判断是否可以滑动（basic 页未填写完整时禁止滑动）
     final canScroll = !(_isBasicPage && !_basicValid);
@@ -1271,14 +1282,21 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                               ? const NeverScrollableScrollPhysics()
                               : const PageScrollPhysics(),
                           onPageChanged: (index) {
-                            setState(() => _currentRoutePage = index);
+                            setState(() {
+                              _currentRoutePage = index;
+                              // 只有在路线 tab 活跃时，才更新活跃页面索引
+                              if (_activeScrollableTabIndex == 0) {
+                                _activeScrollablePageIndex = index;
+                              }
+                            });
                           },
                           children: routePageChildren,
                         ),
                       ),
                       // 途径点 tab：显示 RoadTripRouteSection
+                      // 只在当前 tab 活跃时使用 scrollController，避免 ScrollController 被多个可滚动组件共享
                       SingleChildScrollView(
-                        controller: widget.scrollCtrl,
+                        controller: _activeScrollableTabIndex == 1 ? widget.scrollCtrl : null,
                         physics: const ClampingScrollPhysics(),
                         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
                         child: RoadTripRouteSection(
@@ -1317,14 +1335,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           ),
           // 底部按钮
           Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 12.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 页面指示器（在点击起始页继续后显示，显示起始页和basic页的指示点）
                 if (_hasClickedStartContinue && !_canSwipe && _tabController.index == 0)
                   Center(
-                    child: _ClickablePageIndicator(
+                    child: ClickablePageIndicator(
                       controller: _routePageCtrl,
                       currentPage: _currentRoutePage,
                       totalPages: 2, // 只有起始页和basic页
@@ -1341,7 +1359,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 // 页面指示器（显示ToggleTabBar后显示所有页面的指示点）
                 if (_canSwipe && _tabController.index == 0)
                   Center(
-                    child: _ClickablePageIndicator(
+                    child: ClickablePageIndicator(
                       controller: _routePageCtrl,
                       currentPage: _currentRoutePage,
                       totalPages: _totalRoutePages,
@@ -1356,26 +1374,26 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                     ),
                   ),
                 if ((_hasClickedStartContinue && !_canSwipe) || (_canSwipe && _tabController.index == 0))
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 8.h),
                 // 按钮区域
                 if (_canSwipe)
                   // 显示 ToggleTabBar 后：只有创建按钮
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: (_startValid && _basicValid && !_isCreating)
-                          ? _onCreatePressed
-                          : null,
-                      child: _isCreating
-                          ? SizedBox(
-                              width: 20.w,
-                              height: 20.h,
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(loc.road_trip_create_button),
+                  FilledButton(
+                    onPressed: (_startValid && _basicValid && !_isCreating)
+                        ? _onCreatePressed
+                        : null,
+                    style: FilledButton.styleFrom(
+                      minimumSize: Size(double.infinity, 44.h),
                     ),
+                    child: _isCreating
+                        ? SizedBox(
+                            width: 20.w,
+                            height: 20.h,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(loc.road_trip_create_button),
                   )
                 else if (_hasClickedStartContinue)
                   // 点击起始页继续后：在basic页显示创建和继续两个按钮
@@ -1408,22 +1426,22 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           ],
                         )
                       : // 在起始页：只显示继续按钮（跳转到basic页）
-                        SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: _startValid ? _enableWizard : null,
-                              child: Text(loc.road_trip_continue_button),
+                        FilledButton(
+                            onPressed: _startValid ? _enableWizard : null,
+                            style: FilledButton.styleFrom(
+                              minimumSize: Size(double.infinity, 44.h),
                             ),
+                            child: Text(loc.road_trip_continue_button),
                           )
                 else
                   // 初始状态：只在起始页显示继续按钮
                   _isStartPage
-                      ? SizedBox(
-                          width: double.infinity,
-                          child: FilledButton(
-                            onPressed: _startValid ? _enableWizard : null,
-                            child: Text(loc.road_trip_continue_button),
+                      ? FilledButton(
+                          onPressed: _startValid ? _enableWizard : null,
+                          style: FilledButton.styleFrom(
+                            minimumSize: Size(double.infinity, 44.h),
                           ),
+                          child: Text(loc.road_trip_continue_button),
                         )
                       : const SizedBox.shrink(),
               ],
@@ -1559,323 +1577,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           ),
         ],
       ),
-    );
-  }
-
-}
-
-class _RouteSelectionPage extends StatelessWidget {
-  const _RouteSelectionPage({
-    this.scrollCtrl,
-    required this.onContinue,
-    required this.departureTitle,
-    required this.departureSubtitle,
-    required this.destinationTitle,
-    required this.destinationSubtitle,
-    required this.onEditDeparture,
-    required this.onEditDestination,
-    this.onSearchDeparture,
-    this.onSearchDestination,
-    this.departurePosition,
-    this.departureAddressFuture,
-    this.departureNearbyFuture,
-    this.destinationPosition,
-    this.destinationAddressFuture,
-    this.destinationNearbyFuture,
-  });
-  final ScrollController? scrollCtrl;
-  final VoidCallback onContinue;
-  final String departureTitle;
-  final String departureSubtitle;
-  final String destinationTitle;
-  final String destinationSubtitle;
-  final VoidCallback onEditDeparture;
-  final VoidCallback onEditDestination;
-  final VoidCallback? onSearchDeparture;
-  final VoidCallback? onSearchDestination;
-  final LatLng? departurePosition;
-  final Future<String?>? departureAddressFuture;
-  final Future<List<NearbyPlace>>? departureNearbyFuture;
-  final LatLng? destinationPosition;
-  final Future<String?>? destinationAddressFuture;
-  final Future<List<NearbyPlace>>? destinationNearbyFuture;
-
-  @override
-  Widget build(BuildContext context) {
-    // 直接使用 scrollCtrl，如果为 null 则不使用 controller
-    // 让 DraggableScrollableSheet 的滚动控制器直接连接到这个 CustomScrollView
-    return CustomScrollView(
-      controller: scrollCtrl,
-      slivers: [
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-          sliver: SliverList.list(
-            children: [
-              _CardTile(
-                leading: const Icon(Icons.radio_button_checked),
-                title: departureTitle,
-                subtitle: null,
-                onTap: onEditDeparture,
-                onLeadingTap: onSearchDeparture,
-              ),
-              SizedBox(height: 12.h),
-              _CardTile(
-                leading: const Icon(Icons.place_outlined),
-                title: destinationTitle,
-                subtitle: null,
-                onTap: departurePosition != null ? onEditDestination : null,
-                onLeadingTap: departurePosition != null ? onSearchDestination : null,
-                enabled: departurePosition != null,
-              ),
-              SizedBox(height: 24.h),
-              _UnifiedNearbyPlacesList(
-                startNearbyFuture: departureNearbyFuture,
-                destinationNearbyFuture: destinationNearbyFuture,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _UnifiedNearbyPlacesList extends StatelessWidget {
-  const _UnifiedNearbyPlacesList({
-    this.startNearbyFuture,
-    this.destinationNearbyFuture,
-  });
-
-  final Future<List<NearbyPlace>>? startNearbyFuture;
-  final Future<List<NearbyPlace>>? destinationNearbyFuture;
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    // 如果两个future都不存在，不显示任何内容
-    if (startNearbyFuture == null && destinationNearbyFuture == null) {
-      return const SizedBox.shrink();
-    }
-
-    // 使用 Future.wait 等待所有future完成
-    final futures = <Future<List<NearbyPlace>>>[];
-    if (startNearbyFuture != null) {
-      futures.add(startNearbyFuture!);
-    }
-    if (destinationNearbyFuture != null) {
-      futures.add(destinationNearbyFuture!);
-    }
-
-    return FutureBuilder<List<List<NearbyPlace>>>(
-      future: Future.wait(futures),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                loc.map_location_info_nearby_title,
-                style: theme.textTheme.labelLarge,
-              ),
-              SizedBox(height: 8.h),
-              SizedBox(
-                height: 56.h,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ],
-          );
-        }
-
-        if (snapshot.hasError) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                loc.map_location_info_nearby_title,
-                style: theme.textTheme.labelLarge,
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                loc.map_location_info_nearby_error,
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
-          );
-        }
-
-        // 合并所有POI列表，去重（基于id）
-        final allPlaces = <String, NearbyPlace>{};
-        final results = snapshot.data ?? [];
-        for (final placeList in results) {
-          for (final place in placeList) {
-            allPlaces[place.id] = place;
-          }
-        }
-
-        final places = allPlaces.values.toList();
-
-        if (places.isEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                loc.map_location_info_nearby_title,
-                style: theme.textTheme.labelLarge,
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                loc.map_location_info_nearby_empty,
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
-          );
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              loc.map_location_info_nearby_title,
-              style: theme.textTheme.labelLarge,
-            ),
-            SizedBox(height: 8.h),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var i = 0; i < places.length; i++) ...[
-                  NearbyPlaceTile(place: places[i]),
-                  if (i < places.length - 1) SizedBox(height: 8.h),
-                ],
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _CardTile extends StatelessWidget {
-  const _CardTile({
-    required this.leading,
-    required this.title,
-    this.subtitle,
-    this.onTap,
-    this.onLeadingTap,
-    this.enabled = true,
-  });
-  final Widget leading;
-  final String title;
-  final String? subtitle;
-  final VoidCallback? onTap;
-  final VoidCallback? onLeadingTap;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final opacity = enabled ? 1.0 : 0.5;
-    return Material(
-      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-      borderRadius: BorderRadius.circular(16.r),
-      child: InkWell(
-        onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(16.r),
-        child: Opacity(
-          opacity: opacity,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
-            child: Row(
-              children: [
-                onLeadingTap != null
-                    ? InkWell(
-                        onTap: enabled ? onLeadingTap : null,
-                        borderRadius: BorderRadius.circular(20.r),
-                        child: Padding(
-                          padding: EdgeInsets.all(4.r),
-                          child: leading,
-                        ),
-                      )
-                    : leading,
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13.sp,
-                        ),
-                      ),
-                      if (subtitle != null && subtitle!.isNotEmpty) ...[
-                        SizedBox(height: 4.h),
-                        Text(
-                          subtitle!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontSize: 12.sp,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 可点击的页面指示器
-class _ClickablePageIndicator extends StatelessWidget {
-  const _ClickablePageIndicator({
-    required this.controller,
-    required this.currentPage,
-    required this.totalPages,
-    required this.onPageTap,
-  });
-
-  final PageController controller;
-  final int currentPage;
-  final int totalPages;
-  final ValueChanged<int> onPageTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(totalPages, (index) {
-        final isActive = index == currentPage;
-        return GestureDetector(
-          onTap: () => onPageTap(index),
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 4.w),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              width: isActive ? 12.w : 10.w,
-              height: 10.h,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(5.r),
-              ),
-            ),
-          ),
-        );
-      }),
     );
   }
 }

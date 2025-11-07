@@ -1256,8 +1256,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get road_trip_route_section_title => 'Route type';
 
   @override
-  String get road_trip_route_section_subtitle =>
-      'Choose round trip or one-way route';
+  String get road_trip_route_section_subtitle => 'Round trip or one-way';
 
   @override
   String get road_trip_route_add_waypoint => 'Add waypoint';
@@ -1276,7 +1275,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String road_trip_route_waypoints_one_way(int count) {
-    return 'Waypoints (one-way) · $count total';
+    return 'Waypoints · $count';
   }
 
   @override
@@ -1287,7 +1286,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String road_trip_route_waypoints_count(int count) {
-    return ' · $count total';
+    return ' · $count';
   }
 
   @override

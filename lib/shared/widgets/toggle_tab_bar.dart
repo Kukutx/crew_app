@@ -1,3 +1,4 @@
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 typedef ToggleTabChanged = void Function(int index);
@@ -67,12 +68,12 @@ class _ToggleTabItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 2), // 进一步减小垂直 padding
+        padding: EdgeInsets.symmetric(vertical: 2.h), // 进一步减小垂直 padding
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
               color: selected ? colorScheme.primary : Colors.transparent,
-              width: selected ? 3.0 : 0.0,
+              width: selected ? 3.h : 0.0,
             ),
           ),
         ),
@@ -80,7 +81,7 @@ class _ToggleTabItem extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 15.sp,
               fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               color: textColor,
             ),

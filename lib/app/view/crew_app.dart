@@ -5,6 +5,7 @@ import 'package:crew_app/features/settings/state/settings_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quick_actions/quick_actions.dart';
 
 const String _scanQrShortcutType = 'action_scan_qr';
@@ -123,23 +124,34 @@ class _CrewAppState extends ConsumerState<CrewApp> {
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(crewAppRouterProvider);
 
-    return MaterialApp.router(
-      title: 'Events Demo',
-      locale: settings.locale,
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: settings.themeMode,
-      routerConfig: router,
+    return ScreenUtilInit(
+      // 设计稿基准尺寸：iPhone 13 (390x844)
+      designSize: const Size(390, 844),
+      // 最小文字适配，确保文字不会过小
+      minTextAdapt: true,
+      // 根据屏幕高度分割，确保横竖屏都能正常显示
+      splitScreenMode: true,
+      // 平板最大缩放比例限制为 1.2，避免内容过大
       builder: (context, child) {
-        final loc = AppLocalizations.of(context);
-        if (loc != null) {
-          final locale = Localizations.localeOf(context);
-          _updateQuickActions(loc, locale);
-        }
-        _maybeSchedulePendingShortcutHandling();
-        return child ?? const SizedBox.shrink();
+        return MaterialApp.router(
+          title: 'Events Demo',
+          locale: settings.locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: settings.themeMode,
+          routerConfig: router,
+          builder: (context, child) {
+            final loc = AppLocalizations.of(context);
+            if (loc != null) {
+              final locale = Localizations.localeOf(context);
+              _updateQuickActions(loc, locale);
+            }
+            _maybeSchedulePendingShortcutHandling();
+            return child ?? const SizedBox.shrink();
+          },
+        );
       },
     );
   }

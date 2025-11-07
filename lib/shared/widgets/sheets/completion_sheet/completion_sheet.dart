@@ -1,4 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// 显示完成页 Sheet
@@ -25,20 +26,20 @@ Future<void> showCompletionSheet(
       builder: (context, scrollController) => Container(
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
         ),
         child: SingleChildScrollView(
           controller: scrollController,
           physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 32.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
               // 图标
               Container(
-                width: 80,
-                height: 80,
+                width: 80.w,
+                height: 80.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isSuccess
@@ -47,13 +48,13 @@ Future<void> showCompletionSheet(
                 ),
                 child: Icon(
                   isSuccess ? Icons.check_circle : Icons.error_outline,
-                  size: 48,
+                  size: 48.sp,
                   color: isSuccess
                       ? colorScheme.onPrimaryContainer
                       : colorScheme.onErrorContainer,
                 ),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32.h),
               // 标题
               Text(
                 isSuccess
@@ -64,7 +65,7 @@ Future<void> showCompletionSheet(
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               // 消息
               Text(
                 isSuccess
@@ -75,7 +76,7 @@ Future<void> showCompletionSheet(
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
               // 完成按钮
               SizedBox(
                 width: double.infinity,

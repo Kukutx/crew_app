@@ -1140,10 +1140,10 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
 
   List<double> get _snapSizes {
     return switch (widget.sheetType) {
-      MapOverlaySheetType.chat => const [0.2, 0.5, 0.88],
-      MapOverlaySheetType.explore => const [0.2, 0.5, 0.88],
+      MapOverlaySheetType.chat => const [0.3, 0.5, 0.88],
+      MapOverlaySheetType.explore => const [0.3, 0.5, 0.88],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.88],
-      MapOverlaySheetType.createRoadTrip => const [0.2, 0.3, 0.88],
+      MapOverlaySheetType.createRoadTrip => const [0.3, 0.5, 0.88],
     };
   }
   

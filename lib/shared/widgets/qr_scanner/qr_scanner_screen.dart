@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
+import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QrScannerScreen extends StatefulWidget {
@@ -94,7 +96,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
             _BottomActionButton(
               icon: Icons.qr_code_rounded,
               label: loc.qr_scanner_my_code,
-              onTap: () => _showUnavailableMessage(context),
+              onTap: () => context.push(AppRoutePaths.myQrCode),
             ),
             const SizedBox(width: 16),
             _BottomActionButton(

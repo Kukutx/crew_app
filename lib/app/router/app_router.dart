@@ -14,6 +14,7 @@ import 'package:crew_app/features/settings/presentation/settings_page.dart';
 import 'package:crew_app/features/settings/presentation/pages/support/support_feedback_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/shared/widgets/qr_scanner/qr_scanner_screen.dart';
+import 'package:crew_app/shared/widgets/qr_scanner/my_qr_code_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -150,6 +151,11 @@ final crewAppRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutePaths.paymentMethods,
         name: AppRouteNames.paymentMethods,
         builder: (context, state) => const PaymentMethodsPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.myQrCode,
+        name: AppRouteNames.myQrCode,
+        builder: (context, state) => const MyQrCodeScreen(),
       ),
     ],
   );

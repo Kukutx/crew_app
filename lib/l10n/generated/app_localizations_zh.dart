@@ -1091,6 +1091,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wallet_reserved_funds => '预留中';
 
   @override
+  String get wallet_reserved_funds_tooltip =>
+      '参与者已支付的报名费，但活动尚未结束，资金暂未到账。活动结束后将自动转到您的账户。';
+
+  @override
   String get wallet_reward_points => '积分';
 
   @override
@@ -1157,7 +1161,99 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wallet_transaction_subscription_title => 'Crew Plus 订阅';
 
   @override
-  String get wallet_transaction_subscription_subtitle => '自动续费';
+  String get wallet_transaction_subscription_subtitle => 'Auto renewal';
+
+  @override
+  String get wallet_revenue_records_title => '活动收益';
+
+  @override
+  String get wallet_revenue_records_empty => '暂无活动收益';
+
+  @override
+  String get wallet_revenue_ongoing_title => '进行中的活动';
+
+  @override
+  String get wallet_revenue_ended_title => '已结束的活动';
+
+  @override
+  String get wallet_revenue_status_available => '已到账';
+
+  @override
+  String get wallet_revenue_status_reserved => '预留中';
+
+  @override
+  String wallet_revenue_record_participants(Object count) {
+    return '$count人参与';
+  }
+
+  @override
+  String get wallet_payment_methods_title => '支付方式';
+
+  @override
+  String get wallet_payment_methods_empty => '暂无支付方式';
+
+  @override
+  String get wallet_payment_method_add => '添加支付方式';
+
+  @override
+  String get wallet_payment_method_default => '默认';
+
+  @override
+  String get wallet_payment_method_bank_card => '银行卡';
+
+  @override
+  String get wallet_payment_method_paypal => 'PayPal';
+
+  @override
+  String get wallet_payment_method_stripe => 'Stripe账户';
+
+  @override
+  String get wallet_payment_method_other => '其他';
+
+  @override
+  String get wallet_payment_method_delete => '删除';
+
+  @override
+  String get wallet_payment_method_set_default => '设为默认';
+
+  @override
+  String get wallet_payment_method_name_label => '名称';
+
+  @override
+  String get wallet_payment_method_name_hint => '如：尾号1234的银行卡';
+
+  @override
+  String get wallet_payment_method_type_label => '类型';
+
+  @override
+  String get wallet_payment_method_bank_name_label => '银行名称';
+
+  @override
+  String get wallet_payment_method_bank_name_hint => '如：中国银行';
+
+  @override
+  String get wallet_payment_method_last4_label => '卡号后4位';
+
+  @override
+  String get wallet_payment_method_last4_hint => '1234';
+
+  @override
+  String get wallet_payment_method_email_label => '邮箱';
+
+  @override
+  String get wallet_payment_method_email_hint => 'example@email.com';
+
+  @override
+  String get wallet_payment_method_account_holder_label => '账户持有人';
+
+  @override
+  String get wallet_payment_method_account_holder_hint => '姓名';
+
+  @override
+  String get wallet_payment_method_save => '保存';
+
+  @override
+  String get wallet_payment_method_cancel => '取消';
 
   @override
   String get settings_developer_stripe_test => 'Stripe 支付测试';

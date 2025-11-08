@@ -8,7 +8,8 @@ import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_prof
 import 'package:crew_app/features/events/presentation/pages/drafts/my_drafts_page.dart';
 import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
 import 'package:crew_app/features/events/presentation/pages/moment/my_moments_page.dart';
-import 'package:crew_app/features/settings/presentation/pages/wallet/wallet_page.dart';
+import 'package:crew_app/features/settings/presentation/pages/revenue/pages/payment_methods_page.dart';
+import 'package:crew_app/features/settings/presentation/pages/revenue/revenue_page.dart';
 import 'package:crew_app/features/settings/presentation/settings_page.dart';
 import 'package:crew_app/features/settings/presentation/pages/support/support_feedback_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
@@ -31,6 +32,7 @@ class AppRoutePaths {
   static const String qrScanner = '/qr-scanner';
   static const String myQrCode = '/my-qr-code';
   static const String profile = '/profile';
+  static const String paymentMethods = '/payment-methods';
 }
 
 class AppRouteNames {
@@ -48,6 +50,7 @@ class AppRouteNames {
   static const String qrScanner = 'qr_scanner';
   static const String myQrCode = 'my_qr_code';
   static const String profile = 'profile';
+  static const String paymentMethods = 'payment_methods';
 }
 
 final crewAppRouterProvider = Provider<GoRouter>((ref) {
@@ -108,7 +111,7 @@ final crewAppRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutePaths.wallet,
         name: AppRouteNames.wallet,
-        builder: (context, state) => const WalletPage(),
+        builder: (context, state) => const RevenuePage(),
       ),
       GoRoute(
         path: AppRoutePaths.support,
@@ -142,6 +145,11 @@ final crewAppRouterProvider = Provider<GoRouter>((ref) {
           final uid = state.extra is String ? state.extra as String : null;
           return UserProfilePage(uid: uid);
         },
+      ),
+      GoRoute(
+        path: AppRoutePaths.paymentMethods,
+        name: AppRouteNames.paymentMethods,
+        builder: (context, state) => const PaymentMethodsPage(),
       ),
     ],
   );

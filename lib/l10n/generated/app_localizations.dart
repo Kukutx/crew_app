@@ -2180,6 +2180,12 @@ abstract class AppLocalizations {
   /// **'On hold'**
   String get wallet_reserved_funds;
 
+  /// No description provided for @wallet_reserved_funds_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration fees paid by participants, but the event has not ended yet. Funds will be transferred to your account after the event ends.'**
+  String get wallet_reserved_funds_tooltip;
+
   /// No description provided for @wallet_reward_points.
   ///
   /// In en, this message translates to:
@@ -2317,6 +2323,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto renewal'**
   String get wallet_transaction_subscription_subtitle;
+
+  /// No description provided for @wallet_revenue_records_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Revenue'**
+  String get wallet_revenue_records_title;
+
+  /// No description provided for @wallet_revenue_records_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No event revenue yet'**
+  String get wallet_revenue_records_empty;
+
+  /// No description provided for @wallet_revenue_ongoing_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing Events'**
+  String get wallet_revenue_ongoing_title;
+
+  /// No description provided for @wallet_revenue_ended_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended Events'**
+  String get wallet_revenue_ended_title;
+
+  /// No description provided for @wallet_revenue_status_available.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get wallet_revenue_status_available;
+
+  /// No description provided for @wallet_revenue_status_reserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserved'**
+  String get wallet_revenue_status_reserved;
+
+  /// No description provided for @wallet_revenue_record_participants.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} participants'**
+  String wallet_revenue_record_participants(Object count);
+
+  /// No description provided for @wallet_payment_methods_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Methods'**
+  String get wallet_payment_methods_title;
+
+  /// No description provided for @wallet_payment_methods_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No payment methods yet'**
+  String get wallet_payment_methods_empty;
+
+  /// No description provided for @wallet_payment_method_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Payment Method'**
+  String get wallet_payment_method_add;
+
+  /// No description provided for @wallet_payment_method_default.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get wallet_payment_method_default;
+
+  /// No description provided for @wallet_payment_method_bank_card.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Card'**
+  String get wallet_payment_method_bank_card;
+
+  /// No description provided for @wallet_payment_method_paypal.
+  ///
+  /// In en, this message translates to:
+  /// **'PayPal'**
+  String get wallet_payment_method_paypal;
+
+  /// No description provided for @wallet_payment_method_stripe.
+  ///
+  /// In en, this message translates to:
+  /// **'Stripe Account'**
+  String get wallet_payment_method_stripe;
+
+  /// No description provided for @wallet_payment_method_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get wallet_payment_method_other;
+
+  /// No description provided for @wallet_payment_method_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get wallet_payment_method_delete;
+
+  /// No description provided for @wallet_payment_method_set_default.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as Default'**
+  String get wallet_payment_method_set_default;
+
+  /// No description provided for @wallet_payment_method_name_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get wallet_payment_method_name_label;
+
+  /// No description provided for @wallet_payment_method_name_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Card ending in 1234'**
+  String get wallet_payment_method_name_hint;
+
+  /// No description provided for @wallet_payment_method_type_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get wallet_payment_method_type_label;
+
+  /// No description provided for @wallet_payment_method_bank_name_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Name'**
+  String get wallet_payment_method_bank_name_label;
+
+  /// No description provided for @wallet_payment_method_bank_name_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Bank of China'**
+  String get wallet_payment_method_bank_name_hint;
+
+  /// No description provided for @wallet_payment_method_last4_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 4 Digits'**
+  String get wallet_payment_method_last4_label;
+
+  /// No description provided for @wallet_payment_method_last4_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'1234'**
+  String get wallet_payment_method_last4_hint;
+
+  /// No description provided for @wallet_payment_method_email_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get wallet_payment_method_email_label;
+
+  /// No description provided for @wallet_payment_method_email_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'example@email.com'**
+  String get wallet_payment_method_email_hint;
+
+  /// No description provided for @wallet_payment_method_account_holder_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Holder'**
+  String get wallet_payment_method_account_holder_label;
+
+  /// No description provided for @wallet_payment_method_account_holder_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get wallet_payment_method_account_holder_hint;
+
+  /// No description provided for @wallet_payment_method_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get wallet_payment_method_save;
+
+  /// No description provided for @wallet_payment_method_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get wallet_payment_method_cancel;
 
   /// No description provided for @settings_developer_stripe_test.
   ///

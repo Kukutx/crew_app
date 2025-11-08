@@ -24,4 +24,9 @@ class NumberFormatHelper {
     }
     return currency.format(value);
   }
+
+  /// 格式化货币（标准格式）
+  static String formatCurrency(double value) {
+    return currency.format(value);
+  }
 }

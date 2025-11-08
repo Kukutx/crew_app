@@ -1139,6 +1139,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wallet_reserved_funds => 'On hold';
 
   @override
+  String get wallet_reserved_funds_tooltip =>
+      'Registration fees paid by participants, but the event has not ended yet. Funds will be transferred to your account after the event ends.';
+
+  @override
   String get wallet_reward_points => 'Reward points';
 
   @override
@@ -1211,6 +1215,98 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wallet_transaction_subscription_subtitle => 'Auto renewal';
+
+  @override
+  String get wallet_revenue_records_title => 'Event Revenue';
+
+  @override
+  String get wallet_revenue_records_empty => 'No event revenue yet';
+
+  @override
+  String get wallet_revenue_ongoing_title => 'Ongoing Events';
+
+  @override
+  String get wallet_revenue_ended_title => 'Ended Events';
+
+  @override
+  String get wallet_revenue_status_available => 'Available';
+
+  @override
+  String get wallet_revenue_status_reserved => 'Reserved';
+
+  @override
+  String wallet_revenue_record_participants(Object count) {
+    return '$count participants';
+  }
+
+  @override
+  String get wallet_payment_methods_title => 'Payment Methods';
+
+  @override
+  String get wallet_payment_methods_empty => 'No payment methods yet';
+
+  @override
+  String get wallet_payment_method_add => 'Add Payment Method';
+
+  @override
+  String get wallet_payment_method_default => 'Default';
+
+  @override
+  String get wallet_payment_method_bank_card => 'Bank Card';
+
+  @override
+  String get wallet_payment_method_paypal => 'PayPal';
+
+  @override
+  String get wallet_payment_method_stripe => 'Stripe Account';
+
+  @override
+  String get wallet_payment_method_other => 'Other';
+
+  @override
+  String get wallet_payment_method_delete => 'Delete';
+
+  @override
+  String get wallet_payment_method_set_default => 'Set as Default';
+
+  @override
+  String get wallet_payment_method_name_label => 'Name';
+
+  @override
+  String get wallet_payment_method_name_hint => 'e.g., Card ending in 1234';
+
+  @override
+  String get wallet_payment_method_type_label => 'Type';
+
+  @override
+  String get wallet_payment_method_bank_name_label => 'Bank Name';
+
+  @override
+  String get wallet_payment_method_bank_name_hint => 'e.g., Bank of China';
+
+  @override
+  String get wallet_payment_method_last4_label => 'Last 4 Digits';
+
+  @override
+  String get wallet_payment_method_last4_hint => '1234';
+
+  @override
+  String get wallet_payment_method_email_label => 'Email';
+
+  @override
+  String get wallet_payment_method_email_hint => 'example@email.com';
+
+  @override
+  String get wallet_payment_method_account_holder_label => 'Account Holder';
+
+  @override
+  String get wallet_payment_method_account_holder_hint => 'Name';
+
+  @override
+  String get wallet_payment_method_save => 'Save';
+
+  @override
+  String get wallet_payment_method_cancel => 'Cancel';
 
   @override
   String get settings_developer_stripe_test => 'Stripe payment test';

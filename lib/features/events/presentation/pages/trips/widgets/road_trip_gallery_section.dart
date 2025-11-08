@@ -1,5 +1,6 @@
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_section_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../data/road_trip_editor_models.dart';
@@ -70,11 +71,11 @@ class RoadTripGalleryGrid extends StatelessWidget {
     if (items.isEmpty) {
       return InkWell(
         onTap: onPickImages,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Container(
-          height: 160,
+          height: 140.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15)),
             color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           ),
@@ -83,7 +84,7 @@ class RoadTripGalleryGrid extends StatelessWidget {
               loc.road_trip_gallery_empty_hint,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
-                fontSize: 13,
+                fontSize: 13.sp,
               ),
             ),
           ),
@@ -91,24 +92,26 @@ class RoadTripGalleryGrid extends StatelessWidget {
       );
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+    return SizedBox(
+      height: 140.h,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        padding: EdgeInsets.symmetric(horizontal: 0.w),
+        itemBuilder: (context, index) {
+          final item = items[index];
+          final isLast = index == items.length - 1;
+          return Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : 12.w),
+            child: _GalleryTile(
+              index: index,
+              item: item,
+              onRemove: () => onRemove(index),
+              onSetCover: () => onSetCover(index),
+            ),
+          );
+        },
       ),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return _GalleryTile(
-          index: index,
-          item: item,
-          onRemove: () => onRemove(index),
-          onSetCover: () => onSetCover(index),
-        );
-      },
     );
   }
 }
@@ -131,84 +134,101 @@ class _GalleryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final loc = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: onSetCover,
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              child: item.isFile
-                  ? Image.file(item.file!, fit: BoxFit.cover)
-                  : Image.network(item.url!, fit: BoxFit.cover),
-            ),
-          ),
-          Positioned(
-            top: 8,
-            left: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: index == 0
-                    ? colorScheme.primaryContainer
-                    : colorScheme.surfaceTint.withValues(alpha: .6),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                index == 0
-                    ? loc.road_trip_gallery_cover_label
-                    : loc.road_trip_gallery_image_label(index + 1),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: index == 0
-                      ? colorScheme.onPrimaryContainer
-                      : colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 10,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: InkWell(
-              onTap: onRemove,
+    return SizedBox(
+      width: 160.w,
+      height: 140.h,
+      child: GestureDetector(
+        onTap: onSetCover,
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14.r),
               child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceTint.withValues(alpha: .6),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.close,
-                  color: colorScheme.onSurface,
-                  size: 18,
-                ),
+                width: 160.w,
+                height: 140.h,
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                child: item.isFile
+                    ? Image.file(
+                        item.file!,
+                        fit: BoxFit.cover,
+                        width: 160.w,
+                        height: 140.h,
+                      )
+                    : Image.network(
+                        item.url!,
+                        fit: BoxFit.cover,
+                        width: 160.w,
+                        height: 140.h,
+                      ),
               ),
             ),
-          ),
-          if (index != 0)
             Positioned(
-              bottom: 8,
-              right: 8,
+              top: 6.h,
+              left: 6.w,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceTint.withValues(alpha: .6),
-                  borderRadius: BorderRadius.circular(12),
+                  color: index == 0
+                      ? colorScheme.primaryContainer
+                      : colorScheme.surfaceTint.withValues(alpha: .6),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Text(
-                  loc.road_trip_gallery_set_cover,
+                  index == 0
+                      ? loc.road_trip_gallery_cover_label
+                      : loc.road_trip_gallery_image_label(index + 1),
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontSize: 10,
+                    color: index == 0
+                        ? colorScheme.onPrimaryContainer
+                        : colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 9.sp,
                   ),
                 ),
               ),
             ),
-        ],
+            Positioned(
+              top: 6.h,
+              right: 6.w,
+              child: InkWell(
+                onTap: onRemove,
+                borderRadius: BorderRadius.circular(10.r),
+                child: Container(
+                  width: 24.w,
+                  height: 24.h,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceTint.withValues(alpha: .6),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(
+                    Icons.close,
+                    color: colorScheme.onSurface,
+                    size: 16.sp,
+                  ),
+                ),
+              ),
+            ),
+            if (index != 0)
+              Positioned(
+                bottom: 6.h,
+                right: 6.w,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceTint.withValues(alpha: .6),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Text(
+                    loc.road_trip_gallery_set_cover,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -16,8 +16,8 @@ import 'package:crew_app/features/events/presentation/pages/trips/pages/location
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/utils/road_trip_form_validation_utils.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/utils/road_trip_address_loader.dart';
+import 'package:crew_app/shared/utils/road_trip_form_validation_utils.dart';
+import 'package:crew_app/shared/utils/road_trip_address_loader.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/route_selection_page.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/widgets/clickable_page_indicator.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

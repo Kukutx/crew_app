@@ -407,7 +407,7 @@
   "map_quick_actions_add_friend": "Add friends",
   "map_quick_actions_my_event": "My events",
   "map_quick_actions_my_ledger": "My ledger",
-  "map_quick_actions_wallet": "My wallet",
+  "map_quick_actions_wallet": "Earnings Center",
   "map_quick_actions_bottom_scan": "Scan",
   "map_quick_actions_bottom_support": "Help & support",
   "map_quick_actions_bottom_settings": "Settings",
@@ -431,7 +431,7 @@
   "map_select_location_open_detailed": "Open detailed planner",
   "map_select_location_create_trip": "Create quick trip",
   "map_apply_location": "Apply location",
-  "wallet_title": "Wallet",
+  "wallet_title": "Earnings Center",
   "wallet_balance_label": "Available balance",
   "wallet_last_updated": "Updated {timeAgo} ago",
   "@wallet_last_updated": {

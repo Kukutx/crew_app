@@ -42,6 +42,7 @@ class MapFloatingActionButtons extends StatelessWidget {
     this.onEdit,
     this.onAddPressed,
     this.onLocationPressed,
+    this.showCompass = false,
   });
 
   final MapOverlaySheetType mapSheetType;
@@ -56,6 +57,7 @@ class MapFloatingActionButtons extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onAddPressed;
   final VoidCallback? onLocationPressed;
+  final bool showCompass;
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +172,7 @@ class MapFloatingActionButtons extends StatelessWidget {
       ];
     }
 
-    // 默认模式：显示 + 和定位按钮
+    // 默认模式：显示 + 和定位按钮（或指南针按钮）
     return [
       MapFloatingButtonConfig(
         icon: Icons.add,
@@ -181,10 +183,10 @@ class MapFloatingActionButtons extends StatelessWidget {
         tooltip: '添加',
       ),
       MapFloatingButtonConfig(
-        icon: Icons.my_location,
+        icon: showCompass ? Icons.explore : Icons.my_location,
         heroTag: 'events_map_my_location_fab',
         onPressed: onLocationPressed ?? () {},
-        tooltip: '定位',
+        tooltip: showCompass ? '回正' : '定位',
       ),
     ];
   }

@@ -13,7 +13,6 @@ class ExpenseListTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final currency = NumberFormatHelper.currency;
     final cardColor = isDark
         ? Color.alphaBlend(
             Colors.white.withValues(alpha: 0.04),
@@ -67,7 +66,7 @@ class ExpenseListTile extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                currency.format(expense.amount),
+                NumberFormatHelper.formatCurrencyCompactIfLarge(expense.amount),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -81,6 +80,44 @@ class ExpenseListTile extends StatelessWidget {
             DateFormatHelper.relative(expense.timestamp),
             style: supportingTextStyle,
           ),
+          // 显示分摊信息
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.people,
+                size: 14,
+                color: supportingTextStyle?.color,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '${expense.sharedBy.length} 人分摊 · 每人 ${NumberFormatHelper.formatCurrencyCompactIfLarge(expense.sharePerPerson)}',
+                  style: supportingTextStyle,
+                ),
+              ),
+            ],
+          ),
+          if (expense.sharedBy.length <= 5)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: expense.sharedBy.map((name) {
+                  return Chip(
+                    label: Text(
+                      name,
+                      style: theme.textTheme.labelSmall,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  );
+                }).toList(),
+              ),
+            ),
           if (expense.paymentMethod != null || expense.note != null) ...[
             const SizedBox(height: 12),
             if (expense.paymentMethod != null)

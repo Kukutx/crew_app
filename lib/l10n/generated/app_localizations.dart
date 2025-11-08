@@ -2021,7 +2021,7 @@ abstract class AppLocalizations {
   /// No description provided for @map_quick_actions_wallet.
   ///
   /// In en, this message translates to:
-  /// **'My wallet'**
+  /// **'Earnings Center'**
   String get map_quick_actions_wallet;
 
   /// No description provided for @map_quick_actions_bottom_scan.
@@ -2159,7 +2159,7 @@ abstract class AppLocalizations {
   /// No description provided for @wallet_title.
   ///
   /// In en, this message translates to:
-  /// **'Wallet'**
+  /// **'Earnings Center'**
   String get wallet_title;
 
   /// No description provided for @wallet_balance_label.

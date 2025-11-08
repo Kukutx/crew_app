@@ -58,6 +58,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   late final ClusterManager _eventsClusterManager;
   CameraPosition? _currentCameraPosition;
   CameraPosition? _lastNotifiedCameraPosition;
+  bool _showCompass = false;
   
   // 缓存 markers 和 polylines，避免重复创建
   Set<Marker>? _cachedMarkers;
@@ -314,6 +315,24 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                   // 只更新相机位置，不触发 setState
                   // 这样可以避免每次相机移动时重建整个 widget 树
                   _currentCameraPosition = position;
+                  
+                  // 判断是否应该显示指南针
+                  // 检查 bearing 变化或位置变化，确保指南针状态及时更新
+                  final bearingChanged = _lastNotifiedCameraPosition != null &&
+                      (position.bearing - _lastNotifiedCameraPosition!.bearing).abs() > 5.0;
+                  final shouldUpdateCompass = _lastNotifiedCameraPosition == null ||
+                      _shouldUpdateCameraPosition(position, _lastNotifiedCameraPosition!) ||
+                      bearingChanged;
+                  
+                  if (shouldUpdateCompass) {
+                    final shouldShowCompass = _shouldShowCompass(position, mapController);
+                    if (shouldShowCompass != _showCompass && mounted) {
+                      setState(() {
+                        _showCompass = shouldShowCompass;
+                      });
+                    }
+                  }
+                  
                   // 只在需要更新 BreathingMarkerOverlay 时才通知
                   // 使用节流：只在相机位置变化超过阈值时才更新
                   if (_lastNotifiedCameraPosition == null ||
@@ -514,13 +533,25 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             startLatLng: selectionState.selectedLatLng,
             destinationLatLng: selectionState.destinationLatLng,
             canSwipe: _roadTripCanSwipe,
+            showCompass: _showCompass,
             onAddWaypoint: () {
               final selectionController = ref.read(mapSelectionControllerProvider.notifier);
               selectionController.setAddingWaypoint(true);
             },
             onAddPressed: () => showCreateContentOptionsSheet(context),
             onLocationPressed: () async {
-              await mapController.moveToMyLocation();
+              if (_showCompass) {
+                // 回正地图
+                if (_currentCameraPosition != null) {
+                  await mapController.resetBearing(
+                    currentZoom: _currentCameraPosition!.zoom,
+                    currentTilt: _currentCameraPosition!.tilt,
+                  );
+                }
+              } else {
+                // 移动到我的位置
+                await mapController.moveToMyLocation();
+              }
             },
           ),
         ],
@@ -656,6 +687,31 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             math.sin(dLon / 2);
     final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
     return earthRadius * c;
+  }
+
+  /// 判断是否应该显示指南针
+  /// 条件：不在用户位置 且 地图被旋转（bearing 的绝对值 > 5度）
+  bool _shouldShowCompass(CameraPosition position, MapController mapController) {
+    // 检查是否在用户位置附近（50米内）
+    final isAtUserLocation = mapController.isAtUserLocation(threshold: 50.0);
+    
+    // 如果正在用户位置，不显示指南针
+    if (isAtUserLocation) {
+      return false;
+    }
+    
+    // 检查地图是否被旋转（bearing 的绝对值 > 5度）
+    // bearing 的范围通常是 0 到 360 度，或者 -180 到 180 度
+    // 我们需要计算最小的旋转角度
+    final bearing = position.bearing;
+    final absBearing = bearing.abs();
+    // 将角度标准化到 0-360 范围
+    final normalizedBearing = absBearing % 360;
+    // 计算最小的旋转角度（考虑从两个方向旋转）
+    final minBearing = normalizedBearing > 180 ? 360 - normalizedBearing : normalizedBearing;
+    
+    // 如果旋转角度大于 5 度，显示指南针
+    return minBearing > 5.0;
   }
 
   // 构建 markers

@@ -1054,7 +1054,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_quick_actions_my_ledger => 'My ledger';
 
   @override
-  String get map_quick_actions_wallet => 'My wallet';
+  String get map_quick_actions_wallet => 'Earnings Center';
 
   @override
   String get map_quick_actions_bottom_scan => 'Scan';
@@ -1125,7 +1125,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_apply_location => 'Apply location';
 
   @override
-  String get wallet_title => 'Wallet';
+  String get wallet_title => 'Earnings Center';
 
   @override
   String get wallet_balance_label => 'Available balance';

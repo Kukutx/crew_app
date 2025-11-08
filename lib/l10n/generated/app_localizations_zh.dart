@@ -1008,7 +1008,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_quick_actions_my_ledger => '我的账本';
 
   @override
-  String get map_quick_actions_wallet => '我的钱包';
+  String get map_quick_actions_wallet => '收益中心';
 
   @override
   String get map_quick_actions_bottom_scan => '扫一扫';
@@ -1077,7 +1077,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_apply_location => '应用位置';
 
   @override
-  String get wallet_title => '我的钱包';
+  String get wallet_title => '收益中心';
 
   @override
   String get wallet_balance_label => '可用余额';

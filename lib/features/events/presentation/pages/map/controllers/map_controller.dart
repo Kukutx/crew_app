@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/data/event.dart';
@@ -267,6 +268,68 @@ class MapController {
     if (loc != null) {
       await moveCamera(loc, zoom: 14);
       loc = await ref.read(userLocationProvider.notifier).refreshNow();
+    }
+  }
+
+  /// 计算两个经纬度之间的距离（米）
+  double _calculateDistance(LatLng a, LatLng b) {
+    const double earthRadius = 6371000; // 地球半径（米）
+    final double dLat = (b.latitude - a.latitude) * math.pi / 180.0;
+    final double dLon = (b.longitude - a.longitude) * math.pi / 180.0;
+    final double sinDLat = math.sin(dLat / 2);
+    final double sinDLon = math.sin(dLon / 2);
+    final double a1 = sinDLat * sinDLat +
+        math.cos(a.latitude * math.pi / 180.0) *
+            math.cos(b.latitude * math.pi / 180.0) *
+            sinDLon *
+            sinDLon;
+    final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
+    return earthRadius * c;
+  }
+
+  /// 判断地图中心是否在用户位置附近
+  /// [threshold] 距离阈值（米），默认 50 米
+  bool isAtUserLocation({double threshold = 50.0}) {
+    final userLoc = ref.read(userLocationProvider).value;
+    if (userLoc == null || _currentCenterPosition == null) {
+      return false;
+    }
+    final distance = _calculateDistance(userLoc, _currentCenterPosition!);
+    return distance <= threshold;
+  }
+
+  /// 回正地图（使用当前相机位置信息）
+  /// [currentZoom] 当前缩放级别
+  /// [currentTilt] 当前倾斜角度
+  Future<void> resetBearing({
+    required double currentZoom,
+    required double currentTilt,
+  }) async {
+    final controller = _mapController;
+    if (controller == null || _currentCenterPosition == null) return;
+
+    try {
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: _currentCenterPosition!,
+            zoom: currentZoom,
+            bearing: 0,
+            tilt: currentTilt,
+          ),
+        ),
+      );
+    } catch (_) {
+      await controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: _currentCenterPosition!,
+            zoom: currentZoom,
+            bearing: 0,
+            tilt: currentTilt,
+          ),
+        ),
+      );
     }
   }
 

@@ -10,6 +10,8 @@ final List<Participant> sampleParticipants = [
         amount: 86.5,
         category: '油费',
         timestamp: DateTime.now().subtract(const Duration(hours: 6)),
+        paidBy: 'Alice',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊油费
         paymentMethod: 'Visa',
       ),
       ParticipantExpense(
@@ -17,6 +19,8 @@ final List<Participant> sampleParticipants = [
         amount: 14.2,
         category: '餐饮',
         timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+        paidBy: 'Alice',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 大家一起喝咖啡
         note: '和大家一起喝咖啡',
       ),
       ParticipantExpense(
@@ -24,6 +28,8 @@ final List<Participant> sampleParticipants = [
         amount: 120,
         category: '住宿',
         timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 4)),
+        paidBy: 'Alice',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊住宿
       ),
     ],
   ),
@@ -35,6 +41,8 @@ final List<Participant> sampleParticipants = [
         amount: 64.3,
         category: '餐饮',
         timestamp: DateTime.now().subtract(const Duration(hours: 20)),
+        paidBy: 'Bruno',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊晚餐
         paymentMethod: 'Mastercard',
       ),
       ParticipantExpense(
@@ -42,6 +50,8 @@ final List<Participant> sampleParticipants = [
         amount: 22.4,
         category: '油费',
         timestamp: DateTime.now().subtract(const Duration(days: 2, hours: 2)),
+        paidBy: 'Bruno',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊路费
       ),
     ],
   ),
@@ -53,6 +63,8 @@ final List<Participant> sampleParticipants = [
         amount: 210,
         category: '住宿',
         timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 12)),
+        paidBy: 'Celine',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊住宿
         note: '两晚海边房',
       ),
       ParticipantExpense(
@@ -60,12 +72,16 @@ final List<Participant> sampleParticipants = [
         amount: 28.9,
         category: '餐饮',
         timestamp: DateTime.now().subtract(const Duration(hours: 10)),
+        paidBy: 'Celine',
+        sharedBy: ['Celine'], // 只有Celine吃早餐
       ),
       ParticipantExpense(
         title: '观光门票',
         amount: 48,
         category: '门票',
         timestamp: DateTime.now().subtract(const Duration(days: 3)),
+        paidBy: 'Celine',
+        sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊门票
       ),
     ],
   ),

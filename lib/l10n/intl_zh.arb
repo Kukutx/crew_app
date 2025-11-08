@@ -407,7 +407,7 @@
   "map_quick_actions_add_friend": "添加好友",
   "map_quick_actions_my_event": "我的活动",
   "map_quick_actions_my_ledger": "我的账本",
-  "map_quick_actions_wallet": "我的钱包",
+  "map_quick_actions_wallet": "收益中心",
   "map_quick_actions_bottom_scan": "扫一扫",
   "map_quick_actions_bottom_support": "帮助与客服",
   "map_quick_actions_bottom_settings": "设置",
@@ -431,7 +431,7 @@
   "map_select_location_open_detailed": "打开详细规划",
   "map_select_location_create_trip": "创建快速行程",
   "map_apply_location": "应用位置",
-  "wallet_title": "我的钱包",
+  "wallet_title": "收益中心",
   "wallet_balance_label": "可用余额",
   "wallet_last_updated": "{timeAgo}前更新",
   "@wallet_last_updated": {

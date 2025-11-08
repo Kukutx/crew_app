@@ -10,11 +10,13 @@ class MemberDetailsSheet extends StatelessWidget {
     super.key,
     required this.participant,
     required this.difference,
+    required this.allParticipants,
     required this.scrollController,
   });
 
   final Participant participant;
   final double difference;
+  final List<Participant> allParticipants;
   final ScrollController scrollController;
 
   @override
@@ -22,7 +24,6 @@ class MemberDetailsSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final currency = NumberFormatHelper.currency;
     final dragHandleColor = isDark ? Colors.white24 : Colors.grey.shade300;
     final subtitleStyle = theme.textTheme.bodyMedium?.copyWith(
       color: isDark ? colorScheme.onSurfaceVariant : Colors.black54,
@@ -71,7 +72,7 @@ class MemberDetailsSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${currency.format(participant.total)} · ${participant.expenses.length} 笔消费',
+                      '${NumberFormatHelper.formatCurrencyCompactIfLarge(participant.totalPaid)} · ${participant.expenses.length} 笔消费',
                       style: subtitleStyle,
                     ),
                   ],
@@ -105,22 +106,31 @@ class MemberDetailsSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SummaryRow(
-                  label: '总计',
-                  value: currency.format(participant.total),
+                  label: '总计支付',
+                  value: NumberFormatHelper.formatCurrencyCompactIfLarge(
+                    participant.totalPaid,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SummaryRow(
+                  label: '应承担',
+                  value: NumberFormatHelper.formatCurrencyCompactIfLarge(
+                    participant.totalOwed(allParticipants),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 SummaryRow(
                   label: '平摊后差额',
                   value: difference >= 0
-                      ? '+${currency.format(difference.abs())}'
-                      : '-${currency.format(difference.abs())}',
+                      ? '+${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}'
+                      : '-${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}',
                   valueColor: summaryAccentColor,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   difference >= 0
-                      ? '需要收回 ${currency.format(difference.abs())}'
-                      : '仍需补交 ${currency.format(difference.abs())}',
+                      ? '需要收回 ${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}'
+                      : '仍需补交 ${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}',
                   style: theme.textTheme.bodyMedium,
                 ),
               ],

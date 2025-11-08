@@ -16,4 +16,12 @@ class NumberFormatHelper {
     }
     return _bubbleCurrency.format(value);
   }
+
+  /// 格式化货币，超过1000时使用紧凑格式
+  static String formatCurrencyCompactIfLarge(double value) {
+    if (value >= 1000) {
+      return _compactCurrency.format(value);
+    }
+    return currency.format(value);
+  }
 }

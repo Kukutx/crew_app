@@ -45,70 +45,77 @@ class _ExpensesPageState extends State<ExpensesPage>
   }
 
   /// 计算合适的变换矩阵，使所有泡泡都能完整显示在视图中
+  /// 
+  /// 策略：
+  /// 1. 集群位于画布中心
+  /// 2. 初始缩放使集群适合视图
+  /// 3. 平移使集群中心对齐视图中心
   Matrix4 _calculateFitTransform({
     required Size viewSize,
     required Size clusterSize,
     required Size canvasSize,
-    double padding = 16.0, // 减少边距，让泡泡显示更大
+    double padding = 16.0,
   }) {
     if (clusterSize.width <= 0 || clusterSize.height <= 0) {
       return Matrix4.identity();
     }
 
-    // 计算可用的视图大小（减少边距，让泡泡显示更大）
+    // 计算可用的视图大小（留出边距）
     final availableWidth = viewSize.width - padding * 2;
     final availableHeight = viewSize.height - padding * 2;
 
     // 计算缩放比例，确保集群完全适合视图（取较小的比例以确保完整显示）
     final scaleX = availableWidth / clusterSize.width;
     final scaleY = availableHeight / clusterSize.height;
-    
-    // 使用更激进的缩放策略，让泡泡显示更大
-    // 取较小的比例以确保完整显示
     var baseScale = math.min(scaleX, scaleY);
     
-    // 如果集群比视图小（baseScale > 1.0），可以放大更多以更好地填充屏幕
-    // 使用0.95的填充率（留5%的边距），让泡泡显示更大、更居中
+    // 优化缩放策略
     var scale = baseScale;
     if (baseScale > 1.0) {
-      // 如果集群比视图小，可以放大到填充95%的屏幕，让泡泡显示更大
-      // 例如：如果 baseScale = 2.0，意味着集群只有视图的1/2，我们可以放大到 2.0 * 0.95 = 1.9倍
+      // 集群比视图小，放大填充95%的屏幕
       scale = baseScale * 0.95;
-      // 但不要超过1.6倍，避免泡泡过大
-      scale = math.min(scale, 1.6);
+      scale = math.min(scale, 1.6); // 限制最大缩放
     } else {
-      // 如果集群比视图大，使用原始比例（不缩小），确保所有泡泡都能完整显示
-      // 但确保最小缩放，避免显示过小
-      scale = math.max(baseScale, 0.6);
+      // 集群比视图大，缩小以完整显示
+      scale = math.max(baseScale, 0.6); // 限制最小缩放
     }
     
-    // 确保缩放比例在合理范围内
     scale = scale.clamp(0.6, 1.6);
 
-    // 计算偏移，使集群居中
-    // 集群在画布中的中心位置
-    final clusterCenterX = canvasSize.width / 2;
-    final clusterCenterY = canvasSize.height / 2;
-
-    // 视图中心位置（考虑顶部统计卡片的高度）
+    // 集群在画布中的中心位置（画布中心）
+    final canvasCenterX = canvasSize.width / 2;
+    final canvasCenterY = canvasSize.height / 2;
+    
+    // 视图中心位置
     final viewCenterX = viewSize.width / 2;
     final viewCenterY = viewSize.height / 2;
 
-    // 计算平移距离，使缩放后的集群中心对齐到视图中心
-    // 变换顺序：先缩放，后平移
-    // 缩放后，画布上的点 (x, y) 变成 (x * scale, y * scale)
-    // 然后平移，使集群中心 (clusterCenterX, clusterCenterY) 对齐到视图中心 (viewCenterX, viewCenterY)
-    // 所以：viewCenterX = clusterCenterX * scale + translateX
-    // 因此：translateX = viewCenterX - clusterCenterX * scale
-    final translateX = viewCenterX - clusterCenterX * scale;
-    final translateY = viewCenterY - clusterCenterY * scale;
+    // 计算变换矩阵
+    // 目标：使缩放后的集群中心对齐到视图中心
+    // 
+    // 集群在画布中心 (canvasCenterX, canvasCenterY)
+    // 视图中心 (viewCenterX, viewCenterY)
+    // 
+    // 变换步骤：
+    // 1. 缩放集群（以原点为中心）
+    // 2. 平移，使缩放后的集群中心对齐视图中心
+    //
+    // 缩放后，集群中心在画布坐标系中的位置仍然是 (canvasCenterX, canvasCenterY)
+    // 但在视图坐标系中，这个点被缩放了，位置变成 (canvasCenterX * scale, canvasCenterY * scale)
+    // 我们需要平移，使得这个点对齐到视图中心
+    // translateX = viewCenterX - canvasCenterX * scale
+    // translateY = viewCenterY - canvasCenterY * scale
+    //
+    // 在 Matrix4 中，变换的应用顺序是从右到左（矩阵乘法）
+    // 如果我们写：scale(scale) * translate(tx, ty)
+    // 实际应用顺序是：先 translate，后 scale
+    // 但我们想要的是：先 scale，后 translate
+    // 所以应该是：translate(tx, ty) * scale(scale)
+    // 在代码中：先调用 scale，后调用 translate
+    final translateX = viewCenterX - canvasCenterX * scale;
+    final translateY = viewCenterY - canvasCenterY * scale;
 
     // 创建变换矩阵：先缩放，后平移
-    // Matrix4 的 scale 和 translate 操作会按照调用的顺序应用
-    // 但我们想要的效果是：先缩放，然后在缩放后的坐标系中平移
-    // 由于 Matrix4 的 translate 是在当前坐标系中应用的，而我们已经应用了 scale
-    // 所以我们需要在缩放前的坐标系中计算平移距离
-    // 在缩放后的坐标系中，平移 translateX 相当于在缩放前的坐标系中平移 translateX / scale
     final matrix = Matrix4.identity()
       ..scale(scale)
       ..translate(translateX / scale, translateY / scale);
@@ -254,21 +261,21 @@ class _ExpensesPageState extends State<ExpensesPage>
                     // 计算泡泡集群的实际大小
                     final clusterSize = ParticipantBubbleCluster.calculateClusterSize(participants);
                     
-                    // 计算合适的画布大小，留有足够的滑动空间
-                    final participantCount = participants.length;
-                    final baseSize = ParticipantBubbleCluster.bubbleDiameter;
-                    // 根据成员数量调整画布大小 - 增大画布以提供更多滑动空间
-                    final canvasMultiplier = participantCount >= 7 ? 3.5 : 2.5;
-                    final canvasWidth = math.max(
-                      constraints.maxWidth * canvasMultiplier,
-                      baseSize * 6,
-                    );
-                    final canvasHeight = math.max(
-                      constraints.maxHeight * canvasMultiplier,
-                      baseSize * 6,
-                    );
-                    final canvasSize = Size(canvasWidth, canvasHeight);
+                    // 视图大小
                     final viewSize = Size(constraints.maxWidth, constraints.maxHeight);
+                    
+                    // 画布大小：设置为视图的2-3倍，确保有足够的滑动空间
+                    // 但至少要比集群大小大，保证集群可以完整显示
+                    final baseSize = ParticipantBubbleCluster.bubbleDiameter;
+                    final minCanvasWidth = math.max(
+                      clusterSize.width * 1.5, // 至少是集群的1.5倍
+                      viewSize.width * 2.0,    // 至少是视图的2倍
+                    );
+                    final minCanvasHeight = math.max(
+                      clusterSize.height * 1.5,
+                      viewSize.height * 2.0,
+                    );
+                    final canvasSize = Size(minCanvasWidth, minCanvasHeight);
 
                     // 检查是否需要重新计算初始变换
                     // 如果还没有初始化，或者视图尺寸变化，或者集群尺寸变化，都需要重新计算
@@ -314,16 +321,23 @@ class _ExpensesPageState extends State<ExpensesPage>
                     return Stack(
                       children: [
                         InteractiveViewer(
-                          minScale: 0.5,
-                          maxScale: 3.0,
+                          minScale: 0.3,
+                          maxScale: 4.0,
                           transformationController: _transformationController,
-                          // 设置更大的边界边距，允许更大的滑动范围
+                          // 设置边界边距，允许在画布边缘滑动
+                          // 边距设置为视图大小的一半，确保缩放后仍有足够的滑动空间
                           boundaryMargin: EdgeInsets.all(
-                            math.max(constraints.maxWidth, constraints.maxHeight) * 0.8,
+                            math.min(viewSize.width, viewSize.height) * 0.5,
                           ),
+                          // 明确启用平移和缩放功能
+                          panEnabled: true,
+                          scaleEnabled: true,
+                          // 不限制边界，允许自由滑动（boundaryMargin 已经处理了边界）
+                          constrained: false,
                           child: Container(
-                            width: canvasWidth,
-                            height: canvasHeight,
+                            width: canvasSize.width,
+                            height: canvasSize.height,
+                            color: Colors.transparent,
                             child: Center(
                               child: ParticipantBubbleCluster(
                                 participants: participants,

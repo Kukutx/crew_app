@@ -29,6 +29,7 @@ class NotificationsPage extends StatelessWidget {
   static DirectChatPreview _createCustomerServicePreview({bool isSystem = false}) {
     return DirectChatPreview(
       id: _CustomerServiceConstants.id,
+      userId: _CustomerServiceConstants.customerServiceAgentId,
       displayName: _CustomerServiceConstants.displayName,
       lastMessagePreview: _CustomerServiceConstants.lastMessagePreview,
       lastMessageTimeLabel: _CustomerServiceConstants.lastMessageTimeLabel,
@@ -66,6 +67,7 @@ class NotificationsPage extends StatelessWidget {
     return [
       ChatMessage(
         id: 'cs-welcome',
+        chatId: _CustomerServiceConstants.id,
         sender: agent,
         body: _CustomerServiceConstants.lastMessagePreview,
         sentAtLabel: _CustomerServiceConstants.lastMessageTimeLabel,
@@ -87,6 +89,7 @@ class NotificationsPage extends StatelessWidget {
     final messages = [
       ChatMessage(
         id: 'sys-1',
+        chatId: notification.id,
         sender: systemParticipant,
         body: notification.lastMessagePreview,
         sentAtLabel: notification.lastMessageTimeLabel,

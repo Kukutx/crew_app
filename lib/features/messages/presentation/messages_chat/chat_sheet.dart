@@ -32,6 +32,7 @@ class _ChatSheetState extends State<ChatSheet> {
   late final List<DirectChatPreview> _samplePrivateConversations = const [
     DirectChatPreview(
       id: 'direct-system',
+      userId: 'system',
       displayName: '系统通知',
       lastMessagePreview: '查看最新公告，不错过任何重要提醒',
       lastMessageTimeLabel: '刚刚',
@@ -40,6 +41,7 @@ class _ChatSheetState extends State<ChatSheet> {
     ),
     DirectChatPreview(
       id: 'direct-1',
+      userId: 'user-lixiang',
       displayName: '李想',
       lastMessagePreview: '要不要晚上一起吃饭？',
       lastMessageTimeLabel: '16:45',
@@ -49,6 +51,7 @@ class _ChatSheetState extends State<ChatSheet> {
     ),
     DirectChatPreview(
       id: 'direct-2',
+      userId: 'user-marco',
       displayName: 'Marco',
       lastMessagePreview: 'Ci vediamo domani in coworking?',
       lastMessageTimeLabel: '15:12',
@@ -58,6 +61,7 @@ class _ChatSheetState extends State<ChatSheet> {
     ),
     DirectChatPreview(
       id: 'direct-3',
+      userId: 'user-wangcongcong',
       displayName: '王聪聪',
       lastMessagePreview: '我已经把资料发给你啦～',
       lastMessageTimeLabel: '昨天',
@@ -66,6 +70,7 @@ class _ChatSheetState extends State<ChatSheet> {
     ),
     DirectChatPreview(
       id: 'direct-4',
+      userId: 'user-sara',
       displayName: 'Sara',
       lastMessagePreview: 'Grazie per报名活动！',
       lastMessageTimeLabel: '周一',
@@ -118,18 +123,21 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'direct-1-msg-1',
+        chatId: 'direct-1',
         sender: _privateContacts[0],
         body: '今晚想吃川菜还是意面？',
         sentAtLabel: '16:40',
       ),
       ChatMessage(
         id: 'direct-1-msg-2',
+        chatId: 'direct-1',
         sender: _currentUser,
         body: '川菜吧，我下班去你那边找你～',
         sentAtLabel: '16:42',
       ),
       ChatMessage(
         id: 'direct-1-msg-3',
+        chatId: 'direct-1',
         sender: _privateContacts[0],
         body: '好，那我提前预约。',
         sentAtLabel: '16:44',
@@ -138,18 +146,21 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'direct-2-msg-1',
+        chatId: 'direct-2',
         sender: _privateContacts[1],
         body: 'Ti mando la presentazione più tardi.',
         sentAtLabel: '14:55',
       ),
       ChatMessage(
         id: 'direct-2-msg-2',
+        chatId: 'direct-2',
         sender: _currentUser,
         body: 'Perfetto, grazie! 明早见～',
         sentAtLabel: '15:01',
       ),
       ChatMessage(
         id: 'direct-2-msg-3',
+        chatId: 'direct-2',
         sender: _privateContacts[1],
         body: 'A domani 👋',
         sentAtLabel: '15:04',
@@ -158,18 +169,21 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'direct-3-msg-1',
+        chatId: 'direct-3',
         sender: _privateContacts[2],
         body: '你收到我发的资料了吗？',
         sentAtLabel: '昨天 19:12',
       ),
       ChatMessage(
         id: 'direct-3-msg-2',
+        chatId: 'direct-3',
         sender: _currentUser,
         body: '收到了，今晚就开始整理。',
         sentAtLabel: '昨天 19:20',
       ),
       ChatMessage(
         id: 'direct-3-msg-3',
+        chatId: 'direct-3',
         sender: _privateContacts[2],
         body: '太好了！那我就等你的好消息～',
         sentAtLabel: '昨天 19:21',
@@ -178,18 +192,21 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'direct-4-msg-1',
+        chatId: 'direct-4',
         sender: _privateContacts[3],
         body: 'Grazie per l\'invito all\'evento!',
         sentAtLabel: '周一 10:12',
       ),
       ChatMessage(
         id: 'direct-4-msg-2',
+        chatId: 'direct-4',
         sender: _currentUser,
         body: '不客气，到时候一起玩～',
         sentAtLabel: '周一 10:18',
       ),
       ChatMessage(
         id: 'direct-4-msg-3',
+        chatId: 'direct-4',
         sender: _privateContacts[3],
         body: 'Can\'t wait!',
         sentAtLabel: '周一 10:20',
@@ -297,6 +314,7 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'group-1-msg-1',
+        chatId: 'group-1',
         sender: _sampleParticipants[0][0],
         body: '周六记得带上登山杖和保温壶，山上还会有些冷。',
         sentAtLabel: '09:20',
@@ -306,12 +324,14 @@ class _ChatSheetState extends State<ChatSheet> {
       ),
       ChatMessage(
         id: 'group-1-msg-2',
+        chatId: 'group-1',
         sender: _sampleParticipants[0][2],
         body: '我可以带两壶热姜茶，大家可以分着喝。',
         sentAtLabel: '10:02',
       ),
       ChatMessage(
         id: 'group-1-msg-3',
+        chatId: 'group-1',
         sender: _currentUser,
         body: '太贴心了！下午三点在龙泉寺门口集合哦～',
         sentAtLabel: '10:05',
@@ -320,6 +340,7 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'group-2-msg-1',
+        chatId: 'group-2',
         sender: _sampleParticipants[1][0],
         body: '今晚 8 点开始，提前十分钟上线试一下音频～',
         sentAtLabel: '15:40',
@@ -327,12 +348,14 @@ class _ChatSheetState extends State<ChatSheet> {
       ),
       ChatMessage(
         id: 'group-2-msg-2',
+        chatId: 'group-2',
         sender: _sampleParticipants[1][1],
         body: '我准备了新的歌单，等会分享链接。',
         sentAtLabel: '15:44',
       ),
       ChatMessage(
         id: 'group-2-msg-3',
+        chatId: 'group-2',
         sender: _currentUser,
         body: '我能顺便点几首老歌吗？',
         sentAtLabel: '15:46',
@@ -341,6 +364,7 @@ class _ChatSheetState extends State<ChatSheet> {
     [
       ChatMessage(
         id: 'group-3-msg-1',
+        chatId: 'group-3',
         sender: _sampleParticipants[2][0],
         body: '路线 2 号有一些石板路，记得穿好走的鞋子。',
         sentAtLabel: '08:12',
@@ -348,12 +372,14 @@ class _ChatSheetState extends State<ChatSheet> {
       ),
       ChatMessage(
         id: 'group-3-msg-2',
+        chatId: 'group-3',
         sender: _sampleParticipants[2][1],
         body: '咖啡店会提前预约，大家提前 10 分钟到哦。',
         sentAtLabel: '08:21',
       ),
       ChatMessage(
         id: 'group-3-msg-3',
+        chatId: 'group-3',
         sender: _currentUser,
         body: '收到，我顺便把城市探索的新朋友拉进来了。',
         sentAtLabel: '08:30',

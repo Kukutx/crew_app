@@ -115,9 +115,13 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         .formatTimeOfDay(TimeOfDay.fromDateTime(DateTime.now()));
 
     final prefix = _isGroup ? 'group-temp' : 'direct-temp';
+    final chatId = widget.type == ChatConversationType.group
+        ? widget.title
+        : (widget.preview?.id ?? widget.partner?.id ?? 'unknown');
 
     final newMessage = ChatMessage(
       id: '$prefix-${DateTime.now().millisecondsSinceEpoch}',
+      chatId: chatId,
       sender: widget.currentUser,
       body: raw,
       sentAtLabel: timeLabel,

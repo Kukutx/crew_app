@@ -1,6 +1,5 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/theme/app_design_tokens.dart';
-import 'package:crew_app/shared/theme/app_spacing.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 

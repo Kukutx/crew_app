@@ -118,6 +118,44 @@ class ApiRequestHandler {
     }
   }
 
+  /// 执行 PUT 请求
+  /// 
+  /// [path] 请求路径
+  /// [data] 请求体数据
+  /// [requiresAuth] 是否需要认证
+  /// [parseResponse] 响应解析函数，如果为 null 则返回原始数据
+  /// [successStatusCodes] 成功状态码列表，默认为 [200]
+  Future<T> put<T>({
+    required String path,
+    dynamic data,
+    bool requiresAuth = false,
+    T Function(dynamic)? parseResponse,
+    List<int> successStatusCodes = const [200],
+  }) async {
+    try {
+      final headers = requiresAuth
+          ? await _buildAuthHeaders(required: true)
+          : await _buildAuthHeaders();
+
+      final response = await _dio.put(
+        path,
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      return _handleResponse<T>(
+        response: response,
+        parseResponse: parseResponse,
+        errorMessage: 'Failed to update data',
+        successStatusCodes: successStatusCodes,
+      );
+    } on ApiException {
+      rethrow;
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
   /// 处理响应
   T _handleResponse<T>({
     required Response response,
@@ -128,6 +166,45 @@ class ApiRequestHandler {
     if (successStatusCodes.contains(response.statusCode)) {
       final data = response.data;
       
+      // 检查是否是 ApiResponse 格式
+      if (data is Map<String, dynamic>) {
+        final success = data['success'] as bool?;
+        
+        // 如果 success 为 false，说明是错误响应
+        if (success == false) {
+          final error = data['error'];
+          if (error is Map<String, dynamic>) {
+            final errorMessage = error['message'] as String? ?? 'An error occurred';
+            throw ApiException(
+              errorMessage,
+              statusCode: response.statusCode,
+            );
+          }
+          throw ApiException(
+            'Request failed',
+            statusCode: response.statusCode,
+          );
+        }
+        
+        // 如果 success 为 true 或未设置，提取 data 字段
+        final responseData = data['data'] ?? data;
+        
+        if (parseResponse != null) {
+          return parseResponse(responseData);
+        }
+        
+        // 如果没有提供解析函数，尝试直接返回数据
+        if (responseData is T) {
+          return responseData;
+        }
+        
+        throw ApiException(
+          'Unexpected response type',
+          statusCode: response.statusCode,
+        );
+      }
+      
+      // 如果不是 Map，直接处理
       if (parseResponse != null) {
         return parseResponse(data);
       }

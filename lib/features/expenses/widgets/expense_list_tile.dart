@@ -1,4 +1,4 @@
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 import 'package:crew_app/shared/utils/formatted_date.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class ExpenseListTile extends StatelessWidget {
   const ExpenseListTile({super.key, required this.expense});
 
-  final ParticipantExpense expense;
+  final MemberExpense expense;
 
   @override
   Widget build(BuildContext context) {

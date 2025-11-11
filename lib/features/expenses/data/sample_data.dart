@@ -1,11 +1,11 @@
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 
-final List<Participant> sampleParticipants = [
-  Participant(
+final List<Member> sampleMembers = [
+  Member(
     name: 'Alice',
     isHost: true,
     expenses: [
-      ParticipantExpense(
+      MemberExpense(
         title: '第一天加油',
         amount: 86.5,
         category: '油费',
@@ -14,7 +14,7 @@ final List<Participant> sampleParticipants = [
         sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊油费
         paymentMethod: 'Visa',
       ),
-      ParticipantExpense(
+      MemberExpense(
         title: '路边咖啡',
         amount: 14.2,
         category: '餐饮',
@@ -23,7 +23,7 @@ final List<Participant> sampleParticipants = [
         sharedBy: ['Alice', 'Bruno', 'Celine'], // 大家一起喝咖啡
         note: '和大家一起喝咖啡',
       ),
-      ParticipantExpense(
+      MemberExpense(
         title: '营地预定',
         amount: 120,
         category: '住宿',
@@ -33,10 +33,10 @@ final List<Participant> sampleParticipants = [
       ),
     ],
   ),
-  Participant(
+  Member(
     name: 'Bruno',
     expenses: [
-      ParticipantExpense(
+      MemberExpense(
         title: '晚餐烧烤',
         amount: 64.3,
         category: '餐饮',
@@ -45,7 +45,7 @@ final List<Participant> sampleParticipants = [
         sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊晚餐
         paymentMethod: 'Mastercard',
       ),
-      ParticipantExpense(
+      MemberExpense(
         title: '高速路费',
         amount: 22.4,
         category: '油费',
@@ -55,10 +55,10 @@ final List<Participant> sampleParticipants = [
       ),
     ],
   ),
-  Participant(
+  Member(
     name: 'Celine',
     expenses: [
-      ParticipantExpense(
+      MemberExpense(
         title: 'Airbnb 预定',
         amount: 210,
         category: '住宿',
@@ -67,7 +67,7 @@ final List<Participant> sampleParticipants = [
         sharedBy: ['Alice', 'Bruno', 'Celine'], // 三人均摊住宿
         note: '两晚海边房',
       ),
-      ParticipantExpense(
+      MemberExpense(
         title: '早餐烘焙坊',
         amount: 28.9,
         category: '餐饮',
@@ -75,7 +75,7 @@ final List<Participant> sampleParticipants = [
         paidBy: 'Celine',
         sharedBy: ['Celine'], // 只有Celine吃早餐
       ),
-      ParticipantExpense(
+      MemberExpense(
         title: '观光门票',
         amount: 48,
         category: '门票',

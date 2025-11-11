@@ -2,11 +2,13 @@ import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/shared/utils/country_helper.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/state/location_api_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'section_card.dart';
 
-class BasicInfoSection extends StatelessWidget {
+class BasicInfoSection extends ConsumerWidget {
   const BasicInfoSection({
     super.key,
     required this.nameController,
@@ -16,12 +18,8 @@ class BasicInfoSection extends StatelessWidget {
     required this.onCustomGenderChanged,
     required this.countryCode,
     required this.onCountryChanged,
-    required this.birthdayController,
-    required this.onBirthdayTap,
-    required this.onClearBirthday,
-    required this.hasBirthday,
-    required this.schoolController,
-    required this.locationController,
+    required this.selectedCity,
+    required this.onCityChanged,
     required this.bioController,
     required this.onFieldChanged,
     required this.maxBioLength,
@@ -34,19 +32,18 @@ class BasicInfoSection extends StatelessWidget {
   final ValueChanged<String> onCustomGenderChanged;
   final String? countryCode;
   final ValueChanged<String?> onCountryChanged;
-  final TextEditingController birthdayController;
-  final VoidCallback onBirthdayTap;
-  final VoidCallback onClearBirthday;
-  final bool hasBirthday;
-  final TextEditingController schoolController;
-  final TextEditingController locationController;
+  final String? selectedCity;
+  final ValueChanged<String?> onCityChanged;
   final TextEditingController bioController;
   final VoidCallback onFieldChanged;
   final int maxBioLength;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
+    // 使用新的 Location API Provider
+    final countriesAsync = ref.watch(countriesProvider);
+    final citiesAsync = ref.watch(citiesByCountryCodeProvider(countryCode));
 
     return SectionCard(
       child: Column(
@@ -146,125 +143,172 @@ class BasicInfoSection extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 16),
-          DropdownButtonFormField<String?>(
-            initialValue: countryCode,
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              letterSpacing: 0.2,
-            ),
-            decoration: InputDecoration(
-              labelText: loc.preferences_country_label,
-              helperText: loc.preferences_country_hint,
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                height: 1.3,
-                letterSpacing: 0,
+          // 国家选择下拉框
+          countriesAsync.when(
+            data: (countries) => DropdownButtonFormField<String?>(
+              value: countryCode,
+              style: const TextStyle(
+                fontSize: 15,
+                height: 1.5,
+                letterSpacing: 0.2,
               ),
-            ),
-            items: [
-              DropdownMenuItem<String?>(
-                value: null,
-                child: Text(loc.preferences_country_unset),
+              decoration: InputDecoration(
+                labelText: loc.preferences_country_label,
+                helperText: loc.preferences_country_hint,
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  letterSpacing: 0,
+                ),
               ),
-              for (final option in _buildCountryOptions(loc))
+              items: [
                 DropdownMenuItem<String?>(
-                  value: option.key,
-                  child: _CountryMenuLabel(
-                    flag: CountryHelper.countryCodeToEmoji(option.key) ?? '',
-                    name: option.value,
+                  value: null,
+                  child: Text(loc.preferences_country_unset),
+                ),
+                for (final country in countries)
+                  DropdownMenuItem<String?>(
+                    value: country.code,
+                    child: _CountryMenuLabel(
+                      flag: CountryHelper.countryCodeToEmoji(country.code) ?? '',
+                      name: country.nameZh ?? country.name,
+                    ),
+                  ),
+              ],
+              onChanged: (value) {
+                onCountryChanged(value);
+                // 国家改变时，清空城市选择
+                if (value != countryCode) {
+                  onCityChanged(null);
+                }
+              },
+            ),
+            loading: () => const SizedBox(
+              height: 56,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (error, stack) => DropdownButtonFormField<String?>(
+              value: countryCode,
+              style: const TextStyle(
+                fontSize: 15,
+                height: 1.5,
+                letterSpacing: 0.2,
+              ),
+              decoration: InputDecoration(
+                labelText: loc.preferences_country_label,
+                helperText: '加载国家列表失败',
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  letterSpacing: 0,
+                ),
+              ),
+              items: [
+                DropdownMenuItem<String?>(
+                  value: null,
+                  child: Text(loc.preferences_country_unset),
+                ),
+                // 降级到硬编码列表
+                for (final option in _buildCountryOptions(loc))
+                  DropdownMenuItem<String?>(
+                    value: option.key,
+                    child: _CountryMenuLabel(
+                      flag: CountryHelper.countryCodeToEmoji(option.key) ?? '',
+                      name: option.value,
+                    ),
+                  ),
+              ],
+              onChanged: (value) {
+                onCountryChanged(value);
+                if (value != countryCode) {
+                  onCityChanged(null);
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+          // 城市选择下拉框
+          citiesAsync.when(
+            data: (cities) {
+              final cityNames = cities.map((c) => c.getDisplayName()).toList();
+              final validCityValue = _getValidCityValueFromList(selectedCity, cityNames);
+              
+              return DropdownButtonFormField<String?>(
+                value: validCityValue,
+                style: const TextStyle(
+                  fontSize: 15,
+                  height: 1.5,
+                  letterSpacing: 0.2,
+                ),
+                decoration: InputDecoration(
+                  labelText: '城市',
+                  helperText: countryCode == null 
+                      ? '请先选择国家' 
+                      : cities.isEmpty 
+                          ? '暂无城市数据' 
+                          : null,
+                  labelStyle: const TextStyle(
+                    fontSize: 14,
+                    height: 1.3,
+                    letterSpacing: 0,
                   ),
                 ),
-            ],
-            onChanged: onCountryChanged,
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: birthdayController,
-            readOnly: true,
-            showCursor: false,
-            onTap: onBirthdayTap,
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              letterSpacing: 0.2,
-            ),
-            decoration: InputDecoration(
-              labelText: '生日',
-              hintText: '选择你的生日',
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                height: 1.3,
-                letterSpacing: 0,
-              ),
-              hintStyle: TextStyle(
-                fontSize: 15,
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-              ),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (hasBirthday)
-                    IconButton(
-                      tooltip: '清除',
-                      icon: const Icon(Icons.close, size: 20),
-                      onPressed: onClearBirthday,
+                items: [
+                  DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(
+                      countryCode == null ? '请先选择国家' : '未选择',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  IconButton(
-                    tooltip: '选择生日',
-                    icon: const Icon(Icons.cake_outlined, size: 20),
-                    onPressed: onBirthdayTap,
                   ),
+                  for (final city in cities)
+                    DropdownMenuItem<String?>(
+                      value: city.getDisplayName(),
+                      child: Text(city.getDisplayName()),
+                    ),
                 ],
-              ),
+                onChanged: countryCode == null ? null : (value) {
+                  onCityChanged(value);
+                  onFieldChanged();
+                },
+              );
+            },
+            loading: () => const SizedBox(
+              height: 56,
+              child: Center(child: CircularProgressIndicator()),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: schoolController,
-            maxLength: 30,
-            onChanged: (_) => onFieldChanged(),
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              letterSpacing: 0.2,
-            ),
-            decoration: InputDecoration(
-              labelText: '学校',
-              hintText: '填写就读或毕业学校',
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                height: 1.3,
-                letterSpacing: 0,
-              ),
-              hintStyle: TextStyle(
+            error: (error, stack) => DropdownButtonFormField<String?>(
+              value: selectedCity,
+              style: const TextStyle(
                 fontSize: 15,
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                height: 1.5,
+                letterSpacing: 0.2,
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: locationController,
-            maxLength: 30,
-            onChanged: (_) => onFieldChanged(),
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              letterSpacing: 0.2,
-            ),
-            decoration: InputDecoration(
-              labelText: '常驻地区',
-              hintText: '例如 广东 · 深圳',
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                height: 1.3,
-                letterSpacing: 0,
+              decoration: InputDecoration(
+                labelText: '城市',
+                helperText: countryCode == null 
+                    ? '请先选择国家' 
+                    : '加载城市列表失败',
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  letterSpacing: 0,
+                ),
               ),
-              hintStyle: TextStyle(
-                fontSize: 15,
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-              ),
+              items: [
+                DropdownMenuItem<String?>(
+                  value: null,
+                  child: Text(
+                    countryCode == null ? '请先选择国家' : '未选择',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+              onChanged: null,
             ),
           ),
           const SizedBox(height: 16),
@@ -330,6 +374,22 @@ String _genderLabel(AppLocalizations loc, Gender gender) {
     case Gender.undisclosed:
       return loc.preferences_gender_other;
   }
+}
+
+/// 从城市名称列表中获取有效的城市值
+String? _getValidCityValueFromList(String? selectedCity, List<String> cityNames) {
+  if (selectedCity == null) {
+    return null;
+  }
+  // 检查 selectedCity 是否在 cityNames 列表中（支持模糊匹配）
+  for (final cityName in cityNames) {
+    if (cityName == selectedCity || 
+        cityName.toLowerCase() == selectedCity.toLowerCase()) {
+      return cityName;
+    }
+  }
+  // 如果不在列表中，返回 null（避免 DropdownButton 错误）
+  return null;
 }
 
 List<MapEntry<String, String>> _buildCountryOptions(AppLocalizations loc) => [

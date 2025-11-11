@@ -1,4 +1,4 @@
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -25,10 +25,10 @@ class AddExpenseResult {
 class AddExpenseSheet extends StatefulWidget {
   const AddExpenseSheet({
     super.key,
-    required this.participants,
+    required this.members,
   });
 
-  final List<Participant> participants;
+  final List<Member> members;
 
   @override
   State<AddExpenseSheet> createState() => _AddExpenseSheetState();
@@ -46,10 +46,10 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   @override
   void initState() {
     super.initState();
-    if (widget.participants.isNotEmpty) {
-      _selectedPayer = widget.participants.first.name;
+    if (widget.members.isNotEmpty) {
+      _selectedPayer = widget.members.first.name;
       // 默认选择所有成员参与分摊
-      _selectedParticipants.addAll(widget.participants.map((p) => p.name));
+      _selectedParticipants.addAll(widget.members.map((p) => p.name));
     }
   }
 
@@ -89,7 +89,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   void _selectAll() {
     setState(() {
       _selectedParticipants.clear();
-      _selectedParticipants.addAll(widget.participants.map((p) => p.name));
+      _selectedParticipants.addAll(widget.members.map((p) => p.name));
     });
   }
 
@@ -183,11 +183,11 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                         hintText: '选择支付此费用的人',
                         prefixIcon: Icon(Icons.person),
                       ),
-                      items: widget.participants
+                      items: widget.members
                           .map(
-                            (participant) => DropdownMenuItem<String>(
-                              value: participant.name,
-                              child: Text(participant.name),
+                            (member) => DropdownMenuItem<String>(
+                              value: member.name,
+                              child: Text(member.name),
                             ),
                           )
                           .toList(),
@@ -273,9 +273,9 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                     Wrap(
                       spacing: 12,
                       runSpacing: 12,
-                      children: widget.participants.map((participant) {
-                        final isSelected = _selectedParticipants.contains(participant.name);
-                        final isPayer = participant.name == _selectedPayer;
+                      children: widget.members.map((member) {
+                        final isSelected = _selectedParticipants.contains(member.name);
+                        final isPayer = member.name == _selectedPayer;
                         return FilterChip(
                           selected: isSelected,
                           label: Row(
@@ -286,7 +286,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                                   padding: EdgeInsets.only(right: 4),
                                   child: Icon(Icons.account_balance_wallet, size: 16),
                                 ),
-                              Text(participant.name),
+                              Text(member.name),
                             ],
                           ),
                           onSelected: (selected) {
@@ -300,7 +300,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                               );
                               return;
                             }
-                            _toggleParticipant(participant.name);
+                            _toggleParticipant(member.name);
                           },
                           avatar: isSelected
                               ? const Icon(Icons.check_circle, size: 18)

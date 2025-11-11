@@ -4,6 +4,7 @@ import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/features/settings/state/settings_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/state/country_city_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -124,6 +125,8 @@ class _CrewAppState extends ConsumerState<CrewApp> {
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(crewAppRouterProvider);
+    // 预加载国家-城市数据
+    ref.watch(countryCityDataProvider);
 
     return ScreenUtilInit(
       // 设计稿基准尺寸：iPhone 13 (390x844)

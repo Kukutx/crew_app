@@ -53,7 +53,10 @@ class LocationSelectionManager {
       unawaited(mapController.moveCamera(latlng, zoom: 17));
       
       // 直接显示 CreateRoadTripSheet 的启动页
-      _showRoadTripCreationSheet(context, latlng);
+      // 在异步操作后使用 context 前，需要检查 context 是否仍然有效
+      if (context.mounted) {
+        _showRoadTripCreationSheet(context, latlng);
+      }
     } finally {
       _isHandlingLongPress = false;
     }
@@ -159,7 +162,7 @@ class LocationSelectionManager {
         pos: result.start,
         locationName: '${result.startAddress ?? 'Start'} → ${result.destinationAddress ?? 'Destination'}',
       );
-    } on ApiException catch (error) {
+    } on ApiException {
       // 处理错误
     } catch (_) {
       // 处理错误
@@ -293,7 +296,6 @@ class LocationSelectionManager {
 
   /// 检查网络连接
   Future<bool> _ensureNetworkAvailable() async {
-    const offlineMessage = 'No internet connection detected.';
     final host = Uri.parse(Env.current).host;
     var lookupHost = host;
 

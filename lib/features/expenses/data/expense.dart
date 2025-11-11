@@ -173,8 +173,8 @@ class ExpenseSettlement {
       };
 }
 
-/// 参与者费用汇总
-class ParticipantExpenseSummary {
+/// 成员费用汇总
+class MemberExpenseSummary {
   final String userId;
   final String userName;
   final String? userAvatarUrl;
@@ -183,7 +183,7 @@ class ParticipantExpenseSummary {
   final double balance;
   final bool isHost;
 
-  const ParticipantExpenseSummary({
+  const MemberExpenseSummary({
     required this.userId,
     required this.userName,
     this.userAvatarUrl,
@@ -193,8 +193,8 @@ class ParticipantExpenseSummary {
     this.isHost = false,
   });
 
-  factory ParticipantExpenseSummary.fromJson(Map<String, dynamic> json) {
-    return ParticipantExpenseSummary(
+  factory MemberExpenseSummary.fromJson(Map<String, dynamic> json) {
+    return MemberExpenseSummary(
       userId: json['userId'] as String? ?? '',
       userName: json['userName'] as String? ?? '',
       userAvatarUrl: json['userAvatarUrl'] as String?,

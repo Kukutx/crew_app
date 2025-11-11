@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -13,23 +14,27 @@ class ProfileTabView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 只 watch 一次 eventsProvider，然后在子组件中过滤数据
+    final eventsAsync = ref.watch(eventsProvider);
+
     return TabBarView(
       controller: controller,
-      children: const [
-        _EventsGrid(),
-        _FavoritesGrid(),
+      children: [
+        _EventsGrid(eventsAsync: eventsAsync),
+        _FavoritesGrid(eventsAsync: eventsAsync),
       ],
     );
   }
 }
 
-class _EventsGrid extends ConsumerWidget {
-  const _EventsGrid();
+class _EventsGrid extends StatelessWidget {
+  const _EventsGrid({required this.eventsAsync});
+
+  final AsyncValue<List<Event>> eventsAsync;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final eventsAsync = ref.watch(eventsProvider);
 
     return eventsAsync.when(
       data: (events) {
@@ -57,20 +62,21 @@ class _EventsGrid extends ConsumerWidget {
         );
       },
       loading: () => const _CenteredScrollable(
-        child:  CircularProgressIndicator(),
+        child: CircularProgressIndicator(),
       ),
-      error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
+      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
     );
   }
 }
 
-class _FavoritesGrid extends ConsumerWidget {
-  const _FavoritesGrid();
+class _FavoritesGrid extends StatelessWidget {
+  const _FavoritesGrid({required this.eventsAsync});
+
+  final AsyncValue<List<Event>> eventsAsync;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final eventsAsync = ref.watch(eventsProvider);
 
     return eventsAsync.when(
       data: (events) {
@@ -100,7 +106,7 @@ class _FavoritesGrid extends ConsumerWidget {
       loading: () => const _CenteredScrollable(
         child: CircularProgressIndicator(),
       ),
-      error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
+      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
     );
   }
 }

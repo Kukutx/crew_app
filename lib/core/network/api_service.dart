@@ -48,12 +48,29 @@ class ApiService {
   final AuthService _auth;
   late final ApiRequestHandler _requestHandler;
 
+  /// 公开的请求处理器访问方法
+  /// 用于其他服务（如 LocationApiService）调用 API
+  ApiRequestHandler get requestHandler => _requestHandler;
+
+  /// 获取当前登录用户的详细信息
+  /// 使用 /users/me 端点，返回完整的用户资料
   Future<AuthenticatedUserDto> getAuthenticatedUserDetail() async {
     return _requestHandler.get<AuthenticatedUserDto>(
-      path: '/User/GetAuthenticatedUserDetail',
+      path: '/users/me',
       requiresAuth: true,
       parseResponse: (data) {
+        // 后端返回的是 ApiResponse<UserProfileDto>，需要提取 data 字段
         if (data is Map<String, dynamic>) {
+          // 如果响应是包装在 ApiResponse 中，提取 data 字段
+          final responseData = data['data'] ?? data;
+          if (responseData is Map<String, dynamic>) {
+            // 从 UserProfileDto 中提取 uid（FirebaseUid）
+            final uid = responseData['firebaseUid'] as String?;
+            if (uid != null) {
+              return AuthenticatedUserDto(uid: uid);
+            }
+          }
+          // 兼容旧格式（直接是 AuthenticatedUserDto）
           return AuthenticatedUserDto.fromJson(data);
         }
         throw Exception('Unexpected user payload type');
@@ -114,6 +131,55 @@ class ApiService {
           return events;
         }
         throw Exception('Unexpected events payload type');
+      },
+    );
+  }
+
+  /// 更新当前用户信息
+  /// 
+  /// [displayName] 显示名称
+  /// [bio] 简介
+  /// [avatarUrl] 头像URL
+  /// [coverImageUrl] 封面图片URL
+  /// [gender] 性别（female, male, custom, undisclosed）
+  /// [customGender] 自定义性别（当 gender 为 custom 时使用）
+  /// [city] 城市
+  /// [countryCode] 国家代码（ISO 格式，如 "CN"）
+  /// [tags] 标签列表
+  Future<Map<String, dynamic>> updateUserProfile({
+    String? displayName,
+    String? bio,
+    String? avatarUrl,
+    String? coverImageUrl,
+    String? gender,
+    String? customGender,
+    String? city,
+    String? countryCode,
+    List<String>? tags,
+  }) async {
+    return _requestHandler.put<Map<String, dynamic>>(
+      path: '/users/me',
+      requiresAuth: true,
+      data: {
+        if (displayName != null) 'displayName': displayName,
+        if (bio != null) 'bio': bio,
+        if (avatarUrl != null) 'avatarUrl': avatarUrl,
+        if (coverImageUrl != null) 'coverImageUrl': coverImageUrl,
+        if (gender != null) 'gender': gender,
+        if (customGender != null) 'customGender': customGender,
+        if (city != null) 'city': city,
+        if (countryCode != null) 'countryCode': countryCode,
+        if (tags != null) 'tags': tags,
+      },
+      parseResponse: (data) {
+        // 后端返回 ApiResponse<UserProfileDto>，需要提取 data 字段
+        if (data is Map<String, dynamic>) {
+          final responseData = data['data'] ?? data;
+          if (responseData is Map<String, dynamic>) {
+            return responseData;
+          }
+        }
+        throw Exception('Unexpected user profile payload type');
       },
     );
   }

@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 import 'package:crew_app/features/expenses/data/sample_data.dart';
 import 'package:crew_app/features/expenses/widgets/add_expense_sheet.dart';
 import 'package:crew_app/features/expenses/widgets/dialog_row.dart';
 import 'package:crew_app/features/expenses/widgets/member_details_sheet.dart';
-import 'package:crew_app/features/expenses/widgets/participant_bubble_cluster.dart';
+import 'package:crew_app/features/expenses/widgets/member_bubble_cluster.dart';
 import 'package:crew_app/features/expenses/widgets/settlement_preview_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/formatted_date.dart';
@@ -22,7 +22,7 @@ class ExpensesPage extends StatefulWidget {
 
 class _ExpensesPageState extends State<ExpensesPage>
     with TickerProviderStateMixin {
-  late List<Participant> _participants;
+  late List<Member> _members;
   final TransformationController _transformationController =
       TransformationController();
   AnimationController? _resetAnimationController;
@@ -34,7 +34,7 @@ class _ExpensesPageState extends State<ExpensesPage>
   @override
   void initState() {
     super.initState();
-    _participants = List.from(sampleParticipants);
+    _members = List.from(sampleMembers);
   }
 
   @override
@@ -162,11 +162,11 @@ class _ExpensesPageState extends State<ExpensesPage>
   void _addExpense(AddExpenseResult result) {
     setState(() {
       // 找到支付人
-      final payerIndex = _participants.indexWhere((p) => p.name == result.paidBy);
+      final payerIndex = _members.indexWhere((p) => p.name == result.paidBy);
       if (payerIndex == -1) return;
 
       // 创建新的费用
-      final expense = ParticipantExpense(
+      final expense = MemberExpense(
         title: result.title,
         amount: result.amount,
         category: result.category,
@@ -178,15 +178,15 @@ class _ExpensesPageState extends State<ExpensesPage>
       );
 
       // 添加到支付人的费用列表
-      final payer = _participants[payerIndex];
-      final updatedPayer = Participant(
+      final payer = _members[payerIndex];
+      final updatedPayer = Member(
         name: payer.name,
         isHost: payer.isHost,
         expenses: [...payer.expenses, expense],
       );
 
-      _participants = List.from(_participants);
-      _participants[payerIndex] = updatedPayer;
+      _members = List.from(_members);
+      _members[payerIndex] = updatedPayer;
       
       // 重置初始变换标志，以便在下次构建时重新计算
       _hasInitializedTransform = false;
@@ -195,21 +195,34 @@ class _ExpensesPageState extends State<ExpensesPage>
     });
   }
 
+  // 缓存计算结果，避免每次 build 都重新计算
+  double? _cachedOverallTotal;
+  double? _cachedAveragePerPerson;
+  List<Member>? _cachedMembersForTotal;
+
   double get _overallTotal {
-    return _participants.fold<double>(
-      0,
-      (sum, participant) => sum + participant.totalPaid,
-    );
+    if (_cachedOverallTotal == null || _cachedMembersForTotal != _members) {
+      _cachedOverallTotal = _members.fold<double>(
+        0,
+        (sum, member) => sum + member.totalPaid,
+      );
+      _cachedMembersForTotal = List.from(_members);
+    }
+    return _cachedOverallTotal!;
   }
 
   double get _averagePerPerson {
-    if (_participants.isEmpty) return 0;
-    // 计算所有费用的总应承担金额
-    double totalOwed = 0;
-    for (final participant in _participants) {
-      totalOwed += participant.totalOwed(_participants);
+    if (_members.isEmpty) return 0;
+    if (_cachedAveragePerPerson == null || _cachedMembersForTotal != _members) {
+      // 计算所有费用的总应承担金额
+      double totalOwed = 0;
+      for (final member in _members) {
+        totalOwed += member.totalOwed(_members);
+      }
+      _cachedAveragePerPerson = totalOwed / _members.length;
+      _cachedMembersForTotal = List.from(_members);
     }
-    return totalOwed / _participants.length;
+    return _cachedAveragePerPerson!;
   }
 
   @override
@@ -256,17 +269,17 @@ class _ExpensesPageState extends State<ExpensesPage>
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final participants = _participants.take(7).toList();
+                    final displayMembers = _members.take(7).toList();
                     
                     // 计算泡泡集群的实际大小
-                    final clusterSize = ParticipantBubbleCluster.calculateClusterSize(participants);
+                    final clusterSize = MemberBubbleCluster.calculateClusterSize(displayMembers);
                     
                     // 视图大小
                     final viewSize = Size(constraints.maxWidth, constraints.maxHeight);
                     
                     // 画布大小：设置为视图的2-3倍，确保有足够的滑动空间
                     // 但至少要比集群大小大，保证集群可以完整显示
-                    final baseSize = ParticipantBubbleCluster.bubbleDiameter;
+                    final baseSize = MemberBubbleCluster.bubbleDiameter;
                     final minCanvasWidth = math.max(
                       clusterSize.width * 1.5, // 至少是集群的1.5倍
                       viewSize.width * 2.0,    // 至少是视图的2倍
@@ -339,14 +352,14 @@ class _ExpensesPageState extends State<ExpensesPage>
                             height: canvasSize.height,
                             color: Colors.transparent,
                             child: Center(
-                              child: ParticipantBubbleCluster(
-                                participants: participants,
-                                allParticipants: _participants,
-                                onParticipantTap: _showMemberDetails,
-                                onExpenseTap: (participant, expense) =>
+                              child: MemberBubbleCluster(
+                                members: displayMembers,
+                                allMembers: _members,
+                                onMemberTap: _showMemberDetails,
+                                onExpenseTap: (member, expense) =>
                                     _showExpenseDetails(
                                       context,
-                                      participant,
+                                      member,
                                       expense,
                                     ),
                               ),
@@ -471,7 +484,7 @@ class _ExpensesPageState extends State<ExpensesPage>
                 child: _buildStatItem(
                   context,
                   '成员',
-                  '${_participants.length}',
+                  '${_members.length}',
                   Icons.person,
                   colorScheme.tertiary,
                 ),
@@ -517,8 +530,8 @@ class _ExpensesPageState extends State<ExpensesPage>
     );
   }
 
-  Future<void> _showMemberDetails(Participant participant) async {
-    final balance = participant.balance(_participants);
+  Future<void> _showMemberDetails(Member member) async {
+    final balance = member.balance(_members);
 
     await showModalBottomSheet<void>(
       context: context,
@@ -535,9 +548,9 @@ class _ExpensesPageState extends State<ExpensesPage>
           minChildSize: 0.4,
           builder: (context, controller) {
             return MemberDetailsSheet(
-              participant: participant,
+              member: member,
               difference: balance,
-              allParticipants: _participants,
+              allMembers: _members,
               scrollController: controller,
             );
           },
@@ -548,8 +561,8 @@ class _ExpensesPageState extends State<ExpensesPage>
 
   Future<void> _showExpenseDetails(
     BuildContext context,
-    Participant participant,
-    ParticipantExpense expense,
+    Member member,
+    MemberExpense expense,
   ) async {
     await showDialog<void>(
       context: context,
@@ -640,7 +653,7 @@ class _ExpensesPageState extends State<ExpensesPage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (context) {
-        return AddExpenseSheet(participants: _participants);
+        return AddExpenseSheet(members: _members);
       },
     );
 
@@ -664,11 +677,11 @@ class _ExpensesPageState extends State<ExpensesPage>
   }
 
   Future<void> _showSettlementPreview() async {
-    final entries = _participants
+    final entries = _members
         .map(
-          (participant) => SettlementEntry(
-            participant: participant,
-            difference: participant.balance(_participants),
+          (member) => SettlementEntry(
+            member: member,
+            difference: member.balance(_members),
           ),
         )
         .toList()

@@ -395,6 +395,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             top: (hideSearchBar || 
+                  !showBottomNavigation ||
                   (mapSheetType != MapOverlaySheetType.none && 
                    mapSheetStage == MapOverlaySheetStage.expanded))
                 // 搜索框消失时，移动到搜索框原本的位置（顶部安全区域 + 搜索框顶部 padding）

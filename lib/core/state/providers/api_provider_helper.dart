@@ -37,10 +37,10 @@ class ApiProviderHelper {
   /// );
   /// ```
   static Future<T> callApi<T>(
-    Ref ref,
+    dynamic ref,
     Future<T> Function(ApiService) apiCall,
   ) async {
-    final api = ref.read(apiServiceProvider);
+    final api = (ref as dynamic).read(apiServiceProvider);
     return apiCall(api);
   }
 }

@@ -3,9 +3,10 @@ import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/country_helper.dart';
-import 'package:crew_app/shared/widgets/crew_avatar.dart';
+import 'package:crew_app/shared/widgets/profile_avatar_with_flag.dart';
+import 'package:crew_app/shared/widgets/profile_info_badge.dart';
+import 'package:crew_app/shared/widgets/profile_tag_chip.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class ProfilePreviewSection extends StatelessWidget {
   const ProfilePreviewSection({
@@ -18,9 +19,7 @@ class ProfilePreviewSection extends StatelessWidget {
     required this.countryCode,
     required this.gender,
     this.customGender,
-    required this.birthday,
-    required this.school,
-    required this.location,
+    required this.city,
     required this.onEditCover,
     required this.onEditAvatar,
   });
@@ -33,9 +32,7 @@ class ProfilePreviewSection extends StatelessWidget {
   final String? countryCode;
   final Gender gender;
   final String? customGender;
-  final DateTime? birthday;
-  final String? school;
-  final String? location;
+  final String? city;
   final VoidCallback onEditCover;
   final VoidCallback onEditAvatar;
 
@@ -46,29 +43,12 @@ class ProfilePreviewSection extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     final flagEmoji = CountryHelper.countryCodeToEmoji(countryCode);
     final infoBadges = <Widget>[];
-    final birthdayLabel =
-        birthday == null ? null : DateFormat('yyyy年MM月dd日').format(birthday!);
-    final schoolLabel = school?.trim();
-    final locationLabel = location?.trim();
+    final cityLabel = city?.trim();
 
-    if (birthdayLabel != null) {
-      infoBadges.add(_InfoBadge(
-        icon: Icons.cake_outlined,
-        label: birthdayLabel,
-      ));
-    }
-
-    if (schoolLabel?.isNotEmpty ?? false) {
-      infoBadges.add(_InfoBadge(
-        icon: Icons.school_outlined,
-        label: schoolLabel!,
-      ));
-    }
-
-    if (locationLabel?.isNotEmpty ?? false) {
-      infoBadges.add(_InfoBadge(
+    if (cityLabel?.isNotEmpty ?? false) {
+      infoBadges.add(ProfileInfoBadge(
         icon: Icons.place_outlined,
-        label: locationLabel!,
+        label: cityLabel!,
       ));
     }
 
@@ -143,34 +123,13 @@ class ProfilePreviewSection extends StatelessWidget {
                       Semantics(
                         button: true,
                         label: loc.preferences_avatar_action,
-                        child: GestureDetector(
+                        child: ProfileAvatarWithFlag(
+                          avatarUrl: avatarUrl,
+                          flagEmoji: flagEmoji,
+                          radius: 40,
                           onTap: onEditAvatar,
-                          child: CrewAvatar(
-                            radius: 40,
-                            backgroundImage:
-                                CachedNetworkImageProvider(avatarUrl),
-                            borderRadius: BorderRadius.circular(28),
-                          ),
                         ),
                       ),
-                      if (flagEmoji != null)
-                        Positioned(
-                          bottom: -6,
-                          left: -6,
-                          child: Text(
-                            flagEmoji,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black45,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       Positioned(
                         bottom: -4,
                         right: -4,
@@ -253,29 +212,13 @@ class ProfilePreviewSection extends StatelessWidget {
                             runSpacing: 8,
                             children: [
                               for (final tag in tags)
-                                Container(
+                                ProfileTagChip(
+                                  tag: tag,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
                                     vertical: 5,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.2),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    tag,
-                                    style: textTheme.labelMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.3,
-                                      letterSpacing: 0,
-                                    ),
-                                  ),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                             ],
                           ),
@@ -296,51 +239,6 @@ class ProfilePreviewSection extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _InfoBadge extends StatelessWidget {
-  const _InfoBadge({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: Colors.white.withValues(alpha: 0.9),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              height: 1.3,
-              letterSpacing: 0,
-            ),
-          ),
-        ],
       ),
     );
   }

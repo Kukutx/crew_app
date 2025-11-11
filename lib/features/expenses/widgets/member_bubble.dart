@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:crew_app/features/expenses/widgets/bubble_constants.dart';

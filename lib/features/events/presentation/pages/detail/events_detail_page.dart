@@ -393,15 +393,15 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   Widget build(BuildContext context) {
     final event = widget.event;
     final loc = AppLocalizations.of(context)!;
-    final organizer = event.organizer;
-    final hostName = (organizer?.name.isNotEmpty ?? false)
-        ? organizer!.name
+    final host = event.host;
+    final hostName = (host?.name.isNotEmpty ?? false)
+        ? host!.name
         : _fallbackHost.name;
-    final hostBio = (organizer?.bio?.isNotEmpty ?? false)
-        ? (organizer!.bio ?? _fallbackHost.bio)
+    final hostBio = (host?.bio?.isNotEmpty ?? false)
+        ? (host!.bio ?? _fallbackHost.bio)
         : _fallbackHost.bio;
-    final hostAvatar = (organizer?.avatarUrl?.isNotEmpty ?? false)
-        ? (organizer!.avatarUrl ?? _fallbackHost.avatar)
+    final hostAvatar = (host?.avatarUrl?.isNotEmpty ?? false)
+        ? (host!.avatarUrl ?? _fallbackHost.avatar)
         : _fallbackHost.avatar;
     final colorScheme = Theme.of(context).colorScheme;
 

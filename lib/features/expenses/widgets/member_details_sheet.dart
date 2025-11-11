@@ -1,6 +1,6 @@
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
-import 'package:crew_app/features/expenses/widgets/avatar.dart';
+import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:crew_app/features/expenses/widgets/expense_list_tile.dart';
 import 'package:crew_app/features/expenses/widgets/summary_row.dart';
 import 'package:flutter/material.dart';
@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 class MemberDetailsSheet extends StatelessWidget {
   const MemberDetailsSheet({
     super.key,
-    required this.participant,
+    required this.member,
     required this.difference,
-    required this.allParticipants,
+    required this.allMembers,
     required this.scrollController,
   });
 
-  final Participant participant;
+  final Member member;
   final double difference;
-  final List<Participant> allParticipants;
+  final List<Member> allMembers;
   final ScrollController scrollController;
 
   @override
@@ -59,20 +59,33 @@ class MemberDetailsSheet extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Avatar(name: participant.name),
+              CrewAvatar(
+                radius: 24,
+                backgroundColor: const Color(0xFF1B8A5C),
+                foregroundColor: Colors.white,
+                child: Text(
+                  member.name.isEmpty
+                      ? ''
+                      : member.name.trim().split(RegExp(r'\s+')).map((part) => part[0]).take(2).join(),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      participant.name,
+                      member.name,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      '${NumberFormatHelper.formatCurrencyCompactIfLarge(participant.totalPaid)} · ${participant.expenses.length} 笔消费',
+                      '${NumberFormatHelper.formatCurrencyCompactIfLarge(member.totalPaid)} · ${member.expenses.length} 笔消费',
                       style: subtitleStyle,
                     ),
                   ],
@@ -84,10 +97,10 @@ class MemberDetailsSheet extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               controller: scrollController,
-              itemCount: participant.expenses.length,
+              itemCount: member.expenses.length,
               separatorBuilder: (_, _) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
-                final expense = participant.expenses[index];
+                final expense = member.expenses[index];
                 return ExpenseListTile(expense: expense);
               },
             ),
@@ -108,14 +121,14 @@ class MemberDetailsSheet extends StatelessWidget {
                 SummaryRow(
                   label: '总计支付',
                   value: NumberFormatHelper.formatCurrencyCompactIfLarge(
-                    participant.totalPaid,
+                    member.totalPaid,
                   ),
                 ),
                 const SizedBox(height: 12),
                 SummaryRow(
                   label: '应承担',
                   value: NumberFormatHelper.formatCurrencyCompactIfLarge(
-                    participant.totalOwed(allParticipants),
+                    member.totalOwed(allMembers),
                   ),
                 ),
                 const SizedBox(height: 12),

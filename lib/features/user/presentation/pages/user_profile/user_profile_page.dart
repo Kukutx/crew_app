@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/user/presentation/pages/guestbook/guestbook_page.dart';
@@ -14,10 +13,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
-import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/collapsed_profile_avatar.dart';
-import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_header_card.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_preview_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
-import 'package:crew_app/shared/utils/image_url.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 
@@ -67,14 +64,39 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     await ref.read(eventsProvider.future);
   }
 
-  void _toggleFollow() {
+  Future<void> _toggleFollow() async {
+    // TODO: 实现关注/取消关注 API 调用
+    // 当前实现仅更新本地状态，需要添加 API 调用
+    // 参考：ApiProviderHelper.callApi(ref, (api) => api.followUser(uid) 或 api.unfollowUser(uid))
+    
     final current = ref.read(userProfileProvider);
+    final newFollowed = !current.followed;
+    
+    // 乐观更新：立即更新 UI
     ref.read(userProfileProvider.notifier).state = current.copyWith(
-      followed: !current.followed,
+      followed: newFollowed,
       followers: current.followed
           ? current.followers - 1
           : current.followers + 1,
     );
+    
+    // TODO: 调用 API
+    // try {
+    //   await ApiProviderHelper.callApi(
+    //     ref,
+    //     (api) => newFollowed
+    //         ? api.followUser(current.uid)
+    //         : api.unfollowUser(current.uid),
+    //   );
+    // } catch (e) {
+    //   // 如果 API 调用失败，回滚状态
+    //   ref.read(userProfileProvider.notifier).state = current;
+    //   if (mounted) {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(content: Text('操作失败：${e.toString()}')),
+    //     );
+    //   }
+    // }
   }
 
   void _handleTabChanged() {
@@ -280,6 +302,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       pinned: true,
       stretch: true,
       expandedHeight: _expandedHeight,
+      toolbarHeight: kToolbarHeight,
       automaticallyImplyLeading: widget.onClose == null,
       leading: widget.onClose == null
           ? null
@@ -319,15 +342,12 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
           return Stack(
             fit: StackFit.expand,
+            clipBehavior: Clip.none,
             children: [
-              _buildCoverImage(profile.cover, theme),
-              const DecoratedBox(
+              // 背景色
+              DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.center,
-                    colors: [Colors.black54, Colors.transparent],
-                  ),
+                  color: theme.scaffoldBackgroundColor,
                 ),
               ),
               if (t > 0.05)
@@ -339,28 +359,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                     opacity: Curves.easeOut.transform(t),
                     child: Transform.scale(
                       scale: lerpDouble(0.92, 1, t)!,
-                      child: ProfileHeaderCard(
+                      child: ProfilePreviewCard(
                         userProfile: profile,
                         onFollowToggle: _toggleFollow,
                         onMessagePressed: () =>
                             _startPrivateMessage(context, profile),
                         onGuestbookPressed: _openGuestbookPage,
                         showUserActions: !isViewingSelf,
-                      ),
-                    ),
-                  ),
-                ),
-              if (collapseProgress > 0)
-                Positioned(
-                  top: topPadding + (kToolbarHeight - 48) / 2,
-                  left: 0,
-                  right: 0,
-                  child: IgnorePointer(
-                    ignoring: collapseProgress < 0.6,
-                    child: Opacity(
-                      opacity: Curves.easeIn.transform(collapseProgress),
-                      child: Center(
-                        child: CollapsedProfileAvatar(user: profile),
                       ),
                     ),
                   ),
@@ -398,26 +403,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     );
   }
 
-  Widget _buildCoverImage(String? coverUrl, ThemeData theme) {
-    final sanitizedUrl = sanitizeImageUrl(coverUrl);
-    final placeholder = DecoratedBox(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-      ),
-    );
-
-    if (sanitizedUrl == null) {
-      return placeholder;
-    }
-
-    return CachedNetworkImage(
-      imageUrl: sanitizedUrl,
-      fit: BoxFit.cover,
-      memCacheHeight: 512,
-      placeholder: (_, _) => placeholder,
-      errorWidget: (_, _, _) => placeholder,
-    );
-  }
 }
 
 class _BlockUserConfirmationSheet extends StatelessWidget {

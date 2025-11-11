@@ -1,10 +1,12 @@
+import 'package:crew_app/core/error/api_exception.dart';
+import 'package:crew_app/core/state/providers/api_provider_helper.dart';
 import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/state/country_city_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'widgets/avatar_preview_overlay.dart';
 import 'widgets/basic_info_section.dart';
 import 'widgets/profile_preview_section.dart';
@@ -34,15 +36,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late final TextEditingController _nameController;
   late final TextEditingController _bioController;
   late final TextEditingController _tagInputController;
-  late final TextEditingController _birthdayController;
-  late final TextEditingController _schoolController;
-  late final TextEditingController _locationController;
   late final TextEditingController _customGenderController;
   late List<String> _tags;
   String? _countryCode;
+  String? _selectedCity;
   late Gender _gender;
   late String _selectedAvatar;
-  DateTime? _birthday;
 
   @override
   void initState() {
@@ -51,17 +50,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _nameController = TextEditingController(text: profile.name);
     _bioController = TextEditingController(text: profile.bio);
     _tagInputController = TextEditingController();
-    _birthdayController =
-        TextEditingController(text: _formatBirthday(profile.birthday));
-    _schoolController = TextEditingController(text: profile.school ?? '');
-    _locationController = TextEditingController(text: profile.location ?? '');
     _customGenderController =
         TextEditingController(text: profile.customGender ?? '');
     _tags = [...profile.tags];
     _countryCode = profile.countryCode;
+    _selectedCity = profile.city;
     _gender = profile.gender;
     _selectedAvatar = profile.avatar;
-    _birthday = profile.birthday;
   }
 
   @override
@@ -69,9 +64,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _nameController.dispose();
     _bioController.dispose();
     _tagInputController.dispose();
-    _birthdayController.dispose();
-    _schoolController.dispose();
-    _locationController.dispose();
     _customGenderController.dispose();
     super.dispose();
   }
@@ -83,12 +75,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _handleSave() {
+  Future<void> _handleSave() async {
     final loc = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     final bio = _bioController.text.trim();
-    final school = _schoolController.text.trim();
-    final location = _locationController.text.trim();
     final customGenderText = _customGenderController.text.trim();
     final customGender =
         _gender == Gender.custom && customGenderText.isNotEmpty
@@ -100,60 +90,78 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       return;
     }
 
-    final notifier = ref.read(userProfileProvider.notifier);
-    notifier.state = notifier.state.copyWith(
-      name: name,
-      bio: bio.isEmpty ? notifier.state.bio : bio,
-      tags: _tags,
-      countryCode: _countryCode,
-      gender: _gender,
-      customGender: customGender,
-      avatar: _selectedAvatar,
-      birthday: _birthday,
-      school: school.isEmpty ? null : school,
-      location: location.isEmpty ? null : location,
+    // 显示加载状态
+    if (!mounted) return;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 12),
+            const Text('保存中...'),
+          ],
+        ),
+        duration: const Duration(seconds: 30), // 设置较长的超时时间
+      ),
     );
 
-    _showSnack(loc.preferences_save_success);
-    Navigator.of(context).maybePop();
-  }
+    try {
+      // 调用 API 更新用户资料
+      await ApiProviderHelper.callApi(
+        ref,
+        (api) => api.updateUserProfile(
+          displayName: name,
+          bio: bio.isEmpty ? null : bio,
+          avatarUrl: _selectedAvatar,
+          gender: _gender.name, // 转换为字符串：female, male, custom, undisclosed
+          customGender: customGender,
+          city: _selectedCity,
+          countryCode: _countryCode,
+          tags: _tags,
+        ),
+      );
 
-  String _formatBirthday(DateTime? date) {
-    if (date == null) {
-      return '';
+      // 更新本地状态
+      final notifier = ref.read(userProfileProvider.notifier);
+      notifier.state = notifier.state.copyWith(
+        name: name,
+        bio: bio.isEmpty ? notifier.state.bio : bio,
+        tags: _tags,
+        countryCode: _countryCode,
+        gender: _gender,
+        customGender: customGender,
+        avatar: _selectedAvatar,
+        city: _selectedCity,
+      );
+
+      if (!mounted) return;
+      scaffoldMessenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(loc.preferences_save_success)));
+      
+      Navigator.of(context).maybePop();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      scaffoldMessenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(e.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ));
+    } catch (e) {
+      if (!mounted) return;
+      scaffoldMessenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text('保存失败：${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ));
     }
-
-    return DateFormat('yyyy年MM月dd日').format(date);
-  }
-
-  Future<void> _pickBirthday() async {
-    FocusScope.of(context).unfocus();
-    final now = DateTime.now();
-    final initialDate = _birthday ?? DateTime(now.year - 20, now.month, now.day);
-    final firstDate = DateTime(now.year - 100);
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: now,
-      helpText: '选择生日',
-      cancelText: '取消',
-      confirmText: '确定',
-    );
-
-    if (picked != null) {
-      setState(() {
-        _birthday = picked;
-        _birthdayController.text = _formatBirthday(picked);
-      });
-    }
-  }
-
-  void _clearBirthday() {
-    setState(() {
-      _birthday = null;
-      _birthdayController.clear();
-    });
   }
 
   void _handleAddTag() {
@@ -274,13 +282,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     ? null
                     : _customGenderController.text.trim())
                 : null,
-            birthday: _birthday,
-            school: _schoolController.text.trim().isEmpty
-                ? null
-                : _schoolController.text.trim(),
-            location: _locationController.text.trim().isEmpty
-                ? null
-                : _locationController.text.trim(),
+            city: _selectedCity,
             onEditCover: _showComingSoon,
             onEditAvatar: _handleEditAvatar,
           ),
@@ -304,15 +306,27 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             customGenderController: _customGenderController,
             onCustomGenderChanged: (_) => setState(() {}),
             countryCode: _countryCode,
-            onCountryChanged: (value) => setState(() {
-              _countryCode = value;
+            onCountryChanged: (value) {
+              setState(() {
+                _countryCode = value;
+                // 国家改变时，检查当前城市是否在新国家的城市列表中
+                if (value != null && _selectedCity != null) {
+                  // 使用 ref.read 获取城市列表（不触发 watch）
+                  final cities = ref.read(citiesByCountryProvider(value));
+                  // 如果当前城市不在新国家的城市列表中，清空城市选择
+                  if (!cities.contains(_selectedCity)) {
+                    _selectedCity = null;
+                  }
+                } else {
+                  // 如果国家为空，清空城市选择
+                  _selectedCity = null;
+                }
+              });
+            },
+            selectedCity: _selectedCity,
+            onCityChanged: (value) => setState(() {
+              _selectedCity = value;
             }),
-            birthdayController: _birthdayController,
-            onBirthdayTap: _pickBirthday,
-            onClearBirthday: _clearBirthday,
-            hasBirthday: _birthday != null,
-            schoolController: _schoolController,
-            locationController: _locationController,
             bioController: _bioController,
             onFieldChanged: () => setState(() {}),
             maxBioLength: _maxBioLength,

@@ -1,6 +1,5 @@
-import 'package:crew_app/features/expenses/data/participant.dart';
+import 'package:crew_app/features/expenses/data/member.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
-import 'package:crew_app/features/expenses/widgets/avatar.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
@@ -77,8 +76,21 @@ class SettlementPreviewSheet extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    leading: Avatar(name: entry.participant.name),
-                    title: Text(entry.participant.name),
+                    leading: CrewAvatar(
+                      radius: 24,
+                      backgroundColor: const Color(0xFF1B8A5C),
+                      foregroundColor: Colors.white,
+                      child: Text(
+                        entry.member.name.isEmpty
+                            ? ''
+                            : entry.member.name.trim().split(RegExp(r'\s+')).map((part) => part[0]).take(2).join(),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    title: Text(entry.member.name),
                     subtitle: Text(
                       isPositive
                           ? '应收 ${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}'
@@ -123,7 +135,7 @@ class SettlementPreviewSheet extends StatelessWidget {
                 ),
                 backgroundColor: containerColor,
                 label: Text(
-                  '${entry.participant.name} ${isPositive ? '收回' : '补给'} ${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}',
+                  '${entry.member.name} ${isPositive ? '收回' : '补给'} ${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: onContainerColor,
                   ),
@@ -139,10 +151,10 @@ class SettlementPreviewSheet extends StatelessWidget {
 
 class SettlementEntry {
   const SettlementEntry({
-    required this.participant,
+    required this.member,
     required this.difference,
   });
 
-  final Participant participant;
+  final Member member;
   final double difference;
 }

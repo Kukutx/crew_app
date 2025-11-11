@@ -88,7 +88,7 @@ class SharePreviewCard extends StatelessWidget {
         ? DateFormat('MM.dd HH:mm').format(event.startTime!.toLocal())
         : loc.to_be_announced;
     final participantsLabel = event.participantSummary ?? loc.to_be_announced;
-    final organizerName = event.organizer?.name;
+    final hostName = event.host?.name;
     return RepaintBoundary(
       key: previewKey,
       child: ClipRRect(
@@ -205,11 +205,11 @@ class SharePreviewCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if (organizerName != null && organizerName.isNotEmpty)
+                          if (hostName != null && hostName.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: 6),
                               child: Text(
-                                organizerName,
+                                hostName,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.8),
                                 ),

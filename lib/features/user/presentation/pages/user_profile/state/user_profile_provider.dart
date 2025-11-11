@@ -15,8 +15,6 @@ final userProfileProvider = StateProvider<User>((ref) {
     gender: Gender.female,
     tags: ['露营玩家', '摄影控', '旅拍达人'],
     countryCode: 'CN',
-    birthday: DateTime(1996, 8, 17),
-    school: '深圳大学',
-    location: '广东 · 深圳',
+    city: '深圳',
   );
 });

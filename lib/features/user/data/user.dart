@@ -38,12 +38,10 @@ class User {
   final bool followed;
   final List<String> tags;
   final String? countryCode;
-  final Gender gender;
-  final String? customGender;
-  final DateTime? birthday;
-  final String? school;
-  final String? location;
-  final String? ipLocation; // IP属地
+    final Gender gender;
+    final String? customGender;
+    final String? city;
+    final String? ipLocation; // IP属地
 
   String? get countryFlag => CountryHelper.countryCodeToEmoji(countryCode);
 
@@ -61,9 +59,7 @@ class User {
     this.tags = const [],
     this.countryCode,
     this.customGender,
-    this.birthday,
-    this.school,
-    this.location,
+    this.city,
     this.ipLocation,
   });
 
@@ -80,9 +76,7 @@ class User {
     String? countryCode,
     Gender? gender,
     Object? customGender = _sentinel,
-    Object? birthday = _sentinel,
-    Object? school = _sentinel,
-    Object? location = _sentinel,
+    Object? city = _sentinel,
     Object? ipLocation = _sentinel,
   }) =>
       User(
@@ -101,10 +95,8 @@ class User {
         customGender: customGender == _sentinel
             ? this.customGender
             : customGender as String?,
-        birthday: birthday == _sentinel ? this.birthday : birthday as DateTime?,
-        school: school == _sentinel ? this.school : school as String?,
-        location:
-            location == _sentinel ? this.location : location as String?,
+        city:
+            city == _sentinel ? this.city : city as String?,
         ipLocation: ipLocation == _sentinel
             ? this.ipLocation
             : ipLocation as String?,

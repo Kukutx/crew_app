@@ -1,13 +1,13 @@
 import 'package:crew_app/shared/utils/json_parser_helper.dart';
 
-class EventOrganizer {
+class EventHost {
   final String id;
   final String name;
   final String? avatarUrl;
   final String? bio;
   final String? username;
 
-  const EventOrganizer({
+  const EventHost({
     required this.id,
     required this.name,
     this.avatarUrl,
@@ -15,36 +15,13 @@ class EventOrganizer {
     this.username,
   });
 
-  factory EventOrganizer.fromJson(Map<String, dynamic> json) {
-    final profile = JsonParserHelper.asMap(json['profile']);
-    return EventOrganizer(
-      id: JsonParserHelper.parseString(
-            json['id'] ??
-                json['userId'] ??
-                json['organizerId'] ??
-                profile?['id'],
-          ) ??
-          '',
-      name: JsonParserHelper.parseString(
-            json['name'] ??
-                json['displayName'] ??
-                json['nickname'] ??
-                json['userName'] ??
-                json['organizerName'] ??
-                profile?['name'],
-          ) ??
-          '',
-      avatarUrl: JsonParserHelper.parseString(
-        json['avatarUrl'] ??
-            json['photoUrl'] ??
-            json['imageUrl'] ??
-            json['avatar'] ??
-            json['organizerAvatar'] ??
-            profile?['avatarUrl'] ??
-            profile?['photoUrl'],
-      ),
-      bio: JsonParserHelper.parseString(json['bio'] ?? profile?['bio']),
-      username: JsonParserHelper.parseString(json['userName'] ?? profile?['userName']),
+  factory EventHost.fromJson(Map<String, dynamic> json) {
+    return EventHost(
+      id: JsonParserHelper.parseString(json['id']) ?? '',
+      name: JsonParserHelper.parseString(json['name']) ?? '',
+      avatarUrl: JsonParserHelper.parseString(json['avatarUrl']),
+      bio: JsonParserHelper.parseString(json['bio']),
+      username: JsonParserHelper.parseString(json['username']),
     );
   }
 
@@ -83,7 +60,7 @@ class Event {
   final List<String> waypoints;
   final bool? isRoundTrip;
   final double? distanceKm;
-  final EventOrganizer? organizer;
+  final EventHost? host;
   final EventStatus? status;
 
   const Event({
@@ -112,199 +89,41 @@ class Event {
     this.waypoints = const <String>[],
     this.isRoundTrip,
     this.distanceKm,
-    this.organizer,
+    this.host,
     this.status,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
-    final locationJson = JsonParserHelper.asMap(json['location']) ?? JsonParserHelper.asMap(json['meetingPoint']);
-    final mediaJson =
-        JsonParserHelper.asMap(json['media']) ?? JsonParserHelper.asMap(json['images']) ?? JsonParserHelper.asMap(json['gallery']);
-    final statsJson = JsonParserHelper.asMap(json['stats']) ??
-        JsonParserHelper.asMap(json['statistics']) ??
-        JsonParserHelper.asMap(json['enrollment']) ??
-        JsonParserHelper.asMap(json['status']);
-    final scheduleJson =
-        JsonParserHelper.asMap(json['schedule']) ?? JsonParserHelper.asMap(json['time']) ?? JsonParserHelper.asMap(json['period']);
-    final organizerJson =
-        JsonParserHelper.asMap(json['organizer']) ?? JsonParserHelper.asMap(json['host']) ?? JsonParserHelper.asMap(json['creator']);
-
-    String locationName = JsonParserHelper.parseString(
-          locationJson?['name'] ??
-              locationJson?['title'] ??
-              json['location'] ??
-              json['locationName'] ??
-              locationJson?['address'],
-        ) ??
-        '';
-    if (locationName.isEmpty) {
-      locationName = '';
-    }
-
-    final latitude = JsonParserHelper.parseDouble(
-          locationJson?['latitude'] ??
-              locationJson?['lat'] ??
-              json['latitude'] ??
-              json['lat'],
-        ) ??
-        0;
-    final longitude = JsonParserHelper.parseDouble(
-          locationJson?['longitude'] ??
-              locationJson?['lng'] ??
-              locationJson?['lon'] ??
-              json['longitude'] ??
-              json['lng'] ??
-              json['lon'],
-        ) ??
-        0;
-
-    final parsedImageUrls = JsonParserHelper.parseStringList(
-      mediaJson?['imageUrls'] ?? mediaJson?['images'] ?? json['imageUrls'] ?? json['images'],
-    );
-    final parsedVideoUrls = JsonParserHelper.parseStringList(
-      mediaJson?['videoUrls'] ??
-          mediaJson?['videos'] ??
-          json['videoUrls'] ??
-          json['videos'] ??
-          mediaJson?['clips'],
-    );
-    final coverImageUrl = JsonParserHelper.parseString(
-      mediaJson?['coverImageUrl'] ??
-          mediaJson?['cover'] ??
-          json['coverImageUrl'] ??
-          json['coverUrl'],
-    );
-
-    final maxParticipants = JsonParserHelper.parseInt(
-      statsJson?['maxParticipants'] ??
-          statsJson?['capacity'] ??
-          json['maxParticipants'] ??
-          json['capacity'] ??
-          json['maxPeople'],
-    );
-    final currentParticipants = JsonParserHelper.parseInt(
-      statsJson?['currentParticipants'] ??
-          statsJson?['attendeeCount'] ??
-          statsJson?['current'] ??
-          statsJson?['registeredCount'] ??
-          json['currentParticipants'] ??
-          json['attendeeCount'] ??
-          json['currentPeople'],
-    );
-
-    final favoriteCount = JsonParserHelper.parseInt(
-          statsJson?['likeCount'] ??
-              statsJson?['likes'] ??
-              statsJson?['favorites'] ??
-              json['likeCount'] ??
-              json['likes'] ??
-              json['favoriteCount'],
-        ) ??
-        0;
-
-    final isFavorite = JsonParserHelper.parseBool(
-          statsJson?['isFavorite'] ??
-              statsJson?['isUserFavorite'] ??
-              json['isFavorite'] ??
-              json['isUserFavorite'],
-        ) ??
-        false;
-    final isRegistered = JsonParserHelper.parseBool(
-          statsJson?['isRegistered'] ??
-              statsJson?['isJoined'] ??
-              statsJson?['isUserJoined'] ??
-              json['isRegistered'] ??
-              json['isJoined'] ??
-              json['isUserJoined'],
-        ) ??
-        false;
-
-    final price = JsonParserHelper.parseDouble(statsJson?['price'] ?? json['price']);
-    final isFree = JsonParserHelper.parseBool(json['isFree'] ?? statsJson?['isFree']) ??
-        (price == null || price == 0);
-
-    final parsedTags =
-        JsonParserHelper.parseStringList(json['tags'] ?? json['categories'] ?? json['labels']);
-    final parsedWaypoints = JsonParserHelper.parseStringList(
-      json['waypoints'] ??
-          json['routePoints'] ??
-          json['stops'] ??
-          json['via'] ??
-          json['viaPoints'] ??
-          locationJson?['waypoints'] ??
-          locationJson?['stops'],
-    );
-    final parsedRoundTrip = JsonParserHelper.parseBool(
-      json['isRoundTrip'] ??
-          json['roundTrip'] ??
-          json['isLoop'] ??
-          json['loop'] ??
-          json['round'],
-    );
-    final parsedDistanceKm = JsonParserHelper.parseDouble(
-      json['distanceKm'] ??
-          json['distance_km'] ??
-          json['distance'] ??
-          json['lengthKm'] ??
-          json['length_km'] ??
-          json['length'] ??
-          json['routeLength'],
-    );
-    final parsedStatus = _parseEventStatus(
-      json['status'] ??
-          statsJson?['status'] ??
-          statsJson?['state'] ??
-          statsJson?['phase'],
-    );
+    final hostJson = json['host'] as Map<String, dynamic>?;
 
     return Event(
-      id: JsonParserHelper.parseString(json['id'] ?? json['eventId']) ?? '',
-      title: JsonParserHelper.parseString(json['title'] ?? json['name']) ?? '',
-      location: locationName,
-      description: JsonParserHelper.parseString(json['description'] ?? json['details']) ?? '',
-      latitude: latitude,
-      longitude: longitude,
-      imageUrls: List.unmodifiable(parsedImageUrls),
-      videoUrls: List.unmodifiable(parsedVideoUrls),
-      coverImageUrl: coverImageUrl,
-      address: JsonParserHelper.parseString(locationJson?['address'] ?? json['address']),
-      startTime: JsonParserHelper.parseDate(
-        scheduleJson?['startTime'] ??
-            scheduleJson?['start'] ??
-            scheduleJson?['begin'] ??
-            json['startTime'] ??
-            json['startDate'],
-      ),
-      endTime: JsonParserHelper.parseDate(
-        scheduleJson?['endTime'] ??
-            scheduleJson?['end'] ??
-            scheduleJson?['finish'] ??
-            json['endTime'] ??
-            json['endDate'],
-      ),
-      createdAt: JsonParserHelper.parseDate(json['createdAt'] ?? scheduleJson?['createdAt'] ?? json['createdOn']),
-      updatedAt: JsonParserHelper.parseDate(json['updatedAt'] ?? scheduleJson?['updatedAt'] ?? json['updatedOn']),
-      maxParticipants: maxParticipants,
-      currentParticipants: currentParticipants,
-      isFavorite: isFavorite,
-      favoriteCount: favoriteCount,
-      isRegistered: isRegistered,
-      isFree: isFree,
-      price: price,
-      tags: List.unmodifiable(parsedTags),
-      waypoints: List.unmodifiable(parsedWaypoints),
-      isRoundTrip: parsedRoundTrip,
-      distanceKm: parsedDistanceKm,
-      organizer: organizerJson != null
-          ? EventOrganizer.fromJson(organizerJson)
-                        : (json['organizerId'] != null || json['organizerName'] != null)
-              ? EventOrganizer(
-                  id: JsonParserHelper.parseString(json['organizerId']) ?? '',
-                  name: JsonParserHelper.parseString(json['organizerName']) ?? '',
-                  avatarUrl: JsonParserHelper.parseString(json['organizerAvatar']),
-                )
-              : null,
-      status: parsedStatus,
+      id: JsonParserHelper.parseString(json['id']) ?? '',
+      title: JsonParserHelper.parseString(json['title']) ?? '',
+      location: JsonParserHelper.parseString(json['location']) ?? '',
+      description: JsonParserHelper.parseString(json['description']) ?? '',
+      latitude: JsonParserHelper.parseDouble(json['latitude']) ?? 0,
+      longitude: JsonParserHelper.parseDouble(json['longitude']) ?? 0,
+      imageUrls: List.unmodifiable(JsonParserHelper.parseStringList(json['imageUrls'])),
+      videoUrls: List.unmodifiable(JsonParserHelper.parseStringList(json['videoUrls'])),
+      coverImageUrl: JsonParserHelper.parseString(json['coverImageUrl']),
+      address: JsonParserHelper.parseString(json['address']),
+      startTime: JsonParserHelper.parseDate(json['startTime']),
+      endTime: JsonParserHelper.parseDate(json['endTime']),
+      createdAt: JsonParserHelper.parseDate(json['createdAt']),
+      updatedAt: JsonParserHelper.parseDate(json['updatedAt']),
+      maxParticipants: JsonParserHelper.parseInt(json['maxParticipants']),
+      currentParticipants: JsonParserHelper.parseInt(json['currentParticipants']),
+      isFavorite: JsonParserHelper.parseBool(json['isFavorite']) ?? false,
+      favoriteCount: JsonParserHelper.parseInt(json['favoriteCount']) ?? 0,
+      isRegistered: JsonParserHelper.parseBool(json['isRegistered']) ?? false,
+      isFree: JsonParserHelper.parseBool(json['isFree']) ?? false,
+      price: JsonParserHelper.parseDouble(json['price']),
+      tags: List.unmodifiable(JsonParserHelper.parseStringList(json['tags'])),
+      waypoints: List.unmodifiable(JsonParserHelper.parseStringList(json['waypoints'])),
+      isRoundTrip: JsonParserHelper.parseBool(json['isRoundTrip']),
+      distanceKm: JsonParserHelper.parseDouble(json['distanceKm']),
+      host: hostJson != null ? EventHost.fromJson(hostJson) : null,
+      status: _parseEventStatus(json['status']),
     );
   }
 
@@ -334,7 +153,7 @@ class Event {
         if (waypoints.isNotEmpty) 'waypoints': waypoints,
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
         if (distanceKm != null) 'distanceKm': distanceKm,
-        if (organizer != null) 'organizer': organizer!.toJson(),
+        if (host != null) 'host': host!.toJson(),
         if (status != null) 'status': status,
       };
 

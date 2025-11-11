@@ -222,7 +222,7 @@ class _ExpensesPageState extends State<ExpensesPage>
         : const [Color(0xFFE8EDFF), Colors.white];
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.event_group_expense_title),
+        title: Text(loc.map_quick_actions_my_ledger),
         actions: [
           IconButton(
             tooltip: '结算预览',

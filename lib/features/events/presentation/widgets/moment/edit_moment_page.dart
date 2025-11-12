@@ -4,7 +4,7 @@ import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../widgets/cards/moment_post_card.dart';
+import '../cards/moment_post_card.dart';
 
 class EditMomentPage extends StatefulWidget {
   const EditMomentPage({super.key, required this.post});

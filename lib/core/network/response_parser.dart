@@ -48,7 +48,6 @@ class ResponseParser {
   /// 从响应数据中提取对象
   /// 
   /// 支持以下格式：
-  /// - 直接是 Map<String, dynamic>
   /// - Map 中包含对象字段（data, event, result, value）
   static Map<String, dynamic> extractObject(dynamic data) {
     if (data is Map<String, dynamic>) {
@@ -124,8 +123,6 @@ class ResponseParser {
   }
 
   /// 从响应数据中提取 data 字段
-  /// 
-  /// 用于提取 ApiResponse<T> 中的 data 字段
   static dynamic extractData(dynamic data) {
     if (data is Map<String, dynamic>) {
       // 优先从 data 字段提取

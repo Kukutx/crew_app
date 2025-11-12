@@ -716,11 +716,23 @@ abstract class AppLocalizations {
   /// **'Choose a start location'**
   String get map_select_location_title;
 
+  /// No description provided for @map_select_meeting_point_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a meeting point'**
+  String get map_select_meeting_point_title;
+
   /// No description provided for @map_select_location_tip.
   ///
   /// In en, this message translates to:
   /// **'Long press on the map to fine-tune the position.'**
   String get map_select_location_tip;
+
+  /// No description provided for @map_select_meeting_point_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press on the map to select a meeting point'**
+  String get map_select_meeting_point_tip;
 
   /// No description provided for @messages.
   ///

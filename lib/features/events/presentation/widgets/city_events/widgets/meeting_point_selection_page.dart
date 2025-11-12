@@ -43,14 +43,14 @@ class MeetingPointSelectionPage extends StatelessWidget {
           sliver: SliverList.list(
             children: [
               Text(
-                loc.map_select_location_title,
+                loc.map_select_meeting_point_title,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 8.h),
               Text(
-                loc.map_select_location_tip,
+                loc.map_select_meeting_point_tip,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),

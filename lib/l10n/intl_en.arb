@@ -124,7 +124,9 @@
   "map_location_info_nearby_empty": "No places found within 100 m.",
   "map_location_info_nearby_error": "Unable to load nearby places.",
   "map_select_location_title": "Choose a start location",
+  "map_select_meeting_point_title": "Choose a meeting point",
   "map_select_location_tip": "Long press on the map to fine-tune the position.",
+  "map_select_meeting_point_tip": "Long press on the map to select a meeting point",
   "messages": "Messages",
   "chat_members_count": "{count} members",
   "@chat_members_count": {

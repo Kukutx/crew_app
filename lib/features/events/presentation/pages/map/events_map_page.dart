@@ -4,9 +4,9 @@ import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/city_events/sheets/create_city_event_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/trips/sheets/create_road_trip_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/city_events/sheets/create_city_event_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -214,17 +214,22 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
       }
     });
 
-    // 当创建路线 sheet 打开时，只在起始页（选择起点/终点）和途径点页（添加途径点）显示信息横幅
+    // 当创建活动 sheet 打开时，在特定页面显示信息横幅
     final isCreatingRoadTrip = mapSheetType == MapOverlaySheetType.createRoadTrip;
+    final isCreatingCityEvent = mapSheetType == MapOverlaySheetType.createCityEvent;
+    
     // 判断是否在显示提示词的页面：
+    // 自驾游：
     // - 起始页：选择起点或终点（selectedLatLng 或 destinationLatLng 相关状态）
     // - 途径点页：添加途径点（isAddingWaypoint）
-    final shouldShowGuide = isCreatingRoadTrip && (
+    // 城市活动：
+    // - 选择集合点（selectedLatLng 为 null）
+    final shouldShowGuide = (isCreatingRoadTrip && (
       selectionState.selectedLatLng == null || // 选择起点
       selectionState.isSelectingDestination || // 选择终点
       selectionState.destinationLatLng == null || // 需要选择终点
       selectionState.isAddingWaypoint // 添加途径点
-    );
+    )) || (isCreatingCityEvent && selectionState.selectedLatLng == null); // 城市活动：选择集合点
     final hideSearchBar =
         shouldShowGuide ||
         selectionState.isSelectionSheetOpen ||
@@ -450,7 +455,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                                 _getGuideText(
                                   loc,
                                   selectionState,
-                                  mapSheetType == MapOverlaySheetType.createRoadTrip,
+                                  mapSheetType,
                                 ),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
@@ -460,7 +465,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                               ),
                             ),
                             // 只在设置起点、终点的时候显示清除选点按钮（起始页）
-                            if (_shouldShowClearButton(selectionState, isCreatingRoadTrip)) ...[
+                            if (_shouldShowClearButton(selectionState, mapSheetType)) ...[
                               const SizedBox(width: 12),
                               TextButton(
                                 onPressed: () {
@@ -670,54 +675,54 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     );
   }
 
-  /// 根据当前步骤和是否在创建路线流程中返回相应的引导文字
+  /// 根据当前步骤和创建模式返回相应的引导文字
   String _getGuideText(
     AppLocalizations loc,
     MapSelectionState selectionState,
-    bool isCreatingRoadTrip,
+    MapOverlaySheetType mapSheetType,
   ) {
-    // 如果在创建路线流程中，根据状态显示引导文字
-    if (isCreatingRoadTrip) {
-      // 途径点页：添加途径点
-      if (selectionState.isAddingWaypoint) {
-        // 点击了按钮后：在列表中管理途径点
-        return loc.map_guide_waypoint_manage;
-      }
-      
-      // 起始页：选择起点和终点
-      if (selectionState.isSelectingDestination) {
-        // 步骤 2：选择终点
-        return loc.map_guide_step_2;
-      } else if (selectionState.selectedLatLng == null) {
-        // 步骤 1：选择起点（带 Step 说明）
-        return loc.map_guide_step_1;
-      } else if (selectionState.destinationLatLng == null) {
-        // 已有起点，但终点为空，显示步骤 2
-        return loc.map_guide_step_2;
-      } else {
-        // 起点和终点都已选择，显示途径点页的引导（步骤 3）
-        return loc.map_guide_waypoint_step_3;
-      }
+    // 城市活动：显示集合点提示
+    if (mapSheetType == MapOverlaySheetType.createCityEvent) {
+      return loc.map_select_meeting_point_tip;
     }
     
-    // 不在创建路线流程中，显示原有的引导文字
-    if (selectionState.isAddingWaypoint) {
-      return loc.map_add_waypoint_tip;
-    } else if (selectionState.isSelectingDestination) {
-      return loc.map_select_location_destination_tip;
-    } else {
-      return loc.map_select_location_tip;
+    // 自驾游：根据状态显示不同提示
+    if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
+      if (selectionState.isAddingWaypoint) {
+        return loc.map_guide_waypoint_manage;
+      }
+      if (selectionState.isSelectingDestination) {
+        return loc.map_guide_step_2;
+      }
+      if (selectionState.selectedLatLng == null) {
+        return loc.map_guide_step_1;
+      }
+      if (selectionState.destinationLatLng == null) {
+        return loc.map_guide_step_2;
+      }
+      return loc.map_guide_waypoint_step_3;
     }
+    
+    // 默认提示
+    if (selectionState.isAddingWaypoint) return loc.map_add_waypoint_tip;
+    if (selectionState.isSelectingDestination) return loc.map_select_location_destination_tip;
+    return loc.map_select_location_tip;
   }
 
   /// 判断是否应该显示清除选点按钮
-  /// 只在起始页（选择起点/终点）设置 marker 的时候显示，途径点页不显示
-  bool _shouldShowClearButton(MapSelectionState selectionState, bool isCreatingRoadTrip) {
-    // 在创建路线流程中，只在起始页（选择起点/终点）时显示清除按钮，途径点页不显示
-    if (isCreatingRoadTrip && selectionState.isAddingWaypoint) {
+  /// 只在起始页（选择起点/终点/集合点）设置 marker 的时候显示，途径点页不显示
+  bool _shouldShowClearButton(MapSelectionState selectionState, MapOverlaySheetType mapSheetType) {
+    // 在创建自驾游流程中，途径点页不显示清除按钮
+    if (mapSheetType == MapOverlaySheetType.createRoadTrip && selectionState.isAddingWaypoint) {
       return false;
     }
-    // 只在设置 marker 时显示：
+    
+    // 城市活动：只在选择集合点时显示清除按钮
+    if (mapSheetType == MapOverlaySheetType.createCityEvent) {
+      return selectionState.selectedLatLng != null;
+    }
+    
+    // 自驾游：只在设置起点或终点时显示：
     // 1. 正在选择起点（selectedLatLng != null 且不在选择终点模式）
     // 2. 正在选择终点（isSelectingDestination 或 destinationLatLng != null）
     return (selectionState.selectedLatLng != null && !selectionState.isSelectingDestination) ||

@@ -1,8 +1,9 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'event_section_card.dart';
 
 class EventGallerySection extends StatelessWidget {
@@ -14,7 +15,7 @@ class EventGallerySection extends StatelessWidget {
     required this.onSetCover,
   });
 
-  final List<RoadTripGalleryItem> items;
+  final List<EventGalleryItem> items;
   final VoidCallback onPickImages;
   final ValueChanged<int> onRemoveImage;
   final ValueChanged<int> onSetCover;
@@ -57,7 +58,7 @@ class EventGalleryGrid extends StatelessWidget {
     required this.onSetCover,
   });
 
-  final List<RoadTripGalleryItem> items;
+  final List<EventGalleryItem> items;
   final VoidCallback onPickImages;
   final ValueChanged<int> onRemove;
   final ValueChanged<int> onSetCover;
@@ -125,7 +126,7 @@ class _GalleryTile extends StatelessWidget {
   });
 
   final int index;
-  final RoadTripGalleryItem item;
+  final EventGalleryItem item;
   final VoidCallback onRemove;
   final VoidCallback onSetCover;
 
@@ -153,12 +154,43 @@ class _GalleryTile extends StatelessWidget {
                         fit: BoxFit.cover,
                         width: 160.w,
                         height: 140.h,
+                        cacheWidth: 320, // 限制缓存大小为 2x 显示尺寸
+                        cacheHeight: 280,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: colorScheme.errorContainer,
+                            child: Icon(Icons.broken_image, color: colorScheme.error),
+                          );
+                        },
                       )
-                    : Image.network(
-                        item.url!,
+                    : CachedNetworkImage(
+                        imageUrl: item.url!,
                         fit: BoxFit.cover,
                         width: 160.w,
                         height: 140.h,
+                        memCacheWidth: 320, // 内存缓存优化
+                        memCacheHeight: 280,
+                        maxWidthDiskCache: 640, // 磁盘缓存优化
+                        maxHeightDiskCache: 560,
+                        placeholder: (context, url) => Container(
+                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          child: Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) {
+                          return Container(
+                            color: colorScheme.errorContainer,
+                            child: Icon(Icons.broken_image, color: colorScheme.error),
+                          );
+                        },
                       ),
               ),
             ),

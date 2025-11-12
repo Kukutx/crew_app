@@ -339,8 +339,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map_select_location_title => 'Choose a start location';
 
   @override
+  String get map_select_meeting_point_title => 'Choose a meeting point';
+
+  @override
   String get map_select_location_tip =>
       'Long press on the map to fine-tune the position.';
+
+  @override
+  String get map_select_meeting_point_tip =>
+      'Long press on the map to select a meeting point';
 
   @override
   String get messages => 'Messages';

@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
@@ -13,29 +13,19 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_tea
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
-import 'package:crew_app/shared/utils/road_trip_address_loader.dart';
-import 'package:crew_app/features/events/presentation/pages/city_events/widgets/meeting_point_selection_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/marker_location_page_indicator.dart';
-import 'package:crew_app/features/events/presentation/pages/city_events/data/city_event_editor_models.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/location_selection_page_factory.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/event_creation_config.dart';
+import 'package:crew_app/features/events/presentation/widgets/city_events/data/city_event_editor_models.dart';
+import 'package:crew_app/features/events/presentation/widgets/mixins/event_creation_mixin.dart';
+import 'package:crew_app/features/events/state/events_api_service.dart';
+import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
-
-/// API provider stub
-final cityEventsApiProvider = Provider<CityEventsApi>((ref) => CityEventsApi());
-
-class CityEventsApi {
-  Future<String> createCityEvent(CityEventDraft input) async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return 'city_event_123';
-  }
-}
 
 // 定义 Section 锚点
 enum CityEventSection { meetingPoint, basic, team, gallery, story, disclaimer }
@@ -59,7 +49,7 @@ class CreateCityEventSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, EventCreationMixin {
   final PageController _pageCtrl = PageController();
   bool _canSwipe = false; // 是否显示其他 section（点击 meetingPoint 的继续后为 true）
   int _currentPage = 0; // 当前页面
@@ -78,14 +68,14 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
   // ==== 团队/费用 ====
   int _maxMembers = 4;
   double? _price;
-  RoadTripPricingType _pricingType = RoadTripPricingType.free;
+  EventPricingType _pricingType = EventPricingType.free;
 
   // ==== 偏好 ====
   final _tagInputCtrl = TextEditingController();
   final List<String> _tags = [];
 
   // ==== 图集 ====
-  final ImagePicker _picker = ImagePicker();
+  // ImagePicker 已由 Mixin 提供
 
   // ==== 文案 ====
   final _storyCtrl = TextEditingController();
@@ -180,18 +170,6 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
   }
 
   Future<void> _onCreatePressed() async {
-    final loc = AppLocalizations.of(context)!;
-
-    if (!_basicValid) {
-      _showSnack('请填写完整的基本信息');
-      return;
-    }
-
-    if (_meetingPointLatLng == null) {
-      _showSnack('请选择集合点');
-      return;
-    }
-
     if (!mounted) return;
 
     // 设置创建状态
@@ -202,27 +180,25 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
     try {
       final title = _titleCtrl.text.trim();
 
-      // 文本长度验证
-      if (title.length > 20) {
-        _showSnack(loc.road_trip_validation_title_max_length);
+      // 使用验证工具类进行验证
+      final validationErrors = EventFormValidationUtils.validateCityEventForm(
+        title: title,
+        dateRange: _editorState.dateRange,
+        meetingPointLatLng: _meetingPointLatLng,
+        pricingType: _pricingType,
+        price: _price,
+      );
+
+      if (validationErrors.isNotEmpty) {
+        showSnackBar(validationErrors.first);
         setState(() {
           _isCreating = false;
         });
         return;
       }
 
-      // 价格验证
-      double? price;
-      if (_pricingType == RoadTripPricingType.paid) {
-        price = _price;
-        if (price == null || price < 0 || price > 100) {
-          _showSnack(loc.road_trip_validation_price_invalid);
-          setState(() {
-            _isCreating = false;
-          });
-          return;
-        }
-      }
+      // 价格已经在验证工具类中验证，这里直接使用
+      final price = _pricingType == EventPricingType.paid ? _price : null;
 
       final draft = CityEventDraft(
         title: title,
@@ -230,7 +206,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
         meetingPoint: _meetingPointAddress ??
             '${_meetingPointLatLng!.latitude.toStringAsFixed(6)}, ${_meetingPointLatLng!.longitude.toStringAsFixed(6)}',
         maxMembers: _maxMembers,
-        isFree: _pricingType == RoadTripPricingType.free,
+        isFree: _pricingType == EventPricingType.free,
         pricePerPerson: price,
         tags: List.of(_tags),
         description: _storyCtrl.text.trim(),
@@ -246,7 +222,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
       );
 
       // 调用API创建
-      await ref.read(cityEventsApiProvider).createCityEvent(draft);
+      await ref.read(eventsApiServiceProvider).createCityEvent(draft);
 
       if (!mounted) return;
 
@@ -255,14 +231,8 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
         _isCreating = false;
       });
 
-      // 清理所有地图选择状态
-      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-      selectionController.resetSelection();
-      selectionController.setSelectionSheetOpen(false);
-      selectionController.resetMapPadding();
-
-      // 关闭当前 sheet
-      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+      // 清理所有地图选择状态并关闭 sheet
+      cleanupAfterCreation();
 
       // 显示完成页 sheet
       if (mounted) {
@@ -279,14 +249,8 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
         _isCreating = false;
       });
 
-      // 清理所有地图选择状态
-      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-      selectionController.resetSelection();
-      selectionController.setSelectionSheetOpen(false);
-      selectionController.resetMapPadding();
-
-      // 关闭当前 sheet
-      ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+      // 清理所有地图选择状态并关闭 sheet
+      cleanupAfterCreation();
 
       // 显示完成页 sheet
       if (mounted) {
@@ -299,60 +263,36 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
     }
   }
 
-  void _onSubmitTag() {
-    final t = _tagInputCtrl.text.trim();
-    if (t.isNotEmpty && !_tags.contains(t)) setState(() => _tags.add(t));
-    _tagInputCtrl.clear();
-  }
+  void _onSubmitTag() => addTag(_tagInputCtrl.text, _tags, _tagInputCtrl);
 
-  void _onRemoveTag(String t) => setState(() => _tags.remove(t));
+  void _onRemoveTag(String t) => removeTag(t, _tags);
 
   Future<void> _onPickImages() async {
-    try {
-      final picked = await _picker.pickMultiImage(imageQuality: 80);
-      if (picked.isEmpty) return;
-      setState(() {
-        final newItems =
-            picked.map((x) => RoadTripGalleryItem.file(File(x.path))).toList();
-        _editorState = _editorState.copyWith(
-          galleryItems: [..._editorState.galleryItems, ...newItems],
-        );
-      });
-    } on PlatformException {
-      if (!mounted) return;
-      final loc = AppLocalizations.of(context)!;
-      _showSnack(loc.road_trip_image_picker_failed);
-    }
+    final newItems = await pickMultipleImages();
+    if (newItems.isEmpty) return;
+    setState(() {
+      _editorState = _editorState.copyWith(
+        galleryItems: [..._editorState.galleryItems, ...newItems],
+      );
+    });
   }
 
   void _onRemoveImage(int i) {
-    final items = _editorState.galleryItems;
-    if (i < 0 || i >= items.length) return;
+    final updated = removeImage(i, _editorState.galleryItems);
     setState(() {
-      final updated = List<RoadTripGalleryItem>.of(items)..removeAt(i);
       _editorState = _editorState.copyWith(galleryItems: updated);
     });
   }
 
   void _onSetCover(int i) {
-    final items = _editorState.galleryItems;
-    if (i <= 0 || i >= items.length) return;
+    final updated = setImageAsCover(i, _editorState.galleryItems);
     setState(() {
-      final updated = List<RoadTripGalleryItem>.of(items);
-      final item = updated.removeAt(i);
-      updated.insert(0, item);
       _editorState = _editorState.copyWith(galleryItems: updated);
     });
   }
 
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  RoadTripAddressLoader get _addressLoader => RoadTripAddressLoader(ref);
-
   Future<String?> _loadAddress(LatLng latLng) {
-    final future = _addressLoader.loadFormattedAddress(latLng);
+    final future = loadFormattedAddress(latLng);
     future.then((value) {
       if (!mounted) return;
       setState(() => _meetingPointAddress = value);
@@ -361,7 +301,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
   }
 
   Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng latLng) {
-    return _addressLoader.loadNearbyPlaces(latLng);
+    return loadNearbyPlaces(latLng);
   }
 
   Future<void> _restartSelectionFlow() async {
@@ -394,9 +334,10 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LocationSearchScreen(
-          title: loc.map_select_location_title,
+          title: loc.map_select_meeting_point_title,
           initialQuery: _meetingPointAddress,
           initialLocation: _meetingPointLatLng,
+          isEditMode: true, // 编辑模式，直接调用回调
           onLocationSelected: (place) {
             final location = place.location;
             if (location == null) return;
@@ -492,7 +433,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
           pricingType: _pricingType,
           onPricingTypeChanged: (v) => setState(() {
             _pricingType = v;
-            if (v == RoadTripPricingType.free) {
+            if (v == EventPricingType.free) {
               _price = null;
             }
           }),
@@ -559,16 +500,23 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
 
         if (index == 0) {
           // 第一个页面：集合点页
-          return MeetingPointSelectionPage(
+          return LocationSelectionPageFactory.build(
+            mode: LocationSelectionMode.singlePoint,
+            data: LocationSelectionPageData(
+              titleKey: 'meeting_point',
+              subtitleKey: 'meeting_point_subtitle',
+              firstLocation: LocationData(
+                title: meetingPointTitle,
+                subtitle: meetingPointSubtitle,
+                onTap: _onEditMeetingPoint,
+                onSearch: _onSearchMeetingPoint,
+                position: _meetingPointLatLng,
+                addressFuture: _meetingPointAddressFuture,
+                nearbyFuture: _meetingPointNearbyFuture,
+              ),
+            ),
             scrollCtrl: shouldUseScrollController ? widget.scrollController : null,
             onContinue: _enableWizard,
-            meetingPointTitle: meetingPointTitle,
-            meetingPointSubtitle: meetingPointSubtitle,
-            onEditMeetingPoint: _onEditMeetingPoint,
-            onSearchMeetingPoint: _onSearchMeetingPoint,
-            meetingPointPosition: _meetingPointLatLng,
-            meetingPointAddressFuture: _meetingPointAddressFuture,
-            meetingPointNearbyFuture: _meetingPointNearbyFuture,
           );
         } else if (index == 1) {
           // 第二个页面：basic 页

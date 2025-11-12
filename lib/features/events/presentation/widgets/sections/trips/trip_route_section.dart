@@ -2,7 +2,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
 import 'package:crew_app/core/network/places/places_service.dart';
 import '../event_section_card.dart';
@@ -18,27 +18,36 @@ class TripRouteSection extends StatelessWidget {
     required this.onAddForward,
     required this.onRemoveForward,
     required this.onReorderForward,
+    this.onEditForwardNote,
+    this.forwardNotes,
 
     // 返程（仅往返时用）
     required this.returnWaypoints,
     required this.onAddReturn,
     required this.onRemoveReturn,
     required this.onReorderReturn,
+    this.onEditReturnNote,
+    this.returnNotes,
+    
     this.waypointAddressMap,
   });
 
-  final RoadTripRouteType routeType;
-  final ValueChanged<RoadTripRouteType> onRouteTypeChanged;
+  final EventRouteType routeType;
+  final ValueChanged<EventRouteType> onRouteTypeChanged;
 
   final List<LatLng> forwardWaypoints; // 途经点位置
   final ValueChanged<PlaceDetails> onAddForward; // 改为接收 PlaceDetails
   final ValueChanged<int> onRemoveForward;
   final void Function(int oldIndex, int newIndex) onReorderForward;
+  final ValueChanged<int>? onEditForwardNote; // 点击编辑备注
+  final Map<String, String>? forwardNotes; // 备注数据
 
   final List<LatLng> returnWaypoints; // 途经点位置
   final ValueChanged<PlaceDetails> onAddReturn; // 改为接收 PlaceDetails
   final ValueChanged<int> onRemoveReturn;
   final void Function(int oldIndex, int newIndex) onReorderReturn;
+  final ValueChanged<int>? onEditReturnNote; // 点击编辑备注
+  final Map<String, String>? returnNotes; // 备注数据
   
   final Map<String, String>? waypointAddressMap; // 途经点地址映射
 
@@ -49,11 +58,11 @@ class TripRouteSection extends StatelessWidget {
       icon: Icons.route_outlined,
       title: loc.road_trip_route_section_title,
       subtitle: loc.road_trip_route_section_subtitle,
-      headerTrailing: SegmentedButton<RoadTripRouteType>(
+      headerTrailing: SegmentedButton<EventRouteType>(
         showSelectedIcon: false,
         segments: [
           ButtonSegment(
-            value: RoadTripRouteType.roundTrip,
+            value: EventRouteType.roundTrip,
             label: Text(
               loc.road_trip_route_type_round,
               style: const TextStyle(fontSize: 13),
@@ -61,7 +70,7 @@ class TripRouteSection extends StatelessWidget {
             icon: const Icon(Icons.autorenew, size: 18),
           ),
           ButtonSegment(
-            value: RoadTripRouteType.oneWay,
+            value: EventRouteType.oneWay,
             label: Text(
               loc.road_trip_route_type_one_way,
               style: const TextStyle(fontSize: 13),
@@ -89,33 +98,50 @@ class TripRouteSection extends StatelessWidget {
           ),
         ),
         // 列表区域
-        if (routeType == RoadTripRouteType.oneWay)
+        if (routeType == EventRouteType.oneWay)
           _WaypointListSection(
             title: loc.road_trip_route_waypoints_one_way(forwardWaypoints.length),
             items: forwardWaypoints,
             onRemove: onRemoveForward,
             onReorder: onReorderForward,
+            onTap: onEditForwardNote,
+            notes: forwardNotes,
             addressMap: waypointAddressMap,
           )
-        else ...[
-          _WaypointListSection(
-            title:
-                '${loc.road_trip_route_forward_label}${loc.road_trip_route_waypoints_count(forwardWaypoints.length)}',
-            items: forwardWaypoints,
-            onRemove: onRemoveForward,
-            onReorder: onReorderForward,
-            addressMap: waypointAddressMap,
+        else
+          // 往返模式：去程和返程并排显示
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 去程列表
+              Expanded(
+                child: _WaypointListSection(
+                  title:
+                      '${loc.road_trip_route_forward_label}${loc.road_trip_route_waypoints_count(forwardWaypoints.length)}',
+                  items: forwardWaypoints,
+                  onRemove: onRemoveForward,
+                  onReorder: onReorderForward,
+                  onTap: onEditForwardNote,
+                  notes: forwardNotes,
+                  addressMap: waypointAddressMap,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // 返程列表
+              Expanded(
+                child: _WaypointListSection(
+                  title:
+                      '${loc.road_trip_route_return_label}${loc.road_trip_route_waypoints_count(returnWaypoints.length)}',
+                  items: returnWaypoints,
+                  onRemove: onRemoveReturn,
+                  onReorder: onReorderReturn,
+                  onTap: onEditReturnNote,
+                  notes: returnNotes,
+                  addressMap: waypointAddressMap,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-          _WaypointListSection(
-            title:
-                '${loc.road_trip_route_return_label}${loc.road_trip_route_waypoints_count(returnWaypoints.length)}',
-            items: returnWaypoints,
-            onRemove: onRemoveReturn,
-            onReorder: onReorderReturn,
-            addressMap: waypointAddressMap,
-          ),
-        ],
       ],
     );
   }
@@ -129,7 +155,7 @@ class TripRouteSection extends StatelessWidget {
     }
     
     final loc = AppLocalizations.of(context)!;
-    debugPrint('准备导航到 LocationSearchScreen，往返模式: ${routeType == RoadTripRouteType.roundTrip}');
+    debugPrint('准备导航到 LocationSearchScreen，往返模式: ${routeType == EventRouteType.roundTrip}');
     
     try {
       // 跳转到 LocationSearchScreen，如果是往返模式，会在页面中显示下拉菜单
@@ -139,7 +165,7 @@ class TripRouteSection extends StatelessWidget {
             debugPrint('正在构建 LocationSearchScreen');
             return LocationSearchScreen(
               title: loc.map_select_location_title,
-              isRoundTrip: routeType == RoadTripRouteType.roundTrip,
+              isRoundTrip: routeType == EventRouteType.roundTrip,
               onLocationSelected: (place) {
                 // 单程模式下使用，但往返模式下会直接返回 LocationSelectionResult
                 debugPrint('onLocationSelected 被调用（单程模式）');
@@ -178,6 +204,8 @@ class _WaypointListSection extends StatelessWidget {
     required this.items,
     required this.onRemove,
     this.onReorder,
+    this.onTap,
+    this.notes,
     this.addressMap,
   });
 
@@ -185,6 +213,8 @@ class _WaypointListSection extends StatelessWidget {
   final List<LatLng> items;
   final ValueChanged<int> onRemove;
   final void Function(int oldIndex, int newIndex)? onReorder;
+  final ValueChanged<int>? onTap; // 点击编辑备注
+  final Map<String, String>? notes; // 备注数据
   final Map<String, String>? addressMap; // 途经点地址映射
 
   @override
@@ -222,8 +252,9 @@ class _WaypointListSection extends StatelessWidget {
               final item = items[index];
               final key = '${item.latitude}_${item.longitude}';
               final address = addressMap?[key];
+              final note = notes?[key];
               final text = address != null
-                  ? address.truncate(maxLength: 30)
+                  ? address.truncate(maxLength: 20)
                   : loc.road_trip_route_waypoint_label(index + 1); // 显示地址或编号
               // ReorderableListView 需要基于内容的 key，而不是 index
               final itemKey = ValueKey('wp-${item.latitude}-${item.longitude}');
@@ -239,29 +270,57 @@ class _WaypointListSection extends StatelessWidget {
                 onDismissed: (_) => onRemove(index),
                 child: ListTile(
                   key: itemKey,
-                  leading: const Icon(Icons.drag_handle),
-                  title: Row(
+                  leading: const Icon(Icons.drag_handle, size: 20),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.place_outlined,
-                        size: 18,
-                        color: theme.colorScheme.onSurfaceVariant,
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.place_outlined,
+                            size: 16,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              '${index + 1}. $text',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${index + 1}. $text',
-                          style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                      if (note != null && note.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          note,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 11,
+                            color: theme.colorScheme.primary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                      ],
                     ],
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close, size: 18),
                     onPressed: () => onRemove(index),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
+                  onTap: onTap != null ? () => onTap!(index) : null,
                   dense: true,
                   visualDensity: VisualDensity.compact,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 ),
               );
             },
@@ -276,8 +335,9 @@ class _WaypointListSection extends StatelessWidget {
               final item = items[index];
               final key = '${item.latitude}_${item.longitude}';
               final address = addressMap?[key];
+              final note = notes?[key];
               final text = address != null
-                  ? address.truncate(maxLength: 30)
+                  ? address.truncate(maxLength: 20)
                   : loc.road_trip_route_waypoint_label(index + 1); // 显示地址或编号
               return Dismissible(
                 key: ValueKey('wp-$index-${item.latitude}-${item.longitude}'),
@@ -290,17 +350,45 @@ class _WaypointListSection extends StatelessWidget {
                 direction: DismissDirection.endToStart,
                 onDismissed: (_) => onRemove(index),
                 child: ListTile(
-                  leading: const Icon(Icons.place_outlined),
-                  title: Text(
-                    '${index + 1}. $text',
-                    style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                  leading: const Icon(Icons.place_outlined, size: 20),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${index + 1}. $text',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (note != null && note.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          note,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 11,
+                            color: theme.colorScheme.primary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close, size: 18),
                     onPressed: () => onRemove(index),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
+                  onTap: onTap != null ? () => onTap!(index) : null,
                   dense: true,
                   visualDensity: VisualDensity.compact,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 ),
               );
             },

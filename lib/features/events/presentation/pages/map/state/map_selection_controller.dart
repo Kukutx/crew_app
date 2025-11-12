@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -46,7 +46,7 @@ class MapSelectionState {
   final LatLng? pendingWaypoint; // 临时存储新添加的途经点
   final List<LatLng> forwardWaypoints; // 去程途经点
   final List<LatLng> returnWaypoints; // 返程途经点
-  final RoadTripRouteType? routeType; // 路线类型
+  final EventRouteType? routeType; // 路线类型
   final LatLng? draggingMarkerPosition; // 正在拖拽的标记点位置
   final DraggingMarkerType? draggingMarkerType; // 正在拖拽的标记点类型
   final bool isMapPickerMode; // 是否正在进行地图选择模式
@@ -66,7 +66,7 @@ class MapSelectionState {
     bool clearPendingWaypoint = false,
     List<LatLng>? forwardWaypoints,
     List<LatLng>? returnWaypoints,
-    RoadTripRouteType? routeType,
+    EventRouteType? routeType,
     LatLng? draggingMarkerPosition,
     DraggingMarkerType? draggingMarkerType,
     bool clearDraggingMarker = false,
@@ -173,7 +173,7 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
     state = state.copyWith(returnWaypoints: waypoints);
   }
 
-  void setRouteType(RoadTripRouteType? routeType) {
+  void setRouteType(EventRouteType? routeType) {
     state = state.copyWith(routeType: routeType);
   }
 

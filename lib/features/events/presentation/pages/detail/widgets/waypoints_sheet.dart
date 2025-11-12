@@ -1,4 +1,5 @@
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +44,7 @@ class _WaypointsSheet extends StatelessWidget {
         ? waypointSegments
             .where((s) => s.direction == EventWaypointDirection.returnTrip)
             .toList()
-        : <EventWaypointSegment>[];
+        : <EventWaypointResponse>[];
     if (returnWaypointsList.isNotEmpty) {
       returnWaypointsList.sort((a, b) => a.seq.compareTo(b.seq));
     }
@@ -197,7 +198,7 @@ class _WaypointSection extends StatelessWidget {
   });
 
   final String title;
-  final List<EventWaypointSegment> waypoints;
+  final List<EventWaypointResponse> waypoints;
   final ColorScheme colorScheme;
   final ThemeData theme;
 

@@ -326,7 +326,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get map_select_location_title => '选择起点位置';
 
   @override
+  String get map_select_meeting_point_title => '选择集合点位置';
+
+  @override
   String get map_select_location_tip => '在地图长按可精确调整位置。';
+
+  @override
+  String get map_select_meeting_point_tip => '长按地图选择集合点位置';
 
   @override
   String get messages => '消息';

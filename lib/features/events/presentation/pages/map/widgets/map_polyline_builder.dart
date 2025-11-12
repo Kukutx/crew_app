@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 
 /// 地图路线构建器，统一管理所有 polyline 的创建逻辑
 class MapPolylineBuilder {
@@ -21,7 +21,7 @@ class MapPolylineBuilder {
     final forwardWaypoints = selectionState.forwardWaypoints;
     final returnWaypoints = selectionState.returnWaypoints;
 
-    if (routeType == RoadTripRouteType.roundTrip) {
+    if (routeType == EventRouteType.roundTrip) {
       // 往返路线：分为两条独立的贝塞尔曲线
       _addPolyline(
         polylines: polylines,

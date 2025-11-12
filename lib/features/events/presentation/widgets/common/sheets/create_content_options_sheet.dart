@@ -1,7 +1,8 @@
+import 'package:crew_app/features/events/presentation/widgets/moment/widgets/create_moment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/widgets/create_moment_screen.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 
 Future<void> showCreateContentOptionsSheet(BuildContext context) {
   final parentContext = context;
@@ -79,6 +80,12 @@ class _CreateContentOptionsSheet extends ConsumerWidget {
                           : const Color(0xFFFFF3E0), // 浅橙色
                       onTap: () {
                         Navigator.of(context).maybePop();
+                        
+                        // 设置地图进入选择集合点状态
+                        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+                        selectionController.setSelectionSheetOpen(true);
+                        selectionController.setSelectingDestination(false); // 确保不是选择终点模式
+                        
                         // 弹出 CreateCityEventSheet
                         ref.read(mapOverlaySheetProvider.notifier).state =
                             MapOverlaySheetType.createCityEvent;

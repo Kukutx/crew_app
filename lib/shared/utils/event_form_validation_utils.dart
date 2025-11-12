@@ -1,10 +1,10 @@
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-/// 自驾游表单验证工具类
-class RoadTripFormValidationUtils {
-  RoadTripFormValidationUtils._();
+/// 事件表单验证工具类
+class EventFormValidationUtils {
+  EventFormValidationUtils._();
 
   /// 验证标题
   /// 
@@ -25,11 +25,11 @@ class RoadTripFormValidationUtils {
   /// 返回错误消息，如果验证通过返回 null
   static String? validatePrice(
     double? price,
-    RoadTripPricingType pricingType, {
+    EventPricingType pricingType, {
     double minPrice = 0,
     double maxPrice = 100,
   }) {
-    if (pricingType == RoadTripPricingType.paid) {
+    if (pricingType == EventPricingType.paid) {
       if (price == null) {
         return '请输入价格';
       }
@@ -48,28 +48,15 @@ class RoadTripFormValidationUtils {
         coordinate.longitude <= 180;
   }
 
-  /// 验证起点坐标
+  /// 验证坐标
   /// 
   /// 返回错误消息，如果验证通过返回 null
-  static String? validateStartLocation(LatLng? startLatLng) {
-    if (startLatLng == null) {
-      return '请选择起点';
+  static String? validateCoordinate(LatLng? coordinate, {String label = '位置'}) {
+    if (coordinate == null) {
+      return '请选择$label';
     }
-    if (!isValidCoordinate(startLatLng)) {
-      return '起点坐标值无效，请重新选择位置';
-    }
-    return null;
-  }
-
-  /// 验证终点坐标
-  /// 
-  /// 返回错误消息，如果验证通过返回 null
-  static String? validateDestinationLocation(LatLng? destinationLatLng) {
-    if (destinationLatLng == null) {
-      return '请选择终点';
-    }
-    if (!isValidCoordinate(destinationLatLng)) {
-      return '终点坐标值无效，请重新选择位置';
+    if (!isValidCoordinate(coordinate)) {
+      return '$label坐标值无效，请重新选择位置';
     }
     return null;
   }
@@ -100,17 +87,13 @@ class RoadTripFormValidationUtils {
     return null;
   }
 
-  /// 验证完整表单
+  /// 验证完整表单（通用）
   /// 
   /// 返回错误消息列表，如果验证通过返回空列表
-  static List<String> validateForm({
+  static List<String> validateCommonForm({
     required String title,
     required DateTimeRange? dateRange,
-    required LatLng? startLatLng,
-    required LatLng? destinationLatLng,
-    required List<LatLng> forwardWaypoints,
-    required List<LatLng> returnWaypoints,
-    required RoadTripPricingType pricingType,
+    required EventPricingType pricingType,
     double? price,
   }) {
     final errors = <String>[];
@@ -121,14 +104,43 @@ class RoadTripFormValidationUtils {
       errors.add(basicError);
     }
 
+    // 验证价格
+    final priceError = validatePrice(price, pricingType);
+    if (priceError != null) {
+      errors.add(priceError);
+    }
+
+    return errors;
+  }
+
+  /// 验证 Road Trip 表单
+  /// 
+  /// 返回错误消息列表，如果验证通过返回空列表
+  static List<String> validateRoadTripForm({
+    required String title,
+    required DateTimeRange? dateRange,
+    required LatLng? startLatLng,
+    required LatLng? destinationLatLng,
+    required List<LatLng> forwardWaypoints,
+    required List<LatLng> returnWaypoints,
+    required EventPricingType pricingType,
+    double? price,
+  }) {
+    final errors = validateCommonForm(
+      title: title,
+      dateRange: dateRange,
+      pricingType: pricingType,
+      price: price,
+    );
+
     // 验证起点
-    final startError = validateStartLocation(startLatLng);
+    final startError = validateCoordinate(startLatLng, label: '起点');
     if (startError != null) {
       errors.add(startError);
     }
 
     // 验证终点
-    final destinationError = validateDestinationLocation(destinationLatLng);
+    final destinationError = validateCoordinate(destinationLatLng, label: '终点');
     if (destinationError != null) {
       errors.add(destinationError);
     }
@@ -140,10 +152,30 @@ class RoadTripFormValidationUtils {
       errors.add(waypointError);
     }
 
-    // 验证价格
-    final priceError = validatePrice(price, pricingType);
-    if (priceError != null) {
-      errors.add(priceError);
+    return errors;
+  }
+
+  /// 验证 City Event 表单
+  /// 
+  /// 返回错误消息列表，如果验证通过返回空列表
+  static List<String> validateCityEventForm({
+    required String title,
+    required DateTimeRange? dateRange,
+    required LatLng? meetingPointLatLng,
+    required EventPricingType pricingType,
+    double? price,
+  }) {
+    final errors = validateCommonForm(
+      title: title,
+      dateRange: dateRange,
+      pricingType: pricingType,
+      price: price,
+    );
+
+    // 验证集合点
+    final meetingPointError = validateCoordinate(meetingPointLatLng, label: '集合点');
+    if (meetingPointError != null) {
+      errors.add(meetingPointError);
     }
 
     return errors;

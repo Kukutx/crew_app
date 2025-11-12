@@ -152,11 +152,9 @@ class MarkerLocationInfoBottomSheet extends StatelessWidget {
 class _NearbyPlacesList extends ConsumerWidget {
   const _NearbyPlacesList({
     required this.future,
-    this.onPlaceTap,
   });
 
   final Future<List<NearbyPlace>> future;
-  final ValueChanged<NearbyPlace>? onPlaceTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -222,7 +220,6 @@ class _NearbyPlacesList extends ConsumerWidget {
                   final place = places[index];
                   return _NearbyPlaceCard(
                     place: place,
-                    onTap: onPlaceTap,
                   );
                 },
               ),
@@ -237,11 +234,9 @@ class _NearbyPlacesList extends ConsumerWidget {
 class _NearbyPlaceCard extends ConsumerWidget {
   const _NearbyPlaceCard({
     required this.place,
-    this.onTap,
   });
 
   final NearbyPlace place;
-  final ValueChanged<NearbyPlace>? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -261,9 +256,6 @@ class _NearbyPlaceCard extends ConsumerWidget {
             place.location!,
             DraggingMarkerType.destination, // 使用 destination 类型，因为这是附近地点
           );
-          
-          // 调用外部回调（如果有）
-          onTap?.call(place);
         }
       },
       child: Container(

@@ -7,7 +7,7 @@ import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet
 import 'package:crew_app/features/user/presentation/pages/edit_profile/edit_profile_page.dart';
 import 'package:crew_app/features/events/presentation/pages/drafts/my_drafts_page.dart';
 import 'package:crew_app/features/user/presentation/pages/friends/add_friend_page.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/my_moments_page.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment/my_moments_page.dart';
 import 'package:crew_app/features/settings/presentation/pages/revenue/pages/payment_methods_page.dart';
 import 'package:crew_app/features/settings/presentation/pages/revenue/revenue_page.dart';
 import 'package:crew_app/features/settings/presentation/settings_page.dart';

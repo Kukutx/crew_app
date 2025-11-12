@@ -132,35 +132,25 @@ class MapFloatingActionButtons extends StatelessWidget {
     BuildContext context,
     ThemeData theme,
   ) {
-    // 创建自驾游模式：显示 + 和编辑按钮
-    if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
-      final hasStart = startLatLng != null;
-      final hasDestination = destinationLatLng != null;
-      final hasAtLeastOne = hasStart || hasDestination;
+    // 创建活动模式（自驾游/城市活动）：显示编辑按钮
+    if (mapSheetType == MapOverlaySheetType.createRoadTrip || 
+        mapSheetType == MapOverlaySheetType.createCityEvent) {
+      final hasLocation = startLatLng != null || destinationLatLng != null;
 
       return [
-        // 编辑按钮（起点和终点至少有一个有值就显示）
         MapFloatingButtonConfig(
           icon: Icons.edit,
           heroTag: 'events_map_edit_fab',
           backgroundColor: theme.colorScheme.tertiary,
           foregroundColor: theme.colorScheme.onTertiary,
-          onPressed: onEdit ??
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('编辑功能开发中'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
+          onPressed: onEdit ?? () {},
           tooltip: '编辑',
-          visible: hasAtLeastOne,
+          visible: hasLocation,
         ),
       ];
     }
 
-    // 默认模式：显示 + 和定位按钮（或指南针按钮）
+    // 默认模式：显示添加和定位按钮
     return [
       MapFloatingButtonConfig(
         icon: Icons.add,

@@ -1,11 +1,12 @@
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_app_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_body.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_bottom_bar.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_constants.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/sheets/event_share_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/widgets/create_moment_screen.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment/widgets/create_moment_screen.dart';
+import 'package:crew_app/features/events/presentation/widgets/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
@@ -239,11 +240,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                       : start.add(const Duration(hours: 4));
                   // 从 waypointSegments 构建 segments
                   final segments = event.waypointSegments
-                      .map((segment) => RoadTripWaypointSegment(
+                      .map((segment) => EventWaypointSegment(
                             coordinate: '${segment.latitude},${segment.longitude}',
-                            direction: segment.direction == EventWaypointDirection.returnTrip
-                                ? RoadTripWaypointDirection.returnTrip
-                                : RoadTripWaypointDirection.forward,
+                            direction: segment.direction,
                             order: segment.seq,
                           ))
                       .toList();

@@ -1,6 +1,6 @@
 import 'package:crew_app/features/events/data/moment.dart' as moment_data;
-import 'package:crew_app/features/events/presentation/pages/moment/sheets/moment_post_comments_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/moment/widgets/moment_post_detail_screen.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment/sheets/moment_post_comments_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/moment/widgets/moment_post_detail_screen.dart';
 import 'package:crew_app/features/events/presentation/widgets/cards/moment_post_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';

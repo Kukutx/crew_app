@@ -3,9 +3,9 @@ import 'package:crew_app/features/events/presentation/pages/map/controllers/loca
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-/// 自驾游地址加载工具类
-class RoadTripAddressLoader {
-  RoadTripAddressLoader(this.ref);
+/// 事件地址加载工具类
+class EventAddressLoader {
+  EventAddressLoader(this.ref);
 
   final WidgetRef ref;
 

@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_gallery_section.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 export 'data/road_trip_editor_models.dart';
 
@@ -17,15 +15,11 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_sto
 import 'package:crew_app/features/events/presentation/widgets/sections/event_team_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_host_disclaimer_section.dart';
 
-/// API provider stub ---------------------------------------------------------
-final eventsApiProvider = Provider<EventsApi>((ref) => EventsApi());
-
-class EventsApi {
-  Future<String> createRoadTrip(RoadTripDraft input) async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return 'event_123';
-  }
-}
+// API Service 已移至 events_api_service.dart
+import 'package:crew_app/features/events/state/events_api_service.dart';
+import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
+import 'package:crew_app/features/events/presentation/widgets/mixins/event_editor_mixin.dart';
+import 'sheets/waypoint_note_sheet.dart';
 
 class RoadTripEditorPage extends ConsumerStatefulWidget {
   const RoadTripEditorPage({
@@ -45,7 +39,8 @@ class RoadTripEditorPage extends ConsumerStatefulWidget {
   ConsumerState<RoadTripEditorPage> createState() => _RoadTripEditorPageState();
 }
 
-class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
+class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage>
+    with EventEditorMixin {
   final _formKey = GlobalKey<FormState>();
 
   final _titleCtrl = TextEditingController();
@@ -59,12 +54,14 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   final _tagInputCtrl = TextEditingController();
 
   RoadTripEditorState _state = const RoadTripEditorState();
-
-  final _picker = ImagePicker();
   
   // 去程和返程途经点
   final List<LatLng> _forwardWps = [];
   final List<LatLng> _returnWps = [];
+  
+  // 途径点备注 Map，key为"lat_lng"格式
+  final Map<String, String> _forwardNotes = {};
+  final Map<String, String> _returnNotes = {};
 
   @override
   void initState() {
@@ -121,15 +118,15 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       final initialState = RoadTripEditorState(
         dateRange: initial.dateRange,
         routeType: initial.isRoundTrip
-            ? RoadTripRouteType.roundTrip
-            : RoadTripRouteType.oneWay,
+            ? EventRouteType.roundTrip
+            : EventRouteType.oneWay,
         pricingType: initial.isFree
-            ? RoadTripPricingType.free
-            : RoadTripPricingType.paid,
+            ? EventPricingType.free
+            : EventPricingType.paid,
         tags: List.of(initial.tags),
         galleryItems: [
-          ...initial.existingImageUrls.map(RoadTripGalleryItem.network),
-          ...initial.galleryImages.map(RoadTripGalleryItem.file),
+          ...initial.existingImageUrls.map(EventGalleryItem.network),
+          ...initial.galleryImages.map(EventGalleryItem.file),
         ],
       );
       _state = initialState;
@@ -170,12 +167,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   }
 
   Future<void> _pickImages() async {
-    final picked = await _picker.pickMultiImage(imageQuality: 85);
-    if (picked.isEmpty) return;
+    final newItems = await pickImages();
+    if (newItems.isEmpty) return;
     setState(() {
-      final newItems = picked
-          .map((x) => RoadTripGalleryItem.file(File(x.path)))
-          .toList();
       _state = _state.copyWith(
         galleryItems: [..._state.galleryItems, ...newItems],
       );
@@ -183,92 +177,73 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   }
 
   void _setCover(int index) {
-    if (index < 0 || index >= _state.galleryItems.length) return;
     setState(() {
-      final items = [..._state.galleryItems];
-      final item = items.removeAt(index);
-      items.insert(0, item);
-      _state = _state.copyWith(galleryItems: items);
+      final updatedItems = setCoverImage(_state.galleryItems, index);
+      _state = _state.copyWith(galleryItems: updatedItems);
     });
   }
 
   void _removeGalleryItem(int index) {
-    if (index < 0 || index >= _state.galleryItems.length) return;
     setState(() {
-      final items = [..._state.galleryItems]..removeAt(index);
-      _state = _state.copyWith(galleryItems: items);
+      final updatedItems = removeGalleryItem(_state.galleryItems, index);
+      _state = _state.copyWith(galleryItems: updatedItems);
     });
   }
 
   void _addTagFromInput() {
     final value = _tagInputCtrl.text.trim();
-    if (value.isEmpty) return;
-    if (_state.tags.contains(value)) return;
-    setState(() {
-      _state = _state.copyWith(tags: [..._state.tags, value]);
-    });
-    _tagInputCtrl.clear();
+    final updatedTags = addTag(_state.tags, value);
+    if (updatedTags.length > _state.tags.length) {
+      setState(() {
+        _state = _state.copyWith(tags: updatedTags);
+      });
+      _tagInputCtrl.clear();
+    }
   }
 
   Future<void> _submit() async {
     final loc = AppLocalizations.of(context)!;
     
     if (!_formKey.currentState!.validate()) return;
-    if (_state.dateRange == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(loc.road_trip_validation_date_range_required)));
-      return;
-    }
 
-    // 文本长度验证
     final title = _titleCtrl.text.trim();
-    if (title.length > 20) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.road_trip_validation_title_max_length)),
-      );
+    
+    // 使用验证工具类进行验证（注意：这里没有起点和终点验证，因为是编辑模式）
+    final validationErrors = EventFormValidationUtils.validateCommonForm(
+      title: title,
+      dateRange: _state.dateRange,
+      pricingType: _state.pricingType,
+      price: _price,
+    );
+
+    // 坐标验证
+    final allWaypoints = [..._forwardWps, ..._returnWps];
+    final waypointError = EventFormValidationUtils.validateWaypoints(allWaypoints);
+    if (waypointError != null) {
+      validationErrors.add(waypointError);
+    }
+
+    if (validationErrors.isNotEmpty) {
+      showErrorMessage(validationErrors.first);
       return;
     }
 
-    // 价格验证
-    double? price;
-    if (_state.pricingType == RoadTripPricingType.paid) {
-      price = _price;
-      if (price == null || price < 0 || price > 100) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(loc.road_trip_validation_price_invalid)),
-        );
-        return;
-      }
-    }
+    // 价格已经在验证工具类中验证，这里直接使用
+    final price = _state.pricingType == EventPricingType.paid ? _price : null;
 
-    // 坐标范围验证
-    final allWaypoints = [..._forwardWps, ..._returnWps];
-    for (final wp in allWaypoints) {
-      if (wp.latitude < -90 ||
-          wp.latitude > 90 ||
-          wp.longitude < -180 ||
-          wp.longitude > 180) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(loc.road_trip_validation_coordinate_invalid)),
-        );
-        return;
-      }
-    }
-
-    final segments = <RoadTripWaypointSegment>[
+    final segments = <EventWaypointSegment>[
       ..._forwardWps.asMap().entries.map(
-        (entry) => RoadTripWaypointSegment(
+        (entry) => EventWaypointSegment(
           coordinate: '${entry.value.latitude},${entry.value.longitude}',
-          direction: RoadTripWaypointDirection.forward,
+          direction: EventWaypointDirection.forward,
           order: entry.key,
         ),
       ),
-      if (_state.routeType == RoadTripRouteType.roundTrip)
+      if (_state.routeType == EventRouteType.roundTrip)
         ..._returnWps.asMap().entries.map(
-          (entry) => RoadTripWaypointSegment(
+          (entry) => EventWaypointSegment(
             coordinate: '${entry.value.latitude},${entry.value.longitude}',
-            direction: RoadTripWaypointDirection.returnTrip,
+            direction: EventWaypointDirection.returnTrip,
             order: entry.key,
           ),
         ),
@@ -281,10 +256,10 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       startLocation: _startLocationCtrl.text.trim(),
       endLocation: _endLocationCtrl.text.trim(),
       meetingPoint: _meetingLocationCtrl.text.trim(),
-      isRoundTrip: _state.routeType == RoadTripRouteType.roundTrip,
+      isRoundTrip: _state.routeType == EventRouteType.roundTrip,
       segments: segments,
                 maxMembers: _maxMembers,
-      isFree: _state.pricingType == RoadTripPricingType.free,
+      isFree: _state.pricingType == EventPricingType.free,
       pricePerPerson: price,
       tags: List.of(_state.tags),
       description: _descriptionCtrl.text.trim(),
@@ -307,18 +282,14 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         return;
       }
 
-      final id = await ref.read(eventsApiProvider).createRoadTrip(draft);
+      final id = await ref.read(eventsApiServiceProvider).createRoadTrip(draft);
       if (!mounted) return;
       final actionText = widget.isEditing ? loc.action_update : loc.action_create;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.road_trip_create_success(actionText, id))),
-      );
+      showSuccessMessage(loc.road_trip_create_success(actionText, id));
       Navigator.pop(context, id);
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(loc.road_trip_create_failed(e.toString()))));
+      if (mounted) {
+        showErrorMessage(loc.road_trip_create_failed(e.toString()));
       }
     }
   }
@@ -362,10 +333,74 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
     if (i >= 0 && i < _returnWps.length) _returnWps.removeAt(i);
   });
   
-  void _onReorderReturn(int oldIndex, int newIndex) => setState(() {
-    final item = _returnWps.removeAt(oldIndex);
-    _returnWps.insert(newIndex, item);
-  });
+  void _onReorderReturn(int oldIndex, int newIndex) {
+    if (oldIndex == newIndex) return;
+    if (oldIndex < 0 || oldIndex >= _returnWps.length) return;
+    if (newIndex < 0 || newIndex >= _returnWps.length) return;
+    
+    setState(() {
+      final item = _returnWps.removeAt(oldIndex);
+      _returnWps.insert(newIndex, item);
+    });
+  }
+
+  // 编辑去程途径点备注
+  Future<void> _onEditForwardNote(int index) async {
+    if (index < 0 || index >= _forwardWps.length) return;
+    
+    final waypoint = _forwardWps[index];
+    final key = '${waypoint.latitude}_${waypoint.longitude}';
+    final currentNote = _forwardNotes[key];
+    
+    final result = await showWaypointNoteSheet(
+      context: context,
+      waypoint: waypoint,
+      index: index,
+      currentNote: currentNote,
+      title: '去程',
+    );
+    
+    if (result == null) {
+      // 删除备注
+      setState(() {
+        _forwardNotes.remove(key);
+      });
+    } else {
+      // 保存备注
+      setState(() {
+        _forwardNotes[key] = result;
+      });
+    }
+  }
+
+  // 编辑返程途径点备注
+  Future<void> _onEditReturnNote(int index) async {
+    if (index < 0 || index >= _returnWps.length) return;
+    
+    final waypoint = _returnWps[index];
+    final key = '${waypoint.latitude}_${waypoint.longitude}';
+    final currentNote = _returnNotes[key];
+    
+    final result = await showWaypointNoteSheet(
+      context: context,
+      waypoint: waypoint,
+      index: index,
+      currentNote: currentNote,
+      title: '返程',
+    );
+    
+    if (result == null) {
+      // 删除备注
+      setState(() {
+        _returnNotes.remove(key);
+      });
+    } else {
+      // 保存备注
+      setState(() {
+        _returnNotes[key] = result;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -402,11 +437,15 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 onAddForward: _onAddForward,
                 onRemoveForward: _onRemoveForward,
                 onReorderForward: _onReorderForward,
+                onEditForwardNote: _onEditForwardNote,
+                forwardNotes: _forwardNotes,
 
                 returnWaypoints: _returnWps,
                 onAddReturn: _onAddReturn,
                 onRemoveReturn: _onRemoveReturn,
                 onReorderReturn: _onReorderReturn,
+                onEditReturnNote: _onEditReturnNote,
+                returnNotes: _returnNotes,
               ),
               EventTeamSection(
                 maxMembers: _maxMembers,
@@ -420,7 +459,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 pricingType: _state.pricingType,
                 onPricingTypeChanged: (type) => setState(() {
                   _state = _state.copyWith(pricingType: type);
-                  if (type == RoadTripPricingType.free) {
+                  if (type == EventPricingType.free) {
                     _price = null;
                   }
                 }),

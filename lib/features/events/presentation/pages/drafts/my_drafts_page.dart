@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
+import 'package:crew_app/features/events/presentation/widgets/trips/road_trip_editor_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 // 各种活动的草稿

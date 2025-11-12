@@ -1,3 +1,4 @@
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/shared/utils/json_parser_helper.dart';
 
 class EventHost {
@@ -34,10 +35,8 @@ class EventHost {
       };
 }
 
-enum EventWaypointDirection { forward, returnTrip }
-
-class EventWaypointSegment {
-  const EventWaypointSegment({
+class EventWaypointResponse {
+  const EventWaypointResponse({
     required this.seq,
     required this.longitude,
     required this.latitude,
@@ -45,14 +44,14 @@ class EventWaypointSegment {
     this.note,
   });
 
-  factory EventWaypointSegment.fromJson(Map<String, dynamic> json) {
+  factory EventWaypointResponse.fromJson(Map<String, dynamic> json) {
       final waypoint = (json['waypoint'] as List<dynamic>? ?? const [])
         .map((value) => JsonParserHelper.parseDouble(value) ?? 0.0)
         .toList();
     final longitude = waypoint.isNotEmpty ? waypoint.first.toDouble() : 0.0;
     final latitude = waypoint.length > 1 ? waypoint[1].toDouble() : 0.0;
 
-    return EventWaypointSegment(
+    return EventWaypointResponse(
       seq: JsonParserHelper.parseInt(json['seq']) ?? 0,
       longitude: longitude,
       latitude: latitude,
@@ -91,7 +90,7 @@ class Event {
   final bool isFree;
   final double? price;
   final List<String> tags;
-  final List<EventWaypointSegment> waypointSegments;
+  final List<EventWaypointResponse> waypointSegments;
   final bool? isRoundTrip;
   final EventHost? host;
   final EventStatus? status;
@@ -119,7 +118,7 @@ class Event {
     this.isFree = false,
     this.price,
     this.tags = const <String>[],
-    this.waypointSegments = const <EventWaypointSegment>[],
+    this.waypointSegments = const <EventWaypointResponse>[],
     this.isRoundTrip,
     this.host,
     this.status,
@@ -154,7 +153,7 @@ class Event {
       waypointSegments: List.unmodifiable(
         (json['segments'] as List<dynamic>? ?? const [])
             .whereType<Map<String, dynamic>>()
-            .map(EventWaypointSegment.fromJson),
+            .map(EventWaypointResponse.fromJson),
       ),
       isRoundTrip: JsonParserHelper.parseBool(json['isRoundTrip']),
       host: hostJson != null ? EventHost.fromJson(hostJson) : null,

@@ -74,8 +74,9 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
     // 计算导航索引
     final navigationIndex = _getNavigationIndex(mapSheetType);
     
-    // 出现创建行程时强制隐藏；其它 Sheet 只在完全展开时隐藏
-    final hideForCreate = mapSheetType == MapOverlaySheetType.createRoadTrip;
+    // 出现创建活动时强制隐藏；其它 Sheet 只在完全展开时隐藏
+    final hideForCreate = mapSheetType == MapOverlaySheetType.createRoadTrip ||
+        mapSheetType == MapOverlaySheetType.createCityEvent;
     final hideForOthers = mapSheetType != MapOverlaySheetType.none &&
         mapSheetStage == MapOverlaySheetStage.expanded;
     final showBottomNav = baseVisible && !hideForCreate && !hideForOthers;

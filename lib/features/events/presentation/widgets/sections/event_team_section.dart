@@ -3,7 +3,7 @@ import 'package:crew_app/shared/theme/app_design_tokens.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-import '../../pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'event_section_card.dart';
 
 class EventTeamSection extends StatelessWidget {
@@ -25,8 +25,8 @@ class EventTeamSection extends StatelessWidget {
   final ValueChanged<int> onMaxMembersChanged;
   final double? price;
   final ValueChanged<double?> onPriceChanged;
-  final RoadTripPricingType pricingType;
-  final ValueChanged<RoadTripPricingType> onPricingTypeChanged;
+  final EventPricingType pricingType;
+  final ValueChanged<EventPricingType> onPricingTypeChanged;
   final TextEditingController tagInputController;
   final VoidCallback onSubmitTag;
   final List<String> tags;
@@ -39,11 +39,11 @@ class EventTeamSection extends StatelessWidget {
       icon: Icons.groups_3_outlined,
       title: loc.road_trip_team_section_title,
       subtitle: loc.road_trip_team_section_subtitle,
-      headerTrailing: SegmentedButton<RoadTripPricingType>(
+      headerTrailing: SegmentedButton<EventPricingType>(
         showSelectedIcon: false,
         segments: [
           ButtonSegment(
-            value: RoadTripPricingType.free,
+            value: EventPricingType.free,
             label: Text(
               loc.road_trip_team_pricing_free,
               style: TextStyle(fontSize: 13.sp),
@@ -51,7 +51,7 @@ class EventTeamSection extends StatelessWidget {
             icon: Icon(Icons.favorite_outline, size: 18.sp),
           ),
           ButtonSegment(
-            value: RoadTripPricingType.paid,
+            value: EventPricingType.paid,
             label: Text(
               loc.road_trip_team_pricing_paid,
               style: TextStyle(fontSize: 13.sp),
@@ -243,7 +243,7 @@ class _PriceInputField extends StatefulWidget {
 
   final double? price;
   final ValueChanged<double?> onPriceChanged;
-  final RoadTripPricingType pricingType;
+  final EventPricingType pricingType;
   final String label;
   final String freeHint;
   final String paidHint;
@@ -268,7 +268,7 @@ class _PriceInputFieldState extends State<_PriceInputField> {
   void didUpdateWidget(_PriceInputField oldWidget) {
     super.didUpdateWidget(oldWidget);
     // 只在收费模式下更新 controller
-    if (widget.pricingType == RoadTripPricingType.paid) {
+    if (widget.pricingType == EventPricingType.paid) {
       if (oldWidget.price != widget.price) {
         if (widget.price != null) {
           final currentText = _priceController.text;
@@ -301,7 +301,7 @@ class _PriceInputFieldState extends State<_PriceInputField> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.pricingType == RoadTripPricingType.free) {
+    if (widget.pricingType == EventPricingType.free) {
       final loc = AppLocalizations.of(context)!;
       final colorScheme = Theme.of(context).colorScheme;
       return TextFormField(

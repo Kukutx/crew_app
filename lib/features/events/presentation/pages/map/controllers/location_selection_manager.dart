@@ -28,30 +28,36 @@ class LocationSelectionManager {
   // Getters
   bool get isHandlingLongPress => _isHandlingLongPress;
 
-  /// 处理地图长按（用于创建/更新起点和终点）
+  /// 处理地图长按（用于选择位置）
   Future<void> onMapLongPress(LatLng latlng, BuildContext context) async {
     final selectionState = ref.read(mapSelectionControllerProvider);
+    final mapSheetType = ref.read(mapOverlaySheetProvider);
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final mapController = ref.read(mapControllerProvider);
     
-    // 如果正在选择终点，长按设置终点
+    // 选择终点模式
     if (selectionState.isSelectingDestination) {
       _handleDestinationSelection(latlng, context);
       return;
     }
     
-    // 已移除通过点击添加途经点的功能
+    // 创建活动模式：更新位置但不切换界面
+    if (mapSheetType == MapOverlaySheetType.createCityEvent || 
+        mapSheetType == MapOverlaySheetType.createRoadTrip) {
+      selectionController.setSelectedLatLng(latlng);
+      unawaited(mapController.moveCamera(latlng, zoom: 17));
+      return;
+    }
     
+    // 默认模式：创建新的自驾游
     if (_isHandlingLongPress) return;
-    
     _isHandlingLongPress = true;
+    
     try {
       await clearSelectedLocation();
-      ref.read(mapSelectionControllerProvider.notifier).setSelectedLatLng(latlng);
-      
-      final mapController = ref.read(mapControllerProvider);
+      selectionController.setSelectedLatLng(latlng);
       unawaited(mapController.moveCamera(latlng, zoom: 17));
       
-      // 直接显示 CreateRoadTripSheet 的启动页
-      // 在异步操作后使用 context 前，需要检查 context 是否仍然有效
       if (context.mounted) {
         _showRoadTripCreationSheet(context, latlng);
       }

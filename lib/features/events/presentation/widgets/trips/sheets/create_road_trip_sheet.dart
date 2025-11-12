@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
@@ -11,21 +11,20 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_hos
 import 'package:crew_app/features/events/presentation/widgets/sections/trips/trip_route_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_story_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_team_section.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/road_trip_editor_page.dart';
+import 'package:crew_app/features/events/presentation/widgets/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
-import 'package:crew_app/shared/utils/road_trip_form_validation_utils.dart';
-import 'package:crew_app/shared/utils/road_trip_address_loader.dart';
-import 'package:crew_app/features/events/presentation/widgets/sections/trips/trip_route_selection_page.dart';
+import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
+import 'package:crew_app/features/events/state/events_api_service.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/marker_location_page_indicator.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/location_selection_page_factory.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/event_creation_config.dart';
+import 'package:crew_app/features/events/presentation/widgets/mixins/event_creation_mixin.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -142,7 +141,7 @@ class _CreateRoadTripContent extends ConsumerStatefulWidget {
 }
 
 class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, EventCreationMixin {
   // ===== 内部状态 =====
   late final TabController _tabController; // 路线/途径点 TabController
   final PageController _routePageCtrl = PageController(); // 路线 tab 内的 PageView
@@ -168,7 +167,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   Future<List<NearbyPlace>>? _destinationNearbyFuture;
 
   // ==== 路线 ====
-  RoadTripRouteType _routeType = RoadTripRouteType.roundTrip;
+  EventRouteType _routeType = EventRouteType.roundTrip;
   final List<LatLng> _forwardWps = []; // 去程途经点
   final List<LatLng> _returnWps = [];  // 返程途经点
   // 途经点地址缓存：key 为 '${lat}_${lng}'，value 为地址
@@ -178,14 +177,11 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   // ==== 团队/费用 ====
   int _maxMembers = 4;
   double? _price;
-  RoadTripPricingType _pricingType = RoadTripPricingType.free;
+  EventPricingType _pricingType = EventPricingType.free;
 
   // ==== 偏好 ====
   final _tagInputCtrl = TextEditingController();
   final List<String> _tags = [];
-
-  // ==== 图集 ====
-  final ImagePicker _picker = ImagePicker();
 
   // ==== 文案 ====
   final _storyCtrl = TextEditingController();
@@ -460,7 +456,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         final title = _titleCtrl.text.trim();
         
         // 使用验证工具类进行验证
-        final validationErrors = RoadTripFormValidationUtils.validateForm(
+        final validationErrors = EventFormValidationUtils.validateRoadTripForm(
           title: title,
           dateRange: _editorState.dateRange,
           startLatLng: _startLatLng,
@@ -480,21 +476,21 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         }
 
         // 价格已经在验证工具类中验证，这里直接使用
-        final price = _pricingType == RoadTripPricingType.paid ? _price : null;
+        final price = _pricingType == EventPricingType.paid ? _price : null;
 
-        final segments = <RoadTripWaypointSegment>[
+        final segments = <EventWaypointSegment>[
           ..._forwardWps.asMap().entries.map(
-            (entry) => RoadTripWaypointSegment(
+            (entry) => EventWaypointSegment(
               coordinate: '${entry.value.latitude},${entry.value.longitude}',
-              direction: RoadTripWaypointDirection.forward,
+              direction: EventWaypointDirection.forward,
               order: entry.key,
             ),
           ),
-          if (_routeType == RoadTripRouteType.roundTrip)
+          if (_routeType == EventRouteType.roundTrip)
             ..._returnWps.asMap().entries.map(
-              (entry) => RoadTripWaypointSegment(
+              (entry) => EventWaypointSegment(
                 coordinate: '${entry.value.latitude},${entry.value.longitude}',
-                direction: RoadTripWaypointDirection.returnTrip,
+                direction: EventWaypointDirection.returnTrip,
                 order: entry.key,
               ),
             ),
@@ -509,10 +505,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
               '${_destinationLatLng!.latitude.toStringAsFixed(6)}, ${_destinationLatLng!.longitude.toStringAsFixed(6)}',
           meetingPoint: _startAddress ?? 
               '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
-          isRoundTrip: _routeType == RoadTripRouteType.roundTrip,
+          isRoundTrip: _routeType == EventRouteType.roundTrip,
           segments: segments,
           maxMembers: _maxMembers,
-          isFree: _pricingType == RoadTripPricingType.free,
+          isFree: _pricingType == EventPricingType.free,
           pricePerPerson: price,
           tags: List.of(_tags),
           description: _storyCtrl.text.trim(),
@@ -528,7 +524,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         );
 
         // 调用API创建
-        final id = await ref.read(eventsApiProvider).createRoadTrip(draft);
+        final id = await ref.read(eventsApiServiceProvider).createRoadTrip(draft);
         
         if (!mounted) return;
         
@@ -590,7 +586,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
 
-  void _onRouteTypeChanged(RoadTripRouteType t) {
+  void _onRouteTypeChanged(EventRouteType t) {
     setState(() => _routeType = t);
     // 更新 MapSelectionController 中的路线类型
     ref.read(mapSelectionControllerProvider.notifier).setRouteType(t);
@@ -778,58 +774,43 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       _reorderWaypoints(oldIndex, newIndex, isForward: false);
 
   void _onSubmitTag() {
-    final t = _tagInputCtrl.text.trim();
-    if (t.isNotEmpty && !_tags.contains(t)) setState(() => _tags.add(t));
-    _tagInputCtrl.clear();
+    addTag(_tagInputCtrl.text, _tags, _tagInputCtrl);
   }
-  void _onRemoveTag(String t) => setState(() => _tags.remove(t));
+  
+  void _onRemoveTag(String t) {
+    removeTag(t, _tags);
+  }
 
   Future<void> _onPickImages() async {
-    try {
-      final picked = await _picker.pickMultiImage(imageQuality: 80);
-      if (picked.isEmpty) return;
-      setState(() {
-        final newItems =
-            picked.map((x) => RoadTripGalleryItem.file(File(x.path))).toList();
-        _editorState = _editorState.copyWith(
-          galleryItems: [..._editorState.galleryItems, ...newItems],
-        );
-      });
-    } on PlatformException {
-      if (!mounted) return;
-      final loc = AppLocalizations.of(context)!;
-      _showSnack(loc.road_trip_image_picker_failed);
-    }
+    final newItems = await pickMultipleImages();
+    if (newItems.isEmpty) return;
+    setState(() {
+      _editorState = _editorState.copyWith(
+        galleryItems: [..._editorState.galleryItems, ...newItems],
+      );
+    });
   }
 
   void _onRemoveImage(int i) {
-    final items = _editorState.galleryItems;
-    if (i < 0 || i >= items.length) return;
+    final updated = removeImage(i, _editorState.galleryItems);
     setState(() {
-      final updated = List<RoadTripGalleryItem>.of(items)..removeAt(i);
       _editorState = _editorState.copyWith(galleryItems: updated);
     });
   }
 
   void _onSetCover(int i) {
-    final items = _editorState.galleryItems;
-    if (i <= 0 || i >= items.length) return;
+    final updated = setImageAsCover(i, _editorState.galleryItems);
     setState(() {
-      final updated = List<RoadTripGalleryItem>.of(items);
-      final item = updated.removeAt(i);
-      updated.insert(0, item);
       _editorState = _editorState.copyWith(galleryItems: updated);
     });
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    showSnackBar(message);
   }
 
-  RoadTripAddressLoader get _addressLoader => RoadTripAddressLoader(ref);
-
   Future<String?> _loadAddress(LatLng latLng, {required bool isStart}) {
-    final future = _addressLoader.loadFormattedAddress(latLng);
+    final future = loadFormattedAddress(latLng);
     future.then((value) {
       if (!mounted) return;
       if (isStart) {
@@ -842,7 +823,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   Future<List<NearbyPlace>> _loadNearbyPlaces(LatLng latLng) {
-    return _addressLoader.loadNearbyPlaces(latLng);
+    return loadNearbyPlaces(latLng);
   }
 
   Future<void> _restartSelectionFlow({required bool skipStart}) async {
@@ -1163,7 +1144,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           pricingType: _pricingType,
           onPricingTypeChanged: (v) => setState(() {
             _pricingType = v;
-            if (v == RoadTripPricingType.free) {
+            if (v == EventPricingType.free) {
               _price = null;
             }
           }),
@@ -1279,23 +1260,32 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         
         if (index == 0) {
           // 第一个页面：起始页
-          return TripRouteSelectionPage(
+          return LocationSelectionPageFactory.build(
+            mode: LocationSelectionMode.startAndDestination,
+            data: LocationSelectionPageData(
+              titleKey: 'road_trip_route',
+              subtitleKey: 'road_trip_route_subtitle',
+              firstLocation: LocationData(
+                title: startTitle,
+                subtitle: startSubtitle,
+                onTap: _onEditDeparture,
+                onSearch: _onSearchStartLocation,
+                position: _startLatLng,
+                addressFuture: _startAddressFuture,
+                nearbyFuture: _startNearbyFuture,
+              ),
+              secondLocation: LocationData(
+                title: destinationTitle,
+                subtitle: destinationSubtitle,
+                onTap: _onEditDestination,
+                onSearch: _onSearchDestination,
+                position: _destinationLatLng,
+                addressFuture: _destinationAddressFuture,
+                nearbyFuture: _destinationNearbyFuture,
+              ),
+            ),
             scrollCtrl: shouldUseScrollController ? widget.scrollCtrl : null,
             onContinue: _enableWizard,
-            departureTitle: startTitle,
-            departureSubtitle: startSubtitle,
-            destinationTitle: destinationTitle,
-            destinationSubtitle: destinationSubtitle,
-            onEditDeparture: _onEditDeparture,
-            onEditDestination: _onEditDestination,
-            onSearchDeparture: _onSearchStartLocation,
-            onSearchDestination: _onSearchDestination,
-            departurePosition: _startLatLng,
-            departureAddressFuture: _startAddressFuture,
-            departureNearbyFuture: _startNearbyFuture,
-            destinationPosition: _destinationLatLng,
-            destinationAddressFuture: _destinationAddressFuture,
-            destinationNearbyFuture: _destinationNearbyFuture,
           );
         } else if (index == 1) {
           // 第二个页面：basic 页

@@ -1,5 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:crew_app/features/messages/data/group_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_conversation_page.dart';
@@ -90,7 +90,7 @@ class _ChatSheetState extends State<ChatSheet> {
           .where((conversation) => conversation.isSystem)
           .toList(growable: false);
 
-  late final ChatParticipant _currentUser = const ChatParticipant(
+  late final ChatMember _currentUser = const ChatMember(
     id: 'user-me',
     displayName: '我',
     initials: 'ME',
@@ -98,10 +98,10 @@ class _ChatSheetState extends State<ChatSheet> {
     isCurrentUser: true,
   );
 
-  late final List<ChatParticipant> _privateContacts =
+  late final List<ChatMember> _privateContacts =
       _nonSystemPrivateConversations.map(
-        (conversation) => ChatParticipant(
-          id: 'direct-participant-${conversation.id}',
+        (conversation) => ChatMember(
+          id: 'direct-member-${conversation.id}',
           displayName: conversation.displayName,
           initials: _resolveInitials(
             conversation.displayName,
@@ -113,7 +113,7 @@ class _ChatSheetState extends State<ChatSheet> {
       )
       .toList(growable: false);
 
-  late final Map<String, ChatParticipant> _privateContactsByConversationId =
+  late final Map<String, ChatMember> _privateContactsByConversationId =
       Map.fromIterables(
     _nonSystemPrivateConversations.map((conversation) => conversation.id),
     _privateContacts,
@@ -247,21 +247,21 @@ class _ChatSheetState extends State<ChatSheet> {
     ),
   ];
 
-  late final List<List<ChatParticipant>> _sampleParticipants = [
+  late final List<List<ChatMember>> _sampleMembers = [
     const [
-      ChatParticipant(
+      ChatMember(
         id: 'group-1-1',
         displayName: '林雨晴',
         initials: 'YQ',
         avatarColorValue: 0xFF6750A4,
       ),
-      ChatParticipant(
+      ChatMember(
         id: 'group-1-2',
         displayName: 'Marco',
         initials: 'MA',
         avatarColorValue: 0xFF4C6ED7,
       ),
-      ChatParticipant(
+      ChatMember(
         id: 'group-1-3',
         displayName: '王聪聪',
         initials: 'CC',
@@ -269,19 +269,19 @@ class _ChatSheetState extends State<ChatSheet> {
       ),
     ],
     const [
-      ChatParticipant(
+      ChatMember(
         id: 'group-2-1',
         displayName: 'Leo',
         initials: 'LE',
         avatarColorValue: 0xFF00696B,
       ),
-      ChatParticipant(
+      ChatMember(
         id: 'group-2-2',
         displayName: 'Cici',
         initials: 'CI',
         avatarColorValue: 0xFFD6589F,
       ),
-      ChatParticipant(
+      ChatMember(
         id: 'group-2-3',
         displayName: 'Hannah',
         initials: 'HA',
@@ -289,19 +289,19 @@ class _ChatSheetState extends State<ChatSheet> {
       ),
     ],
     const [
-      ChatParticipant(
+      ChatMember(
         id: 'group-3-1',
         displayName: '米兰小巷',
         initials: 'ML',
         avatarColorValue: 0xFF2F4858,
       ),
-      ChatParticipant(
+      ChatMember(
         id: 'group-3-2',
         displayName: 'Francesca',
         initials: 'FR',
         avatarColorValue: 0xFFB75F89,
       ),
-      ChatParticipant(
+      ChatMember(
         id: 'group-3-3',
         displayName: 'Ken',
         initials: 'KE',
@@ -315,7 +315,7 @@ class _ChatSheetState extends State<ChatSheet> {
       ChatMessage(
         id: 'group-1-msg-1',
         chatId: 'group-1',
-        sender: _sampleParticipants[0][0],
+        sender: _sampleMembers[0][0],
         body: '周六记得带上登山杖和保温壶，山上还会有些冷。',
         sentAtLabel: '09:20',
         replyCount: 3,
@@ -325,7 +325,7 @@ class _ChatSheetState extends State<ChatSheet> {
       ChatMessage(
         id: 'group-1-msg-2',
         chatId: 'group-1',
-        sender: _sampleParticipants[0][2],
+        sender: _sampleMembers[0][2],
         body: '我可以带两壶热姜茶，大家可以分着喝。',
         sentAtLabel: '10:02',
       ),
@@ -341,7 +341,7 @@ class _ChatSheetState extends State<ChatSheet> {
       ChatMessage(
         id: 'group-2-msg-1',
         chatId: 'group-2',
-        sender: _sampleParticipants[1][0],
+        sender: _sampleMembers[1][0],
         body: '今晚 8 点开始，提前十分钟上线试一下音频～',
         sentAtLabel: '15:40',
         replyCount: 2,
@@ -349,7 +349,7 @@ class _ChatSheetState extends State<ChatSheet> {
       ChatMessage(
         id: 'group-2-msg-2',
         chatId: 'group-2',
-        sender: _sampleParticipants[1][1],
+        sender: _sampleMembers[1][1],
         body: '我准备了新的歌单，等会分享链接。',
         sentAtLabel: '15:44',
       ),
@@ -365,7 +365,7 @@ class _ChatSheetState extends State<ChatSheet> {
       ChatMessage(
         id: 'group-3-msg-1',
         chatId: 'group-3',
-        sender: _sampleParticipants[2][0],
+        sender: _sampleMembers[2][0],
         body: '路线 2 号有一些石板路，记得穿好走的鞋子。',
         sentAtLabel: '08:12',
         attachmentLabels: const ['路线图.png'],
@@ -373,7 +373,7 @@ class _ChatSheetState extends State<ChatSheet> {
       ChatMessage(
         id: 'group-3-msg-2',
         chatId: 'group-3',
-        sender: _sampleParticipants[2][1],
+        sender: _sampleMembers[2][1],
         body: '咖啡店会提前预约，大家提前 10 分钟到哦。',
         sentAtLabel: '08:21',
       ),
@@ -451,14 +451,14 @@ class _ChatSheetState extends State<ChatSheet> {
   void _openGroupChat(GroupChatPreview event) {
     final index = _sampleEvents.indexOf(event);
     final safeIndex = index >= 0 ? index : 0;
-    final participants =
-        _sampleParticipants[safeIndex % _sampleParticipants.length];
+    final members =
+        _sampleMembers[safeIndex % _sampleMembers.length];
     final messages = _sampleMessages[safeIndex % _sampleMessages.length];
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ChatConversationPage.group(
           channelTitle: event.title,
-          participants: participants,
+          participants: members,
           currentUser: _currentUser,
           initialMessages: messages,
         ),
@@ -516,11 +516,11 @@ class _ChatSheetState extends State<ChatSheet> {
           .toList(growable: false),
       onConversationTap: _openPrivateChat,
       onAvatarTap: (conversation) {
-        final participant = _privateContactsByConversationId[conversation.id];
+        final member = _privateContactsByConversationId[conversation.id];
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => UserProfilePage(
-              uid: participant?.id ?? conversation.id,
+              uid: member?.id ?? conversation.id,
             ),
           ),
         );

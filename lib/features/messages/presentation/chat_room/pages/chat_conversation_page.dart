@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:crew_app/features/messages/data/chat_message.dart';
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/features/messages/data/direct_chat_preview.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_room_settings_page.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_attachment_sheet.dart';
@@ -38,11 +38,11 @@ class ChatConversationPage extends StatefulWidget {
     super.key,
     required String channelTitle,
     required this.currentUser,
-    required List<ChatParticipant> participants,
+    required List<ChatMember> participants,
     required this.initialMessages,
   })  : type = ChatConversationType.group,
         title = channelTitle,
-        participants = List<ChatParticipant>.unmodifiable(participants),
+        participants = List<ChatMember>.unmodifiable(participants),
         preview = null,
         partner = null;
 
@@ -54,17 +54,17 @@ class ChatConversationPage extends StatefulWidget {
     required this.initialMessages,
   })  : type = ChatConversationType.direct,
         title = preview?.displayName ?? '',
-        participants = List<ChatParticipant>.unmodifiable(
+        participants = List<ChatMember>.unmodifiable(
           [partner, currentUser],
         );
 
   final ChatConversationType type;
   final String title;
-  final ChatParticipant currentUser;
-  final List<ChatParticipant> participants;
+  final ChatMember currentUser;
+  final List<ChatMember> participants;
   final List<ChatMessage> initialMessages;
   final DirectChatPreview? preview;
-  final ChatParticipant? partner;
+  final ChatMember? partner;
 
   @override
   State<ChatConversationPage> createState() => _ChatConversationPageState();
@@ -304,13 +304,13 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
-  void _openSettings(List<ChatParticipant> participants) {
+  void _openSettings(List<ChatMember> members) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ChatRoomSettingsPage(
           title: widget.title,
           isGroup: _isGroup,
-          participants: participants,
+          participants: members,
           currentUser: widget.currentUser,
           partner: widget.partner,
         ),
@@ -318,14 +318,14 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
-  void _openUserProfile(ChatParticipant participant) {
-    if (participant.isCurrentUser) {
+  void _openUserProfile(ChatMember member) {
+    if (member.isCurrentUser) {
       return;
     }
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => UserProfilePage(uid: participant.id),
+        builder: (_) => UserProfilePage(uid: member.id),
       ),
     );
   }
@@ -355,15 +355,15 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   PreferredSizeWidget _buildAppBar(
     AppLocalizations loc,
     ColorScheme colorScheme,
-    List<ChatParticipant> participants,
+    List<ChatMember> members,
   ) {
     if (_isGroup) {
       return ChatRoomAppBar(
         channelTitle: widget.title,
-        participants: participants,
-        onOpenSettings: () => _openSettings(participants),
+        members: members,
+        onOpenSettings: () => _openSettings(members),
         onSearchTap: _showSearchSheet,
-        onParticipantTap: _openUserProfile,
+        onMemberTap: _openUserProfile,
       );
     }
 
@@ -456,7 +456,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       actions: [
         ChatHeaderActions(
           onSearchTap: _showSearchSheet,
-          onOpenSettings: () => _openSettings(participants),
+          onOpenSettings: () => _openSettings(members),
         ),
       ],
     );
@@ -466,11 +466,11 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final participants = _buildParticipants();
+    final members = _buildMembers();
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: _buildAppBar(loc, colorScheme, participants),
+      appBar: _buildAppBar(loc, colorScheme, members),
       body: Column(
         children: [
           Expanded(
@@ -515,17 +515,17 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
-  List<ChatParticipant> _buildParticipants() {
-    final participants = List<ChatParticipant>.of(widget.participants);
-    final hasCurrentUser = participants.any(
-      (participant) => participant.id == widget.currentUser.id,
+  List<ChatMember> _buildMembers() {
+    final members = List<ChatMember>.of(widget.participants);
+    final hasCurrentUser = members.any(
+      (member) => member.id == widget.currentUser.id,
     );
 
     if (!hasCurrentUser) {
-      participants.add(widget.currentUser);
+      members.add(widget.currentUser);
     }
 
-    return participants;
+    return members;
   }
 
   /// 判断是否为客服聊天

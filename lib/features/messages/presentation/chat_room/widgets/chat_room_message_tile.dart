@@ -1,5 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class ChatRoomMessageTile extends StatelessWidget {
   final String youLabel;
   final String Function(int) repliesLabelBuilder;
   final bool isHighlighted;
-  final ValueChanged<ChatParticipant>? onAvatarTap;
+  final ValueChanged<ChatMember>? onAvatarTap;
 
   // 提取动画时长常量
   static const _animationDuration = Duration(milliseconds: 200);

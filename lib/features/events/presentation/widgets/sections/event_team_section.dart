@@ -9,8 +9,8 @@ import 'event_section_card.dart';
 class EventTeamSection extends StatelessWidget {
   const EventTeamSection({
     super.key,
-    required this.maxParticipants,
-    required this.onMaxParticipantsChanged,
+    required this.maxMembers,
+    required this.onMaxMembersChanged,
     required this.price,
     required this.onPriceChanged,
     required this.pricingType,
@@ -21,8 +21,8 @@ class EventTeamSection extends StatelessWidget {
     required this.onRemoveTag,
   });
 
-  final int maxParticipants;
-  final ValueChanged<int> onMaxParticipantsChanged;
+  final int maxMembers;
+  final ValueChanged<int> onMaxMembersChanged;
   final double? price;
   final ValueChanged<double?> onPriceChanged;
   final RoadTripPricingType pricingType;
@@ -66,11 +66,11 @@ class EventTeamSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _MaxParticipantsInputField(
-                maxParticipants: maxParticipants,
-                onMaxParticipantsChanged: onMaxParticipantsChanged,
-                label: loc.road_trip_team_max_participants_label,
-                hint: loc.road_trip_team_max_participants_hint,
+              child: _MaxMembersInputField(
+                maxMembers: maxMembers,
+                onMaxMembersChanged: onMaxMembersChanged,
+                label: loc.road_trip_team_max_members_label,
+                hint: loc.road_trip_team_max_members_hint,
               ),
             ),
             SizedBox(width: 10.w),
@@ -128,39 +128,39 @@ class EventTeamSection extends StatelessWidget {
   }
 }
 
-class _MaxParticipantsInputField extends StatefulWidget {
-  const _MaxParticipantsInputField({
-    required this.maxParticipants,
-    required this.onMaxParticipantsChanged,
+class _MaxMembersInputField extends StatefulWidget {
+  const _MaxMembersInputField({
+    required this.maxMembers,
+    required this.onMaxMembersChanged,
     required this.label,
     required this.hint,
   });
 
-  final int maxParticipants;
-  final ValueChanged<int> onMaxParticipantsChanged;
+  final int maxMembers;
+  final ValueChanged<int> onMaxMembersChanged;
   final String label;
   final String hint;
 
   @override
-  State<_MaxParticipantsInputField> createState() => _MaxParticipantsInputFieldState();
+  State<_MaxMembersInputField> createState() => _MaxMembersInputFieldState();
 }
 
-class _MaxParticipantsInputFieldState extends State<_MaxParticipantsInputField> {
+class _MaxMembersInputFieldState extends State<_MaxMembersInputField> {
   final TextEditingController _controller = TextEditingController();
   static const List<int> _presetValues = [1, 2, 3, 4, 5, 6, 7];
 
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.maxParticipants.toString();
+    _controller.text = widget.maxMembers.toString();
   }
 
   @override
-  void didUpdateWidget(_MaxParticipantsInputField oldWidget) {
+  void didUpdateWidget(_MaxMembersInputField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.maxParticipants != widget.maxParticipants) {
+    if (oldWidget.maxMembers != widget.maxMembers) {
       final currentText = _controller.text;
-      final newText = widget.maxParticipants.toString();
+      final newText = widget.maxMembers.toString();
       if (currentText != newText) {
         _controller.text = newText;
       }
@@ -175,7 +175,7 @@ class _MaxParticipantsInputFieldState extends State<_MaxParticipantsInputField> 
 
   void _applyPresetValue(int value) {
     _controller.text = value.toString();
-    widget.onMaxParticipantsChanged(value);
+    widget.onMaxMembersChanged(value);
   }
 
   @override
@@ -205,25 +205,25 @@ class _MaxParticipantsInputFieldState extends State<_MaxParticipantsInputField> 
         if (value.isEmpty) {
           return;
         }
-        final participants = int.tryParse(value);
-        if (participants != null) {
+        final members = int.tryParse(value);
+        if (members != null) {
           // 验证：不能超过7
-          if (participants > 7) {
+          if (members > 7) {
             // 限制为7
             _controller.value = TextEditingValue(
               text: '7',
               selection: TextSelection.collapsed(offset: 1),
             );
-            widget.onMaxParticipantsChanged(7);
-          } else if (participants < 1) {
+            widget.onMaxMembersChanged(7);
+          } else if (members < 1) {
             // 不能小于1
             _controller.value = TextEditingValue(
               text: '1',
               selection: TextSelection.collapsed(offset: 1),
             );
-            widget.onMaxParticipantsChanged(1);
+            widget.onMaxMembersChanged(1);
           } else {
-            widget.onMaxParticipantsChanged(participants);
+            widget.onMaxMembersChanged(members);
           }
         }
       },

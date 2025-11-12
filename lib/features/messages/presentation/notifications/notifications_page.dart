@@ -3,7 +3,7 @@ import 'package:crew_app/features/messages/presentation/messages_chat/widgets/di
 import 'package:crew_app/features/messages/presentation/notifications/system_notification_detail_page.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_conversation_page.dart';
 import 'package:crew_app/features/messages/data/chat_message.dart';
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:flutter/material.dart';
 
 /// 客服相关常量
@@ -39,9 +39,9 @@ class NotificationsPage extends StatelessWidget {
     );
   }
 
-  /// 创建客服参与者
-  static ChatParticipant _createCustomerServiceAgent() {
-    return ChatParticipant(
+  /// 创建客服成员
+  static ChatMember _createCustomerServiceAgent() {
+    return ChatMember(
       id: _CustomerServiceConstants.customerServiceAgentId,
       displayName: _CustomerServiceConstants.displayName,
       initials: _CustomerServiceConstants.initials,
@@ -49,9 +49,9 @@ class NotificationsPage extends StatelessWidget {
     );
   }
 
-  /// 创建当前用户参与者
-  static ChatParticipant _createCurrentUser() {
-    return const ChatParticipant(
+  /// 创建当前用户成员
+  static ChatMember _createCurrentUser() {
+    return const ChatMember(
       id: 'user-me',
       displayName: '我',
       initials: 'ME',
@@ -62,7 +62,7 @@ class NotificationsPage extends StatelessWidget {
 
   /// 创建客服初始消息
   static List<ChatMessage> _createCustomerServiceMessages(
-    ChatParticipant agent,
+    ChatMember agent,
   ) {
     return [
       ChatMessage(
@@ -79,7 +79,7 @@ class NotificationsPage extends StatelessWidget {
     // 系统通知进入只读详情页面
     // 这里需要根据通知ID获取对应的消息列表
     // 暂时使用示例数据
-    final systemParticipant = ChatParticipant(
+    final systemMember = ChatMember(
       id: notification.id,
       displayName: notification.displayName,
       initials: notification.initials,
@@ -90,7 +90,7 @@ class NotificationsPage extends StatelessWidget {
       ChatMessage(
         id: 'sys-1',
         chatId: notification.id,
-        sender: systemParticipant,
+        sender: systemMember,
         body: notification.lastMessagePreview,
         sentAtLabel: notification.lastMessageTimeLabel,
       ),

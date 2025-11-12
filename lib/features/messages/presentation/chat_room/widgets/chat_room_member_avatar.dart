@@ -1,34 +1,34 @@
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
-class ChatRoomParticipantAvatar extends StatelessWidget {
-  const ChatRoomParticipantAvatar({
+class ChatRoomMemberAvatar extends StatelessWidget {
+  const ChatRoomMemberAvatar({
     super.key,
-    required this.participant,
+    required this.member,
     this.onTap,
   });
 
-  final ChatParticipant participant;
-  final ValueChanged<ChatParticipant>? onTap;
+  final ChatMember member;
+  final ValueChanged<ChatMember>? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final borderColor =
-        participant.isCurrentUser ? colorScheme.primary : colorScheme.surface;
+        member.isCurrentUser ? colorScheme.primary : colorScheme.surface;
     final avatarColor = Color(
-      participant.avatarColorValue ?? colorScheme.primary.toARGB32(),
+      member.avatarColorValue ?? colorScheme.primary.toARGB32(),
     );
-    final initials = (participant.initials ??
-            participant.displayName.characters.take(2).toString())
+    final initials = (member.initials ??
+            member.displayName.characters.take(2).toString())
         .toUpperCase();
 
-    final canTap = onTap != null && !participant.isCurrentUser;
+    final canTap = onTap != null && !member.isCurrentUser;
 
     return InkWell(
-      onTap: canTap ? () => onTap!(participant) : null,
+      onTap: canTap ? () => onTap!(member) : null,
       borderRadius: BorderRadius.circular(18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +38,7 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: borderColor,
-                width: participant.isCurrentUser ? 2 : 1,
+                width: member.isCurrentUser ? 2 : 1,
               ),
             ),
             child: CrewAvatar(
@@ -58,9 +58,9 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
           SizedBox(
             width: 64,
             child: Text(
-              participant.isCurrentUser
+              member.isCurrentUser
                   ? AppLocalizations.of(context)!.chat_you_label
-                  : participant.displayName,
+                  : member.displayName,
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -75,3 +75,4 @@ class ChatRoomParticipantAvatar extends StatelessWidget {
     );
   }
 }
+

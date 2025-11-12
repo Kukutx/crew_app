@@ -48,7 +48,7 @@ class MapEventFloatingCard extends StatelessWidget {
     final resolvedTitle = title ?? event?.title ?? '';
     final resolvedLocation = location ?? event?.location;
     final resolvedIsFavorite = isFavorite ?? event?.isFavorite ?? false;
-    final participantSummary = event?.participantSummary ?? loc.to_be_announced;
+    final memberSummary = event?.memberSummary ?? loc.to_be_announced;
 
     final actionButton =
         primaryAction ??
@@ -127,7 +127,7 @@ class MapEventFloatingCard extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(
             child: Text(
-              participantSummary,
+              memberSummary,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(

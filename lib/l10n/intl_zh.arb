@@ -126,7 +126,7 @@
   "event_meeting_point_hint": "点击按钮即可打开地图查看集合地点。",
   "event_copy_address_button": "复制地址",
   "event_copy_address_success": "地址已复制",
-  "event_participants_title": "参与人数",
+  "event_members_title": "参与人数",
   "event_route_start_label": "起点",
   "event_route_end_label": "终点",
   "event_time_title": "活动时间",
@@ -137,6 +137,7 @@
   "event_expense_calculate_button": "计算费用",
   "event_group_expense_title": "多人记账",
   "event_waypoints_title": "途径点",
+  "event_waypoints_view_button": "查看途径点",
   "event_route_type_title": "路线类型",
   "event_route_type_round": "往返路线",
   "event_route_type_one_way": "单程路线",
@@ -470,8 +471,8 @@
   "wallet_revenue_ended_title": "已结束的活动",
   "wallet_revenue_status_available": "已到账",
   "wallet_revenue_status_reserved": "预留中",
-  "wallet_revenue_record_participants": "{count}人参与",
-  "@wallet_revenue_record_participants": {
+  "wallet_revenue_record_members": "{count}人参与",
+  "@wallet_revenue_record_members": {
     "placeholders": {
       "count": {}
     }
@@ -549,9 +550,9 @@
   "road_trip_team_section_subtitle": "人数限制与费用模式",
   "road_trip_team_pricing_free": "免费",
   "road_trip_team_pricing_paid": "收费",
-  "road_trip_team_max_participants_label": "人数上限",
-  "road_trip_team_max_participants_hint": "例如 4",
-  "road_trip_team_max_participants_error": "请输入≥1的整数",
+  "road_trip_team_max_members_label": "人数上限",
+  "road_trip_team_max_members_hint": "例如 4",
+  "road_trip_team_max_members_error": "请输入≥1的整数",
   "road_trip_team_price_label": "人均费用 (€)",
   "road_trip_team_price_free_hint": "免费活动",
   "road_trip_team_price_paid_hint": "例如 29.5",
@@ -591,7 +592,7 @@
   "road_trip_validation_title_max_length": "标题不能超过20个字符",
   "road_trip_validation_price_invalid": "请输入有效的人均费用（0-100）",
   "road_trip_validation_coordinate_invalid": "坐标值无效，请重新选择位置",
-  "road_trip_validation_max_participants_invalid": "请输入有效的人数上限（≥1的整数）",
+  "road_trip_validation_max_members_invalid": "请输入有效的人数上限（≥1的整数）",
   "road_trip_create_success": "{action}成功：{id}",
   "@road_trip_create_success": {
     "placeholders": {

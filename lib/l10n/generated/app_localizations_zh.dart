@@ -100,7 +100,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get event_copy_address_success => '地址已复制';
 
   @override
-  String get event_participants_title => '参与人数';
+  String get event_members_title => '参与人数';
 
   @override
   String get event_route_start_label => '起点';
@@ -131,6 +131,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get event_waypoints_title => '途径点';
+
+  @override
+  String get event_waypoints_view_button => '查看途径点';
 
   @override
   String get event_route_type_title => '路线类型';
@@ -1182,7 +1185,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wallet_revenue_status_reserved => '预留中';
 
   @override
-  String wallet_revenue_record_participants(Object count) {
+  String wallet_revenue_record_members(Object count) {
     return '$count人参与';
   }
 
@@ -1349,13 +1352,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_team_pricing_paid => '收费';
 
   @override
-  String get road_trip_team_max_participants_label => '人数上限';
+  String get road_trip_team_max_members_label => '人数上限';
 
   @override
-  String get road_trip_team_max_participants_hint => '例如 4';
+  String get road_trip_team_max_members_hint => '例如 4';
 
   @override
-  String get road_trip_team_max_participants_error => '请输入≥1的整数';
+  String get road_trip_team_max_members_error => '请输入≥1的整数';
 
   @override
   String get road_trip_team_price_label => '人均费用 (€)';
@@ -1471,8 +1474,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_validation_coordinate_invalid => '坐标值无效，请重新选择位置';
 
   @override
-  String get road_trip_validation_max_participants_invalid =>
-      '请输入有效的人数上限（≥1的整数）';
+  String get road_trip_validation_max_members_invalid => '请输入有效的人数上限（≥1的整数）';
 
   @override
   String road_trip_create_success(Object action, Object id) {

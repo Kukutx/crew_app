@@ -176,12 +176,11 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   final Map<String, Future<String?>> _waypointAddressFutures = {};
 
   // ==== 团队/费用 ====
-  int _maxParticipants = 4;
+  int _maxMembers = 4;
   double? _price;
   RoadTripPricingType _pricingType = RoadTripPricingType.free;
 
   // ==== 偏好 ====
-  String? _carType;
   final _tagInputCtrl = TextEditingController();
   final List<String> _tags = [];
 
@@ -483,6 +482,24 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         // 价格已经在验证工具类中验证，这里直接使用
         final price = _pricingType == RoadTripPricingType.paid ? _price : null;
 
+        final segments = <RoadTripWaypointSegment>[
+          ..._forwardWps.asMap().entries.map(
+            (entry) => RoadTripWaypointSegment(
+              coordinate: '${entry.value.latitude},${entry.value.longitude}',
+              direction: RoadTripWaypointDirection.forward,
+              order: entry.key,
+            ),
+          ),
+          if (_routeType == RoadTripRouteType.roundTrip)
+            ..._returnWps.asMap().entries.map(
+              (entry) => RoadTripWaypointSegment(
+                coordinate: '${entry.value.latitude},${entry.value.longitude}',
+                direction: RoadTripWaypointDirection.returnTrip,
+                order: entry.key,
+              ),
+            ),
+        ];
+
         final draft = RoadTripDraft(
           title: title,
           dateRange: _editorState.dateRange!,
@@ -493,14 +510,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           meetingPoint: _startAddress ?? 
               '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
           isRoundTrip: _routeType == RoadTripRouteType.roundTrip,
-          waypoints: [
-            ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
-            ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
-          ],
-          maxParticipants: _maxParticipants,
+          segments: segments,
+          maxMembers: _maxMembers,
           isFree: _pricingType == RoadTripPricingType.free,
           pricePerPerson: price,
-          carType: _carType,
           tags: List.of(_tags),
           description: _storyCtrl.text.trim(),
           hostDisclaimer: _disclaimerCtrl.text.trim(),
@@ -1139,9 +1152,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         break;
       case TripSection.team:
         content = EventTeamSection(
-          maxParticipants: _maxParticipants,
-          onMaxParticipantsChanged: (value) => setState(() {
-            _maxParticipants = value;
+          maxMembers: _maxMembers,
+          onMaxMembersChanged: (value) => setState(() {
+            _maxMembers = value;
           }),
           price: _price,
           onPriceChanged: (value) => setState(() {

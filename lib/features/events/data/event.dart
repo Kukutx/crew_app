@@ -34,6 +34,40 @@ class EventHost {
       };
 }
 
+enum EventWaypointDirection { forward, returnTrip }
+
+class EventWaypointSegment {
+  const EventWaypointSegment({
+    required this.seq,
+    required this.longitude,
+    required this.latitude,
+    required this.direction,
+    this.note,
+  });
+
+  factory EventWaypointSegment.fromJson(Map<String, dynamic> json) {
+      final waypoint = (json['waypoint'] as List<dynamic>? ?? const [])
+        .map((value) => JsonParserHelper.parseDouble(value) ?? 0.0)
+        .toList();
+    final longitude = waypoint.isNotEmpty ? waypoint.first.toDouble() : 0.0;
+    final latitude = waypoint.length > 1 ? waypoint[1].toDouble() : 0.0;
+
+    return EventWaypointSegment(
+      seq: JsonParserHelper.parseInt(json['seq']) ?? 0,
+      longitude: longitude,
+      latitude: latitude,
+      direction: _parseWaypointDirection(json['direction']),
+      note: JsonParserHelper.parseString(json['note']),
+    );
+  }
+
+  final int seq;
+  final double longitude;
+  final double latitude;
+  final EventWaypointDirection direction;
+  final String? note;
+}
+
 class Event {
   final String id;
   final String title;
@@ -49,17 +83,16 @@ class Event {
   final DateTime? endTime;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final int? maxParticipants;
-  final int? currentParticipants;
+  final int? maxMembers;
+  final int? currentMembers;
   final int favoriteCount;
   final bool isFavorite;
   final bool isRegistered;
   final bool isFree;
   final double? price;
   final List<String> tags;
-  final List<String> waypoints;
+  final List<EventWaypointSegment> waypointSegments;
   final bool? isRoundTrip;
-  final double? distanceKm;
   final EventHost? host;
   final EventStatus? status;
 
@@ -78,17 +111,16 @@ class Event {
     this.endTime,
     this.createdAt,
     this.updatedAt,
-    this.maxParticipants,
-    this.currentParticipants,
+    this.maxMembers,
+    this.currentMembers,
     this.favoriteCount = 0,
     this.isFavorite = false,
     this.isRegistered = false,
     this.isFree = false,
     this.price,
     this.tags = const <String>[],
-    this.waypoints = const <String>[],
+    this.waypointSegments = const <EventWaypointSegment>[],
     this.isRoundTrip,
-    this.distanceKm,
     this.host,
     this.status,
   });
@@ -111,17 +143,20 @@ class Event {
       endTime: JsonParserHelper.parseDate(json['endTime']),
       createdAt: JsonParserHelper.parseDate(json['createdAt']),
       updatedAt: JsonParserHelper.parseDate(json['updatedAt']),
-      maxParticipants: JsonParserHelper.parseInt(json['maxParticipants']),
-      currentParticipants: JsonParserHelper.parseInt(json['currentParticipants']),
+      maxMembers: JsonParserHelper.parseInt(json['maxMembers']),
+      currentMembers: JsonParserHelper.parseInt(json['currentMembers']),
       isFavorite: JsonParserHelper.parseBool(json['isFavorite']) ?? false,
       favoriteCount: JsonParserHelper.parseInt(json['favoriteCount']) ?? 0,
       isRegistered: JsonParserHelper.parseBool(json['isRegistered']) ?? false,
       isFree: JsonParserHelper.parseBool(json['isFree']) ?? false,
       price: JsonParserHelper.parseDouble(json['price']),
       tags: List.unmodifiable(JsonParserHelper.parseStringList(json['tags'])),
-      waypoints: List.unmodifiable(JsonParserHelper.parseStringList(json['waypoints'])),
+      waypointSegments: List.unmodifiable(
+        (json['segments'] as List<dynamic>? ?? const [])
+            .whereType<Map<String, dynamic>>()
+            .map(EventWaypointSegment.fromJson),
+      ),
       isRoundTrip: JsonParserHelper.parseBool(json['isRoundTrip']),
-      distanceKm: JsonParserHelper.parseDouble(json['distanceKm']),
       host: hostJson != null ? EventHost.fromJson(hostJson) : null,
       status: _parseEventStatus(json['status']),
     );
@@ -142,17 +177,26 @@ class Event {
         'endTime': endTime?.toIso8601String(),
         'createdAt': createdAt?.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
-        'maxParticipants': maxParticipants,
-        'currentParticipants': currentParticipants,
+        'maxMembers': maxMembers,
+        'currentMembers': currentMembers,
         'favoriteCount': favoriteCount,
         'isFavorite': isFavorite,
         'isRegistered': isRegistered,
         'isFree': isFree,
         'price': price,
         'tags': tags,
-        if (waypoints.isNotEmpty) 'waypoints': waypoints,
+        if (waypointSegments.isNotEmpty)
+          'segments': waypointSegments
+              .map((segment) => {
+                    'seq': segment.seq,
+                    'waypoint': [segment.longitude, segment.latitude],
+                    'note': segment.note,
+                    'direction': segment.direction == EventWaypointDirection.returnTrip
+                        ? 'return'
+                        : 'forward',
+                  })
+              .toList(),
         if (isRoundTrip != null) 'isRoundTrip': isRoundTrip,
-        if (distanceKm != null) 'distanceKm': distanceKm,
         if (host != null) 'host': host!.toJson(),
         if (status != null) 'status': status,
       };
@@ -170,21 +214,26 @@ class Event {
   }
 
   bool get isFull =>
-      maxParticipants != null &&
-      currentParticipants != null &&
-      currentParticipants! >= maxParticipants!;
+      maxMembers != null &&
+      currentMembers != null &&
+      currentMembers! >= maxMembers!;
 
-  String? get participantSummary {
-    if (currentParticipants == null && maxParticipants == null) {
+  String? get memberSummary {
+    if (currentMembers == null && maxMembers == null) {
       return null;
     }
-    final current = currentParticipants;
-    final max = maxParticipants;
+    final current = currentMembers;
+    final max = maxMembers;
     if (current != null && max != null) {
       return '$current/$max';
     }
     return (current ?? max).toString();
   }
+}
+
+EventWaypointDirection _parseWaypointDirection(dynamic value) {
+  final name = JsonParserHelper.parseString(value)?.toLowerCase();
+  return name == 'return' ? EventWaypointDirection.returnTrip : EventWaypointDirection.forward;
 }
 
 EventStatus? _parseEventStatus(dynamic value) {

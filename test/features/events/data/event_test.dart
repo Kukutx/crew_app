@@ -49,8 +49,8 @@ void main() {
       expect(event.longitude, closeTo(-73.968285, 1e-6));
       expect(event.imageUrls, hasLength(2));
       expect(event.coverImageUrl, 'https://example.com/cover.jpg');
-      expect(event.maxParticipants, 20);
-      expect(event.currentParticipants, 12);
+      expect(event.maxMembers, 20);
+      expect(event.currentMembers, 12);
       expect(event.isFavorite, isTrue);
       expect(event.isRegistered, isFalse);
       expect(event.favoriteCount, 342);
@@ -63,7 +63,7 @@ void main() {
       expect(event.updatedAt, DateTime.parse('2024-05-10T12:00:00Z'));
       expect(event.tags, containsAll(['Running', 'Outdoor']));
       expect(event.firstAvailableImageUrl, 'https://example.com/photo-1.jpg');
-      expect(event.participantSummary, '12/20');
+      expect(event.memberSummary, '12/20');
     });
 
     test('parses standard structure without optional fields', () {
@@ -112,8 +112,8 @@ void main() {
         coverImageUrl: 'https://example.com/cover.png',
         startTime: DateTime.parse('2024-08-03T18:30:00Z'),
         endTime: DateTime.parse('2024-08-03T22:30:00Z'),
-        maxParticipants: 24,
-        currentParticipants: 10,
+        maxMembers: 24,
+        currentMembers: 10,
         isFavorite: true,
         isRegistered: false,
         favoriteCount: 512,

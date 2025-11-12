@@ -339,3 +339,4 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
   }
 }
 
+

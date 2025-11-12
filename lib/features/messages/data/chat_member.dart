@@ -1,5 +1,5 @@
-class ChatParticipant {
-  const ChatParticipant({
+class ChatMember {
+  const ChatMember({
     required this.id,
     required this.displayName,
     this.avatarUrl,
@@ -19,8 +19,8 @@ class ChatParticipant {
   final bool isOnline;
   final DateTime? lastSeen;
 
-  factory ChatParticipant.fromJson(Map<String, dynamic> json) {
-    return ChatParticipant(
+  factory ChatMember.fromJson(Map<String, dynamic> json) {
+    return ChatMember(
       id: json['id'] as String? ?? '',
       displayName: json['displayName'] as String? ?? '',
       avatarUrl: json['avatarUrl'] as String?,
@@ -45,3 +45,4 @@ class ChatParticipant {
         if (lastSeen != null) 'lastSeen': lastSeen!.toIso8601String(),
       };
 }
+

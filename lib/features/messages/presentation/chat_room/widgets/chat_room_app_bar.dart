@@ -1,6 +1,6 @@
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_header_actions.dart';
-import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_participant_avatar.dart';
+import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_member_avatar.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -8,17 +8,17 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ChatRoomAppBar({
     super.key,
     required this.channelTitle,
-    required this.participants,
+    required this.members,
     required this.onOpenSettings,
     this.onSearchTap,
-    this.onParticipantTap,
+    this.onMemberTap,
   });
 
   final String channelTitle;
-  final List<ChatParticipant> participants;
+  final List<ChatMember> members;
   final VoidCallback onOpenSettings;
   final VoidCallback? onSearchTap;
-  final ValueChanged<ChatParticipant>? onParticipantTap;
+  final ValueChanged<ChatMember>? onMemberTap;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 72);
@@ -50,7 +50,7 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 16,
       title: _AppBarTitle(
         channelTitle: channelTitle,
-        membersLabel: loc.chat_members_count(participants.length),
+        membersLabel: loc.chat_members_count(members.length),
         color: colorScheme.onSurfaceVariant,
       ),
       actions: [
@@ -67,14 +67,14 @@ class ChatRoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              final participant = participants[index];
-              return ChatRoomParticipantAvatar(
-                participant: participant,
-                onTap: onParticipantTap,
+              final member = members[index];
+              return ChatRoomMemberAvatar(
+                member: member,
+                onTap: onMemberTap,
               );
             },
             separatorBuilder: (_, _) => const SizedBox(width: 12),
-            itemCount: participants.length,
+            itemCount: members.length,
           ),
         ),
       ),

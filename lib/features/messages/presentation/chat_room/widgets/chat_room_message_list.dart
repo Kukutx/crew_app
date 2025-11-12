@@ -1,5 +1,5 @@
 import 'package:crew_app/features/messages/data/chat_message.dart';
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/widgets/chat_room_message_tile.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ class ChatRoomMessageList extends StatelessWidget {
   final String Function(int) repliesLabelBuilder;
   final Map<String, GlobalKey>? messageKeys;
   final String? highlightedMessageId;
-  final ValueChanged<ChatParticipant>? onAvatarTap;
+  final ValueChanged<ChatMember>? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {

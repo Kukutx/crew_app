@@ -77,7 +77,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
   Future<List<NearbyPlace>>? _meetingPointNearbyFuture;
 
   // ==== 团队/费用 ====
-  int _maxParticipants = 4;
+  int _maxMembers = 4;
   double? _price;
   RoadTripPricingType _pricingType = RoadTripPricingType.free;
 
@@ -230,7 +230,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
         dateRange: _editorState.dateRange!,
         meetingPoint: _meetingPointAddress ??
             '${_meetingPointLatLng!.latitude.toStringAsFixed(6)}, ${_meetingPointLatLng!.longitude.toStringAsFixed(6)}',
-        maxParticipants: _maxParticipants,
+        maxMembers: _maxMembers,
         isFree: _pricingType == RoadTripPricingType.free,
         pricePerPerson: price,
         tags: List.of(_tags),
@@ -482,9 +482,9 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
         break;
       case CityEventSection.team:
         content = EventTeamSection(
-          maxParticipants: _maxParticipants,
-          onMaxParticipantsChanged: (value) => setState(() {
-            _maxParticipants = value;
+          maxMembers: _maxMembers,
+          onMaxMembersChanged: (value) => setState(() {
+            _maxMembers = value;
           }),
           price: _price,
           onPriceChanged: (value) => setState(() {

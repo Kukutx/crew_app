@@ -1,5 +1,6 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/waypoints_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -17,10 +18,11 @@ class EventInfoCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final startTimeText = _formatStartTime();
     final endTimeText = _formatEndTime();
-    final participantText = event.participantSummary ?? loc.to_be_announced;
-    final waypoints = event.waypoints;
-    final displayWaypoints = waypoints.isNotEmpty
-        ? waypoints
+    final memberText = event.memberSummary ?? loc.to_be_announced;
+    // 从 waypointSegments 提取途经点名称（暂时使用坐标作为占位符）
+    final waypointSegments = event.waypointSegments;
+    final displayWaypoints = waypointSegments.isNotEmpty
+        ? waypointSegments.map((s) => '${s.latitude.toStringAsFixed(4)}, ${s.longitude.toStringAsFixed(4)}').toList()
         : _defaultWaypoints;
     final routeType = event.isRoundTrip;
     final displayRouteType = routeType ?? _defaultIsRoundTrip;
@@ -59,29 +61,13 @@ class EventInfoCard extends StatelessWidget {
       height: 1.4,
       letterSpacing: 0,
     );
-    final chipBackground = colorScheme.primaryContainer;
-    final chipTextColor = colorScheme.onPrimaryContainer;
-    final chipBorderColor = colorScheme.primary.withValues(alpha: 0.4);
-    final chipTextStyle = theme.textTheme.labelMedium?.copyWith(
-      color: chipTextColor,
-      fontWeight: FontWeight.w600,
-      fontSize: 12,
-      height: 1.3,
-      letterSpacing: 0,
-    );
-    final fallbackChipTextStyle = TextStyle(
-      fontSize: 12,
-      color: chipTextColor,
-      fontWeight: FontWeight.w600,
-      height: 1.3,
-      letterSpacing: 0,
-    );
 
     final startPoint = event.address?.isNotEmpty == true
         ? event.address!
         : event.location;
-    final endPoint = event.waypoints.isNotEmpty
-        ? event.waypoints.last
+    // 从 waypointSegments 获取终点
+    final endPoint = event.waypointSegments.isNotEmpty
+        ? '${event.waypointSegments.last.latitude.toStringAsFixed(4)}, ${event.waypointSegments.last.longitude.toStringAsFixed(4)}'
         : event.location;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -112,6 +98,7 @@ class EventInfoCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _timeRow(
+              context,
               startTimeText,
               endTimeText,
               iconColor: colorScheme.primary,
@@ -128,8 +115,8 @@ class EventInfoCard extends StatelessWidget {
             ),
             _detailRow(
               Icons.people,
-              loc.event_participants_title,
-              participantText,
+              loc.event_members_title,
+              memberText,
               iconColor: colorScheme.primary,
               titleStyle: detailTitleStyle ?? fallbackDetailTitleStyle,
               valueStyle: valueTextStyle ?? fallbackValueStyle,
@@ -152,13 +139,11 @@ class EventInfoCard extends StatelessWidget {
             ),
             if (displayWaypoints.isNotEmpty)
               _waypointsRow(
-                displayWaypoints,
+                context,
                 loc,
                 colorScheme.primary,
                 detailTitleStyle ?? fallbackDetailTitleStyle,
-                chipBackground,
-                chipBorderColor,
-                chipTextStyle ?? fallbackChipTextStyle,
+                valueTextStyle ?? fallbackValueStyle,
               ),
             _detailRow(
               displayRouteType ? Icons.loop : Icons.trending_flat,
@@ -220,13 +205,11 @@ class EventInfoCard extends StatelessWidget {
   );
 
   Widget _waypointsRow(
-    List<String> waypoints,
+    BuildContext context,
     AppLocalizations loc,
     Color iconColor,
     TextStyle titleStyle,
-    Color chipBackground,
-    Color chipBorderColor,
-    TextStyle chipTextStyle,
+    TextStyle valueStyle,
   ) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
@@ -242,38 +225,30 @@ class EventInfoCard extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(loc.event_waypoints_title, style: titleStyle),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: waypoints
-                    .map(
-                      (point) => Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: chipBackground,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: chipBorderColor,
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          point,
-                          style: chipTextStyle,
-                        ),
-                      ),
-                    )
-                    .toList(growable: false),
+          child: Text(
+            loc.event_waypoints_title,
+            style: titleStyle,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: TextButton(
+            onPressed: () {
+              showWaypointsSheet(context, event, loc);
+            },
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              loc.event_waypoints_view_button,
+              textAlign: TextAlign.right,
+              style: valueStyle.copyWith(
+                color: iconColor,
+                fontWeight: FontWeight.w500,
               ),
-            ],
+            ),
           ),
         ),
       ],
@@ -281,46 +256,127 @@ class EventInfoCard extends StatelessWidget {
   );
 
   Widget _timeRow(
+    BuildContext context,
     String startText,
     String endText, {
     required Color iconColor,
     required TextStyle titleStyle,
     required TextStyle valueStyle,
-  }) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: Icon(
-            Icons.calendar_today,
-            size: 18,
-            color: iconColor.withValues(alpha: 0.9),
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final hasTime = event.startTime != null && event.endTime != null;
+    final isSameDay = hasTime &&
+        event.startTime!.toLocal().year == event.endTime!.toLocal().year &&
+        event.startTime!.toLocal().month == event.endTime!.toLocal().month &&
+        event.startTime!.toLocal().day == event.endTime!.toLocal().day;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(
+              Icons.calendar_today,
+              size: 18,
+              color: iconColor.withValues(alpha: 0.9),
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(loc.event_time_title, style: titleStyle),
-              const SizedBox(height: 6),
-              Text(
-                '${loc.event_start_time_label}: $startText',
-                style: valueStyle,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${loc.event_end_time_label}: $endText',
-                style: valueStyle,
-              ),
-            ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(loc.event_time_title, style: titleStyle),
+                const SizedBox(height: 10),
+                if (hasTime)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: iconColor.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.play_arrow,
+                          size: 14,
+                          color: iconColor.withValues(alpha: 0.8),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          loc.event_start_time_label,
+                          style: valueStyle.copyWith(
+                            fontSize: 12,
+                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          startText,
+                          style: valueStyle.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            size: 14,
+                            color: iconColor.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        Icon(
+                          Icons.stop,
+                          size: 14,
+                          color: iconColor.withValues(alpha: 0.8),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          loc.event_end_time_label,
+                          style: valueStyle.copyWith(
+                            fontSize: 12,
+                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            endText,
+                            style: valueStyle.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                              fontSize: 14,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      startText,
+                      style: valueStyle,
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 
   String _formatStartTime() {
     final start = event.startTime;

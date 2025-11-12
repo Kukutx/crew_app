@@ -99,7 +99,6 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   }
 
   Future<void> _shareThroughSystem(BuildContext sheetContext) async {
-    final loc = AppLocalizations.of(context)!;
     final shareText = _buildShareMessage();
     
     final success = await ImageShareHelper.shareImageWithText(
@@ -125,7 +124,6 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
 
   Future<void> _saveShareImage(BuildContext sheetContext) async {
     final loc = AppLocalizations.of(context)!;
-    
     final success = await ImageShareHelper.saveImageToGallery(
       context: context,
       key: _sharePreviewKey,
@@ -239,21 +237,36 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
                   final end = event.endTime != null && event.endTime!.isAfter(start)
                       ? event.endTime!
                       : start.add(const Duration(hours: 4));
+                  // 从 waypointSegments 构建 segments
+                  final segments = event.waypointSegments
+                      .map((segment) => RoadTripWaypointSegment(
+                            coordinate: '${segment.latitude},${segment.longitude}',
+                            direction: segment.direction == EventWaypointDirection.returnTrip
+                                ? RoadTripWaypointDirection.returnTrip
+                                : RoadTripWaypointDirection.forward,
+                            order: segment.seq,
+                          ))
+                      .toList();
+
+                  // 从 segments 获取终点位置
+                  String endLocationStr = event.location;
+                  if (segments.isNotEmpty) {
+                    final lastSegment = segments.last;
+                    endLocationStr = lastSegment.coordinate;
+                  }
+
                   final draft = RoadTripDraft(
                     id: event.id,
                     title: event.title,
                     dateRange: DateTimeRange(start: start, end: end),
                     startLocation: event.location,
-                    endLocation: event.waypoints.isNotEmpty
-                        ? event.waypoints.last
-                        : event.location,
+                    endLocation: endLocationStr,
                     meetingPoint: event.address ?? event.location,
                     isRoundTrip: event.isRoundTrip ?? true,
-                    waypoints: event.waypoints,
-                    maxParticipants: event.maxParticipants ?? 4,
+                    segments: segments,
+                    maxMembers: event.maxMembers ?? 4,
                     isFree: event.isFree,
                     pricePerPerson: event.isFree ? null : event.price,
-                    carType: null,
                     tags: event.tags,
                     description: event.description,
                     existingImageUrls: event.imageUrls,

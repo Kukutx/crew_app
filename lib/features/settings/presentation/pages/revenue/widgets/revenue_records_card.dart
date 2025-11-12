@@ -219,7 +219,7 @@ class _RevenueRecordItem extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        loc.wallet_revenue_record_participants(record.participantCount),
+        loc.wallet_revenue_record_members(record.participantCount),
         style: theme.textTheme.bodySmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),

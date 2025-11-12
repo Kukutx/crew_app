@@ -87,7 +87,7 @@ class SharePreviewCard extends StatelessWidget {
     final timeLabel = event.startTime != null
         ? DateFormat('MM.dd HH:mm').format(event.startTime!.toLocal())
         : loc.to_be_announced;
-    final participantsLabel = event.participantSummary ?? loc.to_be_announced;
+    final membersLabel = event.memberSummary ?? loc.to_be_announced;
     final hostName = event.host?.name;
     return RepaintBoundary(
       key: previewKey,
@@ -157,7 +157,7 @@ class SharePreviewCard extends StatelessWidget {
                             iconColor: Colors.orange.shade300,
                           ),
                           _StatusChip(
-                            label: participantsLabel,
+                            label: membersLabel,
                             textColor: Colors.grey.shade800,
                             backgroundColor: Colors.orange.shade50,
                             icon: Icons.people,

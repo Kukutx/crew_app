@@ -1,4 +1,4 @@
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 import 'package:crew_app/features/messages/presentation/chat_room/pages/chat_shared_media_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
@@ -18,9 +18,9 @@ class ChatRoomSettingsPage extends StatefulWidget {
 
   final String title;
   final bool isGroup;
-  final List<ChatParticipant> participants;
-  final ChatParticipant currentUser;
-  final ChatParticipant? partner;
+  final List<ChatMember> participants;
+  final ChatMember currentUser;
+  final ChatMember? partner;
 
   @override
   State<ChatRoomSettingsPage> createState() => _ChatRoomSettingsPageState();
@@ -362,25 +362,25 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
           const SizedBox(height: 16),
           if (widget.isGroup)
             ...participants.map(
-              (participant) => _ChatParticipantTile(
-                participant: participant,
+              (member) => _ChatMemberTile(
+                member: member,
                 colorScheme: colorScheme,
                 subtitle: null,
                 youLabel: loc.chat_you_label,
-                isYou: participant.isCurrentUser ||
-                    participant.id == widget.currentUser.id,
+                isYou: member.isCurrentUser ||
+                    member.id == widget.currentUser.id,
               ),
             )
           else if (widget.partner != null) ...[
-            _ChatParticipantTile(
-              participant: widget.partner!,
+            _ChatMemberTile(
+              member: widget.partner!,
               colorScheme: colorScheme,
               subtitle: loc.chat_settings_contact_id(widget.partner!.id),
               youLabel: loc.chat_you_label,
               isYou: false,
             ),
-            _ChatParticipantTile(
-              participant: widget.currentUser,
+            _ChatMemberTile(
+              member: widget.currentUser,
               colorScheme: colorScheme,
               subtitle: loc.chat_settings_contact_id(widget.currentUser.id),
               youLabel: loc.chat_you_label,
@@ -404,7 +404,7 @@ class _ChatSettingsHeader extends StatelessWidget {
   final String title;
   final String overviewText;
   final bool isGroup;
-  final ChatParticipant? partner;
+  final ChatMember? partner;
 
   @override
   Widget build(BuildContext context) {
@@ -467,16 +467,16 @@ class _ChatSettingsHeader extends StatelessWidget {
   }
 }
 
-class _ChatParticipantTile extends StatelessWidget {
-  const _ChatParticipantTile({
-    required this.participant,
+class _ChatMemberTile extends StatelessWidget {
+  const _ChatMemberTile({
+    required this.member,
     required this.colorScheme,
     required this.subtitle,
     required this.youLabel,
     required this.isYou,
   });
 
-  final ChatParticipant participant;
+  final ChatMember member;
   final ColorScheme colorScheme;
   final String? subtitle;
   final String youLabel;
@@ -484,11 +484,11 @@ class _ChatParticipantTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = (participant.initials ??
-            participant.displayName.characters.take(2).toString())
+    final initials = (member.initials ??
+            member.displayName.characters.take(2).toString())
         .toUpperCase();
     final avatarColor = Color(
-      participant.avatarColorValue ?? colorScheme.primary.toARGB32(),
+      member.avatarColorValue ?? colorScheme.primary.toARGB32(),
     );
 
     return Card(
@@ -515,7 +515,7 @@ class _ChatParticipantTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          participant.displayName,
+          member.displayName,
           style: _ChatRoomSettingsConstants.listTileTitleStyle,
         ),
         subtitle: subtitle != null

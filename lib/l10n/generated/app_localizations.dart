@@ -272,11 +272,11 @@ abstract class AppLocalizations {
   /// **'Address copied to clipboard'**
   String get event_copy_address_success;
 
-  /// No description provided for @event_participants_title.
+  /// No description provided for @event_members_title.
   ///
   /// In en, this message translates to:
-  /// **'Participants'**
-  String get event_participants_title;
+  /// **'Members'**
+  String get event_members_title;
 
   /// No description provided for @event_route_start_label.
   ///
@@ -337,6 +337,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waypoints'**
   String get event_waypoints_title;
+
+  /// No description provided for @event_waypoints_view_button.
+  ///
+  /// In en, this message translates to:
+  /// **'View Waypoints'**
+  String get event_waypoints_view_button;
 
   /// No description provided for @event_route_type_title.
   ///
@@ -2360,11 +2366,11 @@ abstract class AppLocalizations {
   /// **'Reserved'**
   String get wallet_revenue_status_reserved;
 
-  /// No description provided for @wallet_revenue_record_participants.
+  /// No description provided for @wallet_revenue_record_members.
   ///
   /// In en, this message translates to:
-  /// **'{count} participants'**
-  String wallet_revenue_record_participants(Object count);
+  /// **'{count} members'**
+  String wallet_revenue_record_members(Object count);
 
   /// No description provided for @wallet_payment_methods_title.
   ///
@@ -2678,23 +2684,23 @@ abstract class AppLocalizations {
   /// **'Paid'**
   String get road_trip_team_pricing_paid;
 
-  /// No description provided for @road_trip_team_max_participants_label.
+  /// No description provided for @road_trip_team_max_members_label.
   ///
   /// In en, this message translates to:
-  /// **'Max participants'**
-  String get road_trip_team_max_participants_label;
+  /// **'Max members'**
+  String get road_trip_team_max_members_label;
 
-  /// No description provided for @road_trip_team_max_participants_hint.
+  /// No description provided for @road_trip_team_max_members_hint.
   ///
   /// In en, this message translates to:
   /// **'e.g., 4'**
-  String get road_trip_team_max_participants_hint;
+  String get road_trip_team_max_members_hint;
 
-  /// No description provided for @road_trip_team_max_participants_error.
+  /// No description provided for @road_trip_team_max_members_error.
   ///
   /// In en, this message translates to:
   /// **'Please enter an integer ≥ 1'**
-  String get road_trip_team_max_participants_error;
+  String get road_trip_team_max_members_error;
 
   /// No description provided for @road_trip_team_price_label.
   ///
@@ -2918,11 +2924,11 @@ abstract class AppLocalizations {
   /// **'Invalid coordinates, please reselect location'**
   String get road_trip_validation_coordinate_invalid;
 
-  /// No description provided for @road_trip_validation_max_participants_invalid.
+  /// No description provided for @road_trip_validation_max_members_invalid.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid max participants (integer ≥ 1)'**
-  String get road_trip_validation_max_participants_invalid;
+  /// **'Please enter a valid max members (integer ≥ 1)'**
+  String get road_trip_validation_max_members_invalid;
 
   /// No description provided for @road_trip_create_success.
   ///

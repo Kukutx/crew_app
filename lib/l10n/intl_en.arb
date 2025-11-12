@@ -39,7 +39,7 @@
   "event_meeting_point_hint": "Tap to view directions to the meeting point.",
   "event_copy_address_button": "Copy address",
   "event_copy_address_success": "Address copied to clipboard",
-  "event_participants_title": "Participants",
+  "event_members_title": "Members",
   "event_route_start_label": "Start point",
   "event_route_end_label": "End point",
   "event_time_title": "Event time",
@@ -50,6 +50,7 @@
   "event_expense_calculate_button": "Calculate",
   "event_group_expense_title": "Group ledger",
   "event_waypoints_title": "Waypoints",
+  "event_waypoints_view_button": "View Waypoints",
   "event_route_type_title": "Route type",
   "event_route_type_round": "Round trip",
   "event_route_type_one_way": "One-way",
@@ -470,8 +471,8 @@
   "wallet_revenue_ended_title": "Ended Events",
   "wallet_revenue_status_available": "Available",
   "wallet_revenue_status_reserved": "Reserved",
-  "wallet_revenue_record_participants": "{count} participants",
-  "@wallet_revenue_record_participants": {
+  "wallet_revenue_record_members": "{count} members",
+  "@wallet_revenue_record_members": {
     "placeholders": {
       "count": {}
     }
@@ -549,9 +550,9 @@
   "road_trip_team_section_subtitle": "Participant limit & pricing",
   "road_trip_team_pricing_free": "Free",
   "road_trip_team_pricing_paid": "Paid",
-  "road_trip_team_max_participants_label": "Max participants",
-  "road_trip_team_max_participants_hint": "e.g., 4",
-  "road_trip_team_max_participants_error": "Please enter an integer ≥ 1",
+  "road_trip_team_max_members_label": "Max members",
+  "road_trip_team_max_members_hint": "e.g., 4",
+  "road_trip_team_max_members_error": "Please enter an integer ≥ 1",
   "road_trip_team_price_label": "Price per person (€)",
   "road_trip_team_price_free_hint": "Free event",
   "road_trip_team_price_paid_hint": "e.g., 29.5",
@@ -596,7 +597,7 @@
   "road_trip_validation_title_max_length": "Title cannot exceed 20 characters",
   "road_trip_validation_price_invalid": "Please enter a valid price per person (0-100)",
   "road_trip_validation_coordinate_invalid": "Invalid coordinates, please reselect location",
-  "road_trip_validation_max_participants_invalid": "Please enter a valid max participants (integer ≥ 1)",
+  "road_trip_validation_max_members_invalid": "Please enter a valid max members (integer ≥ 1)",
   "road_trip_create_success": "{action} successful: {id}",
   "@road_trip_create_success": {
     "placeholders": {

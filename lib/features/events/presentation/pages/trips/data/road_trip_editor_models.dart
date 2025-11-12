@@ -8,8 +8,6 @@ class RoadTripEditorState {
     this.dateRange,
     this.routeType = RoadTripRouteType.roundTrip,
     this.pricingType = RoadTripPricingType.free,
-    this.carType,
-    this.waypoints = const <String>[],
     this.tags = const <String>[],
     this.galleryItems = const <RoadTripGalleryItem>[],
   });
@@ -17,8 +15,6 @@ class RoadTripEditorState {
   final DateTimeRange? dateRange;
   final RoadTripRouteType routeType;
   final RoadTripPricingType pricingType;
-  final String? carType;
-  final List<String> waypoints;
   final List<String> tags;
   final List<RoadTripGalleryItem> galleryItems;
 
@@ -27,9 +23,6 @@ class RoadTripEditorState {
     bool clearDateRange = false,
     RoadTripRouteType? routeType,
     RoadTripPricingType? pricingType,
-    String? carType,
-    bool clearCarType = false,
-    List<String>? waypoints,
     List<String>? tags,
     List<RoadTripGalleryItem>? galleryItems,
   }) {
@@ -37,8 +30,6 @@ class RoadTripEditorState {
       dateRange: clearDateRange ? null : (dateRange ?? this.dateRange),
       routeType: routeType ?? this.routeType,
       pricingType: pricingType ?? this.pricingType,
-      carType: clearCarType ? null : (carType ?? this.carType),
-      waypoints: waypoints ?? this.waypoints,
       tags: tags ?? this.tags,
       galleryItems: galleryItems ?? this.galleryItems,
     );
@@ -55,11 +46,10 @@ class RoadTripDraft {
     required this.endLocation,
     required this.meetingPoint,
     required this.isRoundTrip,
-    required this.waypoints,
-    required this.maxParticipants,
+    required this.segments,
+    required this.maxMembers,
     required this.isFree,
     this.pricePerPerson,
-    this.carType,
     required this.tags,
     required this.description,
     this.hostDisclaimer = '',
@@ -74,11 +64,10 @@ class RoadTripDraft {
   final String endLocation;
   final String meetingPoint;
   final bool isRoundTrip;
-  final List<String> waypoints;
-  final int maxParticipants;
+  final List<RoadTripWaypointSegment> segments;
+  final int maxMembers;
   final bool isFree;
   final double? pricePerPerson;
-  final String? carType;
   final List<String> tags;
   final String description;
   final String hostDisclaimer;
@@ -86,7 +75,41 @@ class RoadTripDraft {
   final List<String> existingImageUrls;
 
   File? get coverImage => galleryImages.isEmpty ? null : galleryImages.first;
+  
+  List<RoadTripWaypointSegment> get forwardSegments =>
+      segments.where((segment) => segment.direction == RoadTripWaypointDirection.forward).toList();
+
+  List<RoadTripWaypointSegment> get returnSegments =>
+      segments.where((segment) => segment.direction == RoadTripWaypointDirection.returnTrip).toList();
+
+  List<Map<String, dynamic>> toSegmentsPayload() {
+    return segments
+        .map(
+          (segment) => {
+            'coordinate': segment.coordinate,
+            'direction': segment.direction == RoadTripWaypointDirection.returnTrip
+                ? 'return'
+                : 'forward',
+            if (segment.order != null) 'order': segment.order,
+          },
+        )
+        .toList();
+  }
 }
+
+class RoadTripWaypointSegment {
+  const RoadTripWaypointSegment({
+    required this.coordinate,
+    required this.direction,
+    this.order,
+  });
+
+  final String coordinate; // 格式: "lat,lng"
+  final RoadTripWaypointDirection direction;
+  final int? order;
+}
+
+enum RoadTripWaypointDirection { forward, returnTrip }
 
 class RoadTripGalleryItem {
   const RoadTripGalleryItem.file(this.file) : url = null;

@@ -102,7 +102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get event_copy_address_success => 'Address copied to clipboard';
 
   @override
-  String get event_participants_title => 'Participants';
+  String get event_members_title => 'Members';
 
   @override
   String get event_route_start_label => 'Start point';
@@ -133,6 +133,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get event_waypoints_title => 'Waypoints';
+
+  @override
+  String get event_waypoints_view_button => 'View Waypoints';
 
   @override
   String get event_route_type_title => 'Route type';
@@ -1235,8 +1238,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wallet_revenue_status_reserved => 'Reserved';
 
   @override
-  String wallet_revenue_record_participants(Object count) {
-    return '$count participants';
+  String wallet_revenue_record_members(Object count) {
+    return '$count members';
   }
 
   @override
@@ -1403,14 +1406,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get road_trip_team_pricing_paid => 'Paid';
 
   @override
-  String get road_trip_team_max_participants_label => 'Max participants';
+  String get road_trip_team_max_members_label => 'Max members';
 
   @override
-  String get road_trip_team_max_participants_hint => 'e.g., 4';
+  String get road_trip_team_max_members_hint => 'e.g., 4';
 
   @override
-  String get road_trip_team_max_participants_error =>
-      'Please enter an integer ≥ 1';
+  String get road_trip_team_max_members_error => 'Please enter an integer ≥ 1';
 
   @override
   String get road_trip_team_price_label => 'Price per person (€)';
@@ -1539,8 +1541,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invalid coordinates, please reselect location';
 
   @override
-  String get road_trip_validation_max_participants_invalid =>
-      'Please enter a valid max participants (integer ≥ 1)';
+  String get road_trip_validation_max_members_invalid =>
+      'Please enter a valid max members (integer ≥ 1)';
 
   @override
   String road_trip_create_success(Object action, Object id) {

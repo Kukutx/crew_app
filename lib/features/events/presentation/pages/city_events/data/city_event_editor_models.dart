@@ -40,7 +40,7 @@ class CityEventDraft {
     required this.title,
     required this.dateRange,
     required this.meetingPoint,
-    required this.maxParticipants,
+    required this.maxMembers,
     required this.isFree,
     this.pricePerPerson,
     required this.tags,
@@ -54,7 +54,7 @@ class CityEventDraft {
   final String title;
   final DateTimeRange dateRange;
   final String meetingPoint; // 集合点位置名称
-  final int maxParticipants;
+  final int maxMembers;
   final bool isFree;
   final double? pricePerPerson;
   final List<String> tags;

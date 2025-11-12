@@ -36,7 +36,7 @@ class AddExpenseSheet extends StatefulWidget {
 
 class _AddExpenseSheetState extends State<AddExpenseSheet> {
   String? _selectedPayer;
-  final Set<String> _selectedParticipants = {};
+  final Set<String> _selectedMembers = {};
   String _category = '餐饮';
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
@@ -49,7 +49,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
     if (widget.members.isNotEmpty) {
       _selectedPayer = widget.members.first.name;
       // 默认选择所有成员参与分摊
-      _selectedParticipants.addAll(widget.members.map((p) => p.name));
+      _selectedMembers.addAll(widget.members.map((p) => p.name));
     }
   }
 
@@ -70,34 +70,34 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
 
   double get _sharePerPerson {
     final amount = _amount;
-    if (amount == null || _selectedParticipants.isEmpty) return 0;
-    return amount / _selectedParticipants.length;
+    if (amount == null || _selectedMembers.isEmpty) return 0;
+    return amount / _selectedMembers.length;
   }
 
-  void _toggleParticipant(String name) {
+  void _toggleMember(String name) {
     setState(() {
-      if (_selectedParticipants.contains(name)) {
-        if (_selectedParticipants.length > 1) {
-          _selectedParticipants.remove(name);
+      if (_selectedMembers.contains(name)) {
+        if (_selectedMembers.length > 1) {
+          _selectedMembers.remove(name);
         }
       } else {
-        _selectedParticipants.add(name);
+        _selectedMembers.add(name);
       }
     });
   }
 
   void _selectAll() {
     setState(() {
-      _selectedParticipants.clear();
-      _selectedParticipants.addAll(widget.members.map((p) => p.name));
+      _selectedMembers.clear();
+      _selectedMembers.addAll(widget.members.map((p) => p.name));
     });
   }
 
   void _deselectAll() {
     setState(() {
-      _selectedParticipants.clear();
+      _selectedMembers.clear();
       if (_selectedPayer != null) {
-        _selectedParticipants.add(_selectedPayer!);
+        _selectedMembers.add(_selectedPayer!);
       }
     });
   }
@@ -148,7 +148,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                       ),
                     ),
                     const Spacer(),
-                    if (_amount != null && _selectedParticipants.isNotEmpty)
+                    if (_amount != null && _selectedMembers.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -195,8 +195,8 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                         setState(() {
                           _selectedPayer = value;
                           // 如果支付人不在参与列表中，自动添加
-                          if (value != null && !_selectedParticipants.contains(value)) {
-                            _selectedParticipants.add(value);
+                          if (value != null && !_selectedMembers.contains(value)) {
+                            _selectedMembers.add(value);
                           }
                         });
                       },
@@ -274,7 +274,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                       spacing: 12,
                       runSpacing: 12,
                       children: widget.members.map((member) {
-                        final isSelected = _selectedParticipants.contains(member.name);
+                        final isSelected = _selectedMembers.contains(member.name);
                         final isPayer = member.name == _selectedPayer;
                         return FilterChip(
                           selected: isSelected,
@@ -300,7 +300,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                               );
                               return;
                             }
-                            _toggleParticipant(member.name);
+                            _toggleMember(member.name);
                           },
                           avatar: isSelected
                               ? const Icon(Icons.check_circle, size: 18)
@@ -308,7 +308,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                         );
                       }).toList(),
                     ),
-                    if (_amount != null && _selectedParticipants.isNotEmpty) ...[
+                    if (_amount != null && _selectedMembers.isNotEmpty) ...[
                       const SizedBox(height: 20),
                       // 分摊预览卡片
                       Container(
@@ -336,7 +336,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                               style: theme.textTheme.bodyMedium,
                             ),
                             Text(
-                              '参与人数：${_selectedParticipants.length} 人',
+                              '参与人数：${_selectedMembers.length} 人',
                               style: theme.textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 4),
@@ -401,7 +401,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
         _amount != null &&
         _amount! > 0 &&
         _titleController.text.trim().isNotEmpty &&
-        _selectedParticipants.isNotEmpty;
+        _selectedMembers.isNotEmpty;
   }
 
   void _saveExpense() {
@@ -409,7 +409,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
 
     final result = AddExpenseResult(
       paidBy: _selectedPayer!,
-      sharedBy: _selectedParticipants.toList(),
+      sharedBy: _selectedMembers.toList(),
       amount: _amount!,
       title: _titleController.text.trim(),
       category: _category,

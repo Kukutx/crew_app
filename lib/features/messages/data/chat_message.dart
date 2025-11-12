@@ -1,4 +1,4 @@
-import 'package:crew_app/features/messages/data/chat_participant.dart';
+import 'package:crew_app/features/messages/data/chat_member.dart';
 
 /// 消息类型
 enum MessageType {
@@ -26,7 +26,7 @@ class ChatMessage {
 
   final String id;
   final String chatId;
-  final ChatParticipant sender;
+  final ChatMember sender;
   final String body;
   final String sentAtLabel;
   final DateTime? sentAt;
@@ -44,7 +44,7 @@ class ChatMessage {
     return ChatMessage(
       id: json['id'] as String? ?? '',
       chatId: json['chatId'] as String? ?? '',
-      sender: ChatParticipant(
+      sender: ChatMember(
         id: json['senderId'] as String? ?? '',
         displayName: json['senderName'] as String? ?? '',
         avatarUrl: json['senderAvatarUrl'] as String?,

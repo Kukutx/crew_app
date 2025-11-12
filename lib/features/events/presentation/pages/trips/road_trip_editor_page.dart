@@ -52,7 +52,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   final _startLocationCtrl = TextEditingController();
   final _endLocationCtrl = TextEditingController();
   final _meetingLocationCtrl = TextEditingController();
-  int _maxParticipants = 4;
+  int _maxMembers = 4;
   double? _price;
   final _descriptionCtrl = TextEditingController();
   final _hostDisclaimerCtrl = TextEditingController();
@@ -61,6 +61,10 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   RoadTripEditorState _state = const RoadTripEditorState();
 
   final _picker = ImagePicker();
+  
+  // 去程和返程途经点
+  final List<LatLng> _forwardWps = [];
+  final List<LatLng> _returnWps = [];
 
   @override
   void initState() {
@@ -71,18 +75,15 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       _startLocationCtrl.text = initial.startLocation;
       _endLocationCtrl.text = initial.endLocation;
       _meetingLocationCtrl.text = initial.meetingPoint;
-      _maxParticipants = initial.maxParticipants;
+      _maxMembers = initial.maxMembers;
       _price = initial.pricePerPerson;
       _descriptionCtrl.text = initial.description;
       _hostDisclaimerCtrl.text = initial.hostDisclaimer;
 
-      // 解析途经点坐标字符串为 LatLng
-      // 注意：waypoints 是扁平列表，后端存储时不区分去程和返程
-      // 由于无法准确区分哪些是去程、哪些是返程，这里将所有途经点加载到去程列表
-      // 用户可以在编辑时手动调整去程和返程的途经点
-      final waypoints = <LatLng>[];
-      for (final wpStr in initial.waypoints) {
-        final parts = wpStr.split(',');
+      // 解析去程途经点
+      final forwardWaypoints = <LatLng>[];
+      for (final segment in initial.forwardSegments) {
+        final parts = segment.coordinate.split(',');
         if (parts.length == 2) {
           final lat = double.tryParse(parts[0].trim());
           final lng = double.tryParse(parts[1].trim());
@@ -93,7 +94,26 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
               lat <= 90 &&
               lng >= -180 &&
               lng <= 180) {
-            waypoints.add(LatLng(lat, lng));
+            forwardWaypoints.add(LatLng(lat, lng));
+          }
+        }
+      }
+      
+      // 解析返程途经点（仅往返行程）
+      final returnWaypoints = <LatLng>[];
+      for (final segment in initial.returnSegments) {
+        final parts = segment.coordinate.split(',');
+        if (parts.length == 2) {
+          final lat = double.tryParse(parts[0].trim());
+          final lng = double.tryParse(parts[1].trim());
+          // 坐标范围验证
+          if (lat != null &&
+              lng != null &&
+              lat >= -90 &&
+              lat <= 90 &&
+              lng >= -180 &&
+              lng <= 180) {
+            returnWaypoints.add(LatLng(lat, lng));
           }
         }
       }
@@ -106,9 +126,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
         pricingType: initial.isFree
             ? RoadTripPricingType.free
             : RoadTripPricingType.paid,
-        carType: initial.carType,
-        // waypoints 在编辑页面中通过 _forwardWps 和 _returnWps 管理
-        waypoints: const <String>[],
         tags: List.of(initial.tags),
         galleryItems: [
           ...initial.existingImageUrls.map(RoadTripGalleryItem.network),
@@ -117,8 +134,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       );
       _state = initialState;
       
-      // 将所有途经点加载到去程列表（用户可在编辑时调整）
-      _forwardWps.addAll(waypoints);
+      // 加载去程和返程途经点
+      _forwardWps.addAll(forwardWaypoints);
+      _returnWps.addAll(returnWaypoints);
     }
   }
 
@@ -238,6 +256,24 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       }
     }
 
+    final segments = <RoadTripWaypointSegment>[
+      ..._forwardWps.asMap().entries.map(
+        (entry) => RoadTripWaypointSegment(
+          coordinate: '${entry.value.latitude},${entry.value.longitude}',
+          direction: RoadTripWaypointDirection.forward,
+          order: entry.key,
+        ),
+      ),
+      if (_state.routeType == RoadTripRouteType.roundTrip)
+        ..._returnWps.asMap().entries.map(
+          (entry) => RoadTripWaypointSegment(
+            coordinate: '${entry.value.latitude},${entry.value.longitude}',
+            direction: RoadTripWaypointDirection.returnTrip,
+            order: entry.key,
+          ),
+        ),
+    ];
+
     final draft = RoadTripDraft(
       id: widget.initialValue?.id,
       title: title,
@@ -246,14 +282,10 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       endLocation: _endLocationCtrl.text.trim(),
       meetingPoint: _meetingLocationCtrl.text.trim(),
       isRoundTrip: _state.routeType == RoadTripRouteType.roundTrip,
-      waypoints: [
-        ..._forwardWps.map((wp) => '${wp.latitude},${wp.longitude}'),
-        ..._returnWps.map((wp) => '${wp.latitude},${wp.longitude}'),
-      ],
-      maxParticipants: _maxParticipants,
+      segments: segments,
+                maxMembers: _maxMembers,
       isFree: _state.pricingType == RoadTripPricingType.free,
       pricePerPerson: price,
-      carType: _state.carType,
       tags: List.of(_state.tags),
       description: _descriptionCtrl.text.trim(),
       hostDisclaimer: _hostDisclaimerCtrl.text.trim(),
@@ -290,9 +322,6 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       }
     }
   }
-
-  final List<LatLng> _forwardWps = []; // 去程途经点
-  final List<LatLng> _returnWps = []; // 返程途经点
 
   // 添加前往途径点（从 LocationSearchScreen 返回）
   void _onAddForward(PlaceDetails place) {
@@ -380,9 +409,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 onReorderReturn: _onReorderReturn,
               ),
               EventTeamSection(
-                maxParticipants: _maxParticipants,
-                onMaxParticipantsChanged: (value) => setState(() {
-                  _maxParticipants = value;
+                maxMembers: _maxMembers,
+                onMaxMembersChanged: (value) => setState(() {
+                  _maxMembers = value;
                 }),
                 price: _price,
                 onPriceChanged: (value) => setState(() {

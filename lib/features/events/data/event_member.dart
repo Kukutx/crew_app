@@ -1,7 +1,7 @@
 import 'event_registration.dart';
 
-/// 事件参与者
-class EventParticipant {
+/// 事件成员
+class EventMember {
   final String id;
   final String userId;
   final String userName;
@@ -11,7 +11,7 @@ class EventParticipant {
   final DateTime registeredAt;
   final bool isHost;
 
-  const EventParticipant({
+  const EventMember({
     required this.id,
     required this.userId,
     required this.userName,
@@ -22,8 +22,8 @@ class EventParticipant {
     this.isHost = false,
   });
 
-  factory EventParticipant.fromJson(Map<String, dynamic> json) {
-    return EventParticipant(
+  factory EventMember.fromJson(Map<String, dynamic> json) {
+    return EventMember(
       id: json['id'] as String? ?? '',
       userId: json['userId'] as String? ?? '',
       userName: json['userName'] as String? ?? '',
@@ -76,6 +76,4 @@ class EventParticipant {
     }
   }
 }
-
-
 

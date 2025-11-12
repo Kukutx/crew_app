@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 /// 可展开的筛选器按钮组件
-/// 位于搜索框下方，点击可展开显示筛选器选项（附近、最新、热门、关注）
+/// 位于搜索框下方，点击可展开显示筛选器选项
 class ExpandableFilterButton extends StatefulWidget {
   const ExpandableFilterButton({
     super.key,
     this.onFilterSelected,
     this.selectedFilter,
+    this.filters = const ['附近', '最新', '热门', '关注'],
   });
 
   final ValueChanged<String>? onFilterSelected;
   final String? selectedFilter;
+  final List<String> filters;
 
   @override
   State<ExpandableFilterButton> createState() => _ExpandableFilterButtonState();
@@ -22,8 +24,7 @@ class _ExpandableFilterButtonState extends State<ExpandableFilterButton>
   late AnimationController _animationController;
   late Animation<double> _expandAnimation;
 
-  static const _filters = ['附近', '最新', '热门', '关注'];
-  String _selectedFilter = _filters.first;
+  late String _selectedFilter;
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _ExpandableFilterButtonState extends State<ExpandableFilterButton>
       parent: _animationController,
       curve: Curves.easeInOut,
     );
-    _selectedFilter = widget.selectedFilter ?? _filters.first;
+    _selectedFilter = widget.selectedFilter ?? widget.filters.first;
   }
 
   @override
@@ -92,7 +93,7 @@ class _ExpandableFilterButtonState extends State<ExpandableFilterButton>
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 左侧图标 - 附近图标
+                  // 左侧图标
                   Icon(
                     Icons.near_me,
                     color: colorScheme.onSurface,
@@ -111,7 +112,7 @@ class _ExpandableFilterButtonState extends State<ExpandableFilterButton>
                     ),
                     const SizedBox(width: 4),
                   ],
-                  // 右侧箭头 - ">"
+                  // 右侧箭头
                   AnimatedRotation(
                     turns: _isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 300),
@@ -140,7 +141,7 @@ class _ExpandableFilterButtonState extends State<ExpandableFilterButton>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (final filter in _filters)
+                    for (final filter in widget.filters)
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: _buildFilterButton(

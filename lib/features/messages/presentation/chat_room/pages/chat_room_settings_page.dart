@@ -4,7 +4,6 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ChatRoomSettingsPage extends StatefulWidget {
   const ChatRoomSettingsPage({
@@ -106,7 +105,6 @@ class _ChatRoomSettingsPageState extends State<ChatRoomSettingsPage> {
       submitLabel: localization.report_event_submit,
       cancelLabel: localization.action_cancel,
       reportTypes: _reportTypes(localization),
-      imagePicker: ImagePicker(),
     );
 
     if (!mounted || submission == null) {

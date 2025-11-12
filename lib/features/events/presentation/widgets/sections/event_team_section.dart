@@ -4,7 +4,7 @@ import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'package:crew_app/features/events/data/event_common_models.dart';
-import 'event_section_card.dart';
+import 'package:crew_app/shared/widgets/cards/section_card.dart';
 
 class EventTeamSection extends StatelessWidget {
   const EventTeamSection({
@@ -35,7 +35,7 @@ class EventTeamSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return EventSectionCard(
+    return SectionCard(
       icon: Icons.groups_3_outlined,
       title: loc.road_trip_team_section_title,
       subtitle: loc.road_trip_team_section_subtitle,
@@ -90,7 +90,7 @@ class EventTeamSection extends StatelessWidget {
         TextField(
           controller: tagInputController,
           style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
-          decoration: eventInputDecoration(
+          decoration: getInputDecoration(
             context,
             loc.road_trip_preferences_tag_label,
             loc.road_trip_preferences_tag_hint,
@@ -183,7 +183,7 @@ class _MaxMembersInputFieldState extends State<_MaxMembersInputField> {
     return TextFormField(
       controller: _controller,
       style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
-      decoration: eventInputDecoration(
+      decoration: getInputDecoration(
         context,
         widget.label,
         widget.hint,
@@ -309,7 +309,7 @@ class _PriceInputFieldState extends State<_PriceInputField> {
         enabled: false,
         initialValue: loc.road_trip_team_pricing_free,
         style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
-        decoration: eventInputDecoration(
+        decoration: getInputDecoration(
           context,
           widget.label,
           widget.freeHint,
@@ -332,7 +332,7 @@ class _PriceInputFieldState extends State<_PriceInputField> {
       key: const ValueKey('paid_price_input'),
       controller: _priceController,
       style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
-      decoration: eventInputDecoration(
+      decoration: getInputDecoration(
         context,
         widget.label,
         widget.paidHint,

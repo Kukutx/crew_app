@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:crew_app/features/events/data/event_common_models.dart';
-import 'event_section_card.dart';
+import 'package:crew_app/shared/widgets/cards/section_card.dart';
 
 class EventGallerySection extends StatelessWidget {
   const EventGallerySection({
@@ -23,7 +23,7 @@ class EventGallerySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return EventSectionCard(
+    return SectionCard(
       icon: Icons.photo_library_outlined,
       title: loc.road_trip_gallery_section_title,
       subtitle: loc.road_trip_gallery_section_subtitle,

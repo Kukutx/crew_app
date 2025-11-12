@@ -2,17 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../config/google_maps_config.dart';
+import '../../error/api_exception.dart';
 import '../error_message_extractor.dart';
-
-class PlacesApiException implements Exception {
-  PlacesApiException(this.message, {this.statusCode});
-
-  final String message;
-  final int? statusCode;
-
-  @override
-  String toString() => 'PlacesApiException($message, statusCode: $statusCode)';
-}
 
 class PlaceDetails {
   const PlaceDetails({
@@ -62,7 +53,7 @@ class PlacesService {
 
   Future<String?> findPlaceId(LatLng position) async {
     if (!_hasValidKey) {
-      throw PlacesApiException('Google Places API key is not configured');
+      throw ApiException('Google Places API key is not configured');
     }
 
     try {
@@ -103,7 +94,7 @@ class PlacesService {
       }
       return null;
     } on DioException catch (error) {
-      throw PlacesApiException(
+      throw ApiException(
         ErrorMessageExtractor.extractWithDefault(
           error,
           defaultMessage: 'Failed to search places',
@@ -119,7 +110,7 @@ class PlacesService {
     int maxResults = 10,
   }) async {
     if (!_hasValidKey) {
-      throw PlacesApiException('Google Places API key is not configured');
+      throw ApiException('Google Places API key is not configured');
     }
 
     try {
@@ -163,7 +154,7 @@ class PlacesService {
           .whereType<NearbyPlace>()
           .toList(growable: false);
     } on DioException catch (error) {
-      throw PlacesApiException(
+      throw ApiException(
         ErrorMessageExtractor.extractWithDefault(
           error,
           defaultMessage: 'Failed to search places',
@@ -228,7 +219,7 @@ class PlacesService {
 
   Future<PlaceDetails?> getPlaceDetails(String placeId) async {
     if (!_hasValidKey) {
-      throw PlacesApiException('Google Places API key is not configured');
+      throw ApiException('Google Places API key is not configured');
     }
 
     final resourceName = placeId.startsWith('places/') ? placeId : 'places/$placeId';
@@ -292,7 +283,7 @@ class PlacesService {
         priceLevel: priceLevel,
       );
     } on DioException catch (error) {
-      throw PlacesApiException(
+      throw ApiException(
         ErrorMessageExtractor.extractWithDefault(
           error,
           defaultMessage: 'Failed to load place details',
@@ -308,7 +299,7 @@ class PlacesService {
     required int maxResults,
   }) async {
     if (!_hasValidKey) {
-      throw PlacesApiException('Google Places API key is not configured');
+      throw ApiException('Google Places API key is not configured');
     }
 
     if (query.trim().isEmpty) {
@@ -362,7 +353,7 @@ class PlacesService {
           .whereType<PlaceDetails>()
           .toList(growable: false);
     } on DioException catch (error) {
-      throw PlacesApiException(
+      throw ApiException(
         ErrorMessageExtractor.extractWithDefault(
           error,
           defaultMessage: 'Failed to search places',

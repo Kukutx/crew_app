@@ -4,9 +4,9 @@ import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/state/country_city_provider.dart';
+import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'widgets/avatar_preview_overlay.dart';
 import 'widgets/basic_info_section.dart';
 import 'widgets/profile_preview_section.dart';
@@ -224,8 +224,17 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           changeLabel: loc.preferences_avatar_action,
           onCancel: () => Navigator.of(dialogContext).maybePop(),
           onChange: () async {
-            final picker = ImagePicker();
-            await picker.pickImage(source: ImageSource.gallery);
+            // 使用头像配置（自动裁剪为圆形）
+            final file = await MediaPickerHelper.pickImage(
+              config: MediaPickerConfig.avatar,
+            );
+            
+            if (file != null) {
+              // TODO: 上传头像到服务器
+              debugPrint('Selected avatar: ${file.path}');
+              // 这里可以调用上传 API
+            }
+            
             if (!mounted) return;
             if (dialogContext.mounted) {
               Navigator.of(dialogContext).maybePop();

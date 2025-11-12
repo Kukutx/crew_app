@@ -54,9 +54,7 @@ import 'package:crew_app/features/settings/presentation/pages/revenue/data/walle
 class RevenueApiService {
   RevenueApiService({
     required ApiService apiService,
-  }) : _apiService = apiService;
-
-  final ApiService _apiService;
+  });
 
   /// 获取钱包余额
   /// 

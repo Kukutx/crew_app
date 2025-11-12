@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 typedef ReportSheetSubmission = ({
   String type,
@@ -27,7 +27,6 @@ class ReportSheet extends StatefulWidget {
     required this.submitLabel,
     required this.cancelLabel,
     required this.reportTypes,
-    required this.imagePicker,
   }) : assert(reportTypes.length > 0, 'reportTypes cannot be empty');
 
   final String title;
@@ -44,7 +43,6 @@ class ReportSheet extends StatefulWidget {
   final String submitLabel;
   final String cancelLabel;
   final List<String> reportTypes;
-  final ImagePicker imagePicker;
 
   static Future<ReportSheetSubmission?> show({
     required BuildContext context,
@@ -62,7 +60,6 @@ class ReportSheet extends StatefulWidget {
     required String submitLabel,
     required String cancelLabel,
     required List<String> reportTypes,
-    required ImagePicker imagePicker,
   }) {
     return showModalBottomSheet<ReportSheetSubmission>(
       context: context,
@@ -84,7 +81,6 @@ class ReportSheet extends StatefulWidget {
           submitLabel: submitLabel,
           cancelLabel: cancelLabel,
           reportTypes: reportTypes,
-          imagePicker: imagePicker,
         );
       },
     );
@@ -114,12 +110,12 @@ class _ReportSheetState extends State<ReportSheet> {
   }
 
   Future<void> _handlePickImage() async {
-    final file = await widget.imagePicker.pickImage(source: ImageSource.gallery);
+    final file = await MediaPickerHelper.pickImage();
     if (file == null) return;
     final bytes = await file.readAsBytes();
     setState(() {
       _selectedImageBytes = bytes;
-      _selectedImageName = file.name;
+      _selectedImageName = file.path.split('/').last.split('\\').last;
     });
   }
 

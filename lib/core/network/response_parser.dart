@@ -99,38 +99,10 @@ class ResponseParser {
         .toList(growable: false);
   }
 
-  /// 从响应数据中提取并转换事件列表
-  /// 
-  /// 这是为了兼容现有的 Event 解析逻辑
-  static List<Map<String, dynamic>> extractEventList(dynamic data) {
-    try {
-      final rawList = extractList(data);
-      return toMapList(rawList);
-    } catch (e) {
-      // 如果提取失败，尝试直接处理
-      if (data is List) {
-        return toMapList(data);
-      }
-      rethrow;
-    }
-  }
-
-  /// 从响应数据中提取并转换事件对象
-  /// 
-  /// 这是为了兼容现有的 Event 解析逻辑
-  static Map<String, dynamic> extractEventObject(dynamic data) {
-    return extractObject(data);
-  }
-
-  /// 从响应数据中提取 data 字段
+  /// 从响应数据中提取 data 字段（统一处理 ApiResponse 包装）
   static dynamic extractData(dynamic data) {
-    if (data is Map<String, dynamic>) {
-      // 优先从 data 字段提取
-      if (data.containsKey('data')) {
-        return data['data'];
-      }
-      // 如果没有 data 字段，直接返回原数据
-      return data;
+    if (data is Map<String, dynamic> && data.containsKey('data')) {
+      return data['data'];
     }
     return data;
   }

@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:crew_app/features/events/data/moment.dart';
 import 'package:crew_app/features/events/state/moment_providers.dart';
-import 'package:crew_app/features/events/utils/moment_image_helper.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
+import 'package:crew_app/shared/utils/media_picker_helper.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
 
 class CreateMomentScreen extends ConsumerStatefulWidget {
@@ -93,19 +93,11 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
   }
 
   Future<void> _pickImages() async {
-    try {
-      final images = await MomentImageHelper.pickMultipleImages();
-      if (images.isNotEmpty && mounted) {
-        setState(() {
-          _selectedImages.addAll(images);
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('选择图片失败: $e')),
-        );
-      }
+    final images = await MediaPickerHelper.pickMultipleImages();
+    if (images.isNotEmpty && mounted) {
+      setState(() {
+        _selectedImages.addAll(images);
+      });
     }
   }
 

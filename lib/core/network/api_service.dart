@@ -1,14 +1,14 @@
 import 'package:crew_app/core/config/environment.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../features/events/data/event.dart';
 import '../../features/user/data/authenticated_user_dto.dart';
 import 'api_request_handler.dart';
-import 'auth/auth_service.dart';
 import 'response_parser.dart';
 
 class ApiService {
-  ApiService({Dio? dio, required AuthService authService})
+  ApiService({Dio? dio, required FirebaseAuth firebaseAuth})
       : _dio = dio ??
             Dio(
               BaseOptions(
@@ -18,34 +18,30 @@ class ApiService {
                 sendTimeout: const Duration(seconds: 30),
               ),
             ),
-        _auth = authService {
+        _firebaseAuth = firebaseAuth {
     // 添加重试拦截器（在日志拦截器之前）
     _dio.interceptors.add(_RetryInterceptor(_dio));
 
-    // 只在开发环境启用日志，避免在生产环境泄露敏感信息
-    // 生产环境日志可能包含：
-    // - 认证Token
-    // - 用户个人信息
-    // - API密钥
+    // 只在开发环境启用日志
     if (Env.isDevelopment) {
       _dio.interceptors.add(
         LogInterceptor(
           request: true,
           responseBody: true,
           error: true,
-          requestBody: false, // 不记录请求体（可能包含敏感信息）
-          requestHeader: false, // 不记录请求头（可能包含Authorization Token）
-          responseHeader: false, // 不记录响应头
+          requestBody: false,
+          requestHeader: false,
+          responseHeader: false,
         ),
       );
     }
 
     // 初始化请求处理器
-    _requestHandler = ApiRequestHandler(dio: _dio, auth: _auth);
+    _requestHandler = ApiRequestHandler(dio: _dio, firebaseAuth: _firebaseAuth);
   }
 
   final Dio _dio;
-  final AuthService _auth;
+  final FirebaseAuth _firebaseAuth;
   late final ApiRequestHandler _requestHandler;
 
   /// 公开的请求处理器访问方法
@@ -82,14 +78,8 @@ class ApiService {
     return _requestHandler.get<List<Event>>(
       path: '/events',
       parseResponse: (data) {
-        final eventList = ResponseParser.extractEventList(data);
-        final events = eventList.map(Event.fromJson).toList(growable: false);
-        
-        // 验证数据有效性
-        if (events.isNotEmpty || ResponseParser.isKnownEmptyCollection(data)) {
-          return events;
-        }
-        throw Exception('Unexpected events payload type');
+        final list = ResponseParser.extractList(data);
+        return ResponseParser.toMapList(list).map(Event.fromJson).toList(growable: false);
       },
     );
   }
@@ -111,10 +101,7 @@ class ApiService {
         'longitude': lng,
       },
       requiresAuth: true,
-      parseResponse: (data) {
-        final eventData = ResponseParser.extractEventObject(data);
-        return Event.fromJson(eventData);
-      },
+      parseResponse: (data) => Event.fromJson(ResponseParser.extractObject(data)),
     );
   }
 
@@ -123,14 +110,8 @@ class ApiService {
       path: '/events/search',
       queryParameters: {'query': query},
       parseResponse: (data) {
-        final eventList = ResponseParser.extractEventList(data);
-        final events = eventList.map(Event.fromJson).toList(growable: false);
-        
-        // 验证数据有效性
-        if (events.isNotEmpty || ResponseParser.isKnownEmptyCollection(data)) {
-          return events;
-        }
-        throw Exception('Unexpected events payload type');
+        final list = ResponseParser.extractList(data);
+        return ResponseParser.toMapList(list).map(Event.fromJson).toList(growable: false);
       },
     );
   }

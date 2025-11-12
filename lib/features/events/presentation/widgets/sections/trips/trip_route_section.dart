@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
 import 'package:crew_app/core/network/places/places_service.dart';
-import '../event_section_card.dart';
+import 'package:crew_app/shared/widgets/cards/section_card.dart';
 
 class TripRouteSection extends StatelessWidget {
   const TripRouteSection({
@@ -58,7 +58,7 @@ class TripRouteSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return EventSectionCard(
+    return SectionCard(
       icon: Icons.route_outlined,
       title: loc.road_trip_route_section_title,
       subtitle: loc.road_trip_route_section_subtitle,

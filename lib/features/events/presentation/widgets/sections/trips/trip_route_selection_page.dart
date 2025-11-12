@@ -1,6 +1,6 @@
 import 'package:crew_app/core/network/places/places_service.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/event_card_tile.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
+import 'package:crew_app/shared/widgets/cards/card_tile.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +60,7 @@ class TripRouteSelectionPage extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           sliver: SliverList.list(
             children: [
-              EventCardTile(
+              CardTile(
                 leading: const Icon(Icons.radio_button_checked),
                 title: departureTitle,
                 onTap: onEditDeparture,
@@ -69,7 +69,7 @@ class TripRouteSelectionPage extends StatelessWidget {
                 onClear: onClearDeparture,
               ),
               SizedBox(height: 12.h),
-              EventCardTile(
+              CardTile(
                 leading: const Icon(Icons.place_outlined),
                 title: destinationTitle,
                 onTap: departurePosition != null ? onEditDestination : null,

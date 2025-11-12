@@ -6,8 +6,8 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../widgets/common/utils/event_image_cache_manager.dart';
-import '../../../widgets/common/components/event_image_placeholder.dart';
+import 'package:crew_app/shared/widgets/image/image_cache_manager.dart';
+import 'package:crew_app/shared/widgets/image/image_placeholder.dart';
 
 class EventMediaCarousel extends StatefulWidget {
   final Event event;
@@ -133,7 +133,7 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
   Widget _buildFallback(Event event) {
     final url = event.firstAvailableImageUrl;
     if (url == null) {
-      return const EventImagePlaceholder(aspectRatio: 16 / 10);
+      return const ImagePlaceholder(aspectRatio: 16 / 10);
     }
     return _NetworkImageSlide(url: url, cacheKey: event.id);
   }
@@ -153,7 +153,7 @@ class _NetworkImageSlide extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url,
       cacheKey: cacheKey,
-      cacheManager: EventImageCacheManager.instance,
+      cacheManager: ImageCacheManager.instance,
       width: double.infinity,
       fit: BoxFit.cover,
       memCacheHeight: 512, // 合理压缩，减内存抖动
@@ -359,7 +359,7 @@ class _EventVideoPlayerState extends State<_EventVideoPlayer>
     super.build(context);
 
     if (_hasError) {
-      return const EventImagePlaceholder(
+      return const ImagePlaceholder(
         aspectRatio: 16 / 10,
         icon: Icons.videocam_off,
       );

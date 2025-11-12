@@ -57,7 +57,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
       }
 
       // 同步你现有后端用户信息
-      await ref.read(authServiceProvider).getIdToken(forceRefresh: true);
+      await ref.read(firebaseAuthProvider).currentUser?.getIdToken(true);
       await ref.read(authenticatedUserProvider.notifier).refreshProfile();
 
       if (!mounted) return;

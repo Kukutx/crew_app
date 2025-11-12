@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
+import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/data/adapters/moment_adapter.dart';
 
@@ -30,7 +30,6 @@ class _EditMomentPageState extends State<EditMomentPage> {
 
   late List<_MomentImage> _mediaAssets;
   int _currentImageIndex = 0;
-  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -291,7 +290,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
   }
 
   Future<void> _openImagePicker() async {
-    final pickedFiles = await _picker.pickMultiImage();
+    final pickedFiles = await MediaPickerHelper.pickMultipleImages();
     if (pickedFiles.isEmpty) {
       _showPreviewMessage('未选择任何图片');
       return;
@@ -303,7 +302,7 @@ class _EditMomentPageState extends State<EditMomentPage> {
       newImages.add(
         _MomentImage.memory(
           bytes: bytes,
-          name: file.name,
+          name: file.path.split('/').last.split('\\').last,
         ),
       );
     }

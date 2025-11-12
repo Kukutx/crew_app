@@ -11,9 +11,9 @@ import 'package:geocoding/geocoding.dart';
 import 'package:crew_app/core/config/environment.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 
@@ -198,39 +198,6 @@ class LocationSelectionManager {
             sinDLon;
     final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
     return earthRadius * c;
-  }
-
-  /// 处理目标位置选择
-  void _handleDestinationSelection(LatLng position, BuildContext context) {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final selectionState = ref.read(mapSelectionControllerProvider);
-    
-    if (!selectionState.isSelectingDestination) {
-      return;
-    }
-    
-    selectionController.setDestinationLatLng(position);
-    
-    final mapController = ref.read(mapControllerProvider);
-    
-    // 如果起点也存在，调整地图以同时显示起点和终点
-    if (selectionState.selectedLatLng != null) {
-      unawaited(mapController.fitBounds(
-        [selectionState.selectedLatLng!, position],
-        padding: 100,
-      ));
-    } else {
-      // 如果只有终点，移动到终点位置
-      unawaited(mapController.moveCamera(position, zoom: 12));
-    }
-    
-    HapticFeedback.lightImpact();
-    
-    // 清除选择终点模式状态
-    selectionController.setSelectingDestination(false);
-    
-    // 确保 overlay sheet 打开，CreateRoadTripSheet 会显示在 fullCreation 模式
-    ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
   }
 
   /// 显示自驾游创建Sheet（启动页）- 使用 overlay 模式

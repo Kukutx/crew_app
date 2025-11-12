@@ -1,5 +1,5 @@
 import 'package:crew_app/core/network/places/places_service.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

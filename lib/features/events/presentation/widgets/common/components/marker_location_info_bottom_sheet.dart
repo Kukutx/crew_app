@@ -1,5 +1,5 @@
 import 'package:crew_app/core/network/places/places_service.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:crew_app/shared/theme/app_design_tokens.dart';

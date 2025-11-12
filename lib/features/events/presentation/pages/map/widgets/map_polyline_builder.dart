@@ -2,7 +2,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
 
 /// 地图路线构建器，统一管理所有 polyline 的创建逻辑

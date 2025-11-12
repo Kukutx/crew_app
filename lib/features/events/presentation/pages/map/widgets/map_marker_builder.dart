@@ -2,8 +2,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/markers_layer.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';

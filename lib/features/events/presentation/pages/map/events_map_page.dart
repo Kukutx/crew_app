@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
-import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/sheets/create_road_trip_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/city_events/sheets/create_city_event_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/sheets/create_content_options_sheet.dart';
@@ -26,19 +26,19 @@ import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'widgets/breathing_marker_overlay.dart';
-import 'widgets/expandable_filter_button.dart';
+import 'package:crew_app/shared/widgets/buttons/expandable_filter_button.dart';
+import 'package:crew_app/shared/widgets/map/camera_move_optimizer.dart';
 import 'widgets/map_marker_builder.dart';
 import 'widgets/map_polyline_builder.dart';
-import 'utils/camera_move_optimizer.dart';
 import 'state/events_map_search_controller.dart';
-import 'state/map_selection_controller.dart';
+import '../../widgets/common/components/map_selection_controller.dart';
 import 'controllers/map_controller.dart';
 import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
-import 'controllers/location_selection_manager.dart';
+import '../../widgets/common/components/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
-import 'state/map_overlay_sheet_provider.dart';
-import 'state/map_overlay_sheet_stage_provider.dart';
+import '../../widgets/common/components/map_overlay_sheet_provider.dart';
+import '../../widgets/common/components/map_overlay_sheet_stage_provider.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;
@@ -155,13 +155,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     // 统一处理 sheet 状态重置
     if (mapSheetType == MapOverlaySheetType.none) {
       // 清理地图选择状态，避免幽灵标记点（总是执行）
-      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-      if (selectionController.state.selectedLatLng != null || 
-          selectionController.state.destinationLatLng != null ||
-          selectionController.state.forwardWaypoints.isNotEmpty ||
-          selectionController.state.returnWaypoints.isNotEmpty) {
+      final selectionState = ref.read(mapSelectionControllerProvider);
+      if (selectionState.selectedLatLng != null || 
+          selectionState.destinationLatLng != null ||
+          selectionState.forwardWaypoints.isNotEmpty ||
+          selectionState.returnWaypoints.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
+          final selectionController = ref.read(mapSelectionControllerProvider.notifier);
           selectionController.resetSelection();
           selectionController.setSelectionSheetOpen(false);
           selectionController.resetMapPadding();

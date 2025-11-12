@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-/// A cache manager that throttles repeated failed image downloads for events.
+/// 通用的图片缓存管理器，支持失败重试限制
 /// 
 /// **性能优化策略：**
 /// - 限制缓存对象数量：最多200个图片对象
@@ -19,24 +19,24 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 /// ```dart
 /// CachedNetworkImage(
 ///   imageUrl: url,
-///   cacheManager: EventImageCacheManager.instance,
+///   cacheManager: ImageCacheManager.instance,
 ///   memCacheHeight: 512, // 限制内存中图片高度为512px
 ///   memCacheWidth: 512,  // 限制内存中图片宽度为512px
 ///   fit: BoxFit.cover,
 /// )
 /// ```
-class EventImageCacheManager extends CacheManager {
-  EventImageCacheManager._()
+class ImageCacheManager extends CacheManager {
+  ImageCacheManager._()
       : super(
           Config(
-            'event_images',
+            'app_images',
             stalePeriod: const Duration(days: 7),
             maxNrOfCacheObjects: 200, // 限制缓存对象数量，控制存储空间
           ),
         );
 
-  /// Singleton instance used throughout the events feature.
-  static final EventImageCacheManager instance = EventImageCacheManager._();
+  /// Singleton instance used throughout the app.
+  static final ImageCacheManager instance = ImageCacheManager._();
 
   /// Duration to wait before retrying a failed download.
   /// 
@@ -130,3 +130,4 @@ class ThrottledFetchException implements Exception {
   String toString() =>
       'ThrottledFetchException: retry after ${retryDelay.inSeconds}s';
 }
+

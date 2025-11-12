@@ -16,7 +16,6 @@ import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 
 class EventDetailPage extends ConsumerStatefulWidget {
   final Event event;
@@ -178,7 +177,6 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         loc.report_event_type_fraud,
         loc.report_event_type_other,
       ],
-      imagePicker: ImagePicker(),
     );
 
     if (!mounted || submission == null) {

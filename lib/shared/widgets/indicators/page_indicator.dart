@@ -2,9 +2,10 @@ import 'package:crew_app/shared/theme/app_design_tokens.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-/// 用于重新定位 marker 的可点击页面指示器
-class MarkerLocationPageIndicator extends StatelessWidget {
-  const MarkerLocationPageIndicator({
+/// 通用的页面指示器组件
+/// 用于显示多页面切换时的当前页面位置
+class PageIndicator extends StatelessWidget {
+  const PageIndicator({
     super.key,
     required this.controller,
     required this.currentPage,

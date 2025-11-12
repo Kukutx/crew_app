@@ -1,15 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
+import 'package:crew_app/shared/widgets/image/image_placeholder.dart';
+import 'package:crew_app/shared/widgets/image/image_cache_manager.dart';
 import 'package:crew_app/shared/widgets/sheets/share_sheet/app_share_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
-import '../../../widgets/common/utils/event_image_cache_manager.dart';
 
 class EventShareSheet extends StatelessWidget {
   final Event event;
@@ -393,18 +392,18 @@ class _SharePreviewImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = event.firstAvailableImageUrl;
     if (imageUrl == null) {
-      return const EventImagePlaceholder();
+      return const ImagePlaceholder();
     }
     return CachedNetworkImage(
       imageUrl: imageUrl,
       cacheKey: event.id,
-      cacheManager: EventImageCacheManager.instance,
+      cacheManager: ImageCacheManager.instance,
       fit: BoxFit.cover,
       width: double.infinity,
       memCacheHeight: 512, // 合理压缩，减内存抖动
       placeholder: (context, url) =>
           const Center(child: CircularProgressIndicator()),
-      errorWidget: (context, url, error) => const EventImagePlaceholder(),
+      errorWidget: (context, url, error) => const ImagePlaceholder(),
     );
   }
 }

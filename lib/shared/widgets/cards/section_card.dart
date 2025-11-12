@@ -3,8 +3,10 @@ import 'package:crew_app/shared/theme/app_spacing.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-class EventSectionCard extends StatelessWidget {
-  const EventSectionCard({
+/// 通用的 Section 卡片组件
+/// 用于展示带有图标、标题、副标题和子内容的区块
+class SectionCard extends StatelessWidget {
+  const SectionCard({
     super.key,
     required this.icon,
     required this.title,
@@ -96,8 +98,9 @@ class EventSectionCard extends StatelessWidget {
   }
 }
 
-
-InputDecoration eventInputDecoration(
+/// 通用的输入框装饰器
+/// 用于创建统一样式的输入框
+InputDecoration getInputDecoration(
   BuildContext context,
   String label,
   String? hint,

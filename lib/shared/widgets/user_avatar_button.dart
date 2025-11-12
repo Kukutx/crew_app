@@ -1,16 +1,17 @@
-// widgets/avatar_icon.dart
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../../core/state/user/avatar/avatar_provider.dart';
-import '../../../../../../core/state/auth/auth_providers.dart';
+import '../../../core/state/user/avatar/avatar_provider.dart';
+import '../../../core/state/auth/auth_providers.dart';
 
-class AvatarIcon extends ConsumerWidget {
+/// 通用的用户头像按钮组件
+/// 显示当前用户的头像，点击时触发回调
+class UserAvatarButton extends ConsumerWidget {
   final void Function(bool authed) onTap;
-  const AvatarIcon({super.key, required this.onTap});
+  const UserAvatarButton({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,3 +47,4 @@ class AvatarIcon extends ConsumerWidget {
     );
   }
 }
+

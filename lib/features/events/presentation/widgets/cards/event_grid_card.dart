@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
+import 'package:crew_app/shared/widgets/image/image_placeholder.dart';
+import 'package:crew_app/shared/widgets/image/image_cache_manager.dart';
+
 import '../../../data/event.dart';
 import '../../pages/detail/events_detail_page.dart';
-import '../common/utils/event_image_cache_manager.dart';
-import '../common/components/event_image_placeholder.dart';
 
 /// A reusable grid card for displaying [Event] items inside masonry layouts.
 class EventGridCard extends StatelessWidget {
@@ -68,7 +69,7 @@ class EventGridCard extends StatelessWidget {
                       ? CachedNetworkImage(
                           imageUrl: imageUrl,
                           cacheKey: event.id,
-                          cacheManager: EventImageCacheManager.instance,
+                          cacheManager: ImageCacheManager.instance,
                           useOldImageOnUrlChange: true,
                           fit: BoxFit.cover,
                           memCacheWidth: memCacheW,
@@ -79,9 +80,9 @@ class EventGridCard extends StatelessWidget {
                             ),
                           ),
                           errorWidget: (c, _, _) =>
-                              const EventImagePlaceholder(aspectRatio: 1),
+                              const ImagePlaceholder(aspectRatio: 1),
                         )
-                      : const EventImagePlaceholder(aspectRatio: 1),
+                      : const ImagePlaceholder(aspectRatio: 1),
                 ),
               ),
               Positioned(

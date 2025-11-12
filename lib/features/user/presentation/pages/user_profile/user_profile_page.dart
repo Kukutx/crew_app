@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
@@ -223,7 +222,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       submitLabel: localization.report_event_submit,
       cancelLabel: localization.action_cancel,
       reportTypes: _reportTypes(localization),
-      imagePicker: ImagePicker(),
     );
 
     if (submission != null) {

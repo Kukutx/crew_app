@@ -1,6 +1,6 @@
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/app/state/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';

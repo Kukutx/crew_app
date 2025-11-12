@@ -14,7 +14,7 @@ import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 import '../../../../../../app/state/app_overlay_provider.dart';
 import '../../../../../../core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
-import '../state/map_overlay_sheet_provider.dart';
+import '../components/map_overlay_sheet_provider.dart';
 
 class MapExploreSheet extends ConsumerStatefulWidget {
   const MapExploreSheet({

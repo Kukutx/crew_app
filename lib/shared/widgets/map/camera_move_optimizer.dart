@@ -1,8 +1,13 @@
-// utils/camera_move_optimizer.dart
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
+
+/// 地图相机移动优化器的控制器接口
+/// 用于解耦具体实现
+abstract class MapCameraController {
+  void updateCenterPosition(LatLng position);
+  bool isAtUserLocation({double threshold = 50.0});
+}
 
 /// 相机移动优化器，统一处理相机移动事件，减少不必要的更新
 class CameraMoveOptimizer {
@@ -14,7 +19,7 @@ class CameraMoveOptimizer {
     this.updateDebounceMs = 100, // 更新防抖时间（毫秒）
   });
 
-  final MapController mapController;
+  final MapCameraController mapController;
   final double positionUpdateThreshold;
   final double zoomUpdateThreshold;
   final double bearingUpdateThreshold;

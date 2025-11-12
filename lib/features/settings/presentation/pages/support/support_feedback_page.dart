@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
-import 'package:flutter/foundation.dart';
+import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SupportFeedbackPage extends StatefulWidget {
   const SupportFeedbackPage({super.key});
@@ -18,27 +18,17 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _picker = ImagePicker();
 
-  final List<XFile> _attachments = [];
+  final List<File> _attachments = [];
   bool _isSubmitting = false;
 
   bool get _canAddMoreAttachments => _attachments.length < _maxAttachments;
 
   Future<void> _pickImages() async {
-    try {
-      final remaining = _maxAttachments - _attachments.length;
-      final files = await _picker.pickMultiImage(limit: remaining);
-      if (!mounted || files.isEmpty) return;
-      setState(() => _attachments.addAll(files.take(remaining)));
-    } catch (e, st) {
-      debugPrint('pickMultiImage error: $e');
-      debugPrintStack(stackTrace: st);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("图片错误")),
-      );
-    }
+    final remaining = _maxAttachments - _attachments.length;
+    final files = await MediaPickerHelper.pickMultipleImages();
+    if (!mounted || files.isEmpty) return;
+    setState(() => _attachments.addAll(files.take(remaining)));
   }
 
   Future<void> _showAddMediaSheet() async {
@@ -70,24 +60,8 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
     );
   }
 
-  Widget _buildAttachmentPreview(XFile file) {
-    return FutureBuilder<Uint8List>(
-      future: file.readAsBytes(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.done && snap.hasData) {
-          return Image.memory(snap.data!, fit: BoxFit.cover);
-        }
-        if (snap.hasError) {
-          return const Center(child: Icon(Icons.broken_image_outlined));
-        }
-        return const Center(
-          child: SizedBox(
-            width: 24, height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        );
-      },
-    );
+  Widget _buildAttachmentPreview(File file) {
+    return Image.file(file, fit: BoxFit.cover);
   }
 
   Future<void> _submitFeedback() async {

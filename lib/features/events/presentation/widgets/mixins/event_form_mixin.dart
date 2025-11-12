@@ -1,40 +1,37 @@
-import 'dart:io';
-
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 /// 事件表单通用功能 Mixin
 /// 
 /// 提供标签管理、图片管理、地址加载等公共方法
 /// 统一了事件创建和编辑的共同逻辑
 mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
-  final ImagePicker _picker = ImagePicker();
-
   // ===== 图片管理 =====
 
   /// 选择多张图片
   Future<List<EventGalleryItem>> pickImages() async {
-    try {
-      final picked = await _picker.pickMultiImage(imageQuality: 80);
-      if (picked.isEmpty) return [];
-
-      return picked.map((x) => EventGalleryItem.file(File(x.path))).toList();
-    } on PlatformException {
-      if (!mounted) return [];
-      final loc = AppLocalizations.of(context)!;
-      showSnackBar(loc.road_trip_image_picker_failed);
+    final files = await MediaPickerHelper.pickMultipleImages(
+      config: const MediaPickerConfig(imageQuality: 80),
+    );
+    
+    if (files.isEmpty) {
+      if (mounted) {
+        final loc = AppLocalizations.of(context)!;
+        showSnackBar(loc.road_trip_image_picker_failed);
+      }
       return [];
     }
+
+    return files.map((file) => EventGalleryItem.file(file)).toList();
   }
 
   /// 移除图片

@@ -2,9 +2,10 @@ import 'package:crew_app/shared/theme/app_design_tokens.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-/// 卡片瓦片组件
-class EventCardTile extends StatelessWidget {
-  const EventCardTile({
+/// 通用的卡片瓦片组件
+/// 用于显示带有图标、标题、副标题和操作按钮的列表项
+class CardTile extends StatelessWidget {
+  const CardTile({
     super.key,
     required this.leading,
     required this.title,

@@ -3,7 +3,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-import 'avatar_icon.dart';
+import 'package:crew_app/shared/widgets/user_avatar_button.dart';
 
 class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchEventAppBar({
@@ -157,7 +157,7 @@ class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
                                   ), // 占位，宽度和 IconButton 差不多,
                                 Padding(
                                   padding: EdgeInsets.only(right: 6.w),
-                                  child: AvatarIcon(onTap: onAvatarTap),
+                                  child: UserAvatarButton(onTap: onAvatarTap),
                                 ),
                               ],
                             ),

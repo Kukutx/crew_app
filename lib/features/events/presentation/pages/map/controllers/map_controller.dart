@@ -5,9 +5,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
+import 'package:crew_app/shared/widgets/map/camera_move_optimizer.dart';
 
 /// 地图控制器，管理地图相关的所有逻辑
-class MapController {
+class MapController implements MapCameraController {
   MapController(this.ref);
 
   final Ref ref;
@@ -27,6 +28,7 @@ class MapController {
   }
   
   /// 更新地图中心位置（在 onCameraMove 时调用）
+  @override
   void updateCenterPosition(LatLng position) {
     _currentCenterPosition = position;
   }
@@ -289,6 +291,7 @@ class MapController {
 
   /// 判断地图中心是否在用户位置附近
   /// [threshold] 距离阈值（米），默认 50 米
+  @override
   bool isAtUserLocation({double threshold = 50.0}) {
     final userLoc = ref.read(userLocationProvider).value;
     if (userLoc == null || _currentCenterPosition == null) {

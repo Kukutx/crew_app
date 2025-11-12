@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../widgets/common/utils/event_image_cache_manager.dart';
+import 'package:crew_app/shared/widgets/image/image_cache_manager.dart';
 
 class EventMediaFullscreenScreen extends StatefulWidget {
   const EventMediaFullscreenScreen({
@@ -246,7 +246,7 @@ class _FullscreenImageViewer extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: url,
         cacheKey: cacheKey,
-        cacheManager: EventImageCacheManager.instance,
+          cacheManager: ImageCacheManager.instance,
         fit: BoxFit.contain,
         memCacheHeight: 512, // 合理压缩，减内存抖动
         fadeInDuration: const Duration(milliseconds: 200),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_basic_section.dart';
@@ -13,12 +13,12 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_sto
 import 'package:crew_app/features/events/presentation/widgets/sections/event_team_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/road_trip_editor_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
 import 'package:crew_app/features/events/state/events_api_service.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/marker_location_page_indicator.dart';
+import 'package:crew_app/shared/widgets/indicators/page_indicator.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/factories/location_selection_page_factory.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/config/event_creation_config.dart';
 import 'package:crew_app/features/events/presentation/widgets/mixins/event_form_mixin.dart';
@@ -1608,7 +1608,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 // 页面指示器（在点击起始页继续后显示，显示起始页和basic页的指示点）
                 if (_hasClickedStartContinue && !_canSwipe && _tabController.index == 0)
                   Center(
-                    child: MarkerLocationPageIndicator(
+                    child: PageIndicator(
                       controller: _routePageCtrl,
                       currentPage: _currentRoutePage,
                       totalPages: 2, // 只有起始页和basic页
@@ -1625,7 +1625,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 // 页面指示器（显示ToggleTabBar后显示所有页面的指示点）
                 if (_canSwipe && _tabController.index == 0)
                   Center(
-                    child: MarkerLocationPageIndicator(
+                    child: PageIndicator(
                       controller: _routePageCtrl,
                       currentPage: _currentRoutePage,
                       totalPages: _totalRoutePages,

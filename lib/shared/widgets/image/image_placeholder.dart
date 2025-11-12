@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-class EventImagePlaceholder extends StatelessWidget {
+/// 通用的图片占位符组件
+/// 用于显示图片加载失败或无图片时的占位视图
+class ImagePlaceholder extends StatelessWidget {
   final double? aspectRatio;
   final IconData icon;
 
-  const EventImagePlaceholder({
+  const ImagePlaceholder({
     super.key,
     this.aspectRatio,
     this.icon = Icons.image_not_supported_outlined,

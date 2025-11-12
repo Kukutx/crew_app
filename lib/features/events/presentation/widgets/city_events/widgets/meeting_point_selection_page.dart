@@ -1,5 +1,5 @@
 import 'package:crew_app/core/network/places/places_service.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/event_card_tile.dart';
+import 'package:crew_app/shared/widgets/cards/card_tile.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +58,7 @@ class MeetingPointSelectionPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24.h),
-              EventCardTile(
+              CardTile(
                 leading: const Icon(Icons.location_on_outlined),
                 title: meetingPointTitle,
                 subtitle: meetingPointSubtitle,
@@ -124,7 +124,7 @@ class _NearbyPlacesList extends StatelessWidget {
             ...places.map((place) {
               return Padding(
                 padding: EdgeInsets.only(bottom: 8.h),
-                child: EventCardTile(
+                child: CardTile(
                   leading: Icon(
                     Icons.place_outlined,
                     size: 20,

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_provider.dart';
-import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_stage_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_stage_provider.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

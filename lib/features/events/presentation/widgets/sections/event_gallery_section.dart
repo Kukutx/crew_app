@@ -1,12 +1,12 @@
-import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_section_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-import '../data/road_trip_editor_models.dart';
+import '../../pages/trips/data/road_trip_editor_models.dart';
+import 'event_section_card.dart';
 
-class RoadTripGallerySection extends StatelessWidget {
-  const RoadTripGallerySection({
+class EventGallerySection extends StatelessWidget {
+  const EventGallerySection({
     super.key,
     required this.items,
     required this.onPickImages,
@@ -22,7 +22,7 @@ class RoadTripGallerySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return RoadTripSectionCard(
+    return EventSectionCard(
       icon: Icons.photo_library_outlined,
       title: loc.road_trip_gallery_section_title,
       subtitle: loc.road_trip_gallery_section_subtitle,
@@ -37,7 +37,7 @@ class RoadTripGallerySection extends StatelessWidget {
         ),
       ),
       children: [
-        RoadTripGalleryGrid(
+        EventGalleryGrid(
           items: items,
           onPickImages: onPickImages,
           onRemove: onRemoveImage,
@@ -48,8 +48,8 @@ class RoadTripGallerySection extends StatelessWidget {
   }
 }
 
-class RoadTripGalleryGrid extends StatelessWidget {
-  const RoadTripGalleryGrid({
+class EventGalleryGrid extends StatelessWidget {
+  const EventGalleryGrid({
     super.key,
     required this.items,
     required this.onPickImages,
@@ -233,3 +233,4 @@ class _GalleryTile extends StatelessWidget {
     );
   }
 }
+

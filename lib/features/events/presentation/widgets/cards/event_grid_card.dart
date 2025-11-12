@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 
-import '../../data/event.dart';
-import '../pages/detail/events_detail_page.dart';
-import 'event_image_cache_manager.dart';
-import 'event_image_placeholder.dart';
+import '../../../data/event.dart';
+import '../../pages/detail/events_detail_page.dart';
+import '../common/event_image_cache_manager.dart';
+import '../common/event_image_placeholder.dart';
 
 /// A reusable grid card for displaying [Event] items inside masonry layouts.
 class EventGridCard extends StatelessWidget {
@@ -185,3 +185,4 @@ class EventGridCard extends StatelessWidget {
     );
   }
 }
+

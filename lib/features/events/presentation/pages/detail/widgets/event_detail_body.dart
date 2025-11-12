@@ -1,18 +1,19 @@
 import 'dart:math' as math;
 
 import 'package:crew_app/features/events/data/event.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_content_tabs.dart';
+import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_detail_constants.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_host_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_info_card.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_carousel.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_media_fullscreen_page.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_meeting_point_card.dart';
-import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_content_tabs.dart';
 import 'package:crew_app/features/events/presentation/pages/detail/widgets/event_summary_card.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class EventDetailBody extends StatefulWidget {
   final Event event;
@@ -54,15 +55,11 @@ class EventDetailBody extends StatefulWidget {
 
 class _EventDetailBodyState extends State<EventDetailBody>
     with SingleTickerProviderStateMixin {
-  static const double _baseHeaderHeight = 280;
-  static const double _extraStretchHeight = 140;
-  static const double _maxCornerRadius = 28;
-  static const double _fullScreenTriggerOffset = 160;
-
   late final ScrollController _scrollController;
   late final AnimationController _headerStretchController;
   bool _navigatingToFullScreen = false;
   int _lastReportedPage = 0;
+  double _lastOffset = 0.0;
 
   int get _mediaCount {
     final imageCount = widget.event.imageUrls
@@ -85,7 +82,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
       lowerBound: 0,
       upperBound: 1,
       value: 0,
-      duration: const Duration(milliseconds: 220),
+      duration: EventDetailConstants.headerStretchDuration,
     );
     _scrollController.addListener(_handleScroll);
     _lastReportedPage = widget.currentPage;
@@ -112,17 +109,31 @@ class _EventDetailBodyState extends State<EventDetailBody>
       return;
     }
     final offset = _scrollController.offset;
+    
+    // 性能优化：只在偏移量变化足够大时才更新
+    if ((offset - _lastOffset).abs() < 0.5) {
+      return;
+    }
+    _lastOffset = offset;
+    
     if (!_hasMedia) {
       if (_headerStretchController.value != 0) {
-        _headerStretchController.animateTo(0,
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut);
+        _headerStretchController.animateTo(
+          0,
+          duration: EventDetailConstants.headerStretchResetDuration,
+          curve: Curves.easeOut,
+        );
       }
       return;
     }
+    
     if (offset < 0) {
-      final progress = math.min(1.0, -offset / _fullScreenTriggerOffset);
-      if (_headerStretchController.value != progress) {
+      final progress = math.min(
+        1.0,
+        -offset / EventDetailConstants.fullScreenTriggerOffset,
+      );
+      // 只在值变化足够大时才更新，减少不必要的重建
+      if ((_headerStretchController.value - progress).abs() > 0.01) {
         _headerStretchController.value = progress;
       }
       if (!_navigatingToFullScreen && progress >= 1.0) {
@@ -133,9 +144,11 @@ class _EventDetailBodyState extends State<EventDetailBody>
       }
     } else {
       if (_headerStretchController.value != 0) {
-        _headerStretchController.animateTo(0,
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut);
+        _headerStretchController.animateTo(
+          0,
+          duration: EventDetailConstants.headerStretchResetDuration,
+          curve: Curves.easeOut,
+        );
       }
     }
   }
@@ -158,8 +171,9 @@ class _EventDetailBodyState extends State<EventDetailBody>
             ),
           );
         },
-        transitionDuration: const Duration(milliseconds: 220),
-        reverseTransitionDuration: const Duration(milliseconds: 220),
+        transitionDuration: EventDetailConstants.fullscreenTransitionDuration,
+        reverseTransitionDuration:
+            EventDetailConstants.fullscreenTransitionDuration,
       ),
     );
     if (!mounted) return;
@@ -172,8 +186,11 @@ class _EventDetailBodyState extends State<EventDetailBody>
       }
       _handlePageChanged(targetIndex);
     }
-    _headerStretchController.animateTo(0,
-        duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    _headerStretchController.animateTo(
+      0,
+      duration: EventDetailConstants.headerStretchResetDuration,
+      curve: Curves.easeOut,
+    );
   }
 
   void _handlePageChanged(int index) {
@@ -189,13 +206,19 @@ class _EventDetailBodyState extends State<EventDetailBody>
   }
 
   double get _currentHeaderHeight =>
-      _baseHeaderHeight + _extraStretchHeight * _headerStretchController.value;
+      EventDetailConstants.baseHeaderHeight +
+      EventDetailConstants.extraStretchHeight *
+          _headerStretchController.value;
 
   double get _currentCornerRadius =>
-      _maxCornerRadius * (.6 - _headerStretchController.value);
+      EventDetailConstants.maxCornerRadius *
+      (0.6 - _headerStretchController.value);
 
   double get _currentGradientOpacity =>
-      0.25 + 0.55 * _headerStretchController.value;
+      EventDetailConstants.gradientOpacityMin +
+      (EventDetailConstants.gradientOpacityMax -
+              EventDetailConstants.gradientOpacityMin) *
+          _headerStretchController.value;
 
   void _handleHeaderTap() {
     if (_navigatingToFullScreen || !_hasMedia) {
@@ -235,7 +258,8 @@ class _EventDetailBodyState extends State<EventDetailBody>
                     onTap: _handleHeaderTap,
                     onVerticalDragEnd: (details) {
                       final velocity = details.primaryVelocity ?? 0;
-                      if (velocity < -650 && !_navigatingToFullScreen) {
+                      if (velocity < -EventDetailConstants.verticalDragVelocityThreshold &&
+                          !_navigatingToFullScreen) {
                         if (!_hasMedia) {
                           return;
                         }
@@ -277,14 +301,15 @@ class _EventDetailBodyState extends State<EventDetailBody>
                               child: IgnorePointer(
                                 ignoring: true,
                                 child: Container(
-                                  height: topInset + 72,
+                                  height: topInset +
+                                      EventDetailConstants.topGradientHeight,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        Colors.black.withValues(alpha: 
-                                          math.min(1.0, gradientOpacity * 0.9),
+                                        Colors.black.withValues(
+                                          alpha: math.min(1.0, gradientOpacity * 0.9),
                                         ),
                                         Colors.transparent,
                                       ],
@@ -315,7 +340,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                   onToggleFollow: widget.onToggleFollow,
                   isFollowing: widget.isFollowing,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: EventDetailConstants.sectionSpacing),
                 SizedBox(
                   width: double.infinity,
                   child: EventSummaryCard(
@@ -324,7 +349,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                     onTapCalculate: _openGroupExpensePage,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: EventDetailConstants.sectionSpacing),
                 EventMeetingPointCard(
                   loc: widget.loc,
                   meetingPoint: widget.event.address?.isNotEmpty == true
@@ -332,12 +357,12 @@ class _EventDetailBodyState extends State<EventDetailBody>
                       : widget.event.location,
                   onViewOnMap: widget.onTapLocation,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: EventDetailConstants.sectionSpacing),
                 EventInfoCard(
                   event: widget.event,
                   loc: widget.loc,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: EventDetailConstants.sectionSpacing),
                 EventContentTabs(loc: widget.loc),
                 const SizedBox(height: 16),
                 Center(
@@ -346,7 +371,7 @@ class _EventDetailBodyState extends State<EventDetailBody>
                     child: Text(widget.loc.event_organizer_disclaimer_title),
                   ),
                 ),
-                const SizedBox(height: 120),
+                const SizedBox(height: EventDetailConstants.bottomSpacing),
               ],
             ),
           ),

@@ -1,31 +1,30 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'scroll_activity_provider.dart';
 
-typedef ScrollActivityChangedCallback = void Function(bool isScrolling);
-
-class ScrollActivityListener extends StatefulWidget {
+class ScrollActivityListener extends ConsumerStatefulWidget {
   const ScrollActivityListener({
     super.key,
-    required this.onScrollActivityChanged,
     required this.child,
     this.listenToPointerActivity = false,
   });
 
-  final ScrollActivityChangedCallback onScrollActivityChanged;
   final Widget child;
   final bool listenToPointerActivity;
 
   @override
-  State<ScrollActivityListener> createState() => _ScrollActivityListenerState();
+  ConsumerState<ScrollActivityListener> createState() => _ScrollActivityListenerState();
 }
 
-class _ScrollActivityListenerState extends State<ScrollActivityListener> {
+class _ScrollActivityListenerState extends ConsumerState<ScrollActivityListener> {
   bool _pointerActive = false;
 
   bool _handleNotification(ScrollNotification notification) {
+    final notifier = ref.read(scrollActivityProvider.notifier);
     if (notification is ScrollStartNotification) {
-      widget.onScrollActivityChanged(true);
+      notifier.updateScrollActivity(true);
     } else if (notification is ScrollEndNotification) {
-      widget.onScrollActivityChanged(false);
+      notifier.updateScrollActivity(false);
     }
     return false;
   }
@@ -35,7 +34,7 @@ class _ScrollActivityListenerState extends State<ScrollActivityListener> {
       return;
     }
     _pointerActive = true;
-    widget.onScrollActivityChanged(true);
+    ref.read(scrollActivityProvider.notifier).updateScrollActivity(true);
   }
 
   void _handlePointerEnd() {
@@ -43,7 +42,7 @@ class _ScrollActivityListenerState extends State<ScrollActivityListener> {
       return;
     }
     _pointerActive = false;
-    widget.onScrollActivityChanged(false);
+    ref.read(scrollActivityProvider.notifier).updateScrollActivity(false);
   }
 
   @override

@@ -1,6 +1,7 @@
+import 'package:crew_app/features/events/data/moment.dart' as moment_data;
 import 'package:crew_app/features/events/presentation/pages/moment/sheets/moment_post_comments_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/moment/widgets/moment_post_detail_screen.dart';
-import 'package:crew_app/features/events/presentation/widgets/moment_post_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/cards/moment_post_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class EventMomentCard extends StatelessWidget {
       likes: 36,
       comments: 12,
       accentColor: Color(0xFF6750A4),
-      momentType: MomentType.event,
+      momentType: moment_data.MomentType.event,
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
@@ -54,7 +55,7 @@ class EventMomentCard extends StatelessWidget {
       likes: 36,
       comments: 12,
       accentColor: Color(0xFF6750A4),
-      momentType: MomentType.event,
+      momentType: moment_data.MomentType.event,
       commentItems: [
         MomentComment(
           author: 'Lydia',
@@ -78,7 +79,7 @@ class EventMomentCard extends StatelessWidget {
       likes: 52,
       comments: 18,
       accentColor: Color(0xFF4C6ED7),
-      momentType: MomentType.event,
+      momentType: moment_data.MomentType.event,
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',
@@ -107,7 +108,7 @@ class EventMomentCard extends StatelessWidget {
       likes: 21,
       comments: 7,
       accentColor: Color(0xFF377D71),
-      momentType: MomentType.event,
+      momentType: moment_data.MomentType.event,
       mediaAssets: [
         'assets/images/crew.png',
         'assets/images/crew.png',

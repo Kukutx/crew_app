@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/map_canvas.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/widgets/location_info_bottom_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/marker_location_info_bottom_sheet.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/theme/app_design_tokens.dart';
@@ -13,9 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-/// 地图位置选择页面
-class LocationPickerMapPage extends ConsumerStatefulWidget {
-  const LocationPickerMapPage({
+/// 地图位置选择屏幕
+class LocationPickerMapScreen extends ConsumerStatefulWidget {
+  const LocationPickerMapScreen({
     super.key,
     required this.onLocationSelected,
     this.initialLocation,
@@ -27,12 +27,12 @@ class LocationPickerMapPage extends ConsumerStatefulWidget {
   final Color? markerColor;
 
   @override
-  ConsumerState<LocationPickerMapPage> createState() =>
-      _LocationPickerMapPageState();
+  ConsumerState<LocationPickerMapScreen> createState() =>
+      _LocationPickerMapScreenState();
 }
 
-class _LocationPickerMapPageState
-    extends ConsumerState<LocationPickerMapPage> {
+class _LocationPickerMapScreenState
+    extends ConsumerState<LocationPickerMapScreen> {
   GoogleMapController? _mapController;
   LatLng? _currentLocation;
   String? _currentAddress;
@@ -189,7 +189,7 @@ class _LocationPickerMapPageState
             left: 0,
             right: 0,
             bottom: 0,
-            child: LocationInfoBottomSheet(
+            child: MarkerLocationInfoBottomSheet(
               addressFuture: _addressFuture,
               nearbyPlacesFuture: _nearbyPlacesFuture,
               isLoading: _isLoadingAddress,

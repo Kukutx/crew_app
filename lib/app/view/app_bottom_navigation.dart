@@ -25,56 +25,23 @@ class AppBottomNavigation extends ConsumerStatefulWidget {
 }
 
 class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
-  int _navigationIndex = 1;
-  ProviderSubscription<MapOverlaySheetType>? _mapSheetSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _mapSheetSubscription = ref.listenManual(mapOverlaySheetProvider, (
-      previous,
-      next,
-    ) {
-      if (!mounted) {
-        return;
-      }
-      switch (next) {
-        case MapOverlaySheetType.none:
-          if (_navigationIndex != 1) {
-            setState(() => _navigationIndex = 1);
-          }
-          break;
-        case MapOverlaySheetType.explore:
-          if (_navigationIndex != 0) {
-            setState(() => _navigationIndex = 0);
-          }
-          break;
-        case MapOverlaySheetType.chat:
-          if (_navigationIndex != 2) {
-            setState(() => _navigationIndex = 2);
-          }
-          break;
-        case MapOverlaySheetType.createRoadTrip:
-        // tips: 可能是隐患，需要确认
-          if (_navigationIndex != 1) {
-            setState(() => _navigationIndex = 1);
-          }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _mapSheetSubscription?.close();
-    super.dispose();
+  /// 根据 MapOverlaySheetType 计算导航索引
+  int _getNavigationIndex(MapOverlaySheetType sheetType) {
+    switch (sheetType) {
+      case MapOverlaySheetType.explore:
+        return 0;
+      case MapOverlaySheetType.none:
+      case MapOverlaySheetType.createRoadTrip:
+      case MapOverlaySheetType.createCityEvent:
+        return 1;
+      case MapOverlaySheetType.chat:
+        return 2;
+    }
   }
 
   void _handleDestinationSelected(int index) {
-    if (_navigationIndex != index) {
-      setState(() => _navigationIndex = index);
-      // 添加触感反馈
-      HapticFeedback.lightImpact();
-    }
+    // 添加触感反馈
+    HapticFeedback.lightImpact();
 
     final sheetNotifier = ref.read(mapOverlaySheetProvider.notifier);
     switch (index) {
@@ -99,6 +66,20 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
     final borderRadius = BorderRadius.circular(18.r);
     final glassBorderColor = colorScheme.outline.withValues(alpha: 0.14);
 
+    // 使用 select 优化性能，只监听需要的部分
+    final mapSheetType = ref.watch(mapOverlaySheetProvider);
+    final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
+    final baseVisible = widget.show && ref.watch(bottomNavigationVisibilityProvider);
+    
+    // 计算导航索引
+    final navigationIndex = _getNavigationIndex(mapSheetType);
+    
+    // 出现创建行程时强制隐藏；其它 Sheet 只在完全展开时隐藏
+    final hideForCreate = mapSheetType == MapOverlaySheetType.createRoadTrip;
+    final hideForOthers = mapSheetType != MapOverlaySheetType.none &&
+        mapSheetStage == MapOverlaySheetStage.expanded;
+    final showBottomNav = baseVisible && !hideForCreate && !hideForOthers;
+
     BoxDecoration navDecoration(bool isScrolling) {
       return BoxDecoration(
         borderRadius: borderRadius,
@@ -119,20 +100,6 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
         ],
       );
     }
-
-  // ✅ 关注 Overlay 类型/阶段
-  final mapSheetType  = ref.watch(mapOverlaySheetProvider);
-  // 如果你已经在项目里用了 stage，可一起判断；没有就删掉下一行和相关逻辑
-  final mapSheetStage = ref.watch(mapOverlaySheetStageProvider);
-
-  // ✅ 出现创建行程时强制隐藏；其它 Sheet 只在完全展开时隐藏（阶段一、二显示，阶段三隐藏）
-  final hideForCreate = mapSheetType == MapOverlaySheetType.createRoadTrip;
-  final hideForOthers = mapSheetType != MapOverlaySheetType.none &&
-    mapSheetStage == MapOverlaySheetStage.expanded;
-
-      
-    final baseVisible = widget.show && ref.watch(bottomNavigationVisibilityProvider);
-  final showBottomNav = baseVisible && !hideForCreate && !hideForOthers; // 👈 关键
 
     return SafeArea(
       child: AnimatedSlide(
@@ -175,7 +142,7 @@ class _AppBottomNavigationState extends ConsumerState<AppBottomNavigation> {
                     child: NavigationBar(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
-                      selectedIndex: _navigationIndex,
+                      selectedIndex: navigationIndex,
                       onDestinationSelected: _handleDestinationSelected,
                       destinations: const [
                         NavigationDestination(

@@ -64,11 +64,11 @@ class _BreathingMarkerOverlayState extends State<BreathingMarkerOverlay>
   @override
   void didUpdateWidget(BreathingMarkerOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 如果开始拖拽，启动动画
+    // 如果开始选择标记点，启动动画
     if (widget.draggingPosition != null && oldWidget.draggingPosition == null) {
       _animationController.repeat();
     }
-    // 如果停止拖拽，停止动画
+    // 如果停止选择标记点，停止动画
     if (widget.draggingPosition == null && oldWidget.draggingPosition != null) {
       _animationController.stop();
       _animationController.reset();
@@ -103,20 +103,24 @@ class _BreathingMarkerOverlayState extends State<BreathingMarkerOverlay>
 
     final markerColor = _getMarkerColor(widget.draggingType);
 
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: _BreathingMarkerPainter(
-            position: widget.draggingPosition!,
-            cameraPosition: widget.cameraPosition,
-            color: markerColor,
-            scale: _scaleAnimation.value,
-            opacity: _opacityAnimation.value,
-          ),
-          child: const SizedBox.expand(),
-        );
-      },
+    return IgnorePointer(
+      // 不阻止地图交互，只显示视觉效果
+      ignoring: true,
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: _BreathingMarkerPainter(
+              position: widget.draggingPosition!,
+              cameraPosition: widget.cameraPosition,
+              color: markerColor,
+              scale: _scaleAnimation.value,
+              opacity: _opacityAnimation.value,
+            ),
+            child: const SizedBox.expand(),
+          );
+        },
+      ),
     );
   }
 }
@@ -169,37 +173,52 @@ class _BreathingMarkerPainter extends CustomPainter {
   }
 
   /// 将经纬度坐标转换为屏幕坐标
+  /// 使用标准的墨卡托投影，考虑地图的旋转和倾斜
   Offset _latLngToScreen(LatLng latLng, CameraPosition camera, Size size) {
-    // 简化的墨卡托投影计算
     final zoom = camera.zoom;
     final center = camera.target;
+    final bearing = camera.bearing;
+    final tilt = camera.tilt;
 
-    // 计算缩放比例
-    final scale = 256.0 * math.pow(2.0, zoom).toDouble();
-
-    // 墨卡托投影函数
-    double mercatorX(double lng) {
-      return lng / 360.0 + 0.5;
+    // Google Maps 使用的标准墨卡托投影
+    // 计算世界坐标（像素）
+    double worldX(double lng) {
+      return (lng + 180.0) / 360.0 * 256.0 * math.pow(2.0, zoom).toDouble();
     }
 
-    double mercatorY(double lat) {
-      final sinLat = math.sin(lat * math.pi / 180.0);
-      return 0.5 - math.log((1 + sinLat) / (1 - sinLat)) / (4 * math.pi);
+    double worldY(double lat) {
+      final latRad = lat * math.pi / 180.0;
+      final mercN = math.log(math.tan((math.pi / 4) + (latRad / 2)));
+      return (128.0 - (mercN * 128.0 / math.pi)) * math.pow(2.0, zoom).toDouble();
     }
 
-    // 计算中心点和目标点的墨卡托坐标
-    final centerX = mercatorX(center.longitude);
-    final centerY = mercatorY(center.latitude);
-    final pointX = mercatorX(latLng.longitude);
-    final pointY = mercatorY(latLng.latitude);
+    // 计算中心点和目标点的世界坐标
+    final centerWorldX = worldX(center.longitude);
+    final centerWorldY = worldY(center.latitude);
+    final pointWorldX = worldX(latLng.longitude);
+    final pointWorldY = worldY(latLng.latitude);
 
-    // 计算屏幕坐标（相对于中心点的偏移）
-    final dx = (pointX - centerX) * scale;
-    final dy = (pointY - centerY) * scale;
+    // 计算相对于中心点的像素偏移
+    final dx = pointWorldX - centerWorldX;
+    final dy = pointWorldY - centerWorldY;
 
-    // 转换为屏幕坐标（考虑地图旋转和倾斜）
-    final screenX = size.width / 2 + dx;
-    final screenY = size.height / 2 + dy;
+    // 考虑地图旋转（bearing）
+    final bearingRad = bearing * math.pi / 180.0;
+    final cosBearing = math.cos(bearingRad);
+    final sinBearing = math.sin(bearingRad);
+    
+    // 旋转后的偏移
+    final rotatedDx = dx * cosBearing - dy * sinBearing;
+    final rotatedDy = dx * sinBearing + dy * cosBearing;
+
+    // 考虑地图倾斜（tilt）- 简化处理，主要影响垂直方向
+    final tiltRad = tilt * math.pi / 180.0;
+    final tiltFactor = math.cos(tiltRad);
+    final adjustedDy = rotatedDy * tiltFactor;
+
+    // 转换为屏幕坐标（屏幕中心为原点）
+    final screenX = size.width / 2 + rotatedDx;
+    final screenY = size.height / 2 + adjustedDy;
 
     return Offset(screenX, screenY);
   }
@@ -207,20 +226,21 @@ class _BreathingMarkerPainter extends CustomPainter {
   @override
   bool shouldRepaint(_BreathingMarkerPainter oldDelegate) {
     // 优化：只在关键属性变化时重绘
-    // 对于相机位置，只在变化超过阈值时重绘
     if (oldDelegate.position != position ||
         oldDelegate.scale != scale ||
         oldDelegate.opacity != opacity) {
       return true;
     }
     
-    // 相机位置变化时，只在变化超过阈值时重绘
+    // 相机位置变化时，需要及时更新以保持呼吸效果位置准确
     if (cameraPosition != null && oldDelegate.cameraPosition != null) {
       final oldPos = oldDelegate.cameraPosition!;
       final newPos = cameraPosition!;
-      // 只在缩放级别或位置变化超过阈值时重绘
-      if ((newPos.zoom - oldPos.zoom).abs() > 0.1 ||
-          _calculateDistance(newPos.target, oldPos.target) > 5) {
+      // 任何相机变化都需要重绘，确保呼吸效果跟随地图移动
+      if (oldPos.target != newPos.target ||
+          (newPos.zoom - oldPos.zoom).abs() > 0.01 ||
+          (newPos.bearing - oldPos.bearing).abs() > 0.1 ||
+          (newPos.tilt - oldPos.tilt).abs() > 0.1) {
         return true;
       }
       return false;

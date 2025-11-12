@@ -1,14 +1,14 @@
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/widgets/card_tile.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/event_card_tile.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// 路线选择页面（起始页）
-class RouteSelectionPage extends StatelessWidget {
-  const RouteSelectionPage({
+class TripRouteSelectionPage extends StatelessWidget {
+  const TripRouteSelectionPage({
     super.key,
     this.scrollCtrl,
     required this.onContinue,
@@ -56,14 +56,14 @@ class RouteSelectionPage extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           sliver: SliverList.list(
             children: [
-              CardTile(
+              EventCardTile(
                 leading: const Icon(Icons.radio_button_checked),
                 title: departureTitle,
                 onTap: onEditDeparture,
                 onLeadingTap: onSearchDeparture,
               ),
               SizedBox(height: 12.h),
-              CardTile(
+              EventCardTile(
                 leading: const Icon(Icons.place_outlined),
                 title: destinationTitle,
                 onTap: departurePosition != null ? onEditDestination : null,

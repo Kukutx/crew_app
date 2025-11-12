@@ -1,10 +1,10 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import 'road_trip_section_card.dart';
+import 'event_section_card.dart';
 
-class RoadTripStorySection extends StatelessWidget {
-  const RoadTripStorySection({
+class EventStorySection extends StatelessWidget {
+  const EventStorySection({
     super.key,
     required this.descriptionController,
   });
@@ -14,7 +14,7 @@ class RoadTripStorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return RoadTripSectionCard(
+    return EventSectionCard(
       icon: Icons.description_outlined,
       title: loc.road_trip_story_section_title,
       subtitle: loc.road_trip_story_section_subtitle,
@@ -22,7 +22,7 @@ class RoadTripStorySection extends StatelessWidget {
         TextFormField(
           controller: descriptionController,
           style: const TextStyle(fontSize: 14),
-          decoration: roadTripInputDecoration(
+          decoration: eventInputDecoration(
             context,
             loc.road_trip_story_description_label,
             loc.road_trip_story_description_hint,
@@ -37,3 +37,4 @@ class RoadTripStorySection extends StatelessWidget {
     );
   }
 }
+

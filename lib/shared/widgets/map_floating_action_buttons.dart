@@ -141,16 +141,6 @@ class MapFloatingActionButtons extends StatelessWidget {
       final hasAtLeastOne = hasStart || hasDestination;
 
       return [
-        // 添加途径点按钮（在 basic 点继续后，且起点和终点都有值才显示）
-        MapFloatingButtonConfig(
-          icon: FontAwesomeIcons.route,
-          heroTag: 'events_map_add_waypoint_fab',
-          backgroundColor: theme.colorScheme.secondary,
-          foregroundColor: theme.colorScheme.onSecondary,
-          onPressed: onAddWaypoint ?? () {},
-          tooltip: '添加途径点',
-          visible: canSwipe && hasBoth,
-        ),
         // 编辑按钮（起点和终点至少有一个有值就显示）
         MapFloatingButtonConfig(
           icon: Icons.edit,

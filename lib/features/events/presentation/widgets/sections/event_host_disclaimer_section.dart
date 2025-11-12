@@ -1,9 +1,9 @@
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'road_trip_section_card.dart';
+import 'event_section_card.dart';
 
-class RoadTripHostDisclaimerSection extends StatelessWidget {
-  const RoadTripHostDisclaimerSection({
+class EventHostDisclaimerSection extends StatelessWidget {
+  const EventHostDisclaimerSection({
     super.key,
     required this.disclaimerController,
   });
@@ -13,7 +13,7 @@ class RoadTripHostDisclaimerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return RoadTripSectionCard(
+    return EventSectionCard(
       icon: Icons.shield_moon_outlined,
       title: loc.road_trip_disclaimer_section_title,
       subtitle: loc.road_trip_disclaimer_section_subtitle,
@@ -21,7 +21,7 @@ class RoadTripHostDisclaimerSection extends StatelessWidget {
         TextFormField(
           controller: disclaimerController,
           style: const TextStyle(fontSize: 14),
-          decoration: roadTripInputDecoration(
+          decoration: eventInputDecoration(
             context,
             loc.road_trip_disclaimer_content_label,
             loc.road_trip_disclaimer_content_hint,
@@ -36,3 +36,4 @@ class RoadTripHostDisclaimerSection extends StatelessWidget {
     );
   }
 }
+

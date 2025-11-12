@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:crew_app/features/events/presentation/pages/trips/widgets/road_trip_gallery_section.dart';
+import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/presentation/widgets/sections/event_gallery_section.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,11 +11,11 @@ import 'package:image_picker/image_picker.dart';
 export 'data/road_trip_editor_models.dart';
 
 import 'data/road_trip_editor_models.dart';
-import 'widgets/road_trip_basic_section.dart';
-import 'widgets/road_trip_route_section.dart';
-import 'widgets/road_trip_story_section.dart';
-import 'widgets/road_trip_team_section.dart';
-import 'widgets/road_trip_host_disclaimer_section.dart';
+import 'package:crew_app/features/events/presentation/widgets/sections/event_basic_section.dart';
+import 'package:crew_app/features/events/presentation/widgets/sections/trips/trip_route_section.dart';
+import 'package:crew_app/features/events/presentation/widgets/sections/event_story_section.dart';
+import 'package:crew_app/features/events/presentation/widgets/sections/event_team_section.dart';
+import 'package:crew_app/features/events/presentation/widgets/sections/event_host_disclaimer_section.dart';
 
 /// API provider stub ---------------------------------------------------------
 final eventsApiProvider = Provider<EventsApi>((ref) => EventsApi());
@@ -76,7 +77,9 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       _hostDisclaimerCtrl.text = initial.hostDisclaimer;
 
       // 解析途经点坐标字符串为 LatLng
-      // 注意：waypoints 是扁平列表，不区分去程和返程，这里暂时全部放到去程
+      // 注意：waypoints 是扁平列表，后端存储时不区分去程和返程
+      // 由于无法准确区分哪些是去程、哪些是返程，这里将所有途经点加载到去程列表
+      // 用户可以在编辑时手动调整去程和返程的途经点
       final waypoints = <LatLng>[];
       for (final wpStr in initial.waypoints) {
         final parts = wpStr.split(',');
@@ -114,7 +117,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
       );
       _state = initialState;
       
-      // 将解析的途经点加载到去程列表（编辑页面暂时不区分去程和返程）
+      // 将所有途经点加载到去程列表（用户可在编辑时调整）
       _forwardWps.addAll(waypoints);
     }
   }
@@ -291,25 +294,39 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
   final List<LatLng> _forwardWps = []; // 去程途经点
   final List<LatLng> _returnWps = []; // 返程途经点
 
-  // 在编辑页面中，途经点添加功能需要从地图选择
-  // 这里暂时提供空实现，实际使用时需要打开地图选择界面
-  void _onAddForward() {
-    // TODO: 在编辑页面中打开地图选择界面来选择途经点
-    // 暂时不做任何操作，因为编辑页面可能不需要地图选择功能
+  // 添加前往途径点（从 LocationSearchScreen 返回）
+  void _onAddForward(PlaceDetails place) {
+    final location = place.location;
+    if (location == null) return;
+    
+    setState(() {
+      _forwardWps.add(location);
+    });
   }
   
   void _onRemoveForward(int i) => setState(() {
     if (i >= 0 && i < _forwardWps.length) _forwardWps.removeAt(i);
   });
   
-  void _onReorderForward(int oldIndex, int newIndex) => setState(() {
-    final item = _forwardWps.removeAt(oldIndex);
-    _forwardWps.insert(newIndex, item);
-  });
+  void _onReorderForward(int oldIndex, int newIndex) {
+    if (oldIndex == newIndex) return;
+    if (oldIndex < 0 || oldIndex >= _forwardWps.length) return;
+    if (newIndex < 0 || newIndex >= _forwardWps.length) return;
+    
+    setState(() {
+      final item = _forwardWps.removeAt(oldIndex);
+      _forwardWps.insert(newIndex, item);
+    });
+  }
 
-  void _onAddReturn() {
-    // TODO: 在编辑页面中打开地图选择界面来选择途经点
-    // 暂时不做任何操作，因为编辑页面可能不需要地图选择功能
+  // 添加返回途径点（从 LocationSearchScreen 返回）
+  void _onAddReturn(PlaceDetails place) {
+    final location = place.location;
+    if (location == null) return;
+    
+    setState(() {
+      _returnWps.add(location);
+    });
   }
   
   void _onRemoveReturn(int i) => setState(() {
@@ -341,13 +358,13 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 120),
             children: [
-              RoadTripBasicSection(
+              EventBasicSection(
                 titleController: _titleCtrl,
                 dateRange: _state.dateRange,
                 onPickDateRange: _pickDateRange,
               ),
 
-              RoadTripRouteSection(
+              TripRouteSection(
                 routeType: _state.routeType,
                 onRouteTypeChanged: (type) => setState(() {
                   _state = _state.copyWith(routeType: type);
@@ -362,7 +379,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                 onRemoveReturn: _onRemoveReturn,
                 onReorderReturn: _onReorderReturn,
               ),
-              RoadTripTeamSection(
+              EventTeamSection(
                 maxParticipants: _maxParticipants,
                 onMaxParticipantsChanged: (value) => setState(() {
                   _maxParticipants = value;
@@ -387,14 +404,14 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage> {
                   );
                 }),
               ),
-              RoadTripGallerySection(
+              EventGallerySection(
                 items: _state.galleryItems,
                 onPickImages: _pickImages,
                 onRemoveImage: _removeGalleryItem,
                 onSetCover: _setCover,
               ),
-              RoadTripStorySection(descriptionController: _descriptionCtrl),
-              RoadTripHostDisclaimerSection(
+              EventStorySection(descriptionController: _descriptionCtrl),
+              EventHostDisclaimerSection(
                 disclaimerController: _hostDisclaimerCtrl,
               ),
               const SizedBox(height: 12),

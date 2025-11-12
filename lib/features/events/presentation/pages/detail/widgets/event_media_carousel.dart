@@ -6,8 +6,8 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../widgets/event_image_cache_manager.dart';
-import '../../../widgets/event_image_placeholder.dart';
+import '../../../widgets/common/event_image_cache_manager.dart';
+import '../../../widgets/common/event_image_placeholder.dart';
 
 class EventMediaCarousel extends StatefulWidget {
   final Event event;

@@ -1,15 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:crew_app/features/events/data/moment.dart';
+import 'package:crew_app/features/events/state/moment_providers.dart';
+import 'package:crew_app/features/events/utils/moment_image_helper.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
-
-enum MomentType {
-  instant,
-  event,
-}
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CreateMomentScreen extends ConsumerStatefulWidget {
   const CreateMomentScreen({super.key});
@@ -19,19 +17,22 @@ class CreateMomentScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
-  final _commentController = TextEditingController();
+  final _contentController = TextEditingController();
+  final _titleController = TextEditingController();
   final _locationController = TextEditingController();
-  final _picker = ImagePicker();
-  
+
   MomentType _selectedType = MomentType.instant;
-  File? _selectedMedia;
-  bool _isVideo = false;
+  List<File> _selectedImages = [];
   bool _isLoadingLocation = false;
   bool _isLoadingAddress = false;
+  String? _country;
+  String? _city;
+  LatLng? _currentLocation;
 
   @override
   void dispose() {
-    _commentController.dispose();
+    _contentController.dispose();
+    _titleController.dispose();
     _locationController.dispose();
     super.dispose();
   }
@@ -46,7 +47,7 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
       // 获取当前位置
       final locationCtrl = ref.read(userLocationProvider.notifier);
       final location = await locationCtrl.refreshNow();
-      
+
       if (location == null || !mounted) {
         setState(() {
           _isLoadingLocation = false;
@@ -62,18 +63,25 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
 
       setState(() {
         _isLoadingLocation = false;
+        _currentLocation = location;
       });
 
       // 获取地址
       final manager = ref.read(locationSelectionManagerProvider);
       final address = await manager.reverseGeocode(location);
-      
+
       if (mounted) {
         setState(() {
           _locationController.text = address ?? '';
           _isLoadingAddress = false;
         });
       }
+
+      // TODO: 解析国家/城市信息
+      // 这里可以从地址字符串中解析，或者调用地理编码服务
+      // 暂时使用默认值
+      _country = 'CN'; // 默认值，实际应该从地址解析
+      _city = address?.split(',').firstOrNull;
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -87,36 +95,27 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
     }
   }
 
-  Future<void> _pickMedia({required bool isVideo}) async {
+  Future<void> _pickImages() async {
     try {
-      if (isVideo) {
-        final picked = await _picker.pickVideo(
-          source: ImageSource.gallery,
-        );
-        if (picked != null && mounted) {
-          setState(() {
-            _selectedMedia = File(picked.path);
-            _isVideo = true;
-          });
-        }
-      } else {
-        final picked = await _picker.pickImage(
-          source: ImageSource.gallery,
-        );
-        if (picked != null && mounted) {
-          setState(() {
-            _selectedMedia = File(picked.path);
-            _isVideo = false;
-          });
-        }
+      final images = await MomentImageHelper.pickMultipleImages();
+      if (images.isNotEmpty && mounted) {
+        setState(() {
+          _selectedImages.addAll(images);
+        });
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('选择媒体失败: $e')),
+          SnackBar(content: Text('选择图片失败: $e')),
         );
       }
     }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
   }
 
   void _showTypeSelector() {
@@ -153,11 +152,106 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
     );
   }
 
-  void _onCreateMoment() {
-    // TODO: 实现创建瞬间逻辑
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('创建瞬间功能开发中')),
+  Future<void> _onCreateMoment() async {
+    // 验证输入
+    if (_titleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请输入标题')),
+      );
+      return;
+    }
+
+    if (_selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请至少选择一张图片')),
+      );
+      return;
+    }
+
+    if (_country == null || _country!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请获取位置信息')),
+      );
+      return;
+    }
+
+    // 显示加载提示
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
+
+    try {
+      final apiService = ref.read(momentApiServiceProvider);
+
+      // 上传图片
+      final imageUrls = <String>[];
+      for (final imageFile in _selectedImages) {
+        final url = await apiService.uploadImage(filePath: imageFile.path);
+        if (url.isNotEmpty) {
+          imageUrls.add(url);
+        }
+      }
+
+      if (imageUrls.isEmpty) {
+        if (mounted) {
+          Navigator.pop(context); // 关闭加载对话框
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('图片上传失败')),
+          );
+        }
+        return;
+      }
+
+      // 创建请求
+      final request = CreateMomentRequest(
+        title: _titleController.text.trim(),
+        content: _contentController.text.trim().isEmpty
+            ? null
+            : _contentController.text.trim(),
+        coverImageUrl: imageUrls.first,
+        country: _country!,
+        city: _city,
+        images: imageUrls.length > 1 ? imageUrls.sublist(1) : [],
+      );
+
+      // 创建瞬间
+      final createNotifier = ref.read(createMomentProvider.notifier);
+      await createNotifier.createMoment(request);
+
+      final result = ref.read(createMomentProvider);
+      result.when(
+        data: (moment) {
+          if (moment != null && mounted) {
+            Navigator.pop(context); // 关闭加载对话框
+            Navigator.of(context).pop(true); // 返回成功
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('瞬间创建成功')),
+            );
+          }
+        },
+        loading: () {},
+        error: (error, stack) {
+          if (mounted) {
+            Navigator.pop(context); // 关闭加载对话框
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('创建失败: $error')),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // 关闭加载对话框
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('创建失败: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -213,98 +307,101 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Media placeholder - 现代化的卡片设计
-                      GestureDetector(
-                        onTap: () {
-                          // 显示选择媒体对话框
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainerHighest,
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(28),
-                                ),
-                              ),
-                              child: SafeArea(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      leading: const Icon(Icons.videocam, color: Colors.white),
-                                      title: const Text('Video', style: TextStyle(color: Colors.white)),
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        _pickMedia(isVideo: true);
-                                      },
-                                    ),
-                                    ListTile(
-                                      leading: const Icon(Icons.photo, color: Colors.white),
-                                      title: const Text('Photo', style: TextStyle(color: Colors.white)),
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        _pickMedia(isVideo: false);
-                                      },
-                                    ),
-                                  ],
-                                ),
+                      // 标题输入
+                      TextField(
+                        controller: _titleController,
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '标题',
+                          hintStyle: TextStyle(
+                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                          ),
+                          filled: false,
+                          border: InputBorder.none,
+                        ),
+                        maxLength: 50,
+                      ),
+                      const SizedBox(height: 16),
+                      // 图片选择区域
+                      if (_selectedImages.isEmpty)
+                        GestureDetector(
+                          onTap: _pickImages,
+                          child: Container(
+                            height: 400,
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: colorScheme.outline.withValues(alpha: 0.1),
+                                width: 1,
                               ),
                             ),
-                          );
-                        },
-                        child: Container(
-                          height: 400,
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: colorScheme.outline.withValues(alpha: 0.1),
-                              width: 1,
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                FaIcon(
+                                  FontAwesomeIcons.photoFilm,
+                                  size: 100,
+                                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  '点击添加图片',
+                                  style: TextStyle(
+                                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: _selectedMedia == null
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    FaIcon(
-                                      FontAwesomeIcons.photoFilm,
-                                      size: 100,
-                                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                        )
+                      else
+                        SizedBox(
+                          height: 400,
+                          child: PageView.builder(
+                            itemCount: _selectedImages.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: Image.file(
+                                      _selectedImages[index],
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
                                     ),
-                                    const SizedBox(height: 20),
-                                    Text(
-                                      'Add Photo or Video Below.',
-                                      style: TextStyle(
-                                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close, color: Colors.white),
+                                      onPressed: () => _removeImage(index),
                                     ),
-                                  ],
-                                )
-                              : _isVideo
-                                  ? const Center(
-                                      child: Icon(
-                                        Icons.play_circle_filled,
-                                        size: 100,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(24),
-                                      child: Image.file(
-                                        _selectedMedia!,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                      ),
-                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                      if (_selectedImages.isEmpty) ...[
+                        const SizedBox(height: 16),
+                        OutlinedButton.icon(
+                          onPressed: _pickImages,
+                          icon: const Icon(Icons.add_photo_alternate),
+                          label: const Text('添加图片'),
+                        ),
+                      ],
                       const SizedBox(height: 28),
-                      // Location input - 现代化的输入框
+                      // 位置输入
                       Container(
                         decoration: BoxDecoration(
                           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
@@ -335,9 +432,6 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                                     vertical: 18,
                                   ),
                                 ),
-                                onChanged: (value) {
-                                  // 用户可以手动修改地址
-                                },
                               ),
                             ),
                             Padding(
@@ -363,7 +457,7 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Comment input - 现代化的多行输入框
+                      // 内容输入
                       Container(
                         decoration: BoxDecoration(
                           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
@@ -374,13 +468,13 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                           ),
                         ),
                         child: TextField(
-                          controller: _commentController,
+                          controller: _contentController,
                           style: TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 16,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Comment....',
+                            hintText: '描述...',
                             hintStyle: TextStyle(
                               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                             ),
@@ -401,7 +495,7 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                 ),
               ),
             ),
-            // Create Moment button - 固定在底部
+            // 创建按钮
             Container(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               decoration: BoxDecoration(
@@ -432,7 +526,7 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
                       ),
                     ),
                     child: const Text(
-                      'Create Moment',
+                      '创建瞬间',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -449,4 +543,3 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
     );
   }
 }
-

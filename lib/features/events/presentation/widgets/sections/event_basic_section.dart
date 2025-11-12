@@ -5,10 +5,10 @@ import 'package:crew_app/shared/utils/formatted_date.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-import 'road_trip_section_card.dart';
+import 'event_section_card.dart';
 
-class RoadTripBasicSection extends StatelessWidget {
-  const RoadTripBasicSection({
+class EventBasicSection extends StatelessWidget {
+  const EventBasicSection({
     super.key,
     required this.titleController,
     required this.dateRange,
@@ -23,7 +23,7 @@ class RoadTripBasicSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
-    return RoadTripSectionCard(
+    return EventSectionCard(
       icon: Icons.rocket_launch_outlined,
       title: loc.road_trip_basic_section_title,
       subtitle: loc.road_trip_basic_section_subtitle,
@@ -31,7 +31,7 @@ class RoadTripBasicSection extends StatelessWidget {
         TextFormField(
           controller: titleController,
           style: TextStyle(fontSize: AppDesignTokens.fontSizeMD.sp),
-          decoration: roadTripInputDecoration(
+          decoration: eventInputDecoration(
             context,
             loc.road_trip_basic_title_label,
             loc.road_trip_basic_title_hint,
@@ -87,3 +87,4 @@ class RoadTripBasicSection extends StatelessWidget {
     );
   }
 }
+

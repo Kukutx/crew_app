@@ -7,34 +7,50 @@ import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'location_picker_map_page.dart';
+import 'location_picker_map_screen.dart';
 
-/// 地址搜索页面
-class LocationSearchPage extends ConsumerStatefulWidget {
-  const LocationSearchPage({
+/// 位置选择结果（包含位置和方向信息）
+class LocationSelectionResult {
+  const LocationSelectionResult({
+    required this.place,
+    required this.isForward,
+  });
+
+  final PlaceDetails place;
+  final bool isForward; // true: 前往, false: 返回
+}
+
+/// 地址搜索屏幕
+class LocationSearchScreen extends ConsumerStatefulWidget {
+  const LocationSearchScreen({
     super.key,
     required this.onLocationSelected,
     this.initialQuery,
     this.initialLocation,
     this.title,
+    this.isRoundTrip = false,
+    this.isEditMode = false, // 是否是编辑模式（编辑模式下直接调用回调，不返回结果）
   });
 
   final ValueChanged<PlaceDetails> onLocationSelected;
   final String? initialQuery;
   final LatLng? initialLocation;
   final String? title;
+  final bool isRoundTrip; // 是否是往返模式
+  final bool isEditMode; // 是否是编辑模式
 
   @override
-  ConsumerState<LocationSearchPage> createState() => _LocationSearchPageState();
+  ConsumerState<LocationSearchScreen> createState() => _LocationSearchScreenState();
 }
 
-class _LocationSearchPageState extends ConsumerState<LocationSearchPage> {
+class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
   Timer? _debounceTimer;
   List<PlaceDetails> _searchResults = [];
   bool _isSearching = false;
   String? _errorText;
+  bool _isForward = true; // 默认是前往
 
   @override
   void initState() {
@@ -107,15 +123,30 @@ class _LocationSearchPageState extends ConsumerState<LocationSearchPage> {
   }
 
   void _onResultTap(PlaceDetails place) {
-    widget.onLocationSelected(place);
-    Navigator.of(context).pop();
+    if (widget.isEditMode) {
+      // 编辑模式：直接调用回调并关闭页面
+      widget.onLocationSelected(place);
+      Navigator.of(context).pop();
+    } else if (widget.isRoundTrip) {
+      // 往返模式：返回包含方向信息的结果
+      Navigator.of(context).pop(LocationSelectionResult(
+        place: place,
+        isForward: _isForward,
+      ));
+    } else {
+      // 单程模式：返回位置（包装为 LocationSelectionResult，isForward 始终为 true）
+      Navigator.of(context).pop(LocationSelectionResult(
+        place: place,
+        isForward: true,
+      ));
+    }
   }
 
   void _onFindOnMap() {
-    // 打开地图选择页面
+    // 打开地图选择屏幕
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => LocationPickerMapPage(
+        builder: (context) => LocationPickerMapScreen(
           initialLocation: widget.initialLocation,
           onLocationSelected: (latLng, address) {
             // 创建一个临时的PlaceDetails
@@ -125,10 +156,19 @@ class _LocationSearchPageState extends ConsumerState<LocationSearchPage> {
               formattedAddress: address,
               location: latLng,
             );
-            widget.onLocationSelected(place);
-            // 关闭地图选择页面和搜索页面，返回到创建页面
-            Navigator.of(context).pop(); // 关闭 LocationPickerMapPage
-            Navigator.of(context).pop(); // 关闭 LocationSearchPage
+            // 根据模式处理
+            Navigator.of(context).pop(); // 关闭 LocationPickerMapScreen
+            if (widget.isEditMode) {
+              // 编辑模式：直接调用回调并关闭页面
+              widget.onLocationSelected(place);
+              Navigator.of(context).pop(); // 关闭 LocationSearchScreen
+            } else {
+              // 添加模式：返回 LocationSelectionResult
+              Navigator.of(context).pop(LocationSelectionResult(
+                place: place,
+                isForward: widget.isRoundTrip ? _isForward : true, // 单程模式默认为前往
+              )); // 关闭 LocationSearchScreen 并返回结果
+            }
           },
         ),
       ),
@@ -146,9 +186,51 @@ class _LocationSearchPageState extends ConsumerState<LocationSearchPage> {
       ),
       body: Column(
         children: [
+          // 往返模式下的方向选择下拉菜单（编辑模式下不显示）
+          if (widget.isRoundTrip && !widget.isEditMode)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: DropdownButtonFormField<bool>(
+                value: _isForward,
+                decoration: const InputDecoration(
+                  labelText: '选择方向',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                items: const [
+                  DropdownMenuItem<bool>(
+                    value: true,
+                    child: Row(
+                      children: [
+                        Icon(Icons.arrow_forward, size: 18),
+                        SizedBox(width: 8),
+                        Text('前往'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem<bool>(
+                    value: false,
+                    child: Row(
+                      children: [
+                        Icon(Icons.arrow_back, size: 18),
+                        SizedBox(width: 8),
+                        Text('返回'),
+                      ],
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _isForward = value;
+                    });
+                  }
+                },
+              ),
+            ),
           // 搜索框
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(16, widget.isRoundTrip ? 12 : 16, 16, 16),
             child: Row(
               children: [
                 Expanded(

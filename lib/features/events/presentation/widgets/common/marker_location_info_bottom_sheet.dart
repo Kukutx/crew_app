@@ -1,14 +1,17 @@
 import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:crew_app/shared/theme/app_design_tokens.dart';
 import 'package:crew_app/shared/theme/app_spacing.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-/// 位置信息底部窗口
-class LocationInfoBottomSheet extends StatelessWidget {
-  const LocationInfoBottomSheet({
+/// 用于重新定位 marker 的位置信息底部窗口
+class MarkerLocationInfoBottomSheet extends StatelessWidget {
+  const MarkerLocationInfoBottomSheet({
     super.key,
     required this.addressFuture,
     required this.nearbyPlacesFuture,
@@ -147,13 +150,17 @@ class LocationInfoBottomSheet extends StatelessWidget {
   }
 }
 
-class _NearbyPlacesList extends StatelessWidget {
-  const _NearbyPlacesList({required this.future});
+class _NearbyPlacesList extends ConsumerWidget {
+  const _NearbyPlacesList({
+    required this.future,
+    this.onPlaceTap,
+  });
 
   final Future<List<NearbyPlace>> future;
+  final ValueChanged<NearbyPlace>? onPlaceTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
 
@@ -214,7 +221,10 @@ class _NearbyPlacesList extends StatelessWidget {
                     SizedBox(width: AppDesignTokens.spacingSM.w),
                 itemBuilder: (context, index) {
                   final place = places[index];
-                  return _NearbyPlaceCard(place: place);
+                  return _NearbyPlaceCard(
+                    place: place,
+                    onTap: onPlaceTap,
+                  );
                 },
               ),
             ),
@@ -225,50 +235,99 @@ class _NearbyPlacesList extends StatelessWidget {
   }
 }
 
-class _NearbyPlaceCard extends StatelessWidget {
-  const _NearbyPlaceCard({required this.place});
+class _NearbyPlaceCard extends ConsumerWidget {
+  const _NearbyPlaceCard({
+    required this.place,
+    this.onTap,
+  });
 
   final NearbyPlace place;
+  final ValueChanged<NearbyPlace>? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final selectionState = ref.watch(mapSelectionControllerProvider);
+    final isSelected = selectionState.draggingMarkerPosition != null &&
+        place.location != null &&
+        selectionState.draggingMarkerPosition!.latitude == place.location!.latitude &&
+        selectionState.draggingMarkerPosition!.longitude == place.location!.longitude;
 
-    return Container(
-      width: 200.w,
-      padding: AppSpacing.all(AppDesignTokens.spacingMD),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.2),
-          width: AppDesignTokens.borderWidthThin,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            place.displayName.truncate(maxLength: 30),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onTap: () {
+        if (place.location != null) {
+          // 设置选中状态和呼吸效果
+          final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+          selectionController.setDraggingMarker(
+            place.location!,
+            DraggingMarkerType.destination, // 使用 destination 类型，因为这是附近地点
+          );
+          
+          // 调用外部回调（如果有）
+          onTap?.call(place);
+        }
+      },
+      child: Container(
+        width: 200.w,
+        padding: AppSpacing.all(AppDesignTokens.spacingMD),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMD.r),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withValues(alpha: 0.2),
+            width: isSelected
+                ? AppDesignTokens.borderWidthMedium
+                : AppDesignTokens.borderWidthThin,
           ),
-          if (place.formattedAddress != null) ...[
-            SizedBox(height: AppDesignTokens.spacingXS.h),
-            Text(
-              place.formattedAddress!.truncate(maxLength: 30),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.place_outlined,
+                  size: AppDesignTokens.iconSizeSM.sp,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+                SizedBox(width: AppDesignTokens.spacingXS.w),
+                Expanded(
+                  child: Text(
+                    place.displayName.truncate(maxLength: 30),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : null,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
+            if (place.formattedAddress != null) ...[
+              SizedBox(height: AppDesignTokens.spacingXS.h),
+              Text(
+                place.formattedAddress!.truncate(maxLength: 30),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isSelected
+                      ? theme.colorScheme.onSurfaceVariant
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

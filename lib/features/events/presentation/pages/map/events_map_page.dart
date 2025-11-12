@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/app/state/app_overlay_provider.dart';
@@ -7,12 +6,12 @@ import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
+import 'package:crew_app/features/events/presentation/pages/city_events/sheets/create_city_event_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
@@ -26,16 +25,20 @@ import '../../../data/event.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'widgets/search_event_appbar.dart';
 import 'widgets/map_canvas.dart';
-import 'widgets/markers_layer.dart';
 import 'widgets/events_map_event_carousel.dart';
 import 'widgets/breathing_marker_overlay.dart';
 import 'widgets/expandable_filter_button.dart';
+import 'widgets/map_marker_builder.dart';
+import 'widgets/map_polyline_builder.dart';
+import 'utils/camera_move_optimizer.dart';
 import 'state/events_map_search_controller.dart';
 import 'state/map_selection_controller.dart';
 import 'controllers/map_controller.dart';
 import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import 'controllers/location_selection_manager.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
+import 'package:crew_app/core/network/places/places_service.dart';
 import 'state/map_overlay_sheet_provider.dart';
 import 'state/map_overlay_sheet_stage_provider.dart';
 
@@ -56,8 +59,9 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     'events_cluster_manager',
   );
   late final ClusterManager _eventsClusterManager;
+  late final MapMarkerBuilder _markerBuilder;
+  late final CameraMoveOptimizer _cameraOptimizer;
   CameraPosition? _currentCameraPosition;
-  CameraPosition? _lastNotifiedCameraPosition;
   bool _showCompass = false;
   
   // 缓存 markers 和 polylines，避免重复创建
@@ -75,13 +79,18 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   @override
   void initState() {
     super.initState();
+    final mapController = ref.read(mapControllerProvider);
     _eventsClusterManager = ClusterManager(
       clusterManagerId: _eventsClusterManagerId,
       onClusterTap: (cluster) {
-        final controller = ref.read(mapControllerProvider);
-        unawaited(controller.moveCamera(cluster.position, zoom: 14));
+        unawaited(mapController.moveCamera(cluster.position, zoom: 14));
       },
     );
+    _markerBuilder = MapMarkerBuilder(
+      ref: ref,
+      eventsClusterManagerId: _eventsClusterManagerId,
+    );
+    _cameraOptimizer = CameraMoveOptimizer(mapController: mapController);
     _mapFocusSubscription = ref.listenManual(mapFocusEventProvider, (
       previous,
       next,
@@ -122,6 +131,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
   void dispose() {
     _mapFocusSubscription?.close();
     _carouselSubscription?.close();
+    _cameraOptimizer.dispose();
     // 注意：不能在 dispose 中修改 provider，这违反了 Riverpod 的规则
     // Widget 销毁时，provider 状态会自动处理，无需手动清理
     super.dispose();
@@ -144,29 +154,19 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     final mapSheetSize = ref.watch(mapOverlaySheetSizeProvider);
     final showBottomNavigation = ref.watch(bottomNavigationVisibilityProvider);
 
-    if (mapSheetType == MapOverlaySheetType.none &&
-        mapSheetStage != MapOverlaySheetStage.collapsed) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
-        if (notifier.state != MapOverlaySheetStage.collapsed) {
-          notifier.state = MapOverlaySheetStage.collapsed;
-        }
-        // 重置 sheet size
-        ref.read(mapOverlaySheetSizeProvider.notifier).state = 0.0;
-      });
-    }
-    
-    // 当 sheet 类型变为 none 时，重置 sheet size
-    if (mapSheetType == MapOverlaySheetType.none && mapSheetSize > 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        ref.read(mapOverlaySheetSizeProvider.notifier).state = 0.0;
-      });
+    // 统一处理 sheet 状态重置
+    if (mapSheetType == MapOverlaySheetType.none) {
+      if (mapSheetStage != MapOverlaySheetStage.collapsed || mapSheetSize > 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          if (mapSheetStage != MapOverlaySheetStage.collapsed) {
+            ref.read(mapOverlaySheetStageProvider.notifier).state = MapOverlaySheetStage.collapsed;
+          }
+          if (mapSheetSize > 0) {
+            ref.read(mapOverlaySheetSizeProvider.notifier).state = 0.0;
+          }
+        });
+      }
     }
 
     final cardVisible =
@@ -188,14 +188,14 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (shouldRebuildMarkers || _cachedMarkers == null) {
       _lastSelectionState = selectionState;
       _lastEventsList = currentEventsList;
-      _cachedMarkers = _buildMarkers(
-        events,
-        selectionState,
-        mapController,
-        carouselManager,
-        locationSelectionManager,
+      _cachedMarkers = _markerBuilder.buildMarkers(
+        events: events,
+        selectionState: selectionState,
+        mapController: mapController,
+        carouselManager: carouselManager,
+        locationSelectionManager: locationSelectionManager,
       );
-      _cachedPolylines = _buildPolylines(selectionState);
+      _cachedPolylines = MapPolylineBuilder.buildPolylines(selectionState);
     }
     
     final markers = _cachedMarkers!;
@@ -309,42 +309,29 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                   }
                 },
                 onCameraMove: (position) {
-                  // 更新地图中心位置（用于地图选择模式）
-                  mapController.updateCenterPosition(position.target);
-                  
-                  // 只更新相机位置，不触发 setState
-                  // 这样可以避免每次相机移动时重建整个 widget 树
+                  // 使用优化器处理相机移动，减少不必要的更新
                   _currentCameraPosition = position;
                   
-                  // 判断是否应该显示指南针
-                  // 检查 bearing 变化或位置变化，确保指南针状态及时更新
-                  final bearingChanged = _lastNotifiedCameraPosition != null &&
-                      (position.bearing - _lastNotifiedCameraPosition!.bearing).abs() > 5.0;
-                  final shouldUpdateCompass = _lastNotifiedCameraPosition == null ||
-                      _shouldUpdateCameraPosition(position, _lastNotifiedCameraPosition!) ||
-                      bearingChanged;
+                  final shouldUpdate = _cameraOptimizer.handleCameraMove(position);
                   
-                  if (shouldUpdateCompass) {
-                    final shouldShowCompass = _shouldShowCompass(position, mapController);
-                    if (shouldShowCompass != _showCompass && mounted) {
+                  // 如果有选中的标记点（呼吸效果），需要及时更新相机位置
+                  final selectionState = ref.read(mapSelectionControllerProvider);
+                  final hasSelectedMarker = selectionState.draggingMarkerPosition != null;
+                  
+                  if (shouldUpdate && mounted) {
+                    // 检查指南针状态
+                    final shouldShowCompass = _cameraOptimizer.shouldShowCompass(position);
+                    if (shouldShowCompass != _showCompass) {
                       setState(() {
                         _showCompass = shouldShowCompass;
                       });
+                    } else if (hasSelectedMarker) {
+                      // 即使不需要更新指南针，如果有选中的标记点，也需要更新以刷新呼吸效果位置
+                      setState(() {});
                     }
-                  }
-                  
-                  // 只在需要更新 BreathingMarkerOverlay 时才通知
-                  // 使用节流：只在相机位置变化超过阈值时才更新
-                  if (_lastNotifiedCameraPosition == null ||
-                      _shouldUpdateCameraPosition(position, _lastNotifiedCameraPosition!)) {
-                    _lastNotifiedCameraPosition = position;
-                    // 使用 SchedulerBinding 来延迟更新，避免阻塞手势
-                    // 只在需要更新 BreathingMarkerOverlay 时才触发 setState
-                    if (mounted) {
-                      setState(() {
-                        // 只更新需要相机位置的 widget
-                      });
-                    }
+                  } else if (hasSelectedMarker && mounted) {
+                    // 即使优化器认为不需要更新，如果有选中的标记点，也要更新
+                    setState(() {});
                   }
                 },
                 onTap: (pos) {
@@ -381,8 +368,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               onFavorite: () => _showSnackBar(loc.feature_not_ready),
             ),
           ),
-          // 呼吸动画覆盖层
-          // 使用 RepaintBoundary 隔离，只在需要时重绘
+          // 呼吸动画覆盖层（用于显示选中标记点的呼吸效果）
           RepaintBoundary(
             child: BreathingMarkerOverlay(
               draggingPosition: selectionState.draggingMarkerPosition,
@@ -413,7 +399,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                                     ? ((searchState.results.length > 4 ? 4 : searchState.results.length) - 1) * 1.0 
                                     : 0.0) + 20.0)))
                         : 0.0) + 
-                    8.0,
+                    12.0,
             left: 12,
             right: 12,
             child: RepaintBoundary(
@@ -540,6 +526,7 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
               selectionController.setAddingWaypoint(true);
             },
             onAddPressed: () => showCreateContentOptionsSheet(context),
+            onEdit: () => _onEditSelectedMarker(context, selectionState),
             onLocationPressed: () async {
               if (_showCompass) {
                 // 回正地图
@@ -588,6 +575,108 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// 处理编辑选中标记点的功能
+  Future<void> _onEditSelectedMarker(
+    BuildContext context,
+    MapSelectionState selectionState,
+  ) async {
+    // 检查是否有选中的标记点
+    if (selectionState.draggingMarkerPosition == null ||
+        selectionState.draggingMarkerType == null) {
+      _showSnackBar('请先选择一个标记点');
+      return;
+    }
+
+    final selectedPosition = selectionState.draggingMarkerPosition!;
+    final markerType = selectionState.draggingMarkerType!;
+    final loc = AppLocalizations.of(context)!;
+    final locationManager = ref.read(locationSelectionManagerProvider);
+
+    // 根据标记点类型获取地址信息
+    String? address;
+    switch (markerType) {
+      case DraggingMarkerType.start:
+        // 起点：尝试从 CreateRoadTripSheet 获取地址，如果没有则使用反向地理编码
+        // 这里先使用反向地理编码
+        address = await locationManager.reverseGeocode(selectedPosition);
+        break;
+      case DraggingMarkerType.destination:
+        // 终点：尝试从 CreateRoadTripSheet 获取地址，如果没有则使用反向地理编码
+        address = await locationManager.reverseGeocode(selectedPosition);
+        break;
+      case DraggingMarkerType.forwardWaypoint:
+      case DraggingMarkerType.returnWaypoint:
+        // 途经点：使用反向地理编码获取地址
+        address = await locationManager.reverseGeocode(selectedPosition);
+        break;
+    }
+
+    // 创建 PlaceDetails 对象
+    final place = PlaceDetails(
+      id: 'selected_marker_${selectedPosition.latitude}_${selectedPosition.longitude}',
+      displayName: address ?? '已选择的位置',
+      formattedAddress: address,
+      location: selectedPosition,
+    );
+
+    // 跳转到 LocationSearchScreen（编辑模式）
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LocationSearchScreen(
+          title: loc.map_select_location_title,
+          initialQuery: address,
+          initialLocation: selectedPosition,
+          isRoundTrip: false, // 编辑模式下不需要往返模式的下拉菜单
+          isEditMode: true, // 标记为编辑模式
+          onLocationSelected: (newPlace) {
+            // 处理位置更新
+            final newLocation = newPlace.location;
+            if (newLocation == null) return;
+
+            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+
+            // 根据标记点类型更新对应的位置
+            switch (markerType) {
+              case DraggingMarkerType.start:
+                selectionController.setSelectedLatLng(newLocation);
+                break;
+              case DraggingMarkerType.destination:
+                selectionController.setDestinationLatLng(newLocation);
+                break;
+              case DraggingMarkerType.forwardWaypoint:
+                // 找到并更新对应的去程途经点
+                final forwardWps = List<LatLng>.from(selectionState.forwardWaypoints);
+                final index = forwardWps.indexWhere(
+                  (wp) => wp.latitude == selectedPosition.latitude &&
+                      wp.longitude == selectedPosition.longitude,
+                );
+                if (index >= 0) {
+                  forwardWps[index] = newLocation;
+                  selectionController.setForwardWaypoints(forwardWps);
+                }
+                break;
+              case DraggingMarkerType.returnWaypoint:
+                // 找到并更新对应的返程途经点
+                final returnWps = List<LatLng>.from(selectionState.returnWaypoints);
+                final index = returnWps.indexWhere(
+                  (wp) => wp.latitude == selectedPosition.latitude &&
+                      wp.longitude == selectedPosition.longitude,
+                );
+                if (index >= 0) {
+                  returnWps[index] = newLocation;
+                  selectionController.setReturnWaypoints(returnWps);
+                }
+                break;
+            }
+
+            // 清除选中的标记点（停止呼吸效果）
+            selectionController.clearDraggingMarker();
+          },
+        ),
+      ),
+    );
   }
 
   /// 根据当前步骤和是否在创建路线流程中返回相应的引导文字
@@ -661,351 +750,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     ref.read(appOverlayIndexProvider.notifier).state = 1;
   }
 
-  // 判断是否需要更新相机位置（节流）
-  // 只在相机位置变化超过阈值时才返回 true
-  bool _shouldUpdateCameraPosition(
-    CameraPosition current,
-    CameraPosition last,
-  ) {
-    // 计算位置距离（米）
-    final distance = _calculateDistance(
-      current.target,
-      last.target,
-    );
-    // 如果距离超过 10 米或缩放级别变化超过 0.5，则更新
-    return distance > 10 || (current.zoom - last.zoom).abs() > 0.5;
-  }
-
-  // 计算两个经纬度之间的距离（米）
-  double _calculateDistance(LatLng a, LatLng b) {
-    const double earthRadius = 6371000; // 地球半径（米）
-    final double dLat = (b.latitude - a.latitude) * math.pi / 180.0;
-    final double dLon = (b.longitude - a.longitude) * math.pi / 180.0;
-    final double a1 = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(a.latitude * math.pi / 180.0) *
-            math.cos(b.latitude * math.pi / 180.0) *
-            math.sin(dLon / 2) *
-            math.sin(dLon / 2);
-    final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
-    return earthRadius * c;
-  }
-
-  /// 判断是否应该显示指南针
-  /// 条件：不在用户位置 且 地图被旋转（bearing 的绝对值 > 5度）
-  bool _shouldShowCompass(CameraPosition position, MapController mapController) {
-    // 检查是否在用户位置附近（50米内）
-    final isAtUserLocation = mapController.isAtUserLocation(threshold: 50.0);
-    
-    // 如果正在用户位置，不显示指南针
-    if (isAtUserLocation) {
-      return false;
-    }
-    
-    // 检查地图是否被旋转（bearing 的绝对值 > 5度）
-    // bearing 的范围通常是 0 到 360 度，或者 -180 到 180 度
-    // 我们需要计算最小的旋转角度
-    final bearing = position.bearing;
-    final absBearing = bearing.abs();
-    // 将角度标准化到 0-360 范围
-    final normalizedBearing = absBearing % 360;
-    // 计算最小的旋转角度（考虑从两个方向旋转）
-    final minBearing = normalizedBearing > 180 ? 360 - normalizedBearing : normalizedBearing;
-    
-    // 如果旋转角度大于 5 度，显示指南针
-    return minBearing > 5.0;
-  }
-
-  // 构建 markers
-  Set<Marker> _buildMarkers(
-    AsyncValue<List<Event>> events,
-    MapSelectionState selectionState,
-    MapController mapController,
-    EventCarouselManager carouselManager,
-    LocationSelectionManager locationSelectionManager,
-  ) {
-    final markersLayer = events.when(
-      loading: () => const MarkersLayer(markers: <Marker>{}),
-      error: (_, _) => const MarkersLayer(markers: <Marker>{}),
-      data: (list) => MarkersLayer.fromEvents(
-        events: list,
-        onEventTap: (event) {
-          mapController.focusOnEvent(event);
-          carouselManager.showEventCard(event);
-        },
-        clusterManagerId: _eventsClusterManagerId,
-      ),
-    );
-
-    final shouldHideEventMarkers =
-        selectionState.selectedLatLng != null ||
-        selectionState.isSelectingDestination;
-    final markers = <Marker>{
-      if (!shouldHideEventMarkers) ...markersLayer.markers,
-    };
-    
-    final selected = selectionState.selectedLatLng;
-    if (selected != null) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('selected_location'),
-          position: selected,
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueAzure,
-          ),
-          onTap: () =>
-              unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.start);
-            selectionController.setSelectedLatLng(pos);
-          },
-          onDragEnd: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setSelectedLatLng(pos);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-
-    final destination = selectionState.destinationLatLng;
-    if (destination != null) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('destination_location'),
-          position: destination,
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueGreen,
-          ),
-          onTap: () =>
-              unawaited(locationSelectionManager.clearSelectedLocation()),
-          onDrag: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.destination);
-            selectionController.setDestinationLatLng(pos);
-          },
-          onDragEnd: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setDestinationLatLng(pos);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-
-    // 添加途经点 markers
-    final forwardWaypoints = selectionState.forwardWaypoints;
-    final returnWaypoints = selectionState.returnWaypoints;
-    
-    for (int i = 0; i < forwardWaypoints.length; i++) {
-      markers.add(
-        Marker(
-          markerId: MarkerId('forward_waypoint_$i'),
-          position: forwardWaypoints[i],
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueYellow,
-          ),
-          onDrag: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.forwardWaypoint);
-            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setForwardWaypoints(currentWaypoints);
-          },
-          onDragEnd: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            final currentWaypoints = List<LatLng>.from(forwardWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setForwardWaypoints(currentWaypoints);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-    
-    for (int i = 0; i < returnWaypoints.length; i++) {
-      markers.add(
-        Marker(
-          markerId: MarkerId('return_waypoint_$i'),
-          position: returnWaypoints[i],
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueYellow,
-          ),
-          onDrag: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            selectionController.setDraggingMarker(pos, DraggingMarkerType.returnWaypoint);
-            final currentWaypoints = List<LatLng>.from(returnWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setReturnWaypoints(currentWaypoints);
-          },
-          onDragEnd: (pos) {
-            final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-            final currentWaypoints = List<LatLng>.from(returnWaypoints);
-            currentWaypoints[i] = pos;
-            selectionController.setReturnWaypoints(currentWaypoints);
-            selectionController.clearDraggingMarker();
-            HapticFeedback.lightImpact();
-          },
-        ),
-      );
-    }
-
-    return markers;
-  }
-
-
-
-  // 构建 polylines
-  Set<Polyline> _buildPolylines(MapSelectionState selectionState) {
-    final polylines = <Polyline>{};
-    final selected = selectionState.selectedLatLng;
-    final destination = selectionState.destinationLatLng;
-    
-    if (selected != null && destination != null) {
-      final routeType = selectionState.routeType;
-      final forwardWaypoints = selectionState.forwardWaypoints;
-      final returnWaypoints = selectionState.returnWaypoints;
-      
-      if (routeType == RoadTripRouteType.roundTrip) {
-        // 往返路线：分为两条独立的贝塞尔曲线
-        // 去程：起点 -> 去程途经点 -> 终点
-        final forwardPoints = <LatLng>[selected, ...forwardWaypoints, destination];
-        if (forwardPoints.length > 1) {
-          final forwardCurvedPoints = _generateCurvedRoute(forwardPoints);
-          polylines.add(
-            Polyline(
-              polylineId: const PolylineId('route_polyline_forward'),
-              points: forwardCurvedPoints,
-              color: Colors.blue,
-              width: 4,
-              geodesic: true,
-              patterns: [
-                PatternItem.dash(20),
-                PatternItem.gap(10),
-              ],
-            ),
-          );
-        }
-        
-        // 返程：终点 -> 返程途经点 -> 起点
-        final returnPoints = <LatLng>[destination, ...returnWaypoints.reversed, selected];
-        if (returnPoints.length > 1) {
-          final returnCurvedPoints = _generateCurvedRoute(returnPoints);
-          polylines.add(
-            Polyline(
-              polylineId: const PolylineId('route_polyline_return'),
-              points: returnCurvedPoints,
-              color: Colors.orange,
-              width: 4,
-              geodesic: true,
-              patterns: [
-                PatternItem.dash(20),
-                PatternItem.gap(10),
-              ],
-            ),
-          );
-        }
-      } else {
-        // 单程路线：起点 -> 去程途经点 -> 终点
-        final oneWayPoints = <LatLng>[selected, ...forwardWaypoints, destination];
-        if (oneWayPoints.length > 1) {
-          final curvedPoints = _generateCurvedRoute(oneWayPoints);
-          polylines.add(
-            Polyline(
-              polylineId: const PolylineId('route_polyline'),
-              points: curvedPoints,
-              color: Colors.blue,
-              width: 4,
-              geodesic: true,
-              patterns: [
-                PatternItem.dash(20),
-                PatternItem.gap(10),
-              ],
-            ),
-          );
-        }
-      }
-    }
-
-    return polylines;
-  }
-
-  /// 生成带弧度的路线点（使用贝塞尔曲线插值）
-  List<LatLng> _generateCurvedRoute(List<LatLng> points) {
-    if (points.length < 2) return points;
-    
-    final curvedPoints = <LatLng>[];
-    
-    // 添加起点
-    curvedPoints.add(points.first);
-    
-    // 对每两个相邻点之间进行贝塞尔曲线插值
-    for (int i = 0; i < points.length - 1; i++) {
-      final start = points[i];
-      final end = points[i + 1];
-      
-      // 计算中间控制点（用于创建弧度）
-      final midLat = (start.latitude + end.latitude) / 2;
-      final midLng = (start.longitude + end.longitude) / 2;
-      
-      // 计算垂直于两点连线的偏移量，创建弧度效果
-      final dx = end.longitude - start.longitude;
-      final dy = end.latitude - start.latitude;
-      final distance = math.sqrt(dx * dx + dy * dy);
-      
-      // 计算垂直方向（用于创建弧度）
-      final perpDx = -dy / distance;
-      final perpDy = dx / distance;
-      
-      // 弧度强度（可以根据距离调整）
-      final curveStrength = math.min(distance * 0.3, 0.5); // 最大弧度不超过0.5度
-      
-      // 控制点位置（在中间点的基础上向垂直方向偏移）
-      final controlLat = midLat + perpDy * curveStrength;
-      final controlLng = midLng + perpDx * curveStrength;
-      
-      // 使用二次贝塞尔曲线生成中间点
-      final controlPoint = LatLng(controlLat, controlLng);
-      final segmentPoints = _bezierCurve(start, controlPoint, end, segments: 10);
-      
-      // 添加中间点（跳过第一个点，因为已经添加了起点）
-      curvedPoints.addAll(segmentPoints.skip(1));
-    }
-    
-    return curvedPoints;
-  }
-
-  /// 生成二次贝塞尔曲线点
-  List<LatLng> _bezierCurve(
-    LatLng start,
-    LatLng control,
-    LatLng end, {
-    int segments = 10,
-  }) {
-    final points = <LatLng>[];
-    
-    for (int i = 0; i <= segments; i++) {
-      final t = i / segments;
-      final lat = _bezierValue(start.latitude, control.latitude, end.latitude, t);
-      final lng = _bezierValue(start.longitude, control.longitude, end.longitude, t);
-      points.add(LatLng(lat, lng));
-    }
-    
-    return points;
-  }
-
-  /// 计算贝塞尔曲线上的值
-  double _bezierValue(double p0, double p1, double p2, double t) {
-    final oneMinusT = 1 - t;
-    return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
-  }
 }
 
 class _MapOverlaySheet extends ConsumerStatefulWidget {
@@ -1065,11 +809,9 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     _currentSize = _initialSize;
     // 延迟到下一帧再更新状态，避免在 initState 中直接修改 provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        _notifyStateChanges(_currentSize);
       }
-      _notifyStage(_currentSize);
-      _notifySize(_currentSize);
     });
   }
 
@@ -1083,28 +825,31 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   }
 
   void _handleSizeChanged() {
-        if (!_attached || !mounted) return;  
+    if (!_attached || !mounted) return;
     final size = _controller.size;
-    if ((size - _currentSize).abs() < 1e-4 || !mounted) {
+    if ((size - _currentSize).abs() < 1e-4) {
       return;
     }
 
-    final schedulerPhase = SchedulerBinding.instance.schedulerPhase;
-    if (schedulerPhase == SchedulerPhase.idle) {
+    _currentSize = size;
+    _notifyStateChanges(size);
+  }
+
+  /// 统一通知状态变化（stage 和 size）
+  void _notifyStateChanges(double size) {
+    void update() {
+      if (!mounted) return;
       _notifyStage(size);
       _notifySize(size);
-      setState(() => _currentSize = size);
-      return;
+      setState(() {});
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      _notifyStage(size);
-      _notifySize(size);
-      setState(() => _currentSize = size);
-    });
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.idle || phase == SchedulerPhase.postFrameCallbacks) {
+      update();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => update());
+    }
   }
 
   void _notifySize(double size) {
@@ -1112,22 +857,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
     if ((notifier.state - size).abs() < 1e-4) {
       return;
     }
-
-    void updateSize() {
-      if (!mounted) {
-        return;
-      }
-      notifier.state = size;
-    }
-
-    final phase = SchedulerBinding.instance.schedulerPhase;
-    if (phase == SchedulerPhase.idle ||
-        phase == SchedulerPhase.postFrameCallbacks) {
-      updateSize();
-      return;
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => updateSize());
+    notifier.state = size;
   }
 
   void _onDragUpdate(
@@ -1204,6 +934,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       MapOverlaySheetType.explore => const [0.3, 0.5, 0.88],
       MapOverlaySheetType.none => const [0.2, 0.5, 0.88],
       MapOverlaySheetType.createRoadTrip => const [0.3, 0.5, 0.88],
+      MapOverlaySheetType.createCityEvent => const [0.3, 0.5, 0.88],
     };
   }
   
@@ -1216,6 +947,7 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
       MapOverlaySheetType.explore => snapSizes[0], // 初始为 collapsed（阶段一），确保底部导航栏和悬浮按钮显示
       MapOverlaySheetType.none => snapSizes.first,
       MapOverlaySheetType.createRoadTrip => snapSizes.length > 1 ? snapSizes[1] : snapSizes.first,
+      MapOverlaySheetType.createCityEvent => snapSizes.length > 1 ? snapSizes[1] : snapSizes.first,
     };
   }
 
@@ -1223,16 +955,13 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   void didUpdateWidget(covariant _MapOverlaySheet oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.sheetType != widget.sheetType) {
-      final newSize = _initialSize;
-      setState(() => _currentSize = newSize);
+      _currentSize = _initialSize;
       // 延迟到下一帧再更新状态，避免在 didUpdateWidget 中直接修改 provider
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
+        if (mounted) {
+          _notifyStateChanges(_currentSize);
+          DraggableScrollableActuator.reset(context);
         }
-        _notifyStage(newSize);
-        _notifySize(newSize);
-        DraggableScrollableActuator.reset(context);
       });
     }
   }
@@ -1240,25 +969,9 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
   void _notifyStage(double size) {
     final notifier = ref.read(mapOverlaySheetStageProvider.notifier);
     final newStage = _stageForSize(size);
-    if (notifier.state == newStage) {
-      return;
-    }
-
-    void updateStage() {
-      if (!mounted) {
-        return;
-      }
+    if (notifier.state != newStage) {
       notifier.state = newStage;
     }
-
-    final phase = SchedulerBinding.instance.schedulerPhase;
-    if (phase == SchedulerPhase.idle ||
-        phase == SchedulerPhase.postFrameCallbacks) {
-      updateStage();
-      return;
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => updateStage());
   }
 
   MapOverlaySheetStage _stageForSize(double size) {
@@ -1403,6 +1116,30 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                     );
                   },
                 );
+              case MapOverlaySheetType.createCityEvent:
+                effectiveContent = Consumer(
+                  builder: (context, ref, _) {
+                    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+                    
+                    return CreateCityEventSheet(
+                      scrollController: scrollController,
+                      embeddedMode: true, // overlay 模式
+                      meetingPointPositionListenable: selectionController.selectedLatLngListenable,
+                      onCancel: () {
+                        final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+                        
+                        // 立即清理所有选择状态
+                        selectionController.setSelectingDestination(false);
+                        selectionController.setSelectionSheetOpen(false);
+                        selectionController.setSelectedLatLng(null);
+                        selectionController.resetMapPadding();
+                        
+                        // 关闭 overlay
+                        ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.none;
+                      },
+                    );
+                  },
+                );
             }
 
             return Padding(
@@ -1461,8 +1198,9 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                                     }
                                     return;
                                   }
-                                  // 关闭 overlay 时，如果是 CreateRoadTripSheet，需要清理状态
-                                  if (widget.sheetType == MapOverlaySheetType.createRoadTrip) {
+                                  // 关闭 overlay 时，如果是 CreateRoadTripSheet 或 CreateCityEventSheet，需要清理状态
+                                  if (widget.sheetType == MapOverlaySheetType.createRoadTrip ||
+                                      widget.sheetType == MapOverlaySheetType.createCityEvent) {
                                     final selectionController = ref
                                         .read(mapSelectionControllerProvider.notifier);
                                     

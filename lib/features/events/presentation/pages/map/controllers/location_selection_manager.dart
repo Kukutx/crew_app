@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,10 +38,7 @@ class LocationSelectionManager {
       return;
     }
     
-    // 如果正在添加途经点，长按不应该处理（途经点用单击）
-    if (selectionState.isAddingWaypoint) {
-      return;
-    }
+    // 已移除通过点击添加途经点的功能
     
     if (_isHandlingLongPress) return;
     
@@ -62,42 +60,81 @@ class LocationSelectionManager {
     }
   }
 
-  /// 处理地图点击（用于添加途经点和其他正常点击）
+  /// 处理地图点击（已移除通过点击添加途经点的功能）
   Future<void> onMapTap(LatLng position, BuildContext context) async {
     final selectionState = ref.read(mapSelectionControllerProvider);
     
-    // 如果正在添加途经点，单击添加途经点（不处理终点选择）
-    if (selectionState.isAddingWaypoint) {
-      _handleWaypointSelection(position, context);
+    // 检查点击位置是否在标记点附近（容差约50米）
+    final isNearMarker = _isNearAnyMarker(position, selectionState);
+    
+    // 如果点击了地图空白区域（不在标记点附近），清除选中的标记点（呼吸效果）
+    // 无论是否正在选择终点，都应该能够清除选中状态
+    if (!isNearMarker && selectionState.draggingMarkerPosition != null) {
+      ref.read(mapSelectionControllerProvider.notifier).clearDraggingMarker();
       return;
     }
     
-    // 如果正在选择终点，单击不应该处理（终点用长按）
+    // 如果正在选择终点，且点击的不是标记点，不做其他处理（终点用长按）
     if (selectionState.isSelectingDestination) {
       return;
     }
     
     // 其他正常点击：不做任何处理
   }
-  
-  /// 处理途经点选择
-  void _handleWaypointSelection(LatLng position, BuildContext context) {
-    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
-    final selectionState = ref.read(mapSelectionControllerProvider);
+
+  /// 检查点击位置是否在任何标记点附近
+  bool _isNearAnyMarker(LatLng tapPosition, MapSelectionState selectionState) {
+    const double toleranceMeters = 50.0; // 容差：50米
     
-    if (!selectionState.isAddingWaypoint) {
-      return;
+    // 检查起点
+    if (selectionState.selectedLatLng != null) {
+      final distance = _calculateDistance(tapPosition, selectionState.selectedLatLng!);
+      if (distance <= toleranceMeters) {
+        return true;
+      }
     }
     
-    HapticFeedback.lightImpact();
+    // 检查终点
+    if (selectionState.destinationLatLng != null) {
+      final distance = _calculateDistance(tapPosition, selectionState.destinationLatLng!);
+      if (distance <= toleranceMeters) {
+        return true;
+      }
+    }
     
-    // 存储临时途经点，供 CreateRoadTripSheet 监听
-    selectionController.setPendingWaypoint(position);
-    selectionController.setAddingWaypoint(false);
+    // 检查去程途经点
+    for (final waypoint in selectionState.forwardWaypoints) {
+      final distance = _calculateDistance(tapPosition, waypoint);
+      if (distance <= toleranceMeters) {
+        return true;
+      }
+    }
     
-    // 移动相机到新添加的途经点
-    final mapController = ref.read(mapControllerProvider);
-    unawaited(mapController.moveCamera(position, zoom: 14));
+    // 检查返程途经点
+    for (final waypoint in selectionState.returnWaypoints) {
+      final distance = _calculateDistance(tapPosition, waypoint);
+      if (distance <= toleranceMeters) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  /// 计算两个经纬度之间的距离（米）
+  double _calculateDistance(LatLng a, LatLng b) {
+    const double earthRadius = 6371000; // 地球半径（米）
+    final double dLat = (b.latitude - a.latitude) * 3.141592653589793 / 180.0;
+    final double dLon = (b.longitude - a.longitude) * 3.141592653589793 / 180.0;
+    final double sinDLat = math.sin(dLat / 2);
+    final double sinDLon = math.sin(dLon / 2);
+    final double a1 = sinDLat * sinDLat +
+        math.cos(a.latitude * 3.141592653589793 / 180.0) *
+            math.cos(b.latitude * 3.141592653589793 / 180.0) *
+            sinDLon *
+            sinDLon;
+    final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
+    return earthRadius * c;
   }
 
   /// 处理目标位置选择

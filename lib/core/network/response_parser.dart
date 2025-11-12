@@ -122,5 +122,20 @@ class ResponseParser {
   static Map<String, dynamic> extractEventObject(dynamic data) {
     return extractObject(data);
   }
+
+  /// 从响应数据中提取 data 字段
+  /// 
+  /// 用于提取 ApiResponse<T> 中的 data 字段
+  static dynamic extractData(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      // 优先从 data 字段提取
+      if (data.containsKey('data')) {
+        return data['data'];
+      }
+      // 如果没有 data 字段，直接返回原数据
+      return data;
+    }
+    return data;
+  }
 }
 

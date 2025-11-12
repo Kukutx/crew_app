@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/widgets/event_grid_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/cards/event_grid_card.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';

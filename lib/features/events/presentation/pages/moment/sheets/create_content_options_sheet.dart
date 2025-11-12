@@ -79,10 +79,9 @@ class _CreateContentOptionsSheet extends ConsumerWidget {
                           : const Color(0xFFFFF3E0), // 浅橙色
                       onTap: () {
                         Navigator.of(context).maybePop();
-                        // TODO: 实现城市玩家创建活动页面
-                        ScaffoldMessenger.of(parentContext).showSnackBar(
-                          const SnackBar(content: Text('城市玩家功能开发中...')),
-                        );
+                        // 弹出 CreateCityEventSheet
+                        ref.read(mapOverlaySheetProvider.notifier).state =
+                            MapOverlaySheetType.createCityEvent;
                       },
                     ),
                     const SizedBox(height: 12),

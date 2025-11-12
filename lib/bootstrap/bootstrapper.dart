@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/misc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import 'package:crew_app/bootstrap/bootstrap_result.dart';
@@ -41,21 +42,25 @@ class Bootstrapper {
     await runZonedGuarded(() async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      await _firebaseInitializer.initialize();
+      // 并行初始化 Firebase 和 Preferences（它们互不依赖）
+      final results = await Future.wait([
+        _firebaseInitializer.initialize(),
+        _preferencesInitializer.initialize(),
+      ]);
+      final preferences = results[1] as SharedPreferences;
 
+      // Monitoring 依赖 Firebase，RemoteConfig 依赖 Monitoring
       final monitoring = await _monitoringInitializer.initialize();
       talker = monitoring.talker;
       crashlytics = monitoring.crashlytics;
 
-      final remoteConfig =
-          await _remoteConfigInitializer.initialize(monitoring.talker);
-
+      // 并行初始化 RemoteConfig 和 ErrorHandler（它们都依赖 Monitoring）
+      final remoteConfigFuture = _remoteConfigInitializer.initialize(monitoring.talker);
       _errorHandler.initialize(
         talker: monitoring.talker,
         crashlytics: monitoring.crashlytics,
       );
-
-      final preferences = await _preferencesInitializer.initialize();
+      final remoteConfig = await remoteConfigFuture;
 
       final overrides = <Override>[
         sharedPreferencesProvider.overrideWithValue(preferences),

@@ -156,6 +156,46 @@ class ApiRequestHandler {
     }
   }
 
+  /// 执行 DELETE 请求
+  /// 
+  /// [path] 请求路径
+  /// [requiresAuth] 是否需要认证
+  /// [parseResponse] 响应解析函数，如果为 null 则返回原始数据
+  /// [successStatusCodes] 成功状态码列表，默认为 [200, 204]
+  Future<T?> delete<T>({
+    required String path,
+    bool requiresAuth = false,
+    T Function(dynamic)? parseResponse,
+    List<int> successStatusCodes = const [200, 204],
+  }) async {
+    try {
+      final headers = requiresAuth
+          ? await _buildAuthHeaders(required: true)
+          : await _buildAuthHeaders();
+
+      final response = await _dio.delete(
+        path,
+        options: Options(headers: headers),
+      );
+
+      // DELETE 请求可能返回 204 No Content，此时 response.data 可能为 null
+      if (response.statusCode == 204) {
+        return null;
+      }
+
+      return _handleResponse<T>(
+        response: response,
+        parseResponse: parseResponse,
+        errorMessage: 'Failed to delete data',
+        successStatusCodes: successStatusCodes,
+      );
+    } on ApiException {
+      rethrow;
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
   /// 处理响应
   T _handleResponse<T>({
     required Response response,

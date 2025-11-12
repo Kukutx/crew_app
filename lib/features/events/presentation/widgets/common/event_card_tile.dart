@@ -3,8 +3,8 @@ import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// 卡片瓦片组件
-class CardTile extends StatelessWidget {
-  const CardTile({
+class EventCardTile extends StatelessWidget {
+  const EventCardTile({
     super.key,
     required this.leading,
     required this.title,

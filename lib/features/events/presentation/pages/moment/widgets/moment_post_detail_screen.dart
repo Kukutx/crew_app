@@ -1,4 +1,4 @@
-import 'package:crew_app/features/events/presentation/widgets/moment_post_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/cards/moment_post_card.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

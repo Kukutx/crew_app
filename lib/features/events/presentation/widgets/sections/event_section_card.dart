@@ -3,8 +3,8 @@ import 'package:crew_app/shared/theme/app_spacing.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 
-class RoadTripSectionCard extends StatelessWidget {
-  const RoadTripSectionCard({
+class EventSectionCard extends StatelessWidget {
+  const EventSectionCard({
     super.key,
     required this.icon,
     required this.title,
@@ -97,7 +97,7 @@ class RoadTripSectionCard extends StatelessWidget {
 }
 
 
-InputDecoration roadTripInputDecoration(
+InputDecoration eventInputDecoration(
   BuildContext context,
   String label,
   String? hint,
@@ -142,3 +142,4 @@ InputDecoration roadTripInputDecoration(
     ),
   );
 }
+

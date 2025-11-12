@@ -35,3 +35,4 @@ class EventImagePlaceholder extends StatelessWidget {
     return placeholder;
   }
 }
+

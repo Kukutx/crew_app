@@ -18,6 +18,7 @@ class MeetingPointSelectionPage extends StatelessWidget {
     this.meetingPointPosition,
     this.meetingPointAddressFuture,
     this.meetingPointNearbyFuture,
+    this.onClearMeetingPoint,
   });
 
   final ScrollController? scrollCtrl;
@@ -29,6 +30,7 @@ class MeetingPointSelectionPage extends StatelessWidget {
   final LatLng? meetingPointPosition;
   final Future<String?>? meetingPointAddressFuture;
   final Future<List<NearbyPlace>>? meetingPointNearbyFuture;
+  final VoidCallback? onClearMeetingPoint;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,8 @@ class MeetingPointSelectionPage extends StatelessWidget {
                 subtitle: meetingPointSubtitle,
                 onTap: onEditMeetingPoint,
                 onLeadingTap: onSearchMeetingPoint,
+                hasValue: meetingPointPosition != null,
+                onClear: onClearMeetingPoint,
               ),
               SizedBox(height: 24.h),
               if (meetingPointNearbyFuture != null)

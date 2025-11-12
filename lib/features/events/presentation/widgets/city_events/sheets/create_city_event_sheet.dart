@@ -380,6 +380,21 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
     );
   }
 
+  // 清空集合点
+  void _onClearMeetingPoint() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    
+    setState(() {
+      _meetingPointLatLng = null;
+      _meetingPointAddress = null;
+      _meetingPointAddressFuture = null;
+      _meetingPointNearbyFuture = null;
+    });
+    
+    // 更新选择状态（会自动清除呼吸效果）
+    selectionController.setSelectedLatLng(null);
+  }
+
   void _enableWizard() {
     // 从集合点页点击继续，跳转到 basic 页
     setState(() {
@@ -530,6 +545,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
                 position: _meetingPointLatLng,
                 addressFuture: _meetingPointAddressFuture,
                 nearbyFuture: _meetingPointNearbyFuture,
+                onClear: _onClearMeetingPoint,
               ),
             ),
             scrollCtrl: shouldUseScrollController ? widget.scrollController : null,

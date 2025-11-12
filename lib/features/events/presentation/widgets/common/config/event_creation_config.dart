@@ -59,6 +59,7 @@ class LocationData {
     this.position,
     this.addressFuture,
     this.nearbyFuture,
+    this.onClear,
   });
 
   final String title;
@@ -68,6 +69,7 @@ class LocationData {
   final LatLng? position;
   final Future<String?>? addressFuture;
   final Future<List<NearbyPlace>>? nearbyFuture;
+  final VoidCallback? onClear; // 清空位置的回调
 }
 
 /// 位置选择页面数据

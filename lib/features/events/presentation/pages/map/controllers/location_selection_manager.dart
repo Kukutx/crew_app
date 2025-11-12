@@ -35,19 +35,53 @@ class LocationSelectionManager {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final mapController = ref.read(mapControllerProvider);
     
+    debugPrint('🗺️🗺️🗺️ 长按地图被触发 - mapSheetType: $mapSheetType, isSelectingDestination: ${selectionState.isSelectingDestination}, 起点: ${selectionState.selectedLatLng}, 终点: ${selectionState.destinationLatLng}');
+    
     // 选择终点模式
     if (selectionState.isSelectingDestination) {
+      debugPrint('📍 进入选择终点模式分支');
       _handleDestinationSelection(latlng, context);
       return;
     }
     
-    // 创建活动模式：更新位置但不切换界面
-    if (mapSheetType == MapOverlaySheetType.createCityEvent || 
-        mapSheetType == MapOverlaySheetType.createRoadTrip) {
+    // 创建城市活动模式：只有一个集合点
+    if (mapSheetType == MapOverlaySheetType.createCityEvent) {
+      debugPrint('🏙️ 进入创建城市活动分支');
       selectionController.setSelectedLatLng(latlng);
       unawaited(mapController.moveCamera(latlng, zoom: 17));
       return;
     }
+    
+    // 创建自驾游模式：需要区分起点和终点
+    if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
+      debugPrint('🚗 进入创建自驾游分支 - 起点=${selectionState.selectedLatLng}, 终点=${selectionState.destinationLatLng}');
+      
+      // 如果没有起点，设置起点
+      if (selectionState.selectedLatLng == null) {
+        debugPrint('✅ 创建起点');
+        selectionController.setSelectedLatLng(latlng);
+        unawaited(mapController.moveCamera(latlng, zoom: 17));
+        return;
+      }
+      
+      // 如果有起点但没有终点，设置终点
+      if (selectionState.destinationLatLng == null) {
+        debugPrint('✅ 创建终点');
+        selectionController.setDestinationLatLng(latlng);
+        // 移动地图以显示起点和终点
+        unawaited(mapController.fitBounds(
+          [selectionState.selectedLatLng!, latlng],
+          padding: 100,
+        ));
+        return;
+      }
+      
+      debugPrint('⚠️ 起点和终点都已存在，不做任何操作');
+      // 如果起点和终点都已存在，不做任何操作
+      return;
+    }
+    
+    debugPrint('🔄 进入默认分支 - 创建新的自驾游');
     
     // 默认模式：创建新的自驾游
     if (_isHandlingLongPress) return;

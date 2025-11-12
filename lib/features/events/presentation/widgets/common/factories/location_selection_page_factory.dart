@@ -25,6 +25,7 @@ class LocationSelectionPageFactory {
           meetingPointPosition: location.position,
           meetingPointAddressFuture: location.addressFuture,
           meetingPointNearbyFuture: location.nearbyFuture,
+          onClearMeetingPoint: location.onClear,
         );
 
       case LocationSelectionMode.startAndDestination:
@@ -47,6 +48,8 @@ class LocationSelectionPageFactory {
           destinationPosition: secondLoc?.position,
           destinationAddressFuture: secondLoc?.addressFuture,
           destinationNearbyFuture: secondLoc?.nearbyFuture,
+          onClearDeparture: firstLoc.onClear,
+          onClearDestination: secondLoc?.onClear,
         );
     }
   }

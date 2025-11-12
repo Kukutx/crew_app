@@ -12,6 +12,8 @@ class EventCardTile extends StatelessWidget {
     this.onTap,
     this.onLeadingTap,
     this.enabled = true,
+    this.hasValue = false,
+    this.onClear,
   });
 
   final Widget leading;
@@ -20,6 +22,8 @@ class EventCardTile extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLeadingTap;
   final bool enabled;
+  final bool hasValue; // 是否有值
+  final VoidCallback? onClear; // 清空值的回调
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +76,23 @@ class EventCardTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right),
+                // 根据是否有值显示不同的图标
+                if (hasValue && onClear != null)
+                  // 有值时显示 X 图标（可点击清空）
+                  IconButton(
+                    icon: Icon(Icons.close, size: 20.r),
+                    onPressed: enabled ? onClear : null,
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    iconSize: 20.r,
+                  )
+                else
+                  // 无值时显示箭头图标
+                  const Icon(Icons.chevron_right),
               ],
             ),
           ),

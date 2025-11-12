@@ -26,6 +26,8 @@ class TripRouteSelectionPage extends StatelessWidget {
     this.destinationPosition,
     this.destinationAddressFuture,
     this.destinationNearbyFuture,
+    this.onClearDeparture,
+    this.onClearDestination,
   });
 
   final ScrollController? scrollCtrl;
@@ -44,6 +46,8 @@ class TripRouteSelectionPage extends StatelessWidget {
   final LatLng? destinationPosition;
   final Future<String?>? destinationAddressFuture;
   final Future<List<NearbyPlace>>? destinationNearbyFuture;
+  final VoidCallback? onClearDeparture;
+  final VoidCallback? onClearDestination;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +65,8 @@ class TripRouteSelectionPage extends StatelessWidget {
                 title: departureTitle,
                 onTap: onEditDeparture,
                 onLeadingTap: onSearchDeparture,
+                hasValue: departurePosition != null,
+                onClear: onClearDeparture,
               ),
               SizedBox(height: 12.h),
               EventCardTile(
@@ -69,6 +75,8 @@ class TripRouteSelectionPage extends StatelessWidget {
                 onTap: departurePosition != null ? onEditDestination : null,
                 onLeadingTap: departurePosition != null ? onSearchDestination : null,
                 enabled: departurePosition != null,
+                hasValue: destinationPosition != null,
+                onClear: onClearDestination,
               ),
               SizedBox(height: 24.h),
               UnifiedNearbyPlacesList(

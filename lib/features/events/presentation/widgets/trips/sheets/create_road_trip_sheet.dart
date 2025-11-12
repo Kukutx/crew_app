@@ -312,6 +312,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   void _onStartPositionChanged() {
     if (!mounted) return;
     final newPosition = widget.startPositionListenable?.value;
+    debugPrint('📍 起点监听器触发 - newPosition: $newPosition, 当前: $_startLatLng');
     if (newPosition != _startLatLng) {
       _updateStartLocation(newPosition);
     }
@@ -320,12 +321,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   void _onDestinationPositionChanged() {
     if (!mounted) return;
     final newPosition = widget.destinationListenable?.value;
+    debugPrint('📍 终点监听器触发 - newPosition: $newPosition, 当前: $_destinationLatLng');
     if (newPosition != _destinationLatLng) {
       _updateDestinationLocation(newPosition);
     }
   }
 
   void _updateStartLocation(LatLng? position) {
+    debugPrint('🔄 更新起点位置 - position: $position');
     setState(() {
       _startLatLng = position;
       if (position != null) {
@@ -340,6 +343,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   void _updateDestinationLocation(LatLng? position) {
+    debugPrint('🔄 更新终点位置 - position: $position');
     setState(() {
       _destinationLatLng = position;
       if (position != null) {
@@ -1024,6 +1028,53 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     );
   }
 
+  // 清空起点
+  void _onClearStart() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    
+    // 先清空选择控制器状态（这会自动清空终点）
+    selectionController.setSelectedLatLng(null);
+    // 同时清空 isSelectingDestination 状态，否则长按地图会进入选择终点模式
+    selectionController.setSelectingDestination(false);
+    
+    // 然后清空本地状态
+    setState(() {
+      // 清空起点
+      _startLatLng = null;
+      _startAddress = null;
+      _startAddressFuture = null;
+      _startNearbyFuture = null;
+      
+      // 同步清空终点（因为起点被清空后，终点也必须清空）
+      _destinationLatLng = null;
+      _destinationAddress = null;
+      _destinationAddressFuture = null;
+      _destinationNearbyFuture = null;
+    });
+    
+    debugPrint('🧹 已清空起点和终点 - selectedLatLng: ${ref.read(mapSelectionControllerProvider).selectedLatLng}, destinationLatLng: ${ref.read(mapSelectionControllerProvider).destinationLatLng}, isSelectingDestination: ${ref.read(mapSelectionControllerProvider).isSelectingDestination}');
+  }
+
+  // 清空终点
+  void _onClearDestination() {
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    
+    // 先清空选择控制器状态
+    selectionController.setDestinationLatLng(null);
+    // 同时清空 isSelectingDestination 状态
+    selectionController.setSelectingDestination(false);
+    
+    // 然后清空本地状态
+    setState(() {
+      _destinationLatLng = null;
+      _destinationAddress = null;
+      _destinationAddressFuture = null;
+      _destinationNearbyFuture = null;
+    });
+    
+    debugPrint('🧹 已清空终点 - selectedLatLng: ${ref.read(mapSelectionControllerProvider).selectedLatLng}, destinationLatLng: ${ref.read(mapSelectionControllerProvider).destinationLatLng}, isSelectingDestination: ${ref.read(mapSelectionControllerProvider).isSelectingDestination}');
+  }
+
   Future<void> goToSection(TripSection s) async {
     // 如果 section 是 route，切换到途径点 tab
     if (s == TripSection.route) {
@@ -1206,14 +1257,16 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     ref.listen<MapSelectionState>(mapSelectionControllerProvider, (previous, next) {
       // 监听起点位置变化
       if (previous?.selectedLatLng != next.selectedLatLng) {
-        if (next.selectedLatLng != null && next.selectedLatLng != _startLatLng) {
+        // 移除 null 检查，确保清空时也能同步
+        if (next.selectedLatLng != _startLatLng) {
           _updateStartLocation(next.selectedLatLng);
         }
       }
       
       // 监听终点位置变化
       if (previous?.destinationLatLng != next.destinationLatLng) {
-        if (next.destinationLatLng != null && next.destinationLatLng != _destinationLatLng) {
+        // 移除 null 检查，确保清空时也能同步
+        if (next.destinationLatLng != _destinationLatLng) {
           _updateDestinationLocation(next.destinationLatLng);
         }
       }
@@ -1286,6 +1339,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 position: _startLatLng,
                 addressFuture: _startAddressFuture,
                 nearbyFuture: _startNearbyFuture,
+                onClear: _onClearStart,
               ),
               secondLocation: LocationData(
                 title: destinationTitle,
@@ -1295,6 +1349,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                 position: _destinationLatLng,
                 addressFuture: _destinationAddressFuture,
                 nearbyFuture: _destinationNearbyFuture,
+                onClear: _onClearDestination,
               ),
             ),
             scrollCtrl: shouldUseScrollController ? widget.scrollCtrl : null,

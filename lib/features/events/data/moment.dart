@@ -1,6 +1,3 @@
-/// Moment 数据模型
-/// 与后端 API DTO 对应
-
 /// 瞬间类型
 enum MomentType {
   instant, // 即时瞬间

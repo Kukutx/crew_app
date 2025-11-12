@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// 图片分享和保存工具类
@@ -68,7 +67,7 @@ class ImageShareHelper {
         onError?.call('无法生成分享图片');
         return false;
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       debugPrint('Failed to share image: $e');
       
       // 如果分享图片失败，尝试只分享文本
@@ -127,7 +126,7 @@ class ImageShareHelper {
         onError?.call('保存失败');
         return false;
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       debugPrint('Failed to save image: $e');
       onError?.call('保存失败，请重试');
       return false;

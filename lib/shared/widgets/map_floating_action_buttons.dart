@@ -2,7 +2,6 @@ import 'package:crew_app/features/events/presentation/pages/map/state/map_overla
 import 'package:crew_app/features/events/presentation/pages/map/state/map_overlay_sheet_stage_provider.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// 地图悬浮按钮配置
@@ -137,7 +136,6 @@ class MapFloatingActionButtons extends StatelessWidget {
     if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
       final hasStart = startLatLng != null;
       final hasDestination = destinationLatLng != null;
-      final hasBoth = hasStart && hasDestination;
       final hasAtLeastOne = hasStart || hasDestination;
 
       return [

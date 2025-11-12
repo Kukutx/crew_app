@@ -11,7 +11,6 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_hos
 import 'package:crew_app/features/events/presentation/widgets/sections/event_story_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_team_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
-import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/shared/utils/road_trip_address_loader.dart';
@@ -247,7 +246,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
       );
 
       // 调用API创建
-      final id = await ref.read(cityEventsApiProvider).createCityEvent(draft);
+      await ref.read(cityEventsApiProvider).createCityEvent(draft);
 
       if (!mounted) return;
 

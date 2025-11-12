@@ -6,7 +6,6 @@ import 'package:crew_app/features/events/presentation/pages/map/state/map_select
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/markers_layer.dart';
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/event_carousel_manager.dart';
 
@@ -68,7 +67,7 @@ class MapMarkerBuilder {
   }) {
     return events.when(
       loading: () => const <Marker>{},
-      error: (_, __) => const <Marker>{},
+      error: (_, _) => const <Marker>{},
       data: (list) => MarkersLayer.fromEvents(
         events: list,
         onEventTap: (event) {
@@ -169,8 +168,6 @@ class MapMarkerBuilder {
     required LatLng position,
     required double color,
     VoidCallback? onTap,
-    ValueChanged<LatLng>? onDrag,
-    ValueChanged<LatLng>? onDragEnd,
   }) {
     return Marker(
       markerId: markerId,

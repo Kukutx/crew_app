@@ -103,12 +103,6 @@ class _MemberBubbleState extends State<MemberBubble>
     final expenseShadowColor = isDark
         ? const Color(0x332B2E4F)
         : const Color(0x3381A4FF);
-    final mainGradientBase = isDark
-        ? const [Color(0xFF4F46E5), Color(0xFF9333EA)]
-        : const [Color(0xFF5B8DEF), Color(0xFF7C3AED)];
-    final mainGradient = mainGradientBase
-        .map((color) => color.withValues(alpha: isDark ? 0.72 : 0.78))
-        .toList();
     final bubbleShadowColor = isDark
         ? Colors.black.withValues(alpha: 0.4)
         : const Color(0x335B8DEF);

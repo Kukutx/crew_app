@@ -1,7 +1,4 @@
 import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
-import 'package:crew_app/features/events/data/moment.dart';
-import 'package:crew_app/features/events/presentation/widgets/cards/moment_post_card.dart';
-import 'package:crew_app/features/events/state/moment_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

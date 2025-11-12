@@ -38,13 +38,9 @@ class MemberBubbleCluster extends StatelessWidget {
     
     final offsets = _positionsForCount(displayMembers.length);
     
-    // 使用最大泡泡尺寸来计算 outerExtent，确保所有泡泡都能完整显示
-    final maxBubbleSize = memberSizes.values.reduce(math.max);
     // 使用最大可能的费用泡泡大小（基础大小 × 最大成员泡泡缩放 × 最大金额比例）
     final baseExpenseSize = BubbleConstants.defaultExpenseBubbleDiameter;
     final baseParentSize = BubbleConstants.defaultBubbleDiameter;
-    final maxParentScaleFactor = maxBubbleSize / baseParentSize;
-    final maxExpenseSize = baseExpenseSize * maxParentScaleFactor * BubbleConstants.maxExpenseSizeRatioForBounds;
 
     // 计算实际需要的尺寸，考虑费用泡泡可能超出成员泡泡的范围
     double maxX = 0;

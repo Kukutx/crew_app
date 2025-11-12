@@ -5,7 +5,6 @@ import 'package:crew_app/app/state/app_overlay_provider.dart';
 import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
 import 'package:crew_app/features/events/presentation/pages/map/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/trips/sheets/create_road_trip_sheet.dart';
-import 'package:crew_app/features/events/presentation/pages/trips/data/road_trip_editor_models.dart';
 import 'package:crew_app/features/events/presentation/pages/city_events/sheets/create_city_event_sheet.dart';
 import 'package:crew_app/features/events/presentation/pages/moment/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
@@ -38,7 +37,6 @@ import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import 'controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
-import 'package:crew_app/core/network/places/places_service.dart';
 import 'state/map_overlay_sheet_provider.dart';
 import 'state/map_overlay_sheet_stage_provider.dart';
 
@@ -613,15 +611,8 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
         break;
     }
 
-    // 创建 PlaceDetails 对象
-    final place = PlaceDetails(
-      id: 'selected_marker_${selectedPosition.latitude}_${selectedPosition.longitude}',
-      displayName: address ?? '已选择的位置',
-      formattedAddress: address,
-      location: selectedPosition,
-    );
-
     // 跳转到 LocationSearchScreen（编辑模式）
+    if (!mounted) return;
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LocationSearchScreen(

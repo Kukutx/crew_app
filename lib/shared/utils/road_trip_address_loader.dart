@@ -1,6 +1,5 @@
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
-import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

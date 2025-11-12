@@ -614,7 +614,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     } else if (place != null) {
       // 如果已经有地址，直接使用 place 提供的地址
       final address = place.formattedAddress ?? place.displayName;
-      if (address != null && address.trim().isNotEmpty) {
+      if (address.trim().isNotEmpty) {
         setState(() {
           _waypointAddressCache[key] = address.trim();
         });

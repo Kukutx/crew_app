@@ -1,22 +1,3 @@
-/// 文本截断工具类
-/// 
-/// 用于处理文本过长的情况，支持多种截断方式：
-/// - 从末尾截断（默认）：显示前面部分，后面用".."
-/// - 从开头截断：显示后面部分，前面用".."
-/// - 中间截断：显示前后部分，中间用".."
-/// 
-/// 使用示例：
-/// ```dart
-/// // 从末尾截断（默认）
-/// TextTruncateHelper.truncate('很长的地址文本', 10); // '很长的地址..'
-/// 
-/// // 从开头截断
-/// TextTruncateHelper.truncateStart('很长的地址文本', 10); // '..址文本'
-/// 
-/// // 中间截断
-/// TextTruncateHelper.truncateMiddle('很长的地址文本', 10); // '很长的..文本'
-/// ```
-
 class TextTruncateHelper {
   /// 默认的省略符号
   static const String _defaultEllipsis = '..';

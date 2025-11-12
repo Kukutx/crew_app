@@ -177,7 +177,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                   children: [
                     // 支付人选择
                     DropdownButtonFormField<String>(
-                      value: _selectedPayer,
+                      initialValue: _selectedPayer,
                       decoration: const InputDecoration(
                         labelText: '支付人',
                         hintText: '选择支付此费用的人',
@@ -226,7 +226,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                     const SizedBox(height: 20),
                     // 类别选择
                     DropdownButtonFormField<String>(
-                      value: _category,
+                      initialValue: _category,
                       decoration: const InputDecoration(
                         labelText: '类别',
                         prefixIcon: Icon(Icons.category),

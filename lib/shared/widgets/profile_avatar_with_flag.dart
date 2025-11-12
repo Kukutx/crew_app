@@ -27,7 +27,6 @@ class ProfileAvatarWithFlag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final effectiveBgColor = backgroundColor ??
         Colors.white.withValues(alpha: 0.12);
     final effectiveFgColor = foregroundColor ?? Colors.white;

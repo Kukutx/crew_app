@@ -64,7 +64,7 @@ class _EventsGrid extends StatelessWidget {
       loading: () => const _CenteredScrollable(
         child: CircularProgressIndicator(),
       ),
-      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+      error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
     );
   }
 }
@@ -106,7 +106,7 @@ class _FavoritesGrid extends StatelessWidget {
       loading: () => const _CenteredScrollable(
         child: CircularProgressIndicator(),
       ),
-      error: (_, __) => _CenteredScrollable(child: Text(loc.load_failed)),
+      error: (_, _) => _CenteredScrollable(child: Text(loc.load_failed)),
     );
   }
 }

@@ -107,7 +107,7 @@ class AppDesignTokens {
   /// 小阴影（用于卡片悬浮效果）
   static List<BoxShadow> get shadowSM => [
         BoxShadow(
-          color: Colors.black.withOpacity(0.05),
+          color: Colors.black.withValues(alpha: 0.05),
           blurRadius: 4,
           offset: const Offset(0, 2),
         ),
@@ -116,7 +116,7 @@ class AppDesignTokens {
   /// 中阴影（用于卡片、按钮等，主要使用）
   static List<BoxShadow> get shadowMD => [
         BoxShadow(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 0.1),
           blurRadius: 8,
           offset: const Offset(0, 4),
         ),
@@ -125,7 +125,7 @@ class AppDesignTokens {
   /// 大阴影（用于底部 Sheet、模态框等）
   static List<BoxShadow> get shadowLG => [
         BoxShadow(
-          color: Colors.black.withOpacity(0.15),
+          color: Colors.black.withValues(alpha: 0.15),
           blurRadius: 16,
           offset: const Offset(0, 8),
         ),
@@ -134,7 +134,7 @@ class AppDesignTokens {
   /// 超大阴影（用于浮动按钮、重要卡片等）
   static List<BoxShadow> get shadowXL => [
         BoxShadow(
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           blurRadius: 24,
           offset: const Offset(0, 12),
         ),

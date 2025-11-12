@@ -7,7 +7,6 @@ import 'package:crew_app/features/events/state/moment_providers.dart';
 import 'package:crew_app/features/events/utils/moment_image_helper.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/state/user_location_provider.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CreateMomentScreen extends ConsumerStatefulWidget {
   const CreateMomentScreen({super.key});
@@ -22,12 +21,11 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
   final _locationController = TextEditingController();
 
   MomentType _selectedType = MomentType.instant;
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
   bool _isLoadingLocation = false;
   bool _isLoadingAddress = false;
   String? _country;
   String? _city;
-  LatLng? _currentLocation;
 
   @override
   void dispose() {
@@ -63,7 +61,6 @@ class _CreateMomentScreenState extends ConsumerState<CreateMomentScreen> {
 
       setState(() {
         _isLoadingLocation = false;
-        _currentLocation = location;
       });
 
       // 获取地址

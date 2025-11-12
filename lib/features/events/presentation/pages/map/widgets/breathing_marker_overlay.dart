@@ -248,19 +248,5 @@ class _BreathingMarkerPainter extends CustomPainter {
     
     return oldDelegate.cameraPosition != cameraPosition;
   }
-
-  // 计算两个经纬度之间的距离（米）
-  double _calculateDistance(LatLng a, LatLng b) {
-    const double earthRadius = 6371000; // 地球半径（米）
-    final double dLat = (b.latitude - a.latitude) * math.pi / 180.0;
-    final double dLon = (b.longitude - a.longitude) * math.pi / 180.0;
-    final double a1 = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(a.latitude * math.pi / 180.0) *
-            math.cos(b.latitude * math.pi / 180.0) *
-            math.sin(dLon / 2) *
-            math.sin(dLon / 2);
-    final double c = 2 * math.atan2(math.sqrt(a1), math.sqrt(1 - a1));
-    return earthRadius * c;
-  }
 }
 

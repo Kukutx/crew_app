@@ -278,8 +278,6 @@ class _ExpensesPageState extends State<ExpensesPage>
                     final viewSize = Size(constraints.maxWidth, constraints.maxHeight);
                     
                     // 画布大小：设置为视图的2-3倍，确保有足够的滑动空间
-                    // 但至少要比集群大小大，保证集群可以完整显示
-                    final baseSize = MemberBubbleCluster.bubbleDiameter;
                     final minCanvasWidth = math.max(
                       clusterSize.width * 1.5, // 至少是集群的1.5倍
                       viewSize.width * 2.0,    // 至少是视图的2倍

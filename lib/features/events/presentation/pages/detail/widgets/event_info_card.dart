@@ -266,10 +266,6 @@ class EventInfoCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final hasTime = event.startTime != null && event.endTime != null;
-    final isSameDay = hasTime &&
-        event.startTime!.toLocal().year == event.endTime!.toLocal().year &&
-        event.startTime!.toLocal().month == event.endTime!.toLocal().month &&
-        event.startTime!.toLocal().day == event.endTime!.toLocal().day;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

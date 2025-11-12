@@ -146,7 +146,7 @@ class BasicInfoSection extends ConsumerWidget {
           // 国家选择下拉框
           countriesAsync.when(
             data: (countries) => DropdownButtonFormField<String?>(
-              value: countryCode,
+              initialValue : countryCode,
               style: const TextStyle(
                 fontSize: 15,
                 height: 1.5,
@@ -188,7 +188,7 @@ class BasicInfoSection extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator()),
             ),
             error: (error, stack) => DropdownButtonFormField<String?>(
-              value: countryCode,
+              initialValue : countryCode,
               style: const TextStyle(
                 fontSize: 15,
                 height: 1.5,
@@ -234,7 +234,7 @@ class BasicInfoSection extends ConsumerWidget {
               final validCityValue = _getValidCityValueFromList(selectedCity, cityNames);
               
               return DropdownButtonFormField<String?>(
-                value: validCityValue,
+                initialValue : validCityValue,
                 style: const TextStyle(
                   fontSize: 15,
                   height: 1.5,
@@ -280,7 +280,7 @@ class BasicInfoSection extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator()),
             ),
             error: (error, stack) => DropdownButtonFormField<String?>(
-              value: selectedCity,
+              initialValue : selectedCity,
               style: const TextStyle(
                 fontSize: 15,
                 height: 1.5,

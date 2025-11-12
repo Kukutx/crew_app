@@ -191,7 +191,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: DropdownButtonFormField<bool>(
-                value: _isForward,
+                initialValue: _isForward,
                 decoration: const InputDecoration(
                   labelText: '选择方向',
                   border: OutlineInputBorder(),

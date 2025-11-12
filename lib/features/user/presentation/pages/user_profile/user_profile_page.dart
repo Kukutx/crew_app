@@ -338,7 +338,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             0.0,
             1.0,
           );
-          final collapseProgress = 1 - t;
 
           return Stack(
             fit: StackFit.expand,

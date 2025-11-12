@@ -1,5 +1,4 @@
 import 'package:crew_app/core/network/api_service.dart';
-import 'package:crew_app/core/network/response_parser.dart';
 
 /// 地理位置 API 服务
 /// 从后端 API 获取国家和城市数据

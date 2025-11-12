@@ -1,5 +1,5 @@
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_stage_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_stage_providers.dart';
 import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

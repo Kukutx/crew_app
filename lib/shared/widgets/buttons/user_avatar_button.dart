@@ -4,7 +4,7 @@ import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/state/user/avatar/avatar_provider.dart';
+import '../../../core/state/user/avatar/avatar_providers.dart';
 import '../../../core/state/auth/auth_providers.dart';
 
 /// 通用的用户头像按钮组件

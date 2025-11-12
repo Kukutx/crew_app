@@ -1,7 +1,7 @@
 import 'package:crew_app/features/events/presentation/widgets/moment/widgets/create_moment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 
 Future<void> showCreateContentOptionsSheet(BuildContext context) {

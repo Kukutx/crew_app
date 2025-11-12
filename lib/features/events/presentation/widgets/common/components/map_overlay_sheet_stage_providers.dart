@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum MapOverlaySheetStage {
   collapsed,
@@ -14,3 +14,4 @@ final mapOverlaySheetStageProvider = StateProvider<MapOverlaySheetStage>(
 final mapOverlaySheetSizeProvider = StateProvider<double>(
   (ref) => 0.0,
 );
+

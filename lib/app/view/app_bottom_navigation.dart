@@ -1,14 +1,14 @@
 import 'dart:ui';
 
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_stage_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_stage_providers.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../state/app_overlay_provider.dart';
-import '../state/bottom_navigation_visibility_provider.dart';
+import '../state/app_overlay_providers.dart';
+import '../state/bottom_navigation_visibility_providers.dart';
 
 class AppBottomNavigation extends ConsumerStatefulWidget {
   const AppBottomNavigation({

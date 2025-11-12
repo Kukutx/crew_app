@@ -10,7 +10,7 @@ import 'package:crew_app/features/expenses/widgets/settlement_preview_sheet.dart
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/formatted_date.dart';
 import 'package:crew_app/shared/utils/number_format_helper.dart';
-import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/shared/widgets/buttons/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 
 class ExpensesPage extends StatefulWidget {

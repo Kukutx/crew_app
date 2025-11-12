@@ -1,10 +1,11 @@
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/utils/event_form_validation_utils.dart' show EventFormValidationHelper;
 import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,24 +65,8 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 
   // ===== 坐标验证 =====
-
-  /// 坐标验证
-  bool isValidCoordinate(LatLng coordinate) {
-    return coordinate.latitude >= -90 &&
-        coordinate.latitude <= 90 &&
-        coordinate.longitude >= -180 &&
-        coordinate.longitude <= 180;
-  }
-
-  /// 验证所有坐标
-  bool validateAllCoordinates(List<LatLng> coordinates) {
-    return coordinates.every(isValidCoordinate);
-  }
-
-  /// 格式化坐标为字符串
-  String formatCoordinate(LatLng latLng) {
-    return '${latLng.latitude.toStringAsFixed(6)}, ${latLng.longitude.toStringAsFixed(6)}';
-  }
+  // 注意：坐标验证和格式化方法已移至 EventFormValidationHelper 和 EventCreationHelper
+  // 这里保留解析方法，因为它是 Mixin 特有的辅助方法
 
   /// 解析坐标字符串
   LatLng? parseCoordinate(String coordinate) {
@@ -90,8 +75,10 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final lat = double.tryParse(parts[0].trim());
     final lng = double.tryParse(parts[1].trim());
     if (lat == null || lng == null) return null;
-    if (!isValidCoordinate(LatLng(lat, lng))) return null;
-    return LatLng(lat, lng);
+    // 使用统一的验证方法
+    final coordinate = LatLng(lat, lng);
+    if (!EventFormValidationHelper.isValidCoordinate(coordinate)) return null;
+    return coordinate;
   }
 
   // ===== 地址加载 =====

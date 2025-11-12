@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'scroll_activity_provider.dart';
+import 'scroll_activity_providers.dart';
 
 class ScrollActivityListener extends ConsumerStatefulWidget {
   const ScrollActivityListener({

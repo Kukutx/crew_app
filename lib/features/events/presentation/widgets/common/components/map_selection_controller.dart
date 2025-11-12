@@ -5,7 +5,6 @@ import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// 正在拖拽的标记点类型

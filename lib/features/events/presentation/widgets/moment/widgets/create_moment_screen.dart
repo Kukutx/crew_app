@@ -6,7 +6,7 @@ import 'package:crew_app/features/events/data/moment.dart';
 import 'package:crew_app/features/events/state/moment_providers.dart';
 import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
-import 'package:crew_app/features/events/state/user_location_provider.dart';
+import 'package:crew_app/features/events/state/user_location_providers.dart';
 
 class CreateMomentScreen extends ConsumerStatefulWidget {
   const CreateMomentScreen({super.key});

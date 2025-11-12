@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'package:crew_app/features/user/presentation/pages/guestbook/state/guestbook_provider.dart';
+import 'package:crew_app/features/user/presentation/pages/guestbook/state/guestbook_providers.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 
 /// Neumorphism 装饰工具

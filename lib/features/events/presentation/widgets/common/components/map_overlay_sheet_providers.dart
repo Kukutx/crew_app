@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum MapOverlaySheetType {
   none,
@@ -10,3 +10,4 @@ enum MapOverlaySheetType {
 
 final mapOverlaySheetProvider =
     StateProvider<MapOverlaySheetType>((ref) => MapOverlaySheetType.none);
+

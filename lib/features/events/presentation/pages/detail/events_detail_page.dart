@@ -11,7 +11,7 @@ import 'package:crew_app/features/user/presentation/pages/user_profile/user_prof
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/shared/utils/image_share_helper.dart';
-import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/shared/widgets/buttons/app_floating_action_button.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:crew_app/app/router/app_router.dart';
-import 'package:crew_app/app/state/app_overlay_provider.dart';
-import 'package:crew_app/app/state/bottom_navigation_visibility_provider.dart';
+import 'package:crew_app/app/state/app_overlay_providers.dart';
+import 'package:crew_app/app/state/bottom_navigation_visibility_providers.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/sheets/map_explore_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/sheets/create_road_trip_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/city_events/sheets/create_city_event_sheet.dart';
@@ -37,8 +37,8 @@ import 'controllers/event_carousel_manager.dart';
 import 'controllers/search_manager.dart';
 import '../../widgets/common/components/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
-import '../../widgets/common/components/map_overlay_sheet_provider.dart';
-import '../../widgets/common/components/map_overlay_sheet_stage_provider.dart';
+import '../../widgets/common/components/map_overlay_sheet_providers.dart';
+import '../../widgets/common/components/map_overlay_sheet_stage_providers.dart';
 
 class EventsMapPage extends ConsumerStatefulWidget {
   final Event? selectedEvent;

@@ -1,9 +1,9 @@
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/state/providers/api_provider_helper.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/state/country_city_provider.dart';
+import 'package:crew_app/shared/state/country_city_providers.dart';
 import 'package:crew_app/shared/utils/media_picker_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

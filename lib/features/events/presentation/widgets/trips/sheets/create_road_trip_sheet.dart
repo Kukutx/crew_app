@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_basic_section.dart';
@@ -16,7 +16,8 @@ import 'package:crew_app/features/events/presentation/widgets/common/screens/loc
 import 'package:crew_app/features/events/presentation/widgets/common/components/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
-import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
+import 'package:crew_app/shared/utils/event_form_validation_utils.dart' show EventFormValidationHelper;
+import 'package:crew_app/features/events/presentation/widgets/common/utils/event_creation_helpers.dart' show EventCreationHelper;
 import 'package:crew_app/features/events/state/events_api_service.dart';
 import 'package:crew_app/shared/widgets/indicators/page_indicator.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/factories/location_selection_page_factory.dart';
@@ -465,7 +466,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         final title = _titleCtrl.text.trim();
         
         // 使用验证工具类进行验证
-        final validationErrors = EventFormValidationUtils.validateRoadTripForm(
+        final validationErrors = EventFormValidationHelper.validateRoadTripForm(
           title: title,
           dateRange: _editorState.dateRange,
           startLatLng: _startLatLng,
@@ -487,33 +488,21 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         // 价格已经在验证工具类中验证，这里直接使用
         final price = _pricingType == EventPricingType.paid ? _price : null;
 
-        final segments = <EventWaypointSegment>[
-          ..._forwardWps.asMap().entries.map(
-            (entry) => EventWaypointSegment(
-              coordinate: '${entry.value.latitude},${entry.value.longitude}',
-              direction: EventWaypointDirection.forward,
-              order: entry.key,
-            ),
-          ),
-          if (_routeType == EventRouteType.roundTrip)
-            ..._returnWps.asMap().entries.map(
-              (entry) => EventWaypointSegment(
-                coordinate: '${entry.value.latitude},${entry.value.longitude}',
-                direction: EventWaypointDirection.returnTrip,
-                order: entry.key,
-              ),
-            ),
-        ];
+        final segments = EventCreationHelper.buildWaypointSegments(
+          forwardWaypoints: _forwardWps,
+          returnWaypoints: _returnWps,
+          isRoundTrip: _routeType == EventRouteType.roundTrip,
+        );
 
         final draft = RoadTripDraft(
           title: title,
           dateRange: _editorState.dateRange!,
           startLocation: _startAddress ?? 
-              '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
+              EventCreationHelper.formatCoordinate(_startLatLng!),
           endLocation: _destinationAddress ?? 
-              '${_destinationLatLng!.latitude.toStringAsFixed(6)}, ${_destinationLatLng!.longitude.toStringAsFixed(6)}',
+              EventCreationHelper.formatCoordinate(_destinationLatLng!),
           meetingPoint: _startAddress ?? 
-              '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}',
+              EventCreationHelper.formatCoordinate(_startLatLng!),
           isRoundTrip: _routeType == EventRouteType.roundTrip,
           segments: segments,
           maxMembers: _maxMembers,
@@ -1441,10 +1430,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         _destinationAddress != null && _destinationAddress!.trim().isNotEmpty;
 
     final startCoords = _startLatLng != null
-        ? '${_startLatLng!.latitude.toStringAsFixed(6)}, ${_startLatLng!.longitude.toStringAsFixed(6)}'
+        ? EventCreationHelper.formatCoordinate(_startLatLng!)
         : null;
     final destinationCoords = _destinationLatLng != null
-        ? '${_destinationLatLng!.latitude.toStringAsFixed(6)}, ${_destinationLatLng!.longitude.toStringAsFixed(6)}'
+        ? EventCreationHelper.formatCoordinate(_destinationLatLng!)
         : null;
 
     final startTitle = hasStartAddress

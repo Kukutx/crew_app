@@ -11,10 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crew_app/shared/widgets/app_masonry_grid.dart';
 
-import '../../../../../../app/state/app_overlay_provider.dart';
-import '../../../../../../core/error/api_exception.dart';
+import 'package:crew_app/app/state/app_overlay_providers.dart';
+import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
-import '../components/map_overlay_sheet_provider.dart';
+import '../components/map_overlay_sheet_providers.dart';
 
 class MapExploreSheet extends ConsumerStatefulWidget {
   const MapExploreSheet({

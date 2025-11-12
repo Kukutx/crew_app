@@ -37,3 +37,4 @@ final avatarProvider =
   final uid = ref.watch(authStateProvider).value?.uid;
   return AvatarNotifier(uid);
 });
+

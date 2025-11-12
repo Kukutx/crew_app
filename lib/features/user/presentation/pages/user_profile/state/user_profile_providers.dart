@@ -1,5 +1,5 @@
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final userProfileProvider = StateProvider<User>((ref) {
   return User(
@@ -18,3 +18,4 @@ final userProfileProvider = StateProvider<User>((ref) {
     city: '深圳',
   );
 });
+

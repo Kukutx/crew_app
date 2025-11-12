@@ -5,7 +5,6 @@ import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 final eventsProvider =
     AsyncNotifierProvider.autoDispose<EventsCtrl, List<Event>>(EventsCtrl.new);

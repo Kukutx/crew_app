@@ -36,3 +36,4 @@ class UserLocationCtrl extends AsyncNotifier<LatLng?> {
     return LatLng(pos.latitude, pos.longitude);
   }
 }
+

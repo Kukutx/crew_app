@@ -1,13 +1,13 @@
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/events/presentation/pages/map/events_map_page.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/app/state/scroll_activity_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'state/app_overlay_provider.dart';
-import 'state/scroll_activity_provider.dart';
+import 'state/app_overlay_providers.dart';
+import 'state/scroll_activity_providers.dart';
 import 'view/app_bottom_navigation.dart';
 
 class App extends ConsumerStatefulWidget {

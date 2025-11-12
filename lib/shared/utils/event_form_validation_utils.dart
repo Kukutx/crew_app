@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// 事件表单验证工具类
-class EventFormValidationUtils {
-  EventFormValidationUtils._();
+class EventFormValidationHelper {
+  EventFormValidationHelper._();
 
   /// 验证标题
   /// 

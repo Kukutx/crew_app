@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_provider.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/completion_sheet/completion_sheet.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_basic_section.dart';
@@ -181,7 +181,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
       final title = _titleCtrl.text.trim();
 
       // 使用验证工具类进行验证
-      final validationErrors = EventFormValidationUtils.validateCityEventForm(
+      final validationErrors = EventFormValidationHelper.validateCityEventForm(
         title: title,
         dateRange: _editorState.dateRange,
         meetingPointLatLng: _meetingPointLatLng,

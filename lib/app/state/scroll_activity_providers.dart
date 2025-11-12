@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 滚动活动状态 Provider
 /// 统一管理滚动状态，包含 debounce 逻辑

@@ -2,7 +2,7 @@ import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/shared/utils/country_helper.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/state/location_api_provider.dart';
+import 'package:crew_app/shared/state/location_api_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

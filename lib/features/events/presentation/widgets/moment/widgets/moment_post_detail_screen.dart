@@ -1,5 +1,5 @@
 import 'package:crew_app/features/events/data/adapters/moment_adapter.dart';
-import 'package:crew_app/shared/widgets/app_floating_action_button.dart';
+import 'package:crew_app/shared/widgets/buttons/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

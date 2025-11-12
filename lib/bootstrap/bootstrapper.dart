@@ -14,7 +14,7 @@ import 'package:crew_app/bootstrap/initializers/preferences_initializer.dart';
 import 'package:crew_app/bootstrap/initializers/remote_config_initializer.dart';
 import 'package:crew_app/core/config/remote_config_providers.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
-import 'package:crew_app/core/storage/shared_preferences_provider.dart';
+import 'package:crew_app/core/storage/shared_preferences_providers.dart';
 
 class Bootstrapper {
   Bootstrapper({

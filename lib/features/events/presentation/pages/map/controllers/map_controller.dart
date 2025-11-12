@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/state/user_location_provider.dart';
+import 'package:crew_app/features/events/state/user_location_providers.dart';
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/shared/widgets/map/camera_move_optimizer.dart';
 

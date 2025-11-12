@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:crew_app/features/events/state/events_providers.dart';
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_provider.dart';
+import 'package:crew_app/features/user/presentation/pages/user_profile/state/user_profile_providers.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_preview_card.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/widgets/profile_tab_view.dart';
 import 'package:crew_app/shared/widgets/sheets/report_sheet/report_sheet.dart';

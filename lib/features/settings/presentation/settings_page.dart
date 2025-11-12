@@ -3,7 +3,7 @@ import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/core/monitoring/monitoring_providers.dart';
 import 'package:crew_app/core/state/auth/auth_providers.dart';
 import 'package:crew_app/features/settings/state/settings_providers.dart';
-import 'package:crew_app/core/state/user/authenticated_user_provider.dart';
+import 'package:crew_app/core/state/user/authenticated_user_providers.dart';
 import 'package:crew_app/features/settings/presentation/pages/about/about_page.dart';
 import 'package:crew_app/features/settings/presentation/pages/blocklist/blocklist_page.dart';
 import 'package:crew_app/features/settings/presentation/pages/developer_test/crash_test_page.dart';
@@ -16,8 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:crew_app/app/state/app_overlay_provider.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:crew_app/app/state/app_overlay_providers.dart';
 import 'package:go_router/go_router.dart';
 
 enum LocationPermissionOption { allow, whileUsing, deny }

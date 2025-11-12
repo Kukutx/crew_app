@@ -3,7 +3,7 @@ import 'package:crew_app/features/user/data/user.dart';
 import 'package:crew_app/features/user/presentation/widgets/gender_badge.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
-import 'package:crew_app/shared/state/location_api_provider.dart';
+import 'package:crew_app/shared/state/location_api_providers.dart';
 import 'package:crew_app/shared/utils/image_url.dart';
 import 'package:crew_app/shared/widgets/profile_avatar_with_flag.dart';
 import 'package:crew_app/shared/widgets/profile_info_badge.dart';

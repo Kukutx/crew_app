@@ -2,7 +2,6 @@ import 'package:crew_app/core/network/moment_api_service.dart';
 import 'package:crew_app/core/state/di/providers.dart';
 import 'package:crew_app/features/events/data/moment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 /// Moment API 服务 Provider
 final momentApiServiceProvider = Provider<MomentApiService>((ref) {

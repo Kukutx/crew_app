@@ -4,7 +4,7 @@ import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/core/error/api_exception.dart';
 import 'package:crew_app/core/network/api_service.dart';
 import 'package:crew_app/core/state/di/providers.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EventsMapSearchState {
   const EventsMapSearchState({

@@ -17,7 +17,7 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_hos
 
 // API Service 已移至 events_api_service.dart
 import 'package:crew_app/features/events/state/events_api_service.dart';
-import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
+import 'package:crew_app/shared/utils/event_form_validation_utils.dart' show EventFormValidationHelper;
 import 'package:crew_app/features/events/presentation/widgets/mixins/event_form_mixin.dart';
 import 'sheets/waypoint_note_sheet.dart';
 
@@ -209,7 +209,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage>
     final title = _titleCtrl.text.trim();
     
     // 使用验证工具类进行验证（注意：这里没有起点和终点验证，因为是编辑模式）
-    final validationErrors = EventFormValidationUtils.validateCommonForm(
+    final validationErrors = EventFormValidationHelper.validateCommonForm(
       title: title,
       dateRange: _state.dateRange,
       pricingType: _state.pricingType,
@@ -218,7 +218,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage>
 
     // 坐标验证
     final allWaypoints = [..._forwardWps, ..._returnWps];
-    final waypointError = EventFormValidationUtils.validateWaypoints(allWaypoints);
+    final waypointError = EventFormValidationHelper.validateWaypoints(allWaypoints);
     if (waypointError != null) {
       validationErrors.add(waypointError);
     }

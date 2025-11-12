@@ -4,7 +4,7 @@ import 'package:crew_app/app/router/app_router.dart';
 import 'package:crew_app/core/config/app_theme.dart';
 import 'package:crew_app/features/settings/state/settings_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
-import 'package:crew_app/shared/state/country_city_provider.dart';
+import 'package:crew_app/shared/state/country_city_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

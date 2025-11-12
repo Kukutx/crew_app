@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProfileMessage {
   const ProfileMessage({
@@ -80,3 +80,4 @@ final profileGuestbookProvider =
     StateNotifierProvider<ProfileGuestbookNotifier, List<ProfileMessage>>(
   (ref) => ProfileGuestbookNotifier(),
 );
+

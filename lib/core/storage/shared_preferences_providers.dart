@@ -6,3 +6,4 @@ import 'package:shared_preferences/shared_preferences.dart';
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw StateError('SharedPreferences must be initialized in Bootstrapper');
 });
+

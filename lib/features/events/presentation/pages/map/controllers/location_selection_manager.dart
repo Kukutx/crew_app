@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:crew_app/core/network/places/places_service.dart';
+import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,18 +36,14 @@ class LocationSelectionManager {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final mapController = ref.read(mapControllerProvider);
     
-    debugPrint('🗺️🗺️🗺️ 长按地图被触发 - mapSheetType: $mapSheetType, isSelectingDestination: ${selectionState.isSelectingDestination}, 起点: ${selectionState.selectedLatLng}, 终点: ${selectionState.destinationLatLng}');
-    
     // 选择终点模式
     if (selectionState.isSelectingDestination) {
-      debugPrint('📍 进入选择终点模式分支');
       _handleDestinationSelection(latlng, context);
       return;
     }
     
     // 创建城市活动模式：只有一个集合点
     if (mapSheetType == MapOverlaySheetType.createCityEvent) {
-      debugPrint('🏙️ 进入创建城市活动分支');
       selectionController.setSelectedLatLng(latlng);
       unawaited(mapController.moveCamera(latlng, zoom: 17));
       return;
@@ -54,11 +51,8 @@ class LocationSelectionManager {
     
     // 创建自驾游模式：需要区分起点和终点
     if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
-      debugPrint('🚗 进入创建自驾游分支 - 起点=${selectionState.selectedLatLng}, 终点=${selectionState.destinationLatLng}');
-      
       // 如果没有起点，设置起点
       if (selectionState.selectedLatLng == null) {
-        debugPrint('✅ 创建起点');
         selectionController.setSelectedLatLng(latlng);
         unawaited(mapController.moveCamera(latlng, zoom: 17));
         return;
@@ -66,7 +60,6 @@ class LocationSelectionManager {
       
       // 如果有起点但没有终点，设置终点
       if (selectionState.destinationLatLng == null) {
-        debugPrint('✅ 创建终点');
         selectionController.setDestinationLatLng(latlng);
         // 移动地图以显示起点和终点
         unawaited(mapController.fitBounds(
@@ -76,12 +69,19 @@ class LocationSelectionManager {
         return;
       }
       
-      debugPrint('⚠️ 起点和终点都已存在，不做任何操作');
-      // 如果起点和终点都已存在，不做任何操作
+      // 如果起点和终点都已存在
+      // 检查当前是否在途径点tab（currentTabIndex == 1）
+      if (selectionState.currentTabIndex == 1) {
+        // 在途径点tab，显示对话框让用户选择添加到去程还是返程
+        if (context.mounted) {
+          _showWaypointDirectionDialog(context, latlng);
+        }
+        return;
+      }
+      
+      // 在路线tab，不做任何操作
       return;
     }
-    
-    debugPrint('🔄 进入默认分支 - 创建新的自驾游');
     
     // 默认模式：创建新的自驾游
     if (_isHandlingLongPress) return;
@@ -222,6 +222,63 @@ class LocationSelectionManager {
     // overlay 模式下的 CreateRoadTripSheet 由 events_map_page 管理
     // 它会通过 ValueListenable 读取位置信息，显示在 fullCreation 模式
     ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;
+  }
+
+  /// 显示途径点方向选择对话框
+  Future<void> _showWaypointDirectionDialog(BuildContext context, LatLng latlng) async {
+    final selectionState = ref.read(mapSelectionControllerProvider);
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
+    
+    // 检查路线类型
+    final isRoundTrip = selectionState.routeType == null || 
+                        selectionState.routeType == EventRouteType.roundTrip;
+    
+    // 如果是单程，直接添加到去程
+    if (!isRoundTrip) {
+      final updatedWaypoints = List<LatLng>.from(selectionState.forwardWaypoints)..add(latlng);
+      selectionController.setForwardWaypoints(updatedWaypoints);
+      HapticFeedback.lightImpact();
+      return;
+    }
+    
+    // 如果是往返，显示对话框让用户选择
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(loc.road_trip_add_waypoint_dialog_title),
+        content: Text(loc.road_trip_add_waypoint_dialog_message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(null),
+            child: Text(loc.action_cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // 返程
+            child: Text(loc.road_trip_route_return_label),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true), // 去程
+            child: Text(loc.road_trip_route_forward_label),
+          ),
+        ],
+      ),
+    );
+    
+    if (result == null) return; // 用户取消
+    
+    // 添加到对应的途径点列表
+    if (result) {
+      // 添加到去程
+      final updatedWaypoints = List<LatLng>.from(selectionState.forwardWaypoints)..add(latlng);
+      selectionController.setForwardWaypoints(updatedWaypoints);
+    } else {
+      // 添加到返程
+      final updatedWaypoints = List<LatLng>.from(selectionState.returnWaypoints)..add(latlng);
+      selectionController.setReturnWaypoints(updatedWaypoints);
+    }
+    
+    HapticFeedback.lightImpact();
   }
 
   /// 创建快速行程（公开方法）

@@ -466,38 +466,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
                                 ),
                               ),
                             ),
-                            // 只在设置起点、终点的时候显示清除选点按钮（起始页）
-                            if (_shouldShowClearButton(selectionState, mapSheetType)) ...[
-                              const SizedBox(width: 12),
-                              TextButton(
-                                onPressed: () {
-                                  if (selectionState.isAddingWaypoint) {
-                                    // 在途经点阶段，只清除途经点选择状态，保留起点和终点
-                                    locationSelectionManager.clearWaypointSelection();
-                                  } else {
-                                    // 其他阶段，清除所有选择
-                                    unawaited(
-                                      locationSelectionManager.clearSelectedLocation(),
-                                    );
-                                  }
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: Text(
-                                  selectionState.isAddingWaypoint
-                                      ? loc.map_clear_waypoint
-                                      : loc.map_clear_selected_point,
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.85),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
                           ],
                         ),
                       ),
@@ -709,27 +677,6 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
     if (selectionState.isAddingWaypoint) return loc.map_add_waypoint_tip;
     if (selectionState.isSelectingDestination) return loc.map_select_location_destination_tip;
     return loc.map_select_location_tip;
-  }
-
-  /// 判断是否应该显示清除选点按钮
-  /// 只在起始页（选择起点/终点/集合点）设置 marker 的时候显示，途径点页不显示
-  bool _shouldShowClearButton(MapSelectionState selectionState, MapOverlaySheetType mapSheetType) {
-    // 在创建自驾游流程中，途径点页不显示清除按钮
-    if (mapSheetType == MapOverlaySheetType.createRoadTrip && selectionState.isAddingWaypoint) {
-      return false;
-    }
-    
-    // 城市活动：只在选择集合点时显示清除按钮
-    if (mapSheetType == MapOverlaySheetType.createCityEvent) {
-      return selectionState.selectedLatLng != null;
-    }
-    
-    // 自驾游：只在设置起点或终点时显示：
-    // 1. 正在选择起点（selectedLatLng != null 且不在选择终点模式）
-    // 2. 正在选择终点（isSelectingDestination 或 destinationLatLng != null）
-    return (selectionState.selectedLatLng != null && !selectionState.isSelectingDestination) ||
-        selectionState.isSelectingDestination ||
-        selectionState.destinationLatLng != null;
   }
 
   void _onAvatarTap(bool authed) {
@@ -1255,6 +1202,8 @@ class _MapOverlaySheetState extends ConsumerState<_MapOverlaySheet> {
                               setState(() => _roadTripTab = value);
                               // 通知 CreateRoadTripSheet 切换 tab
                               _roadTripTabChangeNotifier?.value = value;
+                              // 同时更新 MapSelectionController 中的 tab 索引
+                              ref.read(mapSelectionControllerProvider.notifier).setCurrentTabIndex(value);
                             },
                           );
                         }

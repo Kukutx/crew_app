@@ -2630,6 +2630,18 @@ abstract class AppLocalizations {
   /// **'Add to return'**
   String get road_trip_route_add_to_return;
 
+  /// No description provided for @road_trip_add_waypoint_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Waypoint'**
+  String get road_trip_add_waypoint_dialog_title;
+
+  /// No description provided for @road_trip_add_waypoint_dialog_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose whether to add this waypoint to the outbound or return route'**
+  String get road_trip_add_waypoint_dialog_message;
+
   /// No description provided for @road_trip_route_type_round.
   ///
   /// In en, this message translates to:

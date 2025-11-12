@@ -1374,6 +1374,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get road_trip_route_add_to_return => 'Add to return';
 
   @override
+  String get road_trip_add_waypoint_dialog_title => 'Add Waypoint';
+
+  @override
+  String get road_trip_add_waypoint_dialog_message =>
+      'Choose whether to add this waypoint to the outbound or return route';
+
+  @override
   String get road_trip_route_type_round => 'Round trip';
 
   @override

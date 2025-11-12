@@ -296,7 +296,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     // 初始化路线类型为往返，并同步到 MapSelectionController
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ref.read(mapSelectionControllerProvider.notifier).setRouteType(_routeType);
+        final controller = ref.read(mapSelectionControllerProvider.notifier);
+        controller.setRouteType(_routeType);
+        controller.setCurrentTabIndex(_tabController.index);
       }
     });
   }
@@ -312,7 +314,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   void _onStartPositionChanged() {
     if (!mounted) return;
     final newPosition = widget.startPositionListenable?.value;
-    debugPrint('📍 起点监听器触发 - newPosition: $newPosition, 当前: $_startLatLng');
     if (newPosition != _startLatLng) {
       _updateStartLocation(newPosition);
     }
@@ -321,14 +322,12 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   void _onDestinationPositionChanged() {
     if (!mounted) return;
     final newPosition = widget.destinationListenable?.value;
-    debugPrint('📍 终点监听器触发 - newPosition: $newPosition, 当前: $_destinationLatLng');
     if (newPosition != _destinationLatLng) {
       _updateDestinationLocation(newPosition);
     }
   }
 
   void _updateStartLocation(LatLng? position) {
-    debugPrint('🔄 更新起点位置 - position: $position');
     setState(() {
       _startLatLng = position;
       if (position != null) {
@@ -343,7 +342,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   }
 
   void _updateDestinationLocation(LatLng? position) {
-    debugPrint('🔄 更新终点位置 - position: $position');
     setState(() {
       _destinationLatLng = position;
       if (position != null) {
@@ -370,6 +368,9 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
           _activeScrollablePageIndex = null;
         }
       });
+      
+      // 更新 MapSelectionController 中的 tab 索引，以便地图长按知道当前在哪个tab
+      ref.read(mapSelectionControllerProvider.notifier).setCurrentTabIndex(_tabController.index);
       
       // 当切换回路线tab时，同步分页指示点
       if (_tabController.index == 0 && _routePageCtrl.hasClients) {
@@ -1051,8 +1052,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       _destinationAddressFuture = null;
       _destinationNearbyFuture = null;
     });
-    
-    debugPrint('🧹 已清空起点和终点 - selectedLatLng: ${ref.read(mapSelectionControllerProvider).selectedLatLng}, destinationLatLng: ${ref.read(mapSelectionControllerProvider).destinationLatLng}, isSelectingDestination: ${ref.read(mapSelectionControllerProvider).isSelectingDestination}');
   }
 
   // 清空终点
@@ -1071,8 +1070,6 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       _destinationAddressFuture = null;
       _destinationNearbyFuture = null;
     });
-    
-    debugPrint('🧹 已清空终点 - selectedLatLng: ${ref.read(mapSelectionControllerProvider).selectedLatLng}, destinationLatLng: ${ref.read(mapSelectionControllerProvider).destinationLatLng}, isSelectingDestination: ${ref.read(mapSelectionControllerProvider).isSelectingDestination}');
   }
 
   Future<void> goToSection(TripSection s) async {

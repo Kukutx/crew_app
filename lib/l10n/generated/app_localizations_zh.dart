@@ -1319,6 +1319,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get road_trip_route_add_to_return => '添加到返程';
 
   @override
+  String get road_trip_add_waypoint_dialog_title => '添加途径点';
+
+  @override
+  String get road_trip_add_waypoint_dialog_message => '请选择将此途径点添加到去程还是返程';
+
+  @override
   String get road_trip_route_type_round => '往返';
 
   @override

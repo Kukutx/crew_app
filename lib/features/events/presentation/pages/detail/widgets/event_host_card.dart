@@ -3,7 +3,7 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
-import '../../../widgets/common/event_image_cache_manager.dart';
+import '../../../widgets/common/utils/event_image_cache_manager.dart';
 
 class EventHostCard extends StatelessWidget {
   final AppLocalizations loc;

@@ -1,7 +1,7 @@
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:flutter/material.dart';
 
-import 'package:crew_app/features/events/presentation/widgets/cards/moment_post_card.dart';
+import 'package:crew_app/features/events/data/adapters/moment_adapter.dart';
 
 Future<void> showMomentPostCommentsSheet(
   BuildContext context,

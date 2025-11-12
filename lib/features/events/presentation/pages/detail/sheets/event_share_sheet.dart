@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crew_app/features/events/data/event.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/event_image_placeholder.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/event_image_placeholder.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:crew_app/shared/widgets/sheets/share_sheet/app_share_sheet.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../../widgets/common/event_image_cache_manager.dart';
+import '../../../widgets/common/utils/event_image_cache_manager.dart';
 
 class EventShareSheet extends StatelessWidget {
   final Event event;

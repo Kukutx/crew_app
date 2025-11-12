@@ -1,6 +1,6 @@
 import 'package:crew_app/features/events/presentation/widgets/city_events/widgets/meeting_point_selection_page.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/trips/trip_route_selection_page.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/event_creation_config.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/config/event_creation_config.dart';
 import 'package:flutter/material.dart';
 
 /// 位置选择页面工厂

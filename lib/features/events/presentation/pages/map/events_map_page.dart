@@ -372,11 +372,13 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
             ),
           ),
           // 呼吸动画覆盖层（用于显示选中标记点的呼吸效果）
+          // 注意：呼吸效果和标记点的生命周期是强制关联的
           RepaintBoundary(
             child: BreathingMarkerOverlay(
               draggingPosition: selectionState.draggingMarkerPosition,
               draggingType: selectionState.draggingMarkerType,
               cameraPosition: _currentCameraPosition,
+              selectionState: selectionState,
             ),
           ),
           // 可展开的分享按钮（自适应位置：搜索框下方或顶部）

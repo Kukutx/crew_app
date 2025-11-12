@@ -124,6 +124,10 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
     );
     if (position == null) {
       setDestinationLatLng(null);
+      // 如果清除起点，且呼吸效果指向起点，清除呼吸效果
+      if (state.draggingMarkerType == DraggingMarkerType.start) {
+        clearDraggingMarker();
+      }
     }
   }
 
@@ -133,6 +137,10 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
       destinationLatLng: position,
       destinationLatLngSet: true,
     );
+    // 如果清除终点，且呼吸效果指向终点，清除呼吸效果
+    if (position == null && state.draggingMarkerType == DraggingMarkerType.destination) {
+      clearDraggingMarker();
+    }
   }
 
   void setSelectingDestination(bool value) {
@@ -166,10 +174,40 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
   }
 
   void setForwardWaypoints(List<LatLng> waypoints) {
+    // 检查呼吸效果是否指向被移除的去程途经点
+    if (state.draggingMarkerType == DraggingMarkerType.forwardWaypoint &&
+        state.draggingMarkerPosition != null) {
+      final markerStillExists = waypoints.any((wp) =>
+          wp.latitude == state.draggingMarkerPosition!.latitude &&
+          wp.longitude == state.draggingMarkerPosition!.longitude);
+      if (!markerStillExists) {
+        // 途经点被移除了，清除呼吸效果
+        state = state.copyWith(
+          forwardWaypoints: waypoints,
+          clearDraggingMarker: true,
+        );
+        return;
+      }
+    }
     state = state.copyWith(forwardWaypoints: waypoints);
   }
 
   void setReturnWaypoints(List<LatLng> waypoints) {
+    // 检查呼吸效果是否指向被移除的返程途经点
+    if (state.draggingMarkerType == DraggingMarkerType.returnWaypoint &&
+        state.draggingMarkerPosition != null) {
+      final markerStillExists = waypoints.any((wp) =>
+          wp.latitude == state.draggingMarkerPosition!.latitude &&
+          wp.longitude == state.draggingMarkerPosition!.longitude);
+      if (!markerStillExists) {
+        // 途经点被移除了，清除呼吸效果
+        state = state.copyWith(
+          returnWaypoints: waypoints,
+          clearDraggingMarker: true,
+        );
+        return;
+      }
+    }
     state = state.copyWith(returnWaypoints: waypoints);
   }
 

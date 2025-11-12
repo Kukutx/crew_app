@@ -18,7 +18,7 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_hos
 // API Service 已移至 events_api_service.dart
 import 'package:crew_app/features/events/state/events_api_service.dart';
 import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
-import 'package:crew_app/features/events/presentation/widgets/mixins/event_editor_mixin.dart';
+import 'package:crew_app/features/events/presentation/widgets/mixins/event_form_mixin.dart';
 import 'sheets/waypoint_note_sheet.dart';
 
 class RoadTripEditorPage extends ConsumerStatefulWidget {
@@ -40,7 +40,7 @@ class RoadTripEditorPage extends ConsumerStatefulWidget {
 }
 
 class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage>
-    with EventEditorMixin {
+    with EventFormMixin {
   final _formKey = GlobalKey<FormState>();
 
   final _titleCtrl = TextEditingController();
@@ -178,21 +178,21 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage>
 
   void _setCover(int index) {
     setState(() {
-      final updatedItems = setCoverImage(_state.galleryItems, index);
+      final updatedItems = setImageAsCover(index, _state.galleryItems);
       _state = _state.copyWith(galleryItems: updatedItems);
     });
   }
 
   void _removeGalleryItem(int index) {
     setState(() {
-      final updatedItems = removeGalleryItem(_state.galleryItems, index);
+      final updatedItems = removeImage(index, _state.galleryItems);
       _state = _state.copyWith(galleryItems: updatedItems);
     });
   }
 
   void _addTagFromInput() {
     final value = _tagInputCtrl.text.trim();
-    final updatedTags = addTag(_state.tags, value);
+    final updatedTags = addTag(value, _state.tags);
     if (updatedTags.length > _state.tags.length) {
       setState(() {
         _state = _state.copyWith(tags: updatedTags);

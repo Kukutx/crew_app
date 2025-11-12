@@ -5,8 +5,8 @@ import 'package:crew_app/l10n/generated/app_localizations.dart';
 
 import '../../../data/event.dart';
 import '../../pages/detail/events_detail_page.dart';
-import '../common/event_image_cache_manager.dart';
-import '../common/event_image_placeholder.dart';
+import '../common/utils/event_image_cache_manager.dart';
+import '../common/components/event_image_placeholder.dart';
 
 /// A reusable grid card for displaying [Event] items inside masonry layouts.
 class EventGridCard extends StatelessWidget {

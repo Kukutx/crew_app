@@ -18,10 +18,10 @@ import 'package:crew_app/features/events/presentation/pages/map/controllers/map_
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
 import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
 import 'package:crew_app/features/events/state/events_api_service.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/marker_location_page_indicator.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/location_selection_page_factory.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/event_creation_config.dart';
-import 'package:crew_app/features/events/presentation/widgets/mixins/event_creation_mixin.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/marker_location_page_indicator.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/factories/location_selection_page_factory.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/config/event_creation_config.dart';
+import 'package:crew_app/features/events/presentation/widgets/mixins/event_form_mixin.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
@@ -141,7 +141,7 @@ class _CreateRoadTripContent extends ConsumerStatefulWidget {
 }
 
 class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
-    with TickerProviderStateMixin, EventCreationMixin {
+    with TickerProviderStateMixin, EventFormMixin {
   // ===== 内部状态 =====
   late final TabController _tabController; // 路线/途径点 TabController
   final PageController _routePageCtrl = PageController(); // 路线 tab 内的 PageView
@@ -774,15 +774,28 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       _reorderWaypoints(oldIndex, newIndex, isForward: false);
 
   void _onSubmitTag() {
-    addTag(_tagInputCtrl.text, _tags, _tagInputCtrl);
+    final value = _tagInputCtrl.text.trim();
+    if (value.isEmpty) return;
+    final updatedTags = addTag(value, _tags);
+    if (updatedTags.length > _tags.length) {
+      setState(() {
+        _tags.clear();
+        _tags.addAll(updatedTags);
+      });
+      _tagInputCtrl.clear();
+    }
   }
   
   void _onRemoveTag(String t) {
-    removeTag(t, _tags);
+    final updatedTags = removeTag(t, _tags);
+    setState(() {
+      _tags.clear();
+      _tags.addAll(updatedTags);
+    });
   }
 
   Future<void> _onPickImages() async {
-    final newItems = await pickMultipleImages();
+    final newItems = await pickImages();
     if (newItems.isEmpty) return;
     setState(() {
       _editorState = _editorState.copyWith(

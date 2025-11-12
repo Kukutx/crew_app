@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/location_selection_manager.dart';
 import 'package:crew_app/features/events/presentation/pages/map/widgets/map_canvas.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/marker_location_info_bottom_sheet.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/marker_location_info_bottom_sheet.dart';
 import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/theme/app_design_tokens.dart';

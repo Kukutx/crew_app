@@ -1,120 +1,9 @@
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
+import 'package:crew_app/features/events/data/adapters/moment_adapter.dart';
+import 'package:crew_app/shared/extensions/number_extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:crew_app/features/events/data/moment.dart' as moment_data;
 
-/// 兼容旧的 MomentPost 格式
-/// 用于向后兼容，新代码应该直接使用 MomentSummary 或 MomentDetail
-class MomentPost {
-  final String author;
-  final String authorInitials;
-  final String timeLabel;
-  final String content;
-  final String location;
-  final List<String> tags;
-  final int likes;
-  final int comments;
-  final Color accentColor;
-  final List<String> mediaAssets;
-  final List<MomentComment> commentItems;
-  final moment_data.MomentType momentType;
-
-  const MomentPost({
-    required this.author,
-    required this.authorInitials,
-    required this.timeLabel,
-    required this.content,
-    required this.location,
-    required this.tags,
-    required this.likes,
-    required this.comments,
-    required this.accentColor,
-    this.mediaAssets = const [],
-    this.commentItems = const [],
-    this.momentType = moment_data.MomentType.event,
-  });
-
-  /// 从 MomentSummary 创建
-  factory MomentPost.fromSummary(moment_data.MomentSummary summary) {
-    return MomentPost(
-      author: summary.userDisplayName ?? '用户',
-      authorInitials: summary.userDisplayName?.substring(0, 2) ?? 'U',
-      timeLabel: _formatTimeLabel(summary.createdAt),
-      content: summary.title,
-      location: summary.city ?? summary.country,
-      tags: const [],
-      likes: 0,
-      comments: 0,
-      accentColor: Colors.blue,
-      mediaAssets: [summary.coverImageUrl],
-      momentType: moment_data.MomentType.instant,
-    );
-  }
-
-  /// 从 MomentDetail 创建
-  factory MomentPost.fromDetail(moment_data.MomentDetail detail) {
-    return MomentPost(
-      author: detail.userDisplayName ?? '用户',
-      authorInitials: detail.authorInitials,
-      timeLabel: detail.timeLabel,
-      content: detail.content ?? detail.title,
-      location: detail.city ?? detail.country,
-      tags: const [],
-      likes: 0,
-      comments: detail.comments.length,
-      accentColor: Colors.blue,
-      mediaAssets: detail.mediaAssets,
-      commentItems: detail.comments.map((c) => MomentComment(
-        author: c.authorDisplayName ?? '用户',
-        message: c.content,
-        timeLabel: c.timeLabel,
-      )).toList(),
-      momentType: moment_data.MomentType.instant,
-    );
-  }
-
-  static String _formatTimeLabel(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inDays > 365) {
-      return '${(difference.inDays / 365).floor()}年前';
-    } else if (difference.inDays > 30) {
-      return '${(difference.inDays / 30).floor()}个月前';
-    } else if (difference.inDays > 0) {
-      return '${difference.inDays}天前';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}小时前';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}分钟前';
-    } else {
-      return '刚刚';
-    }
-  }
-}
-
-/// 兼容旧的 MomentComment 格式
-class MomentComment {
-  final String author;
-  final String message;
-  final String timeLabel;
-
-  const MomentComment({
-    required this.author,
-    required this.message,
-    required this.timeLabel,
-  });
-
-  String get initials {
-    if (author.isEmpty) {
-      return '';
-    }
-    if (author.length == 1) {
-      return author;
-    }
-    return author.substring(0, 2);
-  }
-}
-
+/// Moment 帖子卡片
 class MomentPostCard extends StatelessWidget {
   final MomentPost post;
   final EdgeInsetsGeometry? margin;
@@ -156,141 +45,147 @@ class MomentPostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: onAuthorTap,
-                    borderRadius: BorderRadius.circular(16),
-                    child: CrewAvatar(
-                      radius: 22,
-                      backgroundColor:
-                          post.accentColor.withValues(alpha: 0.15),
-                      foregroundColor: post.accentColor,
-                      child: Text(
-                        post.authorInitials,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          post.author,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            height: 1.3,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          post.timeLabel,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            fontSize: 12,
-                            height: 1.3,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            _buildHeader(context, theme, colorScheme),
+            const SizedBox(height: 12),
+            _buildContent(theme),
+            if (post.mediaAssets.isNotEmpty) ...[
               const SizedBox(height: 12),
+              _MomentPostMedia(
+                mediaAssets: post.mediaAssets,
+                accentColor: post.accentColor,
+                onTap: onMediaTap,
+              ),
+            ],
+            if (post.location.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildLocation(context, theme, colorScheme),
+            ],
+            const SizedBox(height: 12),
+            _buildActions(theme, colorScheme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: onAuthorTap,
+          borderRadius: BorderRadius.circular(16),
+          child: CrewAvatar(
+            radius: 22,
+            backgroundColor: post.accentColor.withValues(alpha: 0.15),
+            foregroundColor: post.accentColor,
+            child: Text(
+              post.authorInitials,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                post.content,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 15,
-                  height: 1.5,
-                  letterSpacing: 0.2,
-                  fontWeight: FontWeight.w400,
+                post.author,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  height: 1.3,
+                  letterSpacing: -0.2,
                 ),
               ),
-              if (post.mediaAssets.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                _MomentPostMedia(
-                  mediaAssets: post.mediaAssets,
-                  accentColor: post.accentColor,
-                  onTap: onMediaTap,
+              const SizedBox(height: 3),
+              Text(
+                post.timeLabel,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                  height: 1.3,
+                  letterSpacing: 0,
                 ),
-              ],
-              if (post.location.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 16,
-                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        post.location,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          height: 1.3,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  _MomentPostAction(
-                    icon: Icons.favorite_border,
-                    label: post.likes.toCompactString(),
-                  ),
-                  const SizedBox(width: 16),
-                  _MomentPostAction(
-                    icon: Icons.chat_bubble_outline,
-                    label: post.comments.toCompactString(),
-                    onTap: onCommentTap,
-                  ),
-                ],
               ),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildContent(ThemeData theme) {
+    return Text(
+      post.content,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        fontSize: 15,
+        height: 1.5,
+        letterSpacing: 0.2,
+        fontWeight: FontWeight.w400,
+      ),
+    );
+  }
+
+  Widget _buildLocation(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.location_on_outlined,
+            size: 16,
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            post.location,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              height: 1.3,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActions(ThemeData theme, ColorScheme colorScheme) {
+    return Row(
+      children: [
+        _MomentPostAction(
+          icon: Icons.favorite_border,
+          label: post.likes.toCompactString(),
+        ),
+        const SizedBox(width: 16),
+        _MomentPostAction(
+          icon: Icons.chat_bubble_outline,
+          label: post.comments.toCompactString(),
+          onTap: onCommentTap,
+        ),
+      ],
     );
   }
 }
 
-extension _CompactString on int {
-  String toCompactString() {
-    if (this < 1000) {
-      return toString();
-    } else if (this < 1000000) {
-      return '${(this / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '${(this / 1000000).toStringAsFixed(1)}M';
-    }
-  }
-}
-
+/// Moment 媒体组件
 class _MomentPostMedia extends StatelessWidget {
   final List<String> mediaAssets;
   final Color accentColor;
@@ -330,6 +225,7 @@ class _MomentPostMedia extends StatelessWidget {
   }
 }
 
+/// Moment 媒体预览
 class _MomentPostMediaPreview extends StatelessWidget {
   final List<String> mediaAssets;
   final Color accentColor;
@@ -344,7 +240,8 @@ class _MomentPostMediaPreview extends StatelessWidget {
     final theme = Theme.of(context);
     final firstAsset = mediaAssets.first;
     final remainingCount = mediaAssets.length - 1;
-    final isNetworkImage = firstAsset.startsWith('http://') || firstAsset.startsWith('https://');
+    final isNetworkImage =
+        firstAsset.startsWith('http://') || firstAsset.startsWith('https://');
 
     return Stack(
       fit: StackFit.expand,
@@ -410,12 +307,17 @@ class _MomentPostMediaPreview extends StatelessWidget {
   }
 }
 
+/// Moment 操作按钮
 class _MomentPostAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
 
-  const _MomentPostAction({required this.icon, required this.label, this.onTap});
+  const _MomentPostAction({
+    required this.icon,
+    required this.label,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

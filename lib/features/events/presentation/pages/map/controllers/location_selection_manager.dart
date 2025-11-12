@@ -233,6 +233,12 @@ class LocationSelectionManager {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     selectionController.setAddingWaypoint(false);
     selectionController.setPendingWaypoint(null);
+    // 如果呼吸效果指向途经点，清除呼吸效果
+    final state = ref.read(mapSelectionControllerProvider);
+    if (state.draggingMarkerType == DraggingMarkerType.forwardWaypoint ||
+        state.draggingMarkerType == DraggingMarkerType.returnWaypoint) {
+      selectionController.clearDraggingMarker();
+    }
   }
 
   /// 等待选择Sheet关闭

@@ -4,6 +4,7 @@ import 'package:crew_app/features/events/presentation/widgets/moment/sheets/mome
 import 'package:crew_app/features/events/presentation/widgets/moment/widgets/moment_post_detail_screen.dart';
 import 'package:crew_app/features/events/presentation/widgets/cards/event_grid_card.dart';
 import 'package:crew_app/features/events/presentation/widgets/cards/moment_post_card.dart';
+import 'package:crew_app/features/events/data/adapters/moment_adapter.dart';
 import 'package:crew_app/features/user/presentation/pages/user_profile/user_profile_page.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';

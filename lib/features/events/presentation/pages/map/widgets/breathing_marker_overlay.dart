@@ -7,17 +7,22 @@ import 'package:crew_app/features/events/presentation/pages/map/state/map_select
 /// 呼吸动画标记点覆盖层
 /// 在地图上显示拖拽时的呼吸动画效果
 /// 使用 CustomPainter 在地图上绘制呼吸动画圆圈
+/// 
+/// 注意：呼吸效果和标记点的生命周期是强制关联的
+/// 只有当对应的标记点存在时，才会显示呼吸效果
 class BreathingMarkerOverlay extends StatefulWidget {
   const BreathingMarkerOverlay({
     super.key,
     required this.draggingPosition,
     required this.draggingType,
     required this.cameraPosition,
+    required this.selectionState,
   });
 
   final LatLng? draggingPosition;
   final DraggingMarkerType? draggingType;
   final CameraPosition? cameraPosition;
+  final MapSelectionState selectionState;
 
   @override
   State<BreathingMarkerOverlay> createState() => _BreathingMarkerOverlayState();
@@ -95,9 +100,53 @@ class _BreathingMarkerOverlayState extends State<BreathingMarkerOverlay>
     }
   }
 
+  /// 检查对应的标记点是否存在
+  /// 这是防御性检查，确保呼吸效果和标记点的生命周期强制关联
+  bool _isMarkerExists() {
+    if (widget.draggingPosition == null || widget.draggingType == null) {
+      return false;
+    }
+
+    final state = widget.selectionState;
+    final position = widget.draggingPosition!;
+
+    switch (widget.draggingType!) {
+      case DraggingMarkerType.start:
+        // 检查起点是否存在
+        return state.selectedLatLng != null &&
+            state.selectedLatLng!.latitude == position.latitude &&
+            state.selectedLatLng!.longitude == position.longitude;
+      
+      case DraggingMarkerType.destination:
+        // 检查终点是否存在
+        return state.destinationLatLng != null &&
+            state.destinationLatLng!.latitude == position.latitude &&
+            state.destinationLatLng!.longitude == position.longitude;
+      
+      case DraggingMarkerType.forwardWaypoint:
+        // 检查去程途经点是否存在
+        return state.forwardWaypoints.any((wp) =>
+            wp.latitude == position.latitude &&
+            wp.longitude == position.longitude);
+      
+      case DraggingMarkerType.returnWaypoint:
+        // 检查返程途经点是否存在
+        return state.returnWaypoints.any((wp) =>
+            wp.latitude == position.latitude &&
+            wp.longitude == position.longitude);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 第一层检查：基本参数是否存在
     if (widget.draggingPosition == null || widget.draggingType == null) {
+      return const SizedBox.shrink();
+    }
+
+    // 第二层检查（防御性）：对应的标记点是否存在
+    // 这确保了呼吸效果和标记点的生命周期强制关联
+    if (!_isMarkerExists()) {
       return const SizedBox.shrink();
     }
 

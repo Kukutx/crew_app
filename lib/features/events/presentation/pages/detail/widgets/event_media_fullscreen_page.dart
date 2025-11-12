@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../widgets/common/event_image_cache_manager.dart';
+import '../../../widgets/common/utils/event_image_cache_manager.dart';
 
 class EventMediaFullscreenScreen extends StatefulWidget {
   const EventMediaFullscreenScreen({

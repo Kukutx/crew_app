@@ -13,11 +13,11 @@ import 'package:crew_app/features/events/presentation/widgets/sections/event_tea
 import 'package:crew_app/features/events/presentation/widgets/common/screens/location_search_screen.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/state/map_selection_controller.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/marker_location_page_indicator.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/location_selection_page_factory.dart';
-import 'package:crew_app/features/events/presentation/widgets/common/event_creation_config.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/components/marker_location_page_indicator.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/factories/location_selection_page_factory.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/config/event_creation_config.dart';
 import 'package:crew_app/features/events/presentation/widgets/city_events/data/city_event_editor_models.dart';
-import 'package:crew_app/features/events/presentation/widgets/mixins/event_creation_mixin.dart';
+import 'package:crew_app/features/events/presentation/widgets/mixins/event_form_mixin.dart';
 import 'package:crew_app/features/events/state/events_api_service.dart';
 import 'package:crew_app/shared/utils/event_form_validation_utils.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
@@ -49,7 +49,7 @@ class CreateCityEventSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
-    with TickerProviderStateMixin, EventCreationMixin {
+    with TickerProviderStateMixin, EventFormMixin {
   final PageController _pageCtrl = PageController();
   bool _canSwipe = false; // 是否显示其他 section（点击 meetingPoint 的继续后为 true）
   int _currentPage = 0; // 当前页面
@@ -263,12 +263,29 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
     }
   }
 
-  void _onSubmitTag() => addTag(_tagInputCtrl.text, _tags, _tagInputCtrl);
+  void _onSubmitTag() {
+    final value = _tagInputCtrl.text.trim();
+    if (value.isEmpty) return;
+    final updatedTags = addTag(value, _tags);
+    if (updatedTags.length > _tags.length) {
+      setState(() {
+        _tags.clear();
+        _tags.addAll(updatedTags);
+      });
+      _tagInputCtrl.clear();
+    }
+  }
 
-  void _onRemoveTag(String t) => removeTag(t, _tags);
+  void _onRemoveTag(String t) {
+    final updatedTags = removeTag(t, _tags);
+    setState(() {
+      _tags.clear();
+      _tags.addAll(updatedTags);
+    });
+  }
 
   Future<void> _onPickImages() async {
-    final newItems = await pickMultipleImages();
+    final newItems = await pickImages();
     if (newItems.isEmpty) return;
     setState(() {
       _editorState = _editorState.copyWith(

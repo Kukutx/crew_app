@@ -159,7 +159,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '每人 ${NumberFormatHelper.formatCurrencyCompactIfLarge(_sharePerPerson)}',
+                          '每人 ${NumberFormatHelper.formatCurrencyCompact(_sharePerPerson)}',
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w600,
@@ -332,7 +332,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '总金额：${NumberFormatHelper.formatCurrencyCompactIfLarge(_amount!)}',
+                              '总金额：${NumberFormatHelper.formatCurrencyCompact(_amount!)}',
                               style: theme.textTheme.bodyMedium,
                             ),
                             Text(
@@ -341,7 +341,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '每人应承担：${NumberFormatHelper.formatCurrencyCompactIfLarge(_sharePerPerson)}',
+                              '每人应承担：${NumberFormatHelper.formatCurrencyCompact(_sharePerPerson)}',
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colorScheme.primary,

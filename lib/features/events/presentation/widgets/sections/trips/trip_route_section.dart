@@ -20,6 +20,7 @@ class TripRouteSection extends StatelessWidget {
     required this.onReorderForward,
     this.onEditForwardNote,
     this.forwardNotes,
+    this.onTapForward, // 点击定位到地图
 
     // 返程（仅往返时用）
     required this.returnWaypoints,
@@ -28,6 +29,7 @@ class TripRouteSection extends StatelessWidget {
     required this.onReorderReturn,
     this.onEditReturnNote,
     this.returnNotes,
+    this.onTapReturn, // 点击定位到地图
     
     this.waypointAddressMap,
   });
@@ -41,6 +43,7 @@ class TripRouteSection extends StatelessWidget {
   final void Function(int oldIndex, int newIndex) onReorderForward;
   final ValueChanged<int>? onEditForwardNote; // 点击编辑备注
   final Map<String, String>? forwardNotes; // 备注数据
+  final ValueChanged<int>? onTapForward; // 点击定位到地图
 
   final List<LatLng> returnWaypoints; // 途经点位置
   final ValueChanged<PlaceDetails> onAddReturn; // 改为接收 PlaceDetails
@@ -48,6 +51,7 @@ class TripRouteSection extends StatelessWidget {
   final void Function(int oldIndex, int newIndex) onReorderReturn;
   final ValueChanged<int>? onEditReturnNote; // 点击编辑备注
   final Map<String, String>? returnNotes; // 备注数据
+  final ValueChanged<int>? onTapReturn; // 点击定位到地图
   
   final Map<String, String>? waypointAddressMap; // 途经点地址映射
 
@@ -105,6 +109,7 @@ class TripRouteSection extends StatelessWidget {
             onRemove: onRemoveForward,
             onReorder: onReorderForward,
             onTap: onEditForwardNote,
+            onTapWaypoint: onTapForward,
             notes: forwardNotes,
             addressMap: waypointAddressMap,
           )
@@ -122,6 +127,7 @@ class TripRouteSection extends StatelessWidget {
                   onRemove: onRemoveForward,
                   onReorder: onReorderForward,
                   onTap: onEditForwardNote,
+                  onTapWaypoint: onTapForward,
                   notes: forwardNotes,
                   addressMap: waypointAddressMap,
                 ),
@@ -136,6 +142,7 @@ class TripRouteSection extends StatelessWidget {
                   onRemove: onRemoveReturn,
                   onReorder: onReorderReturn,
                   onTap: onEditReturnNote,
+                  onTapWaypoint: onTapReturn,
                   notes: returnNotes,
                   addressMap: waypointAddressMap,
                 ),
@@ -205,6 +212,7 @@ class _WaypointListSection extends StatelessWidget {
     required this.onRemove,
     this.onReorder,
     this.onTap,
+    this.onTapWaypoint,
     this.notes,
     this.addressMap,
   });
@@ -213,7 +221,8 @@ class _WaypointListSection extends StatelessWidget {
   final List<LatLng> items;
   final ValueChanged<int> onRemove;
   final void Function(int oldIndex, int newIndex)? onReorder;
-  final ValueChanged<int>? onTap; // 点击编辑备注
+  final ValueChanged<int>? onTap; // 点击编辑备注（保留，暂不使用）
+  final ValueChanged<int>? onTapWaypoint; // 点击定位到地图
   final Map<String, String>? notes; // 备注数据
   final Map<String, String>? addressMap; // 途经点地址映射
 
@@ -245,7 +254,9 @@ class _WaypointListSection extends StatelessWidget {
           ReorderableListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             itemCount: items.length,
+            buildDefaultDragHandles: false, // 禁用默认拖拽手柄
             onReorder: onReorder!,
             itemBuilder: (context, index) {
               final loc = AppLocalizations.of(context)!;
@@ -268,59 +279,62 @@ class _WaypointListSection extends StatelessWidget {
                 ),
                 direction: DismissDirection.endToStart,
                 onDismissed: (_) => onRemove(index),
-                child: ListTile(
-                  key: itemKey,
-                  leading: const Icon(Icons.drag_handle, size: 20),
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.place_outlined,
-                            size: 16,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              '${index + 1}. $text',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                child: ReorderableDragStartListener(
+                  index: index,
+                  child: ListTile(
+                    key: itemKey,
+                    leading: const Icon(Icons.drag_handle, size: 20),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.place_outlined,
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                '${index + 1}. $text',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (note != null && note.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            note,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 11,
+                              color: theme.colorScheme.primary,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                      ),
-                      if (note != null && note.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          note,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
-                            color: theme.colorScheme.primary,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
                       ],
-                    ],
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: () => onRemove(index),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    onTap: onTapWaypoint != null ? () => onTapWaypoint!(index) : null,
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.close, size: 18),
-                    onPressed: () => onRemove(index),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  onTap: onTap != null ? () => onTap!(index) : null,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 ),
               );
             },
@@ -329,6 +343,7 @@ class _WaypointListSection extends StatelessWidget {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             itemCount: items.length,
             itemBuilder: (context, index) {
               final loc = AppLocalizations.of(context)!;
@@ -385,7 +400,7 @@ class _WaypointListSection extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
-                  onTap: onTap != null ? () => onTap!(index) : null,
+                  onTap: onTapWaypoint != null ? () => onTapWaypoint!(index) : null,
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

@@ -154,6 +154,21 @@ class _EventsMapPageState extends ConsumerState<EventsMapPage> {
 
     // 统一处理 sheet 状态重置
     if (mapSheetType == MapOverlaySheetType.none) {
+      // 清理地图选择状态，避免幽灵标记点（总是执行）
+      final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+      if (selectionController.state.selectedLatLng != null || 
+          selectionController.state.destinationLatLng != null ||
+          selectionController.state.forwardWaypoints.isNotEmpty ||
+          selectionController.state.returnWaypoints.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          selectionController.resetSelection();
+          selectionController.setSelectionSheetOpen(false);
+          selectionController.resetMapPadding();
+        });
+      }
+      
+      // 重置 sheet UI 状态
       if (mapSheetStage != MapOverlaySheetStage.collapsed || mapSheetSize > 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;

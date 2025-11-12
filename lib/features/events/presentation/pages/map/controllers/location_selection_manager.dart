@@ -36,10 +36,67 @@ class LocationSelectionManager {
     final selectionController = ref.read(mapSelectionControllerProvider.notifier);
     final mapController = ref.read(mapControllerProvider);
     
-    // 选择终点模式
-    if (selectionState.isSelectingDestination) {
-      _handleDestinationSelection(latlng, context);
-      return;
+    // 创建自驾游模式：需要区分起点和终点，并检查当前页面（优先级最高）
+    if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
+      // 获取当前 tab 索引和页面索引
+      final currentTabIndex = selectionState.currentTabIndex;
+      final currentRoutePageIndex = selectionState.currentRoutePageIndex;
+      
+      // 判断长按是否允许：
+      // 1. 在路线 tab (index=0) 且在起始页 (page=0)：允许设置起点和终点
+      // 2. 在途径点 tab (index=1)：允许添加途径点
+      // 3. 其他情况：禁用长按
+      
+      if (currentTabIndex == 0 && currentRoutePageIndex == 0) {
+        // 在起始页：允许设置起点和终点
+        
+        final hasStart = selectionState.selectedLatLng != null;
+        final hasDestination = selectionState.destinationLatLng != null;
+        
+        // 情况1：起点和终点都已存在 → 禁用长按
+        if (hasStart && hasDestination) {
+          return;
+        }
+        
+        // 情况2：没有起点 → 设置起点
+        if (!hasStart) {
+          selectionController.setSelectedLatLng(latlng);
+          unawaited(mapController.moveCamera(latlng, zoom: 17));
+          return;
+        }
+        
+        // 情况3：有起点但没有终点 → 设置终点
+        if (hasStart && !hasDestination) {
+          selectionController.setDestinationLatLng(latlng);
+          // 移动地图以显示起点和终点
+          unawaited(mapController.fitBounds(
+            [selectionState.selectedLatLng!, latlng],
+            padding: 100,
+          ));
+          // 清除选择终点模式状态
+          selectionController.setSelectingDestination(false);
+          return;
+        }
+        
+        // 默认情况：禁用长按
+        return;
+      } else if (currentTabIndex == 1) {
+        // 在途径点 tab：允许添加途径点
+        // 只有在起点和终点都存在时才允许添加途径点
+        if (selectionState.selectedLatLng != null && 
+            selectionState.destinationLatLng != null) {
+          // 显示对话框让用户选择添加到去程还是返程
+          if (context.mounted) {
+            _showWaypointDirectionDialog(context, latlng);
+          }
+          return;
+        }
+        // 如果起点或终点不存在，不做任何操作
+        return;
+      } else {
+        // 在其他页面（basic, team, gallery, story, disclaimer）：禁用长按
+        return;
+      }
     }
     
     // 创建城市活动模式：只有一个集合点
@@ -49,41 +106,7 @@ class LocationSelectionManager {
       return;
     }
     
-    // 创建自驾游模式：需要区分起点和终点
-    if (mapSheetType == MapOverlaySheetType.createRoadTrip) {
-      // 如果没有起点，设置起点
-      if (selectionState.selectedLatLng == null) {
-        selectionController.setSelectedLatLng(latlng);
-        unawaited(mapController.moveCamera(latlng, zoom: 17));
-        return;
-      }
-      
-      // 如果有起点但没有终点，设置终点
-      if (selectionState.destinationLatLng == null) {
-        selectionController.setDestinationLatLng(latlng);
-        // 移动地图以显示起点和终点
-        unawaited(mapController.fitBounds(
-          [selectionState.selectedLatLng!, latlng],
-          padding: 100,
-        ));
-        return;
-      }
-      
-      // 如果起点和终点都已存在
-      // 检查当前是否在途径点tab（currentTabIndex == 1）
-      if (selectionState.currentTabIndex == 1) {
-        // 在途径点tab，显示对话框让用户选择添加到去程还是返程
-        if (context.mounted) {
-          _showWaypointDirectionDialog(context, latlng);
-        }
-        return;
-      }
-      
-      // 在路线tab，不做任何操作
-      return;
-    }
-    
-    // 默认模式：创建新的自驾游
+    // 默认模式：创建新的自驾游（未打开任何 sheet）
     if (_isHandlingLongPress) return;
     _isHandlingLongPress = true;
     
@@ -202,6 +225,9 @@ class LocationSelectionManager {
     }
     
     HapticFeedback.lightImpact();
+    
+    // 清除选择终点模式状态
+    selectionController.setSelectingDestination(false);
     
     // 确保 overlay sheet 打开，CreateRoadTripSheet 会显示在 fullCreation 模式
     ref.read(mapOverlaySheetProvider.notifier).state = MapOverlaySheetType.createRoadTrip;

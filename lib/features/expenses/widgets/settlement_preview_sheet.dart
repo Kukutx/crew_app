@@ -93,12 +93,12 @@ class SettlementPreviewSheet extends StatelessWidget {
                     title: Text(entry.member.name),
                     subtitle: Text(
                       isPositive
-                          ? '应收 ${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}'
-                          : '需补 ${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}',
+                          ? '应收 ${NumberFormatHelper.formatCurrencyCompact(entry.difference.abs())}'
+                          : '需补 ${NumberFormatHelper.formatCurrencyCompact(entry.difference.abs())}',
                       style: subtitleStyle,
                     ),
                     trailing: Text(
-                      '${isPositive ? '+' : '-'}${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}',
+                      '${isPositive ? '+' : '-'}${NumberFormatHelper.formatCurrencyCompact(entry.difference.abs())}',
                       style: TextStyle(
                         color: accentColor,
                         fontWeight: FontWeight.w600,
@@ -135,7 +135,7 @@ class SettlementPreviewSheet extends StatelessWidget {
                 ),
                 backgroundColor: containerColor,
                 label: Text(
-                  '${entry.member.name} ${isPositive ? '收回' : '补给'} ${NumberFormatHelper.formatCurrencyCompactIfLarge(entry.difference.abs())}',
+                  '${entry.member.name} ${isPositive ? '收回' : '补给'} ${NumberFormatHelper.formatCurrencyCompact(entry.difference.abs())}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: onContainerColor,
                   ),

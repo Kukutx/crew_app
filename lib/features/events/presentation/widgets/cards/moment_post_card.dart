@@ -1,6 +1,6 @@
 import 'package:crew_app/shared/widgets/crew_avatar.dart';
 import 'package:crew_app/features/events/data/adapters/moment_adapter.dart';
-import 'package:crew_app/shared/extensions/number_extensions.dart';
+import 'package:crew_app/shared/extensions/common_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// Moment 帖子卡片

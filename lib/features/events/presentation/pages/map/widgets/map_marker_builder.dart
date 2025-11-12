@@ -130,10 +130,18 @@ class MapMarkerBuilder {
     // 去程途经点
     for (int i = 0; i < selectionState.forwardWaypoints.length; i++) {
       final waypoint = selectionState.forwardWaypoints[i];
+      final key = '${waypoint.latitude}_${waypoint.longitude}';
+      final note = selectionState.waypointNotes[key];
       markers.add(_createDraggableMarker(
         markerId: MarkerId('forward_waypoint_$i'),
         position: waypoint,
         color: BitmapDescriptor.hueYellow,
+        infoWindow: note != null && note.isNotEmpty
+            ? InfoWindow(
+                title: '去程途经点 ${i + 1}',
+                snippet: note,
+              )
+            : null,
         onTap: () {
           // 选择去程途经点标记点，显示呼吸效果
           selectionController.setDraggingMarker(
@@ -147,10 +155,18 @@ class MapMarkerBuilder {
     // 返程途经点
     for (int i = 0; i < selectionState.returnWaypoints.length; i++) {
       final waypoint = selectionState.returnWaypoints[i];
+      final key = '${waypoint.latitude}_${waypoint.longitude}';
+      final note = selectionState.waypointNotes[key];
       markers.add(_createDraggableMarker(
         markerId: MarkerId('return_waypoint_$i'),
         position: waypoint,
         color: BitmapDescriptor.hueYellow,
+        infoWindow: note != null && note.isNotEmpty
+            ? InfoWindow(
+                title: '返程途经点 ${i + 1}',
+                snippet: note,
+              )
+            : null,
         onTap: () {
           // 选择返程途经点标记点，显示呼吸效果
           selectionController.setDraggingMarker(
@@ -167,6 +183,7 @@ class MapMarkerBuilder {
     required MarkerId markerId,
     required LatLng position,
     required double color,
+    InfoWindow? infoWindow,
     VoidCallback? onTap,
   }) {
     return Marker(
@@ -174,6 +191,7 @@ class MapMarkerBuilder {
       position: position,
       draggable: false, // 已移除拖拽功能
       icon: BitmapDescriptor.defaultMarkerWithHue(color),
+      infoWindow: infoWindow ?? InfoWindow.noText,
       onTap: onTap != null ? () => onTap() : null,
     );
   }

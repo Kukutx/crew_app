@@ -66,7 +66,7 @@ class ExpenseListTile extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                NumberFormatHelper.formatCurrencyCompactIfLarge(expense.amount),
+                NumberFormatHelper.formatCurrencyCompact(expense.amount),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -92,7 +92,7 @@ class ExpenseListTile extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  '${expense.sharedBy.length} 人分摊 · 每人 ${NumberFormatHelper.formatCurrencyCompactIfLarge(expense.sharePerPerson)}',
+                  '${expense.sharedBy.length} 人分摊 · 每人 ${NumberFormatHelper.formatCurrencyCompact(expense.sharePerPerson)}',
                   style: supportingTextStyle,
                 ),
               ),

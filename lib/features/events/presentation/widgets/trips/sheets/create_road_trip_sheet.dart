@@ -173,6 +173,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   // 途经点地址缓存：key 为 '${lat}_${lng}'，value 为地址
   final Map<String, String> _waypointAddressCache = {};
   final Map<String, Future<String?>> _waypointAddressFutures = {};
+  // 途经点备注：key 为 '${lat}_${lng}'，value 为备注
+  final Map<String, String> _waypointNotes = {};
 
   // ==== 团队/费用 ====
   int _maxMembers = 4;
@@ -299,6 +301,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         final controller = ref.read(mapSelectionControllerProvider.notifier);
         controller.setRouteType(_routeType);
         controller.setCurrentTabIndex(_tabController.index);
+        controller.setCurrentRoutePageIndex(_currentRoutePage);
       }
     });
   }
@@ -370,7 +373,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       });
       
       // 更新 MapSelectionController 中的 tab 索引，以便地图长按知道当前在哪个tab
-      ref.read(mapSelectionControllerProvider.notifier).setCurrentTabIndex(_tabController.index);
+      final controller = ref.read(mapSelectionControllerProvider.notifier);
+      controller.setCurrentTabIndex(_tabController.index);
       
       // 当切换回路线tab时，同步分页指示点
       if (_tabController.index == 0 && _routePageCtrl.hasClients) {
@@ -633,6 +637,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       } else {
         controller.setReturnWaypoints(_returnWps);
       }
+      // 同步备注数据到 MapSelectionController
+      controller.setWaypointNotes(_waypointNotes);
     });
   }
 
@@ -698,6 +704,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       waypoints.removeAt(index);
       _waypointAddressCache.remove(key);
       _waypointAddressFutures.remove(key);
+      _waypointNotes.remove(key); // 删除备注
     });
     
     _updateMapSelectionController(isForward: isForward);
@@ -777,6 +784,129 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
   
   void _onReorderReturn(int oldIndex, int newIndex) => 
       _reorderWaypoints(oldIndex, newIndex, isForward: false);
+
+  /// 点击去程途径点，显示备注编辑对话框
+  Future<void> _onTapForwardWaypoint(int index) async {
+    if (index < 0 || index >= _forwardWps.length) return;
+    
+    final waypoint = _forwardWps[index];
+    final key = '${waypoint.latitude}_${waypoint.longitude}';
+    
+    // 显示备注编辑对话框
+    await _showWaypointNoteDialog(
+      context,
+      waypoint: waypoint,
+      index: index,
+      isForward: true,
+      currentNote: _waypointNotes[key],
+    );
+  }
+
+  /// 点击返程途径点，显示备注编辑对话框
+  Future<void> _onTapReturnWaypoint(int index) async {
+    if (index < 0 || index >= _returnWps.length) return;
+    
+    final waypoint = _returnWps[index];
+    final key = '${waypoint.latitude}_${waypoint.longitude}';
+    
+    // 显示备注编辑对话框
+    await _showWaypointNoteDialog(
+      context,
+      waypoint: waypoint,
+      index: index,
+      isForward: false,
+      currentNote: _waypointNotes[key],
+    );
+  }
+
+  /// 显示途径点备注编辑对话框
+  Future<void> _showWaypointNoteDialog(
+    BuildContext context, {
+    required LatLng waypoint,
+    required int index,
+    required bool isForward,
+    String? currentNote,
+  }) {
+    final key = '${waypoint.latitude}_${waypoint.longitude}';
+    final address = _waypointAddressCache[key];
+    final noteController = TextEditingController(text: currentNote ?? '');
+    final selectionController = ref.read(mapSelectionControllerProvider.notifier);
+    final mapController = ref.read(mapControllerProvider);
+
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            isForward
+                ? '去程途经点 ${index + 1}'
+                : '返程途经点 ${index + 1}',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (address != null && address.isNotEmpty) ...[
+                Text(
+                  address,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              TextField(
+                controller: noteController,
+                decoration: InputDecoration(
+                  labelText: '备注',
+                  hintText: '输入备注信息（可选）',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                maxLength: 200,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // 定位到地图
+                selectionController.setDraggingMarker(
+                  waypoint,
+                  isForward
+                      ? DraggingMarkerType.forwardWaypoint
+                      : DraggingMarkerType.returnWaypoint,
+                );
+                unawaited(mapController.moveCamera(waypoint, zoom: 14));
+                Navigator.of(context).pop();
+              },
+              child: const Text('定位'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final note = noteController.text.trim();
+                setState(() {
+                  if (note.isNotEmpty) {
+                    _waypointNotes[key] = note;
+                  } else {
+                    _waypointNotes.remove(key);
+                  }
+                });
+                // 同步备注到 MapSelectionController
+                _updateMapSelectionController(isForward: isForward);
+                Navigator.of(context).pop();
+              },
+              child: const Text('保存'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _onSubmitTag() {
     final value = _tagInputCtrl.text.trim();
@@ -1038,6 +1168,10 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     // 同时清空 isSelectingDestination 状态，否则长按地图会进入选择终点模式
     selectionController.setSelectingDestination(false);
     
+    // 清空途径点（因为没有起点和终点的连线，途径点就失去意义）
+    selectionController.setForwardWaypoints([]);
+    selectionController.setReturnWaypoints([]);
+    
     // 然后清空本地状态
     setState(() {
       // 清空起点
@@ -1051,6 +1185,12 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
       _destinationAddress = null;
       _destinationAddressFuture = null;
       _destinationNearbyFuture = null;
+      
+      // 清空途径点列表和地址缓存
+      _forwardWps.clear();
+      _returnWps.clear();
+      _waypointAddressCache.clear();
+      _waypointAddressFutures.clear();
     });
   }
 
@@ -1063,12 +1203,22 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
     // 同时清空 isSelectingDestination 状态
     selectionController.setSelectingDestination(false);
     
+    // 清空途径点（因为没有终点，途径点就失去意义）
+    selectionController.setForwardWaypoints([]);
+    selectionController.setReturnWaypoints([]);
+    
     // 然后清空本地状态
     setState(() {
       _destinationLatLng = null;
       _destinationAddress = null;
       _destinationAddressFuture = null;
       _destinationNearbyFuture = null;
+      
+      // 清空途径点列表和地址缓存
+      _forwardWps.clear();
+      _returnWps.clear();
+      _waypointAddressCache.clear();
+      _waypointAddressFutures.clear();
     });
   }
 
@@ -1397,6 +1547,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                                 _activeScrollablePageIndex = index;
                               }
                             });
+                            // 更新 MapSelectionController 中的页面索引，以便地图长按知道当前在路线tab的哪个页面
+                            ref.read(mapSelectionControllerProvider.notifier).setCurrentRoutePageIndex(index);
                           },
                           children: routePageChildren,
                         ),
@@ -1414,10 +1566,14 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                           onAddForward: _onAddForward,
                           onRemoveForward: _onRemoveForward,
                           onReorderForward: _onReorderForward,
+                          onTapForward: _onTapForwardWaypoint,
+                          forwardNotes: _waypointNotes, // 传递备注
                           returnWaypoints: _returnWps,
                           onAddReturn: _onAddReturn,
                           onRemoveReturn: _onRemoveReturn,
                           onReorderReturn: _onReorderReturn,
+                          onTapReturn: _onTapReturnWaypoint,
+                          returnNotes: _waypointNotes, // 传递备注
                           waypointAddressMap: _waypointAddressCache,
                         ),
                       ),
@@ -1436,6 +1592,8 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
                             : const PageScrollPhysics(),
                         onPageChanged: (index) {
                           setState(() => _currentRoutePage = index);
+                          // 更新 MapSelectionController 中的页面索引，以便地图长按知道当前在路线tab的哪个页面
+                          ref.read(mapSelectionControllerProvider.notifier).setCurrentRoutePageIndex(index);
                         },
                         children: routePageChildren,
                       ),

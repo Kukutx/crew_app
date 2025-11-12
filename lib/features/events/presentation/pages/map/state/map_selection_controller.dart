@@ -35,6 +35,8 @@ class MapSelectionState {
     this.isMapPickerMode = false,
     this.isPickingStartLocation = true,
     this.currentTabIndex = 0,
+    this.currentRoutePageIndex = 0,
+    this.waypointNotes = const {},
   });
 
   final LatLng? selectedLatLng;
@@ -53,6 +55,8 @@ class MapSelectionState {
   final bool isMapPickerMode; // 是否正在进行地图选择模式
   final bool isPickingStartLocation; // 是否正在选择起点（true）还是终点（false）
   final int currentTabIndex; // 当前tab索引（0=路线，1=途径点）
+  final int currentRoutePageIndex; // 当前路线tab中的页面索引（0=起始页，1=basic，2=team...）
+  final Map<String, String> waypointNotes; // 途经点备注：key 为 '${lat}_${lng}'，value 为备注
 
   MapSelectionState copyWith({
     LatLng? selectedLatLng,
@@ -75,6 +79,8 @@ class MapSelectionState {
     bool? isMapPickerMode,
     bool? isPickingStartLocation,
     int? currentTabIndex,
+    int? currentRoutePageIndex,
+    Map<String, String>? waypointNotes,
   }) {
     return MapSelectionState(
       selectedLatLng:
@@ -97,6 +103,8 @@ class MapSelectionState {
       isMapPickerMode: isMapPickerMode ?? this.isMapPickerMode,
       isPickingStartLocation: isPickingStartLocation ?? this.isPickingStartLocation,
       currentTabIndex: currentTabIndex ?? this.currentTabIndex,
+      currentRoutePageIndex: currentRoutePageIndex ?? this.currentRoutePageIndex,
+      waypointNotes: waypointNotes ?? this.waypointNotes,
     );
   }
 }
@@ -250,6 +258,14 @@ class MapSelectionController extends StateNotifier<MapSelectionState> {
 
   void setCurrentTabIndex(int index) {
     state = state.copyWith(currentTabIndex: index);
+  }
+
+  void setCurrentRoutePageIndex(int index) {
+    state = state.copyWith(currentRoutePageIndex: index);
+  }
+
+  void setWaypointNotes(Map<String, String> notes) {
+    state = state.copyWith(waypointNotes: notes);
   }
 
   Future<List<NearbyPlace>> getNearbyPlaces(LatLng position) {

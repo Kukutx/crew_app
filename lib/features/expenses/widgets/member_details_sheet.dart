@@ -85,7 +85,7 @@ class MemberDetailsSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${NumberFormatHelper.formatCurrencyCompactIfLarge(member.totalPaid)} · ${member.expenses.length} 笔消费',
+                      '${NumberFormatHelper.formatCurrencyCompact(member.totalPaid)} · ${member.expenses.length} 笔消费',
                       style: subtitleStyle,
                     ),
                   ],
@@ -120,14 +120,14 @@ class MemberDetailsSheet extends StatelessWidget {
               children: [
                 SummaryRow(
                   label: '总计支付',
-                  value: NumberFormatHelper.formatCurrencyCompactIfLarge(
+                  value: NumberFormatHelper.formatCurrencyCompact(
                     member.totalPaid,
                   ),
                 ),
                 const SizedBox(height: 12),
                 SummaryRow(
                   label: '应承担',
-                  value: NumberFormatHelper.formatCurrencyCompactIfLarge(
+                  value: NumberFormatHelper.formatCurrencyCompact(
                     member.totalOwed(allMembers),
                   ),
                 ),
@@ -135,15 +135,15 @@ class MemberDetailsSheet extends StatelessWidget {
                 SummaryRow(
                   label: '平摊后差额',
                   value: difference >= 0
-                      ? '+${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}'
-                      : '-${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}',
+                      ? '+${NumberFormatHelper.formatCurrencyCompact(difference.abs())}'
+                      : '-${NumberFormatHelper.formatCurrencyCompact(difference.abs())}',
                   valueColor: summaryAccentColor,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   difference >= 0
-                      ? '需要收回 ${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}'
-                      : '仍需补交 ${NumberFormatHelper.formatCurrencyCompactIfLarge(difference.abs())}',
+                      ? '需要收回 ${NumberFormatHelper.formatCurrencyCompact(difference.abs())}'
+                      : '仍需补交 ${NumberFormatHelper.formatCurrencyCompact(difference.abs())}',
                   style: theme.textTheme.bodyMedium,
                 ),
               ],

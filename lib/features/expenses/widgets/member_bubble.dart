@@ -222,7 +222,7 @@ class _MemberBubbleState extends State<MemberBubble>
                                   SizedBox(height: spacing2),
                                   Flexible(
                                     child: Text(
-                                      NumberFormatHelper.formatCurrencyCompactIfLarge(
+                                      NumberFormatHelper.formatCurrencyCompact(
                                         member.totalPaid,
                                       ),
                                       textAlign: TextAlign.center,
@@ -589,7 +589,7 @@ class _ExpenseBubbleState extends State<_ExpenseBubble>
                           bottom: bottomPadding,
                         ),
                         child: Text(
-                          NumberFormatHelper.formatCurrencyCompactIfLarge(
+                          NumberFormatHelper.formatCurrencyCompact(
                             widget.expense.amount,
                           ),
                           textAlign: TextAlign.center,

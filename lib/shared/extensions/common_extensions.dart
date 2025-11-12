@@ -98,21 +98,41 @@ extension IntExt on int {
   /// 转换为 Duration
   Duration get seconds => Duration(seconds: this);
 
-  /// 将较大的数字格式化为更紧凑的展示形式，例如 1.2k
+  /// 将较大的数字格式化为更紧凑的展示形式
+  /// 
+  /// 例如：
+  /// - 999 → "999"
+  /// - 1500 → "1.5K"
+  /// - 15000 → "15K"
+  /// - 1200000 → "1.2M"
   String toCompactString() {
     final n = this;
     final absValue = n.abs();
-    if (absValue < 1000) return toString();
-
+    
+    if (absValue < 1000) {
+      return toString();
+    }
+    
     final sign = n.isNegative ? '-' : '';
+    
+    // 处理百万级别
+    if (absValue >= 1000000) {
+      final valueInMillions = absValue / 1000000;
+      // 1M 到 9.9M 显示一位小数，其余直接取整
+      final formatted = absValue < 10000000
+          ? (valueInMillions * 10).floor() / 10
+          : valueInMillions.floor();
+      return '$sign${formatted.toStringAsFixed(formatted % 1 == 0 ? 0 : 1)}M';
+    }
+    
+    // 处理千级别
     final valueInThousands = absValue / 1000;
-
-    // 1k 到 9.9k 显示一位小数，其余直接取整
+    // 1K 到 9.9K 显示一位小数，其余直接取整
     final formatted = absValue < 10000
         ? (valueInThousands * 10).floor() / 10
         : valueInThousands.floor();
-
-    return '$sign${formatted.toStringAsFixed(formatted % 1 == 0 ? 0 : 1)}k';
+    
+    return '$sign${formatted.toStringAsFixed(formatted % 1 == 0 ? 0 : 1)}K';
   }
 }
 

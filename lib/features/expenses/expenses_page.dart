@@ -450,7 +450,7 @@ class _ExpensesPageState extends State<ExpensesPage>
                 child: _buildStatItem(
                   context,
                   '总费用',
-                  NumberFormatHelper.formatCurrencyCompactIfLarge(_overallTotal),
+                  NumberFormatHelper.formatCurrencyCompact(_overallTotal),
                   Icons.account_balance_wallet,
                   colorScheme.primary,
                 ),
@@ -466,7 +466,7 @@ class _ExpensesPageState extends State<ExpensesPage>
                 child: _buildStatItem(
                   context,
                   'AA金额',
-                  NumberFormatHelper.formatCurrencyCompactIfLarge(_averagePerPerson),
+                  NumberFormatHelper.formatCurrencyCompact(_averagePerPerson),
                   Icons.people,
                   colorScheme.secondary,
                 ),
@@ -578,7 +578,7 @@ class _ExpensesPageState extends State<ExpensesPage>
               ),
               DialogRow(
                 label: '每人承担',
-                value: NumberFormatHelper.formatCurrencyCompactIfLarge(
+                value: NumberFormatHelper.formatCurrencyCompact(
                   expense.sharePerPerson,
                 ),
               ),
@@ -611,7 +611,7 @@ class _ExpensesPageState extends State<ExpensesPage>
               DialogRow(label: '类别', value: expense.category),
               DialogRow(
                 label: '金额',
-                value: NumberFormatHelper.formatCurrencyCompactIfLarge(
+                value: NumberFormatHelper.formatCurrencyCompact(
                   expense.amount,
                 ),
               ),
@@ -662,7 +662,7 @@ class _ExpensesPageState extends State<ExpensesPage>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '已添加费用：${result.title} (${NumberFormatHelper.formatCurrencyCompactIfLarge(result.amount)})',
+          '已添加费用：${result.title} (${NumberFormatHelper.formatCurrencyCompact(result.amount)})',
         ),
         action: SnackBarAction(
           label: '撤销',

@@ -9,14 +9,13 @@ import 'package:crew_app/features/events/presentation/widgets/city_events/sheets
 import 'package:crew_app/features/events/presentation/widgets/common/sheets/create_content_options_sheet.dart';
 import 'package:crew_app/features/messages/presentation/messages_chat/chat_sheet.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
+import 'package:crew_app/shared/widgets/buttons/map_floating_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import 'package:crew_app/shared/widgets/map_floating_action_buttons.dart';
 import 'package:crew_app/shared/widgets/toggle_tab_bar.dart';
 import 'package:crew_app/app/view/app_drawer.dart';
 

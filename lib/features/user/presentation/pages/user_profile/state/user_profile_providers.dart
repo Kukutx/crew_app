@@ -1,5 +1,5 @@
 import 'package:crew_app/features/user/data/user.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 final userProfileProvider = StateProvider<User>((ref) {
   return User(

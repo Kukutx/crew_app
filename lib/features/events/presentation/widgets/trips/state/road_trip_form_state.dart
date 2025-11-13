@@ -1,3 +1,4 @@
+import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/road_trip_editor_page.dart';
 import 'package:flutter/material.dart';

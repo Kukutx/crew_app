@@ -36,6 +36,7 @@ class EventGridCard extends StatelessWidget {
     final mq = MediaQuery.of(context);
     final memCacheW = ((mq.size.width / 2) * mq.devicePixelRatio).round();
     final imageUrl = event.firstAvailableImageUrl;
+    final hasImage = imageUrl != null;
 
     return Material(
       elevation: 0,
@@ -62,12 +63,13 @@ class EventGridCard extends StatelessWidget {
           aspectRatio: 1,
           child: Stack(
             children: [
+              // 背景：图片或标题背景
               Positioned.fill(
                 child: Hero(
                   tag: heroTag,
-                  child: imageUrl != null
+                  child: hasImage
                       ? CachedNetworkImage(
-                          imageUrl: imageUrl,
+                          imageUrl: imageUrl!,
                           cacheKey: event.id,
                           cacheManager: ImageCacheManager.instance,
                           useOldImageOnUrlChange: true,
@@ -82,14 +84,56 @@ class EventGridCard extends StatelessWidget {
                           errorWidget: (c, _, _) =>
                               const ImagePlaceholder(aspectRatio: 1),
                         )
-                      : const ImagePlaceholder(aspectRatio: 1),
+                      : Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                                .withValues(alpha: 0.3),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer
+                                    .withValues(alpha: 0.2),
+                                Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer
+                                    .withValues(alpha: 0.4),
+                              ],
+                            ),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text(
+                                event.title,
+                                textAlign: TextAlign.center,
+                                maxLines: 4,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.4,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                 ),
               ),
+              // 收藏按钮
               Positioned(
                 top: 8,
                 right: 8,
                 child: Material(
-                  color: Colors.black54,
+                  color: hasImage ? Colors.black54 : Colors.white70,
                   shape: const CircleBorder(),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
@@ -100,14 +144,16 @@ class EventGridCard extends StatelessWidget {
                       child: Icon(
                         event.isFavorite ? Icons.star : Icons.star_border,
                         size: 20,
-                        color: Colors.white,
+                        color: hasImage
+                            ? Colors.white
+                            : Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
                 ),
               ),
 
-              // 待看
+              // 状态标签
               Positioned(
                 top: 8,
                 left: 8,
@@ -139,46 +185,47 @@ class EventGridCard extends StatelessWidget {
                 ),
               ),
 
-              // 标题
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.3),
-                        Colors.black.withValues(alpha: 0.85),
-                      ],
-                      stops: const [0.0, 0.6, 1.0],
+              // 标题（仅在有图片时显示在底部）
+              if (hasImage)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.3),
+                          Colors.black.withValues(alpha: 0.85),
+                        ],
+                        stops: const [0.0, 0.6, 1.0],
+                      ),
                     ),
-                  ),
-                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                  child: Text(
-                    event.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      height: 1.3,
-                      letterSpacing: -0.2,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          offset: const Offset(0, 1),
-                          blurRadius: 3,
-                        ),
-                      ],
+                    padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                    child: Text(
+                      event.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                        letterSpacing: -0.2,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            offset: const Offset(0, 1),
+                            blurRadius: 3,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

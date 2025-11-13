@@ -66,7 +66,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
   Future<List<NearbyPlace>>? _meetingPointNearbyFuture;
 
   // ==== 团队/费用 ====
-  int _maxMembers = 4;
+  int _maxMembers = 10;
   double? _price;
   EventPricingType _pricingType = EventPricingType.free;
 
@@ -454,6 +454,7 @@ class _CreateCityEventSheetState extends ConsumerState<CreateCityEventSheet>
         break;
       case CityEventSection.team:
         content = EventTeamSection(
+          eventType: EventCreationType.cityEvent,
           maxMembers: _maxMembers,
           onMaxMembersChanged: (value) => setState(() {
             _maxMembers = value;

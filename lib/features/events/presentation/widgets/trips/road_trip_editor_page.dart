@@ -14,6 +14,7 @@ import 'package:crew_app/features/events/presentation/widgets/sections/trips/tri
 import 'package:crew_app/features/events/presentation/widgets/sections/event_story_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_team_section.dart';
 import 'package:crew_app/features/events/presentation/widgets/sections/event_host_disclaimer_section.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/config/event_creation_config.dart';
 
 // API Service 已移至 events_api_service.dart
 import 'package:crew_app/features/events/state/events_api_service.dart';
@@ -448,6 +449,7 @@ class _RoadTripEditorPageState extends ConsumerState<RoadTripEditorPage>
                 returnNotes: _returnNotes,
               ),
               EventTeamSection(
+                eventType: EventCreationType.roadTrip,
                 maxMembers: _maxMembers,
                 onMaxMembersChanged: (value) => setState(() {
                   _maxMembers = value;

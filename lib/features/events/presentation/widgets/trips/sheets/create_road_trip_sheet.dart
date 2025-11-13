@@ -1333,6 +1333,7 @@ class _PlannerContentState extends ConsumerState<_CreateRoadTripContent>
         break;
       case TripSection.team:
         content = EventTeamSection(
+          eventType: EventCreationType.roadTrip,
           maxMembers: _maxMembers,
           onMaxMembersChanged: (value) => setState(() {
             _maxMembers = value;

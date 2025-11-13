@@ -1,9 +1,8 @@
 import 'package:crew_app/features/events/data/event.dart';
 import 'package:crew_app/l10n/generated/app_localizations.dart';
 import 'package:crew_app/shared/utils/responsive_extensions.dart';
+import 'package:crew_app/shared/widgets/buttons/user_avatar_button.dart';
 import 'package:flutter/material.dart';
-
-import 'package:crew_app/shared/widgets/user_avatar_button.dart';
 
 class SearchEventAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchEventAppBar({

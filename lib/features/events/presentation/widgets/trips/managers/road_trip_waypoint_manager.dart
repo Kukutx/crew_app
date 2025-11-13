@@ -1,3 +1,4 @@
+import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/managers/base_location_manager.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/state/road_trip_form_state.dart';
@@ -13,10 +14,10 @@ class RoadTripWaypointManager extends BaseLocationManager {
   final VoidCallback onStateChanged;
 
   RoadTripWaypointManager({
-    required super.ref,
+    required WidgetRef ref,
     required this.state,
     required this.onStateChanged,
-  });
+  }) : super(ref);
 
   /// 添加途径点地址到缓存
   void addWaypointAddress(LatLng location, PlaceDetails? place) {

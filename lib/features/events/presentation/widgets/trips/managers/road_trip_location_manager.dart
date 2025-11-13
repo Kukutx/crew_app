@@ -4,7 +4,6 @@ import 'package:crew_app/core/network/places/places_service.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/map_overlay_sheet_providers.dart';
 import 'package:crew_app/features/events/presentation/widgets/common/components/map_selection_controller.dart';
 import 'package:crew_app/features/events/presentation/pages/map/controllers/map_controller.dart';
-import 'package:crew_app/features/events/state/places_providers.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/managers/base_location_manager.dart';
 import 'package:crew_app/features/events/presentation/widgets/trips/state/road_trip_form_state.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +19,11 @@ class RoadTripLocationManager extends BaseLocationManager {
   final bool embeddedMode;
 
   RoadTripLocationManager({
-    required super.ref,
+    required WidgetRef ref,
     required this.state,
     required this.onStateChanged,
     this.embeddedMode = true,
-  });
+  }) : super(ref);
 
   /// 更新起点位置
   void updateStartLocation(LatLng? position) {

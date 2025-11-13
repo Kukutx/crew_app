@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 
 import 'package:crew_app/features/events/data/event_common_models.dart';
 import 'package:crew_app/shared/widgets/cards/section_card.dart';
+import 'package:crew_app/features/events/presentation/widgets/common/config/event_creation_config.dart';
 
 class EventTeamSection extends StatelessWidget {
   const EventTeamSection({
     super.key,
+    required this.eventType,
     required this.maxMembers,
     required this.onMaxMembersChanged,
     required this.price,
@@ -21,6 +23,7 @@ class EventTeamSection extends StatelessWidget {
     required this.onRemoveTag,
   });
 
+  final EventCreationType eventType;
   final int maxMembers;
   final ValueChanged<int> onMaxMembersChanged;
   final double? price;
@@ -67,6 +70,7 @@ class EventTeamSection extends StatelessWidget {
           children: [
             Expanded(
               child: _MaxMembersInputField(
+                eventType: eventType,
                 maxMembers: maxMembers,
                 onMaxMembersChanged: onMaxMembersChanged,
                 label: loc.road_trip_team_max_members_label,
@@ -130,12 +134,14 @@ class EventTeamSection extends StatelessWidget {
 
 class _MaxMembersInputField extends StatefulWidget {
   const _MaxMembersInputField({
+    required this.eventType,
     required this.maxMembers,
     required this.onMaxMembersChanged,
     required this.label,
     required this.hint,
   });
 
+  final EventCreationType eventType;
   final int maxMembers;
   final ValueChanged<int> onMaxMembersChanged;
   final String label;
@@ -147,7 +153,26 @@ class _MaxMembersInputField extends StatefulWidget {
 
 class _MaxMembersInputFieldState extends State<_MaxMembersInputField> {
   final TextEditingController _controller = TextEditingController();
-  static const List<int> _presetValues = [1, 2, 3, 4, 5, 6, 7];
+  
+  // 根据事件类型获取预设值
+  List<int> get _presetValues {
+    switch (widget.eventType) {
+      case EventCreationType.roadTrip:
+        return [1, 2, 3, 4, 5, 6, 7];
+      case EventCreationType.cityEvent:
+        return [10, 15, 20, 25, 50, 100];
+    }
+  }
+  
+  // 根据事件类型获取最大人数限制
+  int get _maxLimit {
+    switch (widget.eventType) {
+      case EventCreationType.roadTrip:
+        return 7;
+      case EventCreationType.cityEvent:
+        return 100;
+    }
+  }
 
   @override
   void initState() {
@@ -207,14 +232,15 @@ class _MaxMembersInputFieldState extends State<_MaxMembersInputField> {
         }
         final members = int.tryParse(value);
         if (members != null) {
-          // 验证：不能超过7
-          if (members > 7) {
-            // 限制为7
+          final maxLimit = _maxLimit;
+          // 验证：不能超过最大限制
+          if (members > maxLimit) {
+            // 限制为最大限制
             _controller.value = TextEditingValue(
-              text: '7',
-              selection: TextSelection.collapsed(offset: 1),
+              text: maxLimit.toString(),
+              selection: TextSelection.collapsed(offset: maxLimit.toString().length),
             );
-            widget.onMaxMembersChanged(7);
+            widget.onMaxMembersChanged(maxLimit);
           } else if (members < 1) {
             // 不能小于1
             _controller.value = TextEditingValue(

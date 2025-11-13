@@ -76,9 +76,9 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final lng = double.tryParse(parts[1].trim());
     if (lat == null || lng == null) return null;
     // 使用统一的验证方法
-    final coordinate = LatLng(lat, lng);
-    if (!EventFormValidationHelper.isValidCoordinate(coordinate)) return null;
-    return coordinate;
+    final parsedCoordinate = LatLng(lat, lng);
+    if (!EventFormValidationHelper.isValidCoordinate(parsedCoordinate)) return null;
+    return parsedCoordinate;
   }
 
   // ===== 地址加载 =====
